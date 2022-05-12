@@ -3,6 +3,7 @@ import {FormControl} from '@angular/forms';
 import {ParserService} from './services/parser.service';
 import {DisplayService} from './services/display.service';
 import {debounceTime, Subscription} from 'rxjs';
+import { sugiyamaTest } from './classes/Sugiyama/testing';
 
 @Component({
     selector: 'app-root',
@@ -20,8 +21,7 @@ export class AppComponent implements OnDestroy {
         this.textareaFc = new FormControl();
         this._sub = this.textareaFc.valueChanges.pipe(debounceTime(400)).subscribe(val => this.processSourceChange(val));
         this.textareaFc.setValue(`hello
-world`);
-    }
+world`);    }
 
     ngOnDestroy(): void {
         this._sub.unsubscribe();
