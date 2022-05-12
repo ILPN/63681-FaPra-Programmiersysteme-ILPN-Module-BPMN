@@ -1,11 +1,13 @@
-export class Element {
+export abstract class Element{
     private _x: number;
     private _y: number;
     private _svgElement: SVGElement | undefined;
+    private _next: Array<Element>;
 
     constructor() {
         this._x = 0;
         this._y = 0;
+        this._next = [];
     }
 
     get x(): number {
@@ -22,6 +24,12 @@ export class Element {
 
     set y(value: number) {
         this._y = value;
+    }
+
+    public abstract createSvg() : SVGElement;
+
+    createSvgElement(name: string): SVGElement {
+        return document.createElementNS('http://www.w3.org/2000/svg', name);
     }
 
     public registerSvg(svg: SVGElement) {
