@@ -1,6 +1,8 @@
 import {Injectable} from '@angular/core';
 import {Diagram} from '../classes/diagram/diagram';
 import {Element} from '../classes/diagram/element';
+import { Task } from '../classes/diagram/elements/task';
+import { TaskType } from '../classes/diagram/elements/tasktype';
 
 @Injectable({
     providedIn: 'root'
@@ -25,6 +27,6 @@ export class ParserService {
     }
 
     private parseElement(line: string): Element {
-        return new Element();
+        return new Task("Hotel buchen", TaskType.Service);
     }
 }
