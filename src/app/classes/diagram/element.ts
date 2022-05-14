@@ -1,11 +1,13 @@
 export abstract class Element {
+    private _id : string;
     private _x: number;
     private _y: number;
     private _svgElement: SVGElement | undefined;
     private _adjacentElements: Element[];
+    
 
-
-    constructor() {
+    constructor(id : string) {
+        this._id = id;
         this._x = 0;
         this._y = 0;
         this._adjacentElements = [];
@@ -13,6 +15,14 @@ export abstract class Element {
 
     get adjacentElements(): Element[] {
         return this._adjacentElements;
+    }
+
+    get id(): string {
+        return this._id;
+    }
+
+    set id(value: string) {
+        this._id = value;
     }
 
     get x(): number {

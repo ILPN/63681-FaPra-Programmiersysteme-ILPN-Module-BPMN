@@ -6,8 +6,8 @@ export class Task extends Element {
     private _type: TaskType;
 
 
-    constructor(label: string, type: TaskType) {
-        super();
+    constructor(id: string, label: string, type: TaskType) {
+        super(id);
         this._label = label;
         this._type = type;
     }

@@ -5,8 +5,8 @@ export class Event extends Element {
     private _type: EventType;
 
 
-    constructor(type: EventType) {
-        super();
+    constructor(id: string, type: EventType) {
+        super(id);
         this._type = type;
     }
 

@@ -5,8 +5,8 @@ export class Gateway extends Element {
     private _type: GatewayType;
 
 
-    constructor(type: GatewayType) {
-        super();
+    constructor(id: string, type: GatewayType) {
+        super(id);
         this._type = type;
     }
 
