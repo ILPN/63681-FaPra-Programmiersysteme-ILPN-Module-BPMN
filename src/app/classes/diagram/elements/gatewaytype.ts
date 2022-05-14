@@ -1,0 +1,1 @@
+export enum GatewayType {XOR_SPLIT, XOR_JOIN, AND_SPLIT, AND_JOIN, OR_SPLIT, OR_JOIN};
