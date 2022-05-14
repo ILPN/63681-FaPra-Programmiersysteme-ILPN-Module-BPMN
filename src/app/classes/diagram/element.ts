@@ -1,13 +1,18 @@
-export abstract class Element{
+export abstract class Element {
     private _x: number;
     private _y: number;
     private _svgElement: SVGElement | undefined;
-    private _next: Array<Element>;
+    private _adjacentElements: Element[];
+
 
     constructor() {
         this._x = 0;
         this._y = 0;
-        this._next = [];
+        this._adjacentElements = [];
+    }
+
+    get adjacentElements(): Element[] {
+        return this._adjacentElements;
     }
 
     get x(): number {
@@ -26,7 +31,7 @@ export abstract class Element{
         this._y = value;
     }
 
-    public abstract createSvg() : SVGElement;
+    public abstract createSvg(): SVGElement;
 
     createSvgElement(name: string): SVGElement {
         return document.createElementNS('http://www.w3.org/2000/svg', name);
@@ -55,5 +60,44 @@ export abstract class Element{
         }
         this._svgElement.setAttribute('fill', 'black');
     }
+
+    /**
+     * adds edge from this element to target
+     * @param target target of new edge
+     */
+    public addEdge(target: Element): void {
+
+        if (!this.hasEdge(target))
+            this._adjacentElements.push(target);
+    }
+
+    /**
+     * removes edge from this element to target
+     * @param target 
+     * @returns 
+     */
+    public removeEdge(target: Element): Element | null {
+
+        const index = this._adjacentElements.findIndex(
+            (element) => Object.is(element, target)
+        );
+
+        if (index > -1) {
+            return this._adjacentElements.splice(index, 1)[0];
+        }
+
+        return null;
+    }
+
+    /**
+     * checks if there is edge from this element to target
+     * @param target 
+     * @returns true if there is edge from this element to target
+     */
+    public hasEdge(target: Element): boolean {
+        return this._adjacentElements.some(element => element === target);
+    }
+
+
 
 }
