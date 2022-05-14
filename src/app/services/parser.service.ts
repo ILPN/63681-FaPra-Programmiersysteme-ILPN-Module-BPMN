@@ -27,6 +27,6 @@ export class ParserService {
     }
 
     private parseElement(line: string): Element {
-        return new Task("Hotel buchen", TaskType.Service);
+        return new Task("t1","Hotel buchen", TaskType.Service);
     }
 }
