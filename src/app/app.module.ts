@@ -10,14 +10,16 @@ import {MatButtonModule} from '@angular/material/button';
 import {MatIconModule} from '@angular/material/icon';
 import {ReactiveFormsModule} from '@angular/forms';
 import {FooterComponent} from './components/footer/footer.component';
-import {TemplateButtonComponent} from './components/template-button/template-button.component';
+import {InputFieldComponent} from './components/input-field/input-field.component';
+import { InputDirective } from './directives/input.directive';
 
 @NgModule({
     declarations: [
         AppComponent,
         DisplayComponent,
         FooterComponent,
-        TemplateButtonComponent
+        InputFieldComponent,
+        InputDirective
     ],
     imports: [
         BrowserModule,

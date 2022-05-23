@@ -1,0 +1,21 @@
+bpmn-Format
+
+.activities
+name type „label“ (coordinate1,coordinate2)
+
+.events
+name type „label“ (coordinate1,coordinate2)
+	
+.gateways
+name type (coordinates)
+
+.sequence
+name1 name2 “label” (coordinates)
+	
+
+----------------
+coordinates are optional
+types for gateways: and, or, xor
+
+
+
