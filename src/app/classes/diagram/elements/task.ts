@@ -4,12 +4,18 @@ import { TaskType } from "./tasktype";
 export class Task extends Element {
     private _label: string;
     private _type: TaskType;
-
+    private width: number = 170; // width 170
+    private height: number  = 100; // height 100
+    private rounding: number = 10; // Abrunden
+    private border: number  = 2;
+    private _myScale: number  = 1;
 
     constructor(id: string, label: string, type: TaskType) {
         super(id);
         this._label = label;
         this._type = type;
+        this.distanceX = 85; //  this.width/2
+        this.distanceY = 50;
     }
 
     public get type(): TaskType {
@@ -28,47 +34,32 @@ export class Task extends Element {
 
 
 
-
-
-
-
-
     public createSvg(): SVGElement {   // Task
-        // const circle = this.createSvgElement('circle');
-        // circle.setAttribute('cx', `${this.x}`);
-        // circle.setAttribute('cy', `${this.y}`);
-        // circle.setAttribute('r', '25');
-        // circle.setAttribute('fill', 'none');
-        // circle.setAttribute('stroke', 'black');
-        // this.registerSvg(circle);
-        // return circle;
-
-        var x: number = 250; // width
-        var y: number  = 150; // height
-        var r: number = 10; // Abrunden
-        var border: number  = 2;
+        
        // var label: string = "TestText  der ersten Aktivität"; // textLength
        // SVG erstellen
           let svg = this.createSvgElement('svg');
-           svg.setAttribute('width', (x+2*border).toString());
-           svg.setAttribute('height', (y+2*border).toString()); //160
-           svg.setAttribute('viewBox', "0 0 "+(x+2*border).toString()+" "+(y+2*border).toString());
-           svg.setAttribute('x', `${this.x}`);
-           svg.setAttribute('y', `${this.x}`);
+           svg.setAttribute('width', `${this.width+2*this.border}`);
+           svg.setAttribute('height', `${this.height+2*this.border}`); //160
+           svg.setAttribute('viewBox', "0 0 "+`${this.width+2*this.border}`+" "+`${this.height+2*this.border}`);
+           svg.setAttribute('preserveAspectRatio', "xMidYMid meet");
+           svg.setAttribute('x', `${this.x-((this.width+2*this.border)/2)}`);
+           svg.setAttribute('y', `${this.y-((this.height+2*this.border)/2)}`);
 
         // G Aktivitäten-Rechteck erstellen
-        var g = this.createSvgElement('rect');
+        let g = this.createSvgElement('rect');
         g.setAttribute('id', 'rect1');
-        g.setAttribute('width', x.toString());
-        g.setAttribute('height', y.toString());
-        g.setAttribute('x', border.toString());
-        g.setAttribute('y', border.toString());
-        g.setAttribute('rx', r.toString());
-        g.setAttribute('ry', r.toString());
+        g.setAttribute('width', `${this.width}`);
+        g.setAttribute('height', `${this.height}`);
+        g.setAttribute('x', `${this.border}`);
+        g.setAttribute('y', `${this.border}`);
+        g.setAttribute('rx', `${this.rounding}`);
+        g.setAttribute('ry', `${this.rounding}`);
         g.setAttribute('stroke', 'rgb(0,0,0)');
-        g.setAttribute('stroke-width', border.toString());
+        g.setAttribute('stroke-width', `${this.border}`);
         g.setAttribute('fill', 'white');
         svg.append(g);
+        this.addSVGtoColorChange(g);
         // G Aktivitäten-Rechteck ende
         // --- G Aktivitäten-Symbole erstellen ---
          var type_svg = this.getTypeSvg(); //this.createSvgElement('path');        
@@ -76,31 +67,18 @@ export class Task extends Element {
         // --- G Aktivitäten-Symbole ende ---
 
 
-
-
-
         // ----- Text Aktivitäten-Text erstellen ----
-            var text = this.createSvgElement('text');
+        let text = this.createSvgElement('text');
            text.setAttribute('x', '50%');
            text.setAttribute('y', '50%');
-           // text.setAttribute('inline-size', '200px');
-
-        //    text.setAttribute('shape-inside', 'url(#rect1)');
-        //   text.setAttribute('shape-padding', '25px');
-
            text.setAttribute('font-size', '12px');
            text.setAttribute('text-align', 'justified');
            text.setAttribute('line-height', '110%');
-
-
-           // text.setAttribute('textLength', 'auto-fit');
-            //text.setAttribute('front-size', '100%');
-
            text.setAttribute('dominant-baseline','middle');  
            text.setAttribute('text-anchor','middle');
 
-
-            var textNode = document.createTextNode(this._label);
+           
+           let textNode = document.createTextNode(this._label);
             text.appendChild(textNode);
             svg.append(text);
         // ----- Text Aktivitäten-Text ende ----
@@ -108,7 +86,10 @@ export class Task extends Element {
         return svg;
     }
 
-
+/** Bekommt eine Number übergeben und wandelt sie in einen String um. Es wird ebenfalls ein Komma durch einen Punkt ersetzt. */
+private replaceNumberToString(zahl: number) {
+    return zahl.toString().replace(/,/gi,'.');
+}
 
 
     private getTypeSvg(): SVGElement {
@@ -123,17 +104,19 @@ export class Task extends Element {
         return type_svg; // default
     }
 
-
     private getTypeSending(): SVGElement {
         var type_svg = this.createSvgElement('svg');
-
         var type_rect = this.createSvgElement('rect');
+        var scaleString: String  = this.replaceNumberToString(0.05*this._myScale);
+        
+
+
         type_rect.setAttribute('x', `20.7`);
         type_rect.setAttribute('y', `23.4`);
         type_rect.setAttribute('width', `429.3`);
         type_rect.setAttribute('height', `311.5`);
         type_rect.setAttribute('fill', `black`);
-        type_rect.setAttribute('transform', 'translate(8 8) scale(0.1 0.1)');
+        type_rect.setAttribute('transform', 'translate(8 8) scale('+ `${scaleString}`+')');
         type_svg.append(type_rect);
 
         var type_path = this.createSvgElement('path');
@@ -143,18 +126,16 @@ export class Task extends Element {
         //type_svg.setAttribute("stroke-width", "3");  
         type_path.setAttribute("opacity", "1");
         type_path.setAttribute("fill", "white");
-        type_path.setAttribute('transform', 'translate(8 8) scale(0.1 0.1)');
-
+        type_path.setAttribute('transform', 'translate(8 8) scale('+ `${scaleString}`+')');
         type_svg.append(type_path);
-
-        //type_svg.setAttribute('transform', 'translate(8 8) scale(0.1 0.1)');
-
+        this.addSVGtoColorChange(type_path);
 
         return type_svg;
     }
 
-
     private getTypeManual(): SVGElement {
+        var scaleString: String  = this.replaceNumberToString(0.06*this._myScale);
+
         var type_svg = this.createSvgElement('path');
         type_svg.setAttribute("id", "pathIdD");
         type_svg.setAttribute("d", "M351.9,250.6c5.2-5.2,8-12.1,8-19.4c0-6-1.9-11.6-5.4-16.3l0.5,0c15.1,0,27.4-12.3,27.4-27.4c0-14.1-10.7-25.8-24.4-27.3 " +
@@ -173,7 +154,7 @@ export class Task extends Element {
         //type_svg.setAttribute("stroke-width", "3");  
         type_svg.setAttribute("opacity", "1");
         type_svg.setAttribute("fill", "black");
-        type_svg.setAttribute('transform', 'translate(8 3) scale(0.1 0.1)');
+        type_svg.setAttribute('transform', 'translate(8 3) scale('+ `${scaleString}`+')');
 
         //type_svg.setAttribute('transform', 'translate(8 8) scale(0.1 0.1)');
 
@@ -182,6 +163,18 @@ export class Task extends Element {
     }
 
     private getTypeService(): SVGElement {
+       //  var scale : String = "0.0375";
+        // private width: number = 150; // width
+        // private height: number  = 100; // height
+        
+        //var scaleString: String  = this.replaceNumberToString(0.06*this._myScale);
+        var scale : String = this.replaceNumberToString(this.width/10/380); 
+        //var scale : String = "0.3375";
+        
+       
+
+
+
         var type_svg = this.createSvgElement('svg');
         // innen Kreis unteres Rad
         var type_path1 = this.createSvgElement('path');
@@ -194,7 +187,7 @@ export class Task extends Element {
         //type_svg.setAttribute("stroke-width", "3");  
         type_path1.setAttribute("opacity", "1");
         type_path1.setAttribute("fill", "black");
-        type_path1.setAttribute('transform', 'translate(8 8) scale(0.1 0.1)');
+        type_path1.setAttribute('transform', 'translate(8 8) scale('+scale+')');
         type_svg.append(type_path1);
 
         // außen Kreis unteres Rad
@@ -228,10 +221,10 @@ export class Task extends Element {
             " c-2.6-2.6-6.4-4.2-10.4-4.2c-6.2,0-11.3,3.6-13.4,9.3c-2.8,7.6-6.3,15.1-9.7,22.3L213.6,335.6z M222.2,358.7L222.2,358.7" +
             " L222.2,358.7L222.2,358.7z");
         type_path2.setAttribute("stroke", "black");
-        //type_svg.setAttribute("stroke-width", "3");  
+        type_svg.setAttribute("stroke-width", "3");  
         type_path2.setAttribute("opacity", "1");
         type_path2.setAttribute("fill", "black");
-        type_path2.setAttribute('transform', 'translate(8 8) scale(0.1 0.1)');
+        type_path2.setAttribute('transform', 'translate(8 8) scale('+scale+')');
         type_svg.append(type_path2);
 
         // 3x Rechteck zur Verdeckung zwischen den beiden Rädern
@@ -241,7 +234,7 @@ export class Task extends Element {
         type_rect.setAttribute('width', `60.8`);
         type_rect.setAttribute('height', `42.8`);
         type_rect.setAttribute('fill', `white`);
-        type_rect.setAttribute('transform', 'translate(8 8) scale(0.1 0.1)');
+        type_rect.setAttribute('transform', 'translate(8 8) scale('+scale+')');
         type_svg.append(type_rect);
 
         var type_rect1 = this.createSvgElement('rect');
@@ -250,7 +243,7 @@ export class Task extends Element {
         type_rect1.setAttribute('width', `232`);
         type_rect1.setAttribute('height', `207`);
         type_rect1.setAttribute('fill', `white`);
-        type_rect1.setAttribute('transform', 'translate(8 8) scale(0.1 0.1) matrix(0.7591 -0.6509 0.6509 0.7591 -121.9079 253.2275)');
+        type_rect1.setAttribute('transform', 'translate(8 8) scale('+scale+') matrix(0.7591 -0.6509 0.6509 0.7591 -121.9079 253.2275)');
         type_svg.append(type_rect1);
 
         var type_rect2 = this.createSvgElement('rect');
@@ -259,12 +252,12 @@ export class Task extends Element {
         type_rect2.setAttribute('width', `122.4`);
         type_rect2.setAttribute('height', `241.8`);
         type_rect2.setAttribute('fill', `white`);
-        type_rect2.setAttribute('transform', 'translate(8 8) scale(0.1 0.1)');
+        type_rect2.setAttribute('transform', 'translate(8 8) scale('+scale+')');
         type_svg.append(type_rect2);
 
-
-
-
+this.addSVGtoColorChange(type_rect);
+this.addSVGtoColorChange(type_rect1);
+this.addSVGtoColorChange(type_rect2);
 
 
         // innen Kreis Oberes Rad
@@ -278,7 +271,7 @@ export class Task extends Element {
         //type_svg.setAttribute("stroke-width", "3");  
         type_path3.setAttribute("opacity", "1");
         type_path3.setAttribute("fill", "black");
-        type_path3.setAttribute('transform', 'translate(8 8) scale(0.1 0.1)');
+        type_path3.setAttribute('transform', 'translate(8 8) scale('+scale+')');
         type_svg.append(type_path3);
 
 
@@ -316,17 +309,15 @@ export class Task extends Element {
         //type_svg.setAttribute("stroke-width", "3");  
         type_path4.setAttribute("opacity", "1");
         type_path4.setAttribute("fill", "black");
-        type_path4.setAttribute('transform', 'translate(8 8) scale(0.1 0.1)');
+        type_path4.setAttribute('transform', 'translate(8 8) scale('+scale+')');
         type_svg.append(type_path4);
-
-
         return type_svg;
     }
 
-
     private getTypeBusinessRule(): SVGElement {
         var type_svg = this.createSvgElement('svg');
-        var transformString = "translate(8 8) scale(0.03 0.03)";
+        var scaleString: String  = this.replaceNumberToString(0.0175*this._myScale);
+        var transformString = "translate(8 8) scale("+scaleString+")";
 
         var type_rect = this.createSvgElement('rect');
         type_rect.setAttribute('x', `60`);
@@ -339,7 +330,7 @@ export class Task extends Element {
         type_rect.setAttribute('stroke-miterlimit', `10`);
         type_rect.setAttribute('transform', transformString);
         type_svg.append(type_rect);
-
+        this.addSVGtoColorChange(type_rect);
 
 
 
@@ -396,6 +387,7 @@ export class Task extends Element {
 
 
     private getTypeReceiving(): SVGElement {
+        var scaleString: String  = this.replaceNumberToString(0.05*this._myScale);
         var type_svg = this.createSvgElement('path');
         type_svg.setAttribute("id", "pathIdD");
         type_svg.setAttribute("d", "M437.5,59.3h-401C16.4,59.3,0,75.7,0,95.8v282.4c0,20.1,16.4,36.5,36.5,36.5h401c20.1,0,36.5-16.4,36.5-36.5V95.8 C474,75.7,457.6,59.3,437.5,59.3z M432.2,86.3L239.5,205.1L46.8,86.3H432.2z M447,378.2c0,5.2-4.3,9.5-9.5,9.5h-401 c-5.2,0-9.5-4.3-9.5-9.5V104.9l203.7,128.2c0.1,0.1,0.3,0.2,0.4,0.3c0.1,0.1,0.3,0.2,0.4,0.3c0.3,0.2,0.5,0.4,0.8,0.5 c0.1,0.1,0.2,0.1,0.3,0.2c0.4,0.2,0.8,0.4,1.2,0.6c0.1,0,0.2,0.1,0.3,0.1c0.3,0.1,0.6,0.3,1,0.4c0.1,0,0.3,0.1,0.4,0.1 c0.3,0.1,0.6,0.2,0.9,0.2c0.1,0,0.3,0.1,0.4,0.1c0.3,0.1,0.7,0.1,1,0.2c0.1,0,0.2,0,0.3,0c0.4,0,0.9,0.1,1.3,0.1l0,0l0,0 c0.4,0,0.9,0,1.3-0.1c0.1,0,0.2,0,0.3,0c0.3,0,0.7-0.1,1-0.2c0.1,0,0.3-0.1,0.4-0.1c0.3-0.1,0.6-0.2,0.9-0.2c0.1,0,0.3-0.1,0.4-0.1 c0.3-0.1,0.6-0.2,1-0.4c0.1,0,0.2-0.1,0.3-0.1c0.4-0.2,0.8-0.4,1.2-0.6c0.1-0.1,0.2-0.1,0.3-0.2c0.3-0.2,0.5-0.3,0.8-0.5 c0.1-0.1,0.3-0.2,0.4-0.3c0.1-0.1,0.3-0.2,0.4-0.3L447,109.2V378.2z");
@@ -403,31 +395,336 @@ export class Task extends Element {
         //type_svg.setAttribute("stroke-width", "3");  
         type_svg.setAttribute("opacity", "1");
         type_svg.setAttribute("fill", "black");
-        type_svg.setAttribute('transform', 'translate(8 3) scale(0.1 0.1)');
+        type_svg.setAttribute('transform', 'translate(8 3) scale('+ `${scaleString}`+')');
         return type_svg;
     }
 
-
-
     private getTypeUserTask(): SVGElement {
+        var scaleString: String  = this.replaceNumberToString(0.2*this._myScale);
         var type_svg = this.createSvgElement('svg');
         var type_path1 = this.createSvgElement('path');
         type_path1.setAttribute("d", "M47.893,47.221c11.768,0,21.341-10.592,21.341-23.611S59.66,0,47.893,0C36.125,0,26.55,10.592,26.55,23.61 C26.55,36.63,36.125,47.221,47.893,47.221z");
         type_path1.setAttribute("stroke", "black");
         type_path1.setAttribute("fill", "black");
-        type_path1.setAttribute('transform', 'translate(8 8) scale(0.3 0.3)');
+        type_path1.setAttribute('transform', 'translate(8 8) scale('+ `${scaleString}`+')');
         type_svg.append(type_path1);
 
         var type_path2 = this.createSvgElement('path');
         type_path2.setAttribute("d", "M72.477,44.123c-1.244-0.269-2.524,0.272-3.192,1.355C61.65,57.847,49.34,58.204,47.962,58.204 s-13.687-0.357-21.32-12.722c-0.67-1.085-1.953-1.628-3.198-1.354C6.868,47.777,2.497,72.798,3.789,93.115 c0.101,1.58,1.411,2.811,2.994,2.811h82.36c1.583,0,2.894-1.23,2.993-2.811C93.429,72.775,89.057,47.74,72.477,44.123z");
         type_path2.setAttribute("stroke", "black");
         type_path2.setAttribute("fill", "black");
-        type_path2.setAttribute('transform', 'translate(8 8) scale(0.3 0.3)');
+        type_path2.setAttribute('transform', 'translate(8 8) scale('+ `${scaleString}`+')');
         type_svg.append(type_path2);
 
 
         return type_svg;
     }
+// -------------------------------------------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------------------------------------------
+// -------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+
+
+    public createSvg2(): SVGElement {
+
+        // // Startereignis
+        //         const svg = this.createSvgElement('circle');
+        //         svg.setAttribute('cx', `${this.x}`);
+        //         svg.setAttribute('cy', `${this.y}`);
+        //         svg.setAttribute('r', '50');
+        //         svg.setAttribute('fill', 'none');
+        //         svg.setAttribute('stroke', 'black');
+        //         svg.setAttribute('stroke-width', "5");
+        //         this.registerSvg(svg);
+
+
+
+        const svg = this.createSvgElement('svg');
+        svg.setAttribute("id","test1");
+        svg.setAttribute('x', `${this.x}`);
+        svg.setAttribute('y', `${this.y}`);
+        svg.setAttribute('width', "126");
+        svg.setAttribute('height', `250`);
+      //  svg.setAttribute('outline', `3px solid green`);
+  
+        const rect = this.createSvgElement('rect');
+        rect.setAttribute('x', `1`);
+        rect.setAttribute('y', `1`);
+        rect.setAttribute('width', `125`);
+        rect.setAttribute('height', `249`);
+//        rect.setAttribute('transform', 'translate(56 56)');
+        rect.setAttribute('fill', 'none');
+        rect.setAttribute('stroke', 'black');
+        rect.setAttribute('stroke-width', "1");
+        svg.append(rect);
+
+
+
+
+        const circle = this.createSvgElement('circle');
+        circle.setAttribute('r', '50');
+        circle.setAttribute('cx', '50%');
+        circle.setAttribute('cy', '23%');
+        //circle.setAttribute('transform', 'translate(56 56)');
+        circle.setAttribute('fill', 'none');
+        circle.setAttribute('stroke', 'black');
+        circle.setAttribute('stroke-width', "9");
+        svg.append(circle);
+
+
+
+        // ----- Text Aktivitäten-Text erstellen ----
+
+
+
+
+
+
+       svg.append(this.createTextSvg());
+
+
+
+
+
+      //  circle.setAttribute("fill","green");
+
+
+        this.registerSvg(svg);
+
+
+        // // Endeereignis
+        //         const svg = this.createSvgElement('circle');
+        //         svg.setAttribute('cx', `${this.x}`);
+        //         svg.setAttribute('cy', `${this.y}`);
+        //         svg.setAttribute('r', '50');
+        //         svg.setAttribute('fill', 'none');
+        //         svg.setAttribute('stroke', 'black');
+        //         svg.setAttribute('stroke-width', "12");
+        //         this.registerSvg(svg);
+
+
+
+
+
+        //     var x: number = 250; // width
+        //     var y: number  = 150; // height
+        //     var r: number = 10; // Abrunden
+        //     var border: number  = 2;
+        //    // var label: string = "TestText  der ersten Aktivität"; // textLength
+        //    // SVG erstellen
+        //       let svg = this.createSvgElement('svg');
+        //        svg.setAttribute('width', (x+2*border).toString());
+        //        svg.setAttribute('height', (y+2*border).toString()); //160
+        //        svg.setAttribute('viewBox', "0 0 "+(x+2*border).toString()+" "+(y+2*border).toString());
+        //        svg.setAttribute('x', `${this.x}`);
+        //        svg.setAttribute('y', `${this.x}`);
+
+        //     // G Aktivitäten-Rechteck erstellen
+        //     var g = this.createSvgElement('rect');
+        //     g.setAttribute('id', 'rect1');
+        //     g.setAttribute('width', x.toString());
+        //     g.setAttribute('height', y.toString());
+        //     g.setAttribute('x', border.toString());
+        //     g.setAttribute('y', border.toString());
+        //     g.setAttribute('rx', r.toString());
+        //     g.setAttribute('ry', r.toString());
+        //     g.setAttribute('stroke', 'rgb(0,0,0)');
+        //     g.setAttribute('stroke-width', border.toString());
+        //     g.setAttribute('fill', 'white');
+        //     svg.append(g);
+
+
+
+        // // G Aktivitäten-Rechteck ende
+        // // --- G Aktivitäten-Symbole erstellen ---
+        //  var type_svg = this.getTypeSvg(); //this.createSvgElement('path');        
+        //  svg.append(type_svg);
+        // // --- G Aktivitäten-Symbole ende ---
+
+
+
+
+
+
+        return svg;
+    }
+
+
+
+private splitString(text : String) : Array<string> {
+    let A : Array<string> = text.split(" ");
+    let B: Array<string> = [""];
+    let i : number = 0; 
+    let j : number = 0; 
+
+A.forEach(Atte => {
+    if((B[j].length + Atte.length) > 16) {
+        j++;
+       // B[j] = Atte;
+        B.push(Atte);
+    } else {
+        B[j] = B[j] + " " + Atte;
+    }
+});
+    return B;
+} 
+
+    public createTextSvg(): SVGElement {
+        
+        var labelText : String = this._label + "ich bin ein test";
+
+
+
+
+
+        var g = this.createSvgElement('g');
+        g.setAttribute('text-align', 'center');
+        g.setAttribute('text-anchor', 'middle');
+        g.setAttribute('font-size', '12px');
+
+        var text = this.createSvgElement('text');
+        text.setAttribute('x', '50%');
+        text.setAttribute('y', '50%');
+
+        var textNode = document.createTextNode(this._label);
+        text.appendChild(textNode);
+        g.appendChild(text);
+
+        var text2 = this.createSvgElement('text');
+        text2.setAttribute('x', '50%');
+        text2.setAttribute('y', '55%');
+   
+        
+
+
+        var textNode2 = document.createTextNode("ich bin ein test");
+        text2.appendChild(textNode2);
+        g.appendChild(text2);
+
+
+
+
+
+        return g;
+
+        //----------------------------
+
+        // var g = this.createSvgElement('g');
+        // g.setAttribute('text-align', 'center');
+        // g.setAttribute('text-anchor', 'middle');
+        // g.setAttribute('font-size', '12px');
+
+        // var text = this.createSvgElement('text');
+        // text.setAttribute('x', '50%');
+        // text.setAttribute('y', '50%');
+
+        // var textNode = document.createTextNode(this._label);
+        // text.appendChild(textNode);
+        // g.appendChild(text);
+
+        // var text2 = this.createSvgElement('text');
+        // text2.setAttribute('x', '50%');
+        // text2.setAttribute('y', '55%');
+   
+        
+
+
+        // var textNode2 = document.createTextNode("ich bin ein test");
+        // text2.appendChild(textNode2);
+        // g.appendChild(text2);
+
+
+
+
+
+        // return g;
+// -------------------------------------
+
+
+
+
+
+
+
+
+
+        //  // var foreignObject_svg = this.createSvgElement('foreignObject');
+        // // foreignObject_svg.setAttribute('x', '2%');
+        // // foreignObject_svg.setAttribute('y', '50%');
+        // // foreignObject_svg.setAttribute('width', '96%');
+        // // foreignObject_svg.setAttribute('height', '50%');
+        // // foreignObject_svg.setAttribute('text-align', 'center');
+        // // foreignObject_svg.setAttribute('text-anchor', 'middle');
+
+
+
+        // // var div = document.createElement('div');
+        // // div.setAttribute("display","table");
+        // // div.setAttribute('width', '100%');
+        // // div.setAttribute('height', '100%');
+
+        // // var p = document.createElement('p');
+        // // p.setAttribute("text-align","center");
+        // // p.setAttribute('display', 'table-cell');
+        // // p.setAttribute('vertical-align', 'middle');
+
+        
+        // var text = this.createSvgElement('text');
+        // text.setAttribute('x', '50%');
+        // text.setAttribute('y', '50%');
+        // text.setAttribute('text-align', 'center');
+        // text.setAttribute('text-anchor', 'middle');
+        // text.setAttribute('inline-size', '125');
+        // text.setAttribute('font-size', '12px');
+        
+        // // var textNode = document.createTextNode(this._label+" ich bin ein test");
+        // // text.appendChild(textNode);
+        // // foreignObject_svg.appendChild(text);
+
+        // var textNode = document.createTextNode(this._label+" ich bin ein test");
+        // text.appendChild(textNode);
+        // svg.appendChild(text);
+
+
+        // // p.appendChild(textNode);
+        // // div.appendChild(p);
+        // // foreignObject_svg.appendChild(div);
+        // // svg.append(foreignObject_svg);
+
+        // // p.appendChild(textNode);
+        // // div.appendChild(p);
+        // // foreignObject_svg.appendChild(div);
+        // // svg.append(foreignObject_svg);
+
+
+
+        // // foreignObject_svg.appendChild(textNode);
+        // // svg.append(foreignObject_svg);
+        // // ----- Text Aktivitäten-Text ende ----
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

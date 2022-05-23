@@ -2,8 +2,12 @@ export abstract class Element {
     private _id : string;
     private _x: number;
     private _y: number;
+    private _distanceX: number = 0;
+    private _distanceY: number = 0;
     private _svgElement: SVGElement | undefined;
     private _adjacentElements: Element[];
+    private _svgColorElements : SVGElement[];
+
     
 
     constructor(id : string) {
@@ -11,10 +15,27 @@ export abstract class Element {
         this._x = 0;
         this._y = 0;
         this._adjacentElements = [];
+        this._svgColorElements = [];
     }
 
     get adjacentElements(): Element[] {
         return this._adjacentElements;
+    }
+
+    get distanceX(): number {
+        return this._distanceX;
+    }
+
+    set distanceX(value: number) {
+        this._distanceX = value;
+    }
+
+    get distanceY(): number {
+        return this._distanceY;
+    }
+
+    set distanceY(value: number) {
+        this._distanceY = value;
     }
 
     get id(): string {
@@ -61,14 +82,16 @@ export abstract class Element {
         if (this._svgElement === undefined) {
             return;
         }
-        this._svgElement.setAttribute('fill', 'red');
+        //this._svgElement.setAttribute('fill', 'red');
+        this.changeColor("red")
     }
 
     private processMouseUp(event: MouseEvent) {
         if (this._svgElement === undefined) {
             return;
         }
-        this._svgElement.setAttribute('fill', 'black');
+        //this._svgElement.setAttribute('fill', 'black');
+        this.changeColor("white")
     }
 
     /**
@@ -76,7 +99,6 @@ export abstract class Element {
      * @param target target of new edge
      */
     public addEdge(target: Element): void {
-
         if (!this.hasEdge(target))
             this._adjacentElements.push(target);
     }
@@ -108,6 +130,12 @@ export abstract class Element {
         return this._adjacentElements.some(element => element === target);
     }
 
+    changeColor(newColor:string) {
+        this._svgColorElements.forEach(element => element.setAttribute('fill', newColor));
+    }
 
+    addSVGtoColorChange(element:SVGElement) {
+        this._svgColorElements.push(element);
+    }
 
 }

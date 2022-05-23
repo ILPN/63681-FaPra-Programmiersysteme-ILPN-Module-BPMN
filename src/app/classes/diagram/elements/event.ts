@@ -1,13 +1,19 @@
+
 import { Element } from './../element'
 import { EventType } from './eventtype'
 
 export class Event extends Element {
+    private _label: string;
     private _type: EventType;
+    private _raduis: number = 35;
 
 
-    constructor(id: string, type: EventType) {
+    constructor(id: string, label: string, type: EventType) {
         super(id);
+        this._label = label;
         this._type = type;
+        this.distanceX = this._raduis + 2;
+        this.distanceY = this._raduis + 2;
     }
 
     public get type(): EventType {
@@ -17,95 +23,107 @@ export class Event extends Element {
         this._type = value;
     }
 
-
-
     public createSvg(): SVGElement {
-        const rect = this.createSvgElement('rect');
-        rect.setAttribute('cx', `${this.x}`);
-        rect.setAttribute('cy', `${this.y}`);
-        rect.setAttribute('fill', 'none');
-        rect.setAttribute('stroke', 'black');
+        const svg = this.createSvgElement('svg');
+        svg.setAttribute('id', `${this.id}`);
+        svg.setAttribute('x', `${this.x - ((this._raduis * 2 + 5) / 2)}`);
+        svg.setAttribute('y', `${this.y - ((this._raduis * 2 + 5) / 2)}`);
+        svg.setAttribute('width', `${this._raduis * 2 + 5}`);
+        svg.setAttribute('height', `${this._raduis * 2 + 5}`);
+        svg.setAttribute('style', "overflow: visible;");
 
-        this.registerSvg(rect);
+        if (this._type === EventType.Start) svg.append(this.getStartSvg());
+        if (this._type === EventType.Intermediate) { svg.append(this.getIntermediateSvgOut()); svg.append(this.getIntermediateSvgIn()); }
+        if (this._type === EventType.End) svg.append(this.getEndSvg());
+        this.registerSvg(svg);
+        svg.append(this.getSVGText());
 
-        return rect;
+
+        return svg;
     }
-
 
     public getStartSvg(): SVGElement {
         // // Startereignis
-        // const svg = this.createSvgElement('circle');
-        // svg.setAttribute('cx', `${this.x}`);
-        // svg.setAttribute('cy', `${this.y}`);
-        // svg.setAttribute('r', '50');
-        // svg.setAttribute('fill', 'none');
-        // svg.setAttribute('stroke', 'black');
-        // svg.setAttribute('stroke-width', "5");
-        // this.registerSvg(svg);
-
-        const svg = this.createSvgElement('svg');
-        svg.setAttribute('x', `${this.x}`);
-        svg.setAttribute('y', `${this.y}`);
-
         const circle = this.createSvgElement('circle');
-        circle.setAttribute('r', '50');
-        circle.setAttribute('transform', 'translate(56 56)');
-        circle.setAttribute('fill', 'none');
+        circle.setAttribute('id', `${this.id}` + "_circle");
+        circle.setAttribute('r', `${this._raduis}`);
+        //circle.setAttribute('transform', 'translate(56 56)');
+        circle.setAttribute('cx', '50%');
+        circle.setAttribute('cy', '50%');
+        circle.setAttribute('fill', 'white');
         circle.setAttribute('stroke', 'black');
         circle.setAttribute('stroke-width', "3");
-        svg.append(circle);
-        this.registerSvg(svg);
-
-
-        return svg;
+        circle.appendChild(this.getSVGText());
+        this.addSVGtoColorChange(circle);
+        return circle;
     }
 
-    public getIntermediateSvg(): SVGElement {
+    public getIntermediateSvgOut(): SVGElement {
         // Zwischeneignis
-        const svg = this.createSvgElement('svg');
-        svg.setAttribute('x', `${this.x}`);
-        svg.setAttribute('y', `${this.y}`);
-
-
         const circle = this.createSvgElement('circle');
-        circle.setAttribute('r', '50');
-        circle.setAttribute('transform', 'translate(56 56)');
-        circle.setAttribute('fill', 'none');
+        circle.setAttribute('id', `${this.id}` + "_circle");
+        circle.setAttribute('r', `${this._raduis}`);
+        circle.setAttribute('cx', '50%');
+        circle.setAttribute('cy', '50%');
+        circle.setAttribute('fill', 'white');
         circle.setAttribute('stroke', 'black');
         circle.setAttribute('stroke-width', "9");
-        svg.append(circle);
+        // svg.append(circle);
+        this.distanceX = this._raduis + 4;
+        this.distanceY = this._raduis + 4;
+        this.addSVGtoColorChange(circle);
+        return circle;
+    }
 
+    public getIntermediateSvgIn(): SVGElement {
+        // Zwischeneignis
         const circle2 = this.createSvgElement('circle');
-        circle2.setAttribute('r', '50');
-        circle2.setAttribute('transform', 'translate(56 56)');
+        circle2.setAttribute('r', `${this._raduis}`);
+        circle2.setAttribute('cx', '50%');
+        circle2.setAttribute('cy', '50%');
         circle2.setAttribute('fill', 'none');
         circle2.setAttribute('stroke', 'white');
         circle2.setAttribute('stroke-width', "3");
-        svg.append(circle2);
-        this.registerSvg(svg);
-        return svg;
+        return circle2;
     }
+
 
     public getEndSvg(): SVGElement {
         // Endeereignis
-        const svg = this.createSvgElement('circle');
-        svg.setAttribute('x', `${this.x}`);
-        svg.setAttribute('y', `${this.y}`);
-
         const circle = this.createSvgElement('circle');
-        svg.setAttribute('r', '50');
-        circle.setAttribute('transform', 'translate(56 56)');
-        circle.setAttribute('fill', 'none');
+        circle.setAttribute('id', `${this.id}` + "_circle");
+        circle.setAttribute('r', `${this._raduis}`);
+        circle.setAttribute('cx', '50%');
+        circle.setAttribute('cy', '50%');
+        circle.setAttribute('fill', 'white');
         circle.setAttribute('stroke', 'black');
         circle.setAttribute('stroke-width', "9");
-        svg.append(circle);
-        this.registerSvg(svg);
-        return svg;
+        this.addSVGtoColorChange(circle);
+        this.distanceX = this._raduis + 4;
+        this.distanceY = this._raduis + 4;
+        return circle;
     }
 
 
 
+    private getSVGText(): SVGElement {
+        // ----- Text Aktivitäten-Text erstellen ----
+        var text = this.createSvgElement('text');
 
+        text.setAttribute('x', '50%');
+        text.setAttribute('y', '120%');
+        text.setAttribute('font-size', '12px');
+        text.setAttribute('text-align', 'justified');
+        text.setAttribute('line-height', '110%');
+        text.setAttribute('dominant-baseline', 'middle');
+        text.setAttribute('text-anchor', 'middle');
+
+        var textNode = document.createTextNode(this._label);
+        text.appendChild(textNode);
+        // svg.append(text);
+        return text;
+        // ----- Text Aktivitäten-Text ende ----
+    }
 
 
 
