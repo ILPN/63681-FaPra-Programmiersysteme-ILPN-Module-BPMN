@@ -97,7 +97,6 @@ export class InputFieldComponent {
             substring = substring.substring(nextLine);
             nextLine = 0;
             while(substring.charAt(nextLine) !== "." && substring.charAt(nextLine) !== " " && substring.search(/\n/) !== 1){
-                console.log(substring.search(/\n/));
                 const match = substring.match(regexp);
                 if (match === null) {
                     console.log("format error at " + category);
@@ -108,7 +107,7 @@ export class InputFieldComponent {
                 substring = substring.substring(nextLine);
                 if(nextLine === 0) {
                     substring = " ";
-                    //wenn keine neue Zeile kommt, wird aus der while-Schleife ausgetreten
+                    //wenn das Ende der Datei erreicht ist, wird aus der while-Schleife ausgetreten
                 }
                 nextLine = 0;
                 console.log(substring.charAt(nextLine));
