@@ -7,10 +7,10 @@ name type „label“ (coordinate1,coordinate2)
 name type „label“ (coordinate1,coordinate2)
 	
 .gateways
-name type (coordinates)
+name type (coordinate1,coordinate2)
 
-.sequence
-name1 name2 “label” (coordinates)
+.sequences
+name1 name2 “label” (coordinate1,coordinate2)
 	
 
 ----------------
