@@ -83,72 +83,56 @@ export class Connector extends Element {
     }
 
 
+
     public createSvg(): SVGElement {
-        const svg = this.createSvgElement('svg');
-        svg.setAttribute('id', `${this.id}`);
-        svg.setAttribute('x', '0');
-        svg.setAttribute('y', '0');
-        svg.setAttribute('style', "overflow: visible;");
-
-        //   svg.append(this.getLinie(0,0,100,100));
-        let xPathTemp = this._start.x;
-        let yPathTemp = this._start.y;
-
-
+        const svg = this.createUndergroundSVG();
         let firstLine: boolean = true;
-        let x1: number = this._start.x;
-        let x2: number = 0;
-        let y1: number = this._start.y;
-        let y2: number = 0;
-        let xdistance: number = this._start.distanceX;
-        let ydistance: number = this._start.distanceY;
-        // svg.append(circle);
-
-
+        var fromElement: Element = this._start;
+        var toElement: Element = this._start;
         for (let i = 0; i < this._pathConnectorElements.length; i++) {
-            let element: ConnectorElement = this._pathConnectorElements[i];
-            svg.append(element.createSvg());
-            x2 = element.x;
-            y2 = element.y;
-
-            //svg.append(this.getLinie(x1,y1,x2,y2));
-            if (x1 < x2) svg.append(this.getLinie((x1 + xdistance), y1, x2 - element.distanceX, y2));
-            if (x1 > x2) svg.append(this.getLinie((x1 - xdistance), y1, x2 + element.distanceX, y2));
-            if (y1 < y2) svg.append(this.getLinie(x1, y1 + ydistance, x2, y2 - element.distanceY));
-            if (y1 > y2) svg.append(this.getLinie(x1, y1 - ydistance, x2, y2 + element.distanceY));
-
+            toElement = this._pathConnectorElements[i];
+            svg.append(toElement.createSvg());
+            this.kawieichdasdingnennensoll(svg, fromElement, toElement);
             if (firstLine && this._type === Connectortype.InformationFlow) {
-                svg.append(this.getCircleIfIsInformationFlow(x1, y1, x2, y2, xdistance, ydistance));
+                svg.append(this.getCircleIfIsInformationFlow(fromElement.x, fromElement.y, toElement.x, toElement.y, fromElement.distanceX, fromElement.distanceY));
                 firstLine = false;
             }
-            xdistance = element.distanceX;
-            ydistance = element.distanceY;
-            x1 = x2;
-            y1 = y2;
+            fromElement = toElement;
         }
 
-
-        x2 = this._end.x;
-        y2 = this._end.y;
-       
-        //svg.append(this.getLinie(x1+xdistance,y1,x2-this._end.distanceX,y2)); // (y2-y1)
-        if (x1 < x2) svg.append(this.getLinie((x1 + xdistance), y1, x2 - this._end.distanceX, y2));
-        if (x1 > x2) svg.append(this.getLinie((x1 - xdistance), y1, x2 + this._end.distanceX, y2));
-        if (y1 < y2) svg.append(this.getLinie(x1, y1 + ydistance, x2, y2 - this._end.distanceY));
-        if (y1 > y2) svg.append(this.getLinie(x1, y1 - ydistance, x2, y2 + this._end.distanceY));
+        toElement = this._end;
+        this.kawieichdasdingnennensoll(svg, fromElement, toElement);
 
         if (firstLine && this._type === Connectortype.InformationFlow) {
-            svg.append(this.getCircleIfIsInformationFlow(x1, y1, x2, y2, xdistance, ydistance));
+            svg.append(this.getCircleIfIsInformationFlow(fromElement.x, fromElement.y, toElement.x, toElement.y, fromElement.distanceX, fromElement.distanceY));
             firstLine = false;
         }
-        
-        if (this._type === Connectortype.InformationFlow || this._type === Connectortype.SequenceFlow)
-            svg.append(this.getArrowIfIsInformationFlow(x1, y1, x2, y2, this._end.distanceX, this._end.distanceY));
+
+        if (this._type === Connectortype.InformationFlow || this._type === Connectortype.SequenceFlow) svg.append(this.getArrowIfIsInformationFlow(fromElement.x, fromElement.y, toElement.x, toElement.y, toElement.distanceX, toElement.distanceY));
         this.registerSvg(svg);
         return svg;
     }
 
-    public getLinie(x_Point_from: number, y_Point_From: number, x_Point_To: number, y_Point_To: number): SVGElement {
+    private kawieichdasdingnennensoll(svg: SVGElement, fromElement: Element, toElement: Element): void {
+        if (fromElement.x < toElement.x) svg.append(this.getLinie((fromElement.x + fromElement.distanceX), fromElement.y, toElement.x - toElement.distanceX, toElement.y));
+        if (fromElement.x > toElement.x) svg.append(this.getLinie((fromElement.x - fromElement.distanceX), fromElement.y, toElement.x + toElement.distanceX, toElement.y));
+        if (fromElement.y < toElement.y) svg.append(this.getLinie(fromElement.x, fromElement.y + fromElement.distanceY, toElement.x, toElement.y - toElement.distanceY));
+        if (fromElement.y > toElement.y) svg.append(this.getLinie(fromElement.x, fromElement.y - fromElement.distanceY, toElement.x, toElement.y + toElement.distanceY));
+    }
+
+
+
+
+    private createUndergroundSVG(): SVGElement {
+        const svg = this.createSvgElement('svg');
+        svg.setAttribute('id', `${this.id}`);
+        svg.setAttribute('x', '0');
+        svg.setAttribute('y', '0');
+        svg.setAttribute('style', 'overflow: visible;');
+        return svg;
+    }
+
+    private getLinie(x_Point_from: number, y_Point_From: number, x_Point_To: number, y_Point_To: number): SVGElement {
         let type_line = this.createSvgElement('line');
         type_line.setAttribute("x1", x_Point_from.toString());
         type_line.setAttribute("x2", x_Point_To.toString());
@@ -159,8 +143,7 @@ export class Connector extends Element {
         return type_line;
     }
 
-
-    public getCircleIfIsInformationFlow(x1: number, y1: number, x2: number, y2: number, xdistance: number, ydistance: number): SVGElement {
+    private getCircleIfIsInformationFlow(x1: number, y1: number, x2: number, y2: number, xdistance: number, ydistance: number): SVGElement {
         const circle = this.createSvgElement('circle');
         circle.setAttribute('r', "4");
         if (x1 < x2) {
@@ -182,12 +165,10 @@ export class Connector extends Element {
         circle.setAttribute('fill', 'white');
         circle.setAttribute('stroke', 'black');
         circle.setAttribute('stroke-width', '2');
-
-
         return circle;
     }
 
-    public getArrowIfIsInformationFlow(x1: number, y1: number, x2: number, y2: number, xdistance: number, ydistance: number): SVGElement {
+    private getArrowIfIsInformationFlow(x1: number, y1: number, x2: number, y2: number, xdistance: number, ydistance: number): SVGElement {
         const polygon = this.createSvgElement('polygon');
         let end_point_x: number = x2;
         let end_point_y: number = y2;
@@ -211,7 +192,6 @@ export class Connector extends Element {
                 }
             }
         }
-
         if (this._type === Connectortype.InformationFlow) {
             polygon.setAttribute('fill', 'white');
         } else {
@@ -221,5 +201,4 @@ export class Connector extends Element {
         polygon.setAttribute('stroke-width', '2');
         return polygon;
     }
-
 }

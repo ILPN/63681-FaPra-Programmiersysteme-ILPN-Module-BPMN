@@ -1,9 +1,9 @@
-import {Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
-import {DisplayService} from '../../services/display.service';
-import {Subscription} from 'rxjs';
-import {LayoutService} from '../../services/layout.service';
-import {SvgService} from '../../services/svg.service';
-import {Diagram} from '../../classes/diagram/diagram';
+import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { DisplayService } from '../../services/display.service';
+import { Subscription } from 'rxjs';
+import { LayoutService } from '../../services/layout.service';
+import { SvgService } from '../../services/svg.service';
+import { Diagram } from '../../classes/diagram/diagram';
 
 @Component({
     selector: 'app-display',
@@ -18,10 +18,10 @@ export class DisplayComponent implements OnDestroy {
     private _diagram: Diagram | undefined;
 
     constructor(private _layoutService: LayoutService,
-                private _svgService: SvgService,
-                private _displayService: DisplayService) {
+        private _svgService: SvgService,
+        private _displayService: DisplayService) {
 
-        this._sub  = this._displayService.diagram$.subscribe(diagram => {
+        this._sub = this._displayService.diagram$.subscribe(diagram => {
             this._diagram = diagram;
             //this._layoutService.layout(this._diagram);
             this.draw();
@@ -43,6 +43,7 @@ export class DisplayComponent implements OnDestroy {
         for (const element of elements) {
             this.drawingArea.nativeElement.appendChild(element);
         }
+
     }
 
     private clearDrawingArea() {

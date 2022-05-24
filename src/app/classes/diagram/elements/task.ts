@@ -4,18 +4,18 @@ import { TaskType } from "./tasktype";
 export class Task extends Element {
     private _label: string;
     private _type: TaskType;
-    private width: number = 170; // width 170
-    private height: number  = 100; // height 100
-    private rounding: number = 10; // Abrunden
-    private border: number  = 2;
-    private _myScale: number  = 1;
+    private _width: number = 170; // width 170
+    private _height: number = 100; // height 100
+    private _rounding: number = 10; // Abrunden
+    private _border: number = 2;
+    private _myScale: number = 1;
 
     constructor(id: string, label: string, type: TaskType) {
         super(id);
         this._label = label;
         this._type = type;
-        this.distanceX = 85; //  this.width/2
-        this.distanceY = 50;
+        this.distanceX = this._width / 2;
+        this.distanceY = this._height / 2;
     }
 
     public get type(): TaskType {
@@ -34,66 +34,66 @@ export class Task extends Element {
 
 
 
-    public createSvg(): SVGElement {   // Task
-        
-       // var label: string = "TestText  der ersten Aktivität"; // textLength
-       // SVG erstellen
-          let svg = this.createSvgElement('svg');
-           svg.setAttribute('width', `${this.width+2*this.border}`);
-           svg.setAttribute('height', `${this.height+2*this.border}`); //160
-           svg.setAttribute('viewBox', "0 0 "+`${this.width+2*this.border}`+" "+`${this.height+2*this.border}`);
-           svg.setAttribute('preserveAspectRatio', "xMidYMid meet");
-           svg.setAttribute('x', `${this.x-((this.width+2*this.border)/2)}`);
-           svg.setAttribute('y', `${this.y-((this.height+2*this.border)/2)}`);
-
-        // G Aktivitäten-Rechteck erstellen
-        let g = this.createSvgElement('rect');
-        g.setAttribute('id', 'rect1');
-        g.setAttribute('width', `${this.width}`);
-        g.setAttribute('height', `${this.height}`);
-        g.setAttribute('x', `${this.border}`);
-        g.setAttribute('y', `${this.border}`);
-        g.setAttribute('rx', `${this.rounding}`);
-        g.setAttribute('ry', `${this.rounding}`);
-        g.setAttribute('stroke', 'rgb(0,0,0)');
-        g.setAttribute('stroke-width', `${this.border}`);
-        g.setAttribute('fill', 'white');
-        svg.append(g);
-        this.addSVGtoColorChange(g);
-        // G Aktivitäten-Rechteck ende
-        // --- G Aktivitäten-Symbole erstellen ---
-         var type_svg = this.getTypeSvg(); //this.createSvgElement('path');        
-         svg.append(type_svg);
-        // --- G Aktivitäten-Symbole ende ---
-
-
-        // ----- Text Aktivitäten-Text erstellen ----
-        let text = this.createSvgElement('text');
-           text.setAttribute('x', '50%');
-           text.setAttribute('y', '50%');
-           text.setAttribute('font-size', '12px');
-           text.setAttribute('text-align', 'justified');
-           text.setAttribute('line-height', '110%');
-           text.setAttribute('dominant-baseline','middle');  
-           text.setAttribute('text-anchor','middle');
-
-           
-           let textNode = document.createTextNode(this._label);
-            text.appendChild(textNode);
-            svg.append(text);
-        // ----- Text Aktivitäten-Text ende ----
+    public createSvg(): SVGElement {
+        const svg = this.createUndergroundSVG();
+        svg.append(this.createRect());
+        svg.append(this.createTypeSvg());
+        svg.append(this.getText());
         this.registerSvg(svg);
         return svg;
     }
 
-/** Bekommt eine Number übergeben und wandelt sie in einen String um. Es wird ebenfalls ein Komma durch einen Punkt ersetzt. */
-private replaceNumberToString(zahl: number) {
-    return zahl.toString().replace(/,/gi,'.');
-}
+    private getText(): SVGElement {
+        let text = this.createSvgElement('text');
+        text.setAttribute('x', '50%');
+        text.setAttribute('y', '50%');
+        text.setAttribute('font-size', '12px');
+        text.setAttribute('text-align', 'justified');
+        text.setAttribute('line-height', '110%');
+        text.setAttribute('dominant-baseline', 'middle');
+        text.setAttribute('text-anchor', 'middle');
+        let textNode = document.createTextNode(this._label);
+        text.appendChild(textNode);
+        return text;
+    }
 
 
-    private getTypeSvg(): SVGElement {
-        var type_svg = this.createSvgElement('path');
+    private createUndergroundSVG(): SVGElement {
+        let svg = this.createSvgElement('svg');
+        svg.setAttribute('width', `${this._width + 2 * this._border}`);
+        svg.setAttribute('height', `${this._height + 2 * this._border}`);
+        svg.setAttribute('viewBox', "0 0 " + `${this._width + 2 * this._border}` + " " + `${this._height + 2 * this._border}`);
+        svg.setAttribute('preserveAspectRatio', "xMidYMid meet");
+        svg.setAttribute('x', `${this.x - ((this._width + 2 * this._border) / 2)}`);
+        svg.setAttribute('y', `${this.y - ((this._height + 2 * this._border) / 2)}`);
+        return svg;
+    }
+
+    private createRect(): SVGElement {
+        let rect = this.createSvgElement('rect');
+        rect.setAttribute('id', 'rect1');
+        rect.setAttribute('width', `${this._width}`);
+        rect.setAttribute('height', `${this._height}`);
+        rect.setAttribute('x', `${this._border}`);
+        rect.setAttribute('y', `${this._border}`);
+        rect.setAttribute('rx', `${this._rounding}`);
+        rect.setAttribute('ry', `${this._rounding}`);
+        rect.setAttribute('stroke', 'rgb(0,0,0)');
+        rect.setAttribute('stroke-width', `${this._border}`);
+        rect.setAttribute('fill', 'white');
+        this.addSVGtoColorChange(rect);
+        return rect;
+    }
+
+    /** Bekommt eine Number übergeben und wandelt sie in einen String um. Es wird ebenfalls ein Komma durch einen Punkt ersetzt. */
+    private replaceNumberToString(zahl: number) {
+        return zahl.toString().replace(/,/gi, '.');
+    }
+
+
+    private createTypeSvg(): SVGElement {
+        // Erzeuge einen leeren default Path.
+        let type_svg = this.createSvgElement('path');
         //  Sending, Manual, Service, BusinessRule, Receiving, UserTask
         if (this._type === TaskType.Sending) return this.getTypeSending();
         if (this._type === TaskType.Manual) return this.getTypeManual();
@@ -105,38 +105,31 @@ private replaceNumberToString(zahl: number) {
     }
 
     private getTypeSending(): SVGElement {
-        var type_svg = this.createSvgElement('svg');
-        var type_rect = this.createSvgElement('rect');
-        var scaleString: String  = this.replaceNumberToString(0.05*this._myScale);
-        
-
-
+        let type_svg = this.createSvgElement('svg');
+        let type_rect = this.createSvgElement('rect');
+        let scaleString: String = this.replaceNumberToString(0.05 * this._myScale);
         type_rect.setAttribute('x', `20.7`);
         type_rect.setAttribute('y', `23.4`);
         type_rect.setAttribute('width', `429.3`);
         type_rect.setAttribute('height', `311.5`);
         type_rect.setAttribute('fill', `black`);
-        type_rect.setAttribute('transform', 'translate(8 8) scale('+ `${scaleString}`+')');
+        type_rect.setAttribute('transform', 'translate(8 8) scale(' + `${scaleString}` + ')');
         type_svg.append(type_rect);
-
-        var type_path = this.createSvgElement('path');
+        let type_path = this.createSvgElement('path');
         type_path.setAttribute("id", "pathIdD");
         type_path.setAttribute("d", "M437.5,0h-401C16.4,0,0,16.4,0,36.5v282.4c0,20.1,16.4,36.5,36.5,36.5h401c20.1,0,36.5-16.4,36.5-36.5V36.5 C474,16.4,457.6,0,437.5,0z M432.2,27L239.5,145.8L46.8,27H432.2z M447,318.9c0,5.2-4.3,9.5-9.5,9.5h-401c-5.2,0-9.5-4.3-9.5-9.5 V45.6l203.7,128.2c0.1,0.1,0.3,0.2,0.4,0.3c0.1,0.1,0.3,0.2,0.4,0.3c0.3,0.2,0.5,0.4,0.8,0.5c0.1,0.1,0.2,0.1,0.3,0.2 c0.4,0.2,0.8,0.4,1.2,0.6c0.1,0,0.2,0.1,0.3,0.1c0.3,0.1,0.6,0.3,1,0.4c0.1,0,0.3,0.1,0.4,0.1c0.3,0.1,0.6,0.2,0.9,0.2  c0.1,0,0.3,0.1,0.4,0.1c0.3,0.1,0.7,0.1,1,0.2c0.1,0,0.2,0,0.3,0c0.4,0,0.9,0.1,1.3,0.1l0,0l0,0c0.4,0,0.9,0,1.3-0.1 c0.1,0,0.2,0,0.3,0c0.3,0,0.7-0.1,1-0.2c0.1,0,0.3-0.1,0.4-0.1c0.3-0.1,0.6-0.2,0.9-0.2c0.1,0,0.3-0.1,0.4-0.1 c0.3-0.1,0.6-0.2,1-0.4c0.1,0,0.2-0.1,0.3-0.1c0.4-0.2,0.8-0.4,1.2-0.6c0.1-0.1,0.2-0.1,0.3-0.2c0.3-0.2,0.5-0.3,0.8-0.5 c0.1-0.1,0.3-0.2,0.4-0.3c0.1-0.1,0.3-0.2,0.4-0.3L447,49.9V318.9z");
         type_path.setAttribute("stroke", "white");
-        //type_svg.setAttribute("stroke-width", "3");  
         type_path.setAttribute("opacity", "1");
         type_path.setAttribute("fill", "white");
-        type_path.setAttribute('transform', 'translate(8 8) scale('+ `${scaleString}`+')');
+        type_path.setAttribute('transform', 'translate(8 8) scale(' + `${scaleString}` + ')');
         type_svg.append(type_path);
         this.addSVGtoColorChange(type_path);
-
         return type_svg;
     }
 
     private getTypeManual(): SVGElement {
-        var scaleString: String  = this.replaceNumberToString(0.06*this._myScale);
-
-        var type_svg = this.createSvgElement('path');
+        let scaleString: String = this.replaceNumberToString(0.06 * this._myScale);
+        let type_svg = this.createSvgElement('path');
         type_svg.setAttribute("id", "pathIdD");
         type_svg.setAttribute("d", "M351.9,250.6c5.2-5.2,8-12.1,8-19.4c0-6-1.9-11.6-5.4-16.3l0.5,0c15.1,0,27.4-12.3,27.4-27.4c0-14.1-10.7-25.8-24.4-27.3 " +
             "c3.5-4.6,5.5-10.3,5.5-16.5c0-7.3-2.9-14.2-8-19.4c-5.2-5.2-12.1-8-19.4-8l-110-1c4.6-5.5,7.1-12.4,7.1-19.7 " +
@@ -151,47 +144,39 @@ private replaceNumberToString(zahl: number) {
             "l132.5,0c9,0,16.3,7.3,16.3,16.3c0,9-7.3,16.3-16.3,16.3l-141.7,0c-3.1,0-5.6,2.5-5.6,5.6c0,3.1,2.5,5.6,5.6,5.6l119.1,0 " +
             "c4.4,0,8.5,1.7,11.6,4.8c3.1,3.1,4.8,7.2,4.8,11.6c0,4.4-1.7,8.5-4.8,11.6C341,245.8,336.9,247.5,332.5,247.5z");
         type_svg.setAttribute("stroke", "black");
-        //type_svg.setAttribute("stroke-width", "3");  
         type_svg.setAttribute("opacity", "1");
         type_svg.setAttribute("fill", "black");
-        type_svg.setAttribute('transform', 'translate(8 3) scale('+ `${scaleString}`+')');
+        type_svg.setAttribute('transform', 'translate(8 3) scale(' + `${scaleString}` + ')');
+        return type_svg;
+    }
 
-        //type_svg.setAttribute('transform', 'translate(8 8) scale(0.1 0.1)');
+    private getTypeService(): SVGElement {
+        let scale: String = this.replaceNumberToString(this._width / 10 / 380);
+        let type_svg = this.createSvgElement('svg');
+        this.AddTypeServiceUndergroundGear(type_svg, scale);
+        this.AddTypeServiceOverlapRect(type_svg, scale);
+        this.AddTypeServiceFrontGear(type_svg, scale);
 
 
         return type_svg;
     }
 
-    private getTypeService(): SVGElement {
-       //  var scale : String = "0.0375";
-        // private width: number = 150; // width
-        // private height: number  = 100; // height
-        
-        //var scaleString: String  = this.replaceNumberToString(0.06*this._myScale);
-        var scale : String = this.replaceNumberToString(this.width/10/380); 
-        //var scale : String = "0.3375";
-        
-       
-
-
-
-        var type_svg = this.createSvgElement('svg');
+    private AddTypeServiceUndergroundGear(type_svg: SVGElement, scale: String): void {
         // innen Kreis unteres Rad
-        var type_path1 = this.createSvgElement('path');
+        let type_path1 = this.createSvgElement('path');
         type_path1.setAttribute("d", "M285,192.2c-0.9-62.6-56.7-95.8-107.4-94.3c-1.4-0.2-2.8-0.3-4.3-0.1c-3.2,0.3-6.4,0.8-9.3,1.4c-4.5,0.7-8.8,1.7-12.8,2.9" +
             " c-1.1,0.3-2.2,0.8-3.3,1.4c-37.3,12.9-60.8,43.5-64.5,84c-2,21.8,4,42.4,17.3,59.4c17.5,22.4,46.5,37.5,77.7,40.5" +
             " c2.9,0.3,5.7,0.4,8.6,0.4l0,0c27.3,0,54.9-12.1,73.7-32.5C276.8,237.5,285.3,215.7,285,192.2z M249.7,199" +
             " c0.2,10.9-3.5,20.4-10.9,28.4c-12.3,13.3-35,21.8-57.9,21.8c-4.4,0-8.6-0.3-12.5-1c-33.5-5.8-46.6-29.8-47.8-50.4" +
             " c-1.3-22.3,11.1-50.6,41.1-59.9c6.6-1.8,13.5-2.8,20.4-2.8C215.2,135.1,249.1,157.1,249.7,199z");
         type_path1.setAttribute("stroke", "black");
-        //type_svg.setAttribute("stroke-width", "3");  
         type_path1.setAttribute("opacity", "1");
         type_path1.setAttribute("fill", "black");
-        type_path1.setAttribute('transform', 'translate(8 8) scale('+scale+')');
+        type_path1.setAttribute('transform', 'translate(8 8) scale(' + scale + ')');
         type_svg.append(type_path1);
 
         // außen Kreis unteres Rad
-        var type_path2 = this.createSvgElement('path');
+        let type_path2 = this.createSvgElement('path');
         type_path2.setAttribute("d", "M347.8,159c-0.1-1.2-0.3-2.4-0.7-3.6c-0.1-5.6-3.2-10.2-8.2-12.2c-0.7-0.5-1.4-0.9-2.2-1.2c-9.3-4-18.2-8.4-27.9-13.3" +
             " c1.7-8.5,3.5-17,5.2-25.5c0.2-0.8,0.2-1.7,0.2-2.5c0.3-3.1-0.8-6.1-3.1-8.4C297.4,78,282.4,66,266.4,56.5c-2.2-1.3-4.6-1.8-7-1.5" +
             " h0c-1.8,0-3.6,0.5-5.3,1.4c-3.2,1.7-6.3,3.5-9.4,5.3c-3.6-7.2-7.2-14.8-10.5-22.3c-0.3-0.8-0.8-1.5-1.2-2.2" +
@@ -221,45 +206,48 @@ private replaceNumberToString(zahl: number) {
             " c-2.6-2.6-6.4-4.2-10.4-4.2c-6.2,0-11.3,3.6-13.4,9.3c-2.8,7.6-6.3,15.1-9.7,22.3L213.6,335.6z M222.2,358.7L222.2,358.7" +
             " L222.2,358.7L222.2,358.7z");
         type_path2.setAttribute("stroke", "black");
-        type_svg.setAttribute("stroke-width", "3");  
+        type_svg.setAttribute("stroke-width", "3");
         type_path2.setAttribute("opacity", "1");
         type_path2.setAttribute("fill", "black");
-        type_path2.setAttribute('transform', 'translate(8 8) scale('+scale+')');
+        type_path2.setAttribute('transform', 'translate(8 8) scale(' + scale + ')');
         type_svg.append(type_path2);
-
+    }
+    private AddTypeServiceOverlapRect(type_svg: SVGElement, scale: String): void {
         // 3x Rechteck zur Verdeckung zwischen den beiden Rädern
-        var type_rect = this.createSvgElement('rect');
+        let type_rect = this.createSvgElement('rect');
         type_rect.setAttribute('x', `281.2`);
         type_rect.setAttribute('y', `143.6`);
         type_rect.setAttribute('width', `60.8`);
         type_rect.setAttribute('height', `42.8`);
         type_rect.setAttribute('fill', `white`);
-        type_rect.setAttribute('transform', 'translate(8 8) scale('+scale+')');
+        type_rect.setAttribute('transform', 'translate(8 8) scale(' + scale + ')');
         type_svg.append(type_rect);
 
-        var type_rect1 = this.createSvgElement('rect');
+        let type_rect1 = this.createSvgElement('rect');
         type_rect1.setAttribute('x', `165.2`);
         type_rect1.setAttribute('y', `187.9`);
         type_rect1.setAttribute('width', `232`);
         type_rect1.setAttribute('height', `207`);
         type_rect1.setAttribute('fill', `white`);
-        type_rect1.setAttribute('transform', 'translate(8 8) scale('+scale+') matrix(0.7591 -0.6509 0.6509 0.7591 -121.9079 253.2275)');
+        type_rect1.setAttribute('transform', 'translate(8 8) scale(' + scale + ') matrix(0.7591 -0.6509 0.6509 0.7591 -121.9079 253.2275)');
         type_svg.append(type_rect1);
 
-        var type_rect2 = this.createSvgElement('rect');
+        let type_rect2 = this.createSvgElement('rect');
         type_rect2.setAttribute('x', `291`);
         type_rect2.setAttribute('y', `186.5`);
         type_rect2.setAttribute('width', `122.4`);
         type_rect2.setAttribute('height', `241.8`);
         type_rect2.setAttribute('fill', `white`);
-        type_rect2.setAttribute('transform', 'translate(8 8) scale('+scale+')');
+        type_rect2.setAttribute('transform', 'translate(8 8) scale(' + scale + ')');
         type_svg.append(type_rect2);
 
-this.addSVGtoColorChange(type_rect);
-this.addSVGtoColorChange(type_rect1);
-this.addSVGtoColorChange(type_rect2);
+        this.addSVGtoColorChange(type_rect);
+        this.addSVGtoColorChange(type_rect1);
+        this.addSVGtoColorChange(type_rect2);
 
+    }
 
+    private AddTypeServiceFrontGear(type_svg: SVGElement, scale: String): void {
         // innen Kreis Oberes Rad
         var type_path3 = this.createSvgElement('path');
         type_path3.setAttribute("d", "M403,301.2c-0.9-62.6-56.7-95.8-107.4-94.3c-1.4-0.2-2.8-0.3-4.3-0.1c-3.2,0.3-6.4,0.8-9.3,1.4c-4.5,0.7-8.8,1.7-12.8,2.9" +
@@ -268,10 +256,9 @@ this.addSVGtoColorChange(type_rect2);
             " c0.2,10.9-3.5,20.4-10.9,28.4c-12.3,13.3-35,21.8-57.9,21.8c-4.4,0-8.6-0.3-12.5-1c-33.5-5.8-46.6-29.8-47.8-50.4" +
             " c-1.3-22.3,11.1-50.6,41.1-59.9c6.6-1.8,13.5-2.8,20.4-2.8C333.2,244.1,367.1,266.1,367.7,308z");
         type_path3.setAttribute("stroke", "black");
-        //type_svg.setAttribute("stroke-width", "3");  
         type_path3.setAttribute("opacity", "1");
         type_path3.setAttribute("fill", "black");
-        type_path3.setAttribute('transform', 'translate(8 8) scale('+scale+')');
+        type_path3.setAttribute('transform', 'translate(8 8) scale(' + scale + ')');
         type_svg.append(type_path3);
 
 
@@ -306,20 +293,25 @@ this.addSVGtoColorChange(type_rect2);
             "c-8.7-1.7-17.3-4.4-25.9-7.9c-2.6-2.6-6.4-4.2-10.4-4.2c-6.2,0-11.3,3.6-13.4,9.3c-2.8,7.6-6.3,15.1-9.7,22.3L331.6,444.6z " +
             "M340.2,467.7L340.2,467.7L340.2,467.7L340.2,467.7z");
         type_path4.setAttribute("stroke", "black");
-        //type_svg.setAttribute("stroke-width", "3");  
         type_path4.setAttribute("opacity", "1");
         type_path4.setAttribute("fill", "black");
-        type_path4.setAttribute('transform', 'translate(8 8) scale('+scale+')');
+        type_path4.setAttribute('transform', 'translate(8 8) scale(' + scale + ')');
         type_svg.append(type_path4);
+    }
+
+
+
+    private getTypeBusinessRule(): SVGElement {
+        let type_svg = this.createSvgElement('svg');
+        let scaleString: String = this.replaceNumberToString(0.0175 * this._myScale);
+        let transformString = "translate(8 8) scale(" + scaleString + ")";
+        this.addRectForBusinessRule(type_svg, transformString);
+        this.addLineForBusinessRule(type_svg, transformString);
         return type_svg;
     }
 
-    private getTypeBusinessRule(): SVGElement {
-        var type_svg = this.createSvgElement('svg');
-        var scaleString: String  = this.replaceNumberToString(0.0175*this._myScale);
-        var transformString = "translate(8 8) scale("+scaleString+")";
-
-        var type_rect = this.createSvgElement('rect');
+    private addRectForBusinessRule(type_svg: SVGElement, transformString: string): void {
+        let type_rect = this.createSvgElement('rect');
         type_rect.setAttribute('x', `60`);
         type_rect.setAttribute('y', `60`);
         type_rect.setAttribute('width', `1840`);
@@ -332,9 +324,7 @@ this.addSVGtoColorChange(type_rect2);
         type_svg.append(type_rect);
         this.addSVGtoColorChange(type_rect);
 
-
-
-        var type_rect1 = this.createSvgElement('rect');
+        let type_rect1 = this.createSvgElement('rect');
         type_rect1.setAttribute('x', `60`);
         type_rect1.setAttribute('y', `60`);
         type_rect1.setAttribute('width', `1840`);
@@ -346,8 +336,10 @@ this.addSVGtoColorChange(type_rect2);
         type_rect1.setAttribute('stroke-miterlimit', `10`);
         type_rect1.setAttribute('transform', transformString);
         type_svg.append(type_rect1);
+    }
 
-        var type_line = this.createSvgElement('line');
+    private addLineForBusinessRule(type_svg: SVGElement, transformString: string): void {
+        let type_line = this.createSvgElement('line');
         type_line.setAttribute("x1", "444");
         type_line.setAttribute("x2", "444");
         type_line.setAttribute("y1", "360");
@@ -357,9 +349,7 @@ this.addSVGtoColorChange(type_rect2);
         type_line.setAttribute('transform', transformString);
         type_svg.append(type_line);
 
-
-
-        var type_line1 = this.createSvgElement('line');
+        let type_line1 = this.createSvgElement('line');
         type_line1.setAttribute("x1", "60");
         type_line1.setAttribute("x2", "1900");
         type_line1.setAttribute("y1", "710");
@@ -369,365 +359,48 @@ this.addSVGtoColorChange(type_rect2);
         type_line1.setAttribute('transform', transformString);
         type_svg.append(type_line1);
 
-
-        var type_line2 = this.createSvgElement('line');
+        let type_line2 = this.createSvgElement('line');
         type_line2.setAttribute("x1", "60");
         type_line2.setAttribute("x2", "1900");
         type_line2.setAttribute("y1", "360");
         type_line2.setAttribute("y2", "360");
         type_line2.setAttribute("stroke", "black");
         type_line2.setAttribute("stroke-width", "20");
-
         type_line2.setAttribute('transform', transformString);
         type_svg.append(type_line2);
-
-
-        return type_svg;
     }
 
 
     private getTypeReceiving(): SVGElement {
-        var scaleString: String  = this.replaceNumberToString(0.05*this._myScale);
-        var type_svg = this.createSvgElement('path');
+        let scaleString: String = this.replaceNumberToString(0.05 * this._myScale);
+        let type_svg = this.createSvgElement('path');
         type_svg.setAttribute("id", "pathIdD");
         type_svg.setAttribute("d", "M437.5,59.3h-401C16.4,59.3,0,75.7,0,95.8v282.4c0,20.1,16.4,36.5,36.5,36.5h401c20.1,0,36.5-16.4,36.5-36.5V95.8 C474,75.7,457.6,59.3,437.5,59.3z M432.2,86.3L239.5,205.1L46.8,86.3H432.2z M447,378.2c0,5.2-4.3,9.5-9.5,9.5h-401 c-5.2,0-9.5-4.3-9.5-9.5V104.9l203.7,128.2c0.1,0.1,0.3,0.2,0.4,0.3c0.1,0.1,0.3,0.2,0.4,0.3c0.3,0.2,0.5,0.4,0.8,0.5 c0.1,0.1,0.2,0.1,0.3,0.2c0.4,0.2,0.8,0.4,1.2,0.6c0.1,0,0.2,0.1,0.3,0.1c0.3,0.1,0.6,0.3,1,0.4c0.1,0,0.3,0.1,0.4,0.1 c0.3,0.1,0.6,0.2,0.9,0.2c0.1,0,0.3,0.1,0.4,0.1c0.3,0.1,0.7,0.1,1,0.2c0.1,0,0.2,0,0.3,0c0.4,0,0.9,0.1,1.3,0.1l0,0l0,0 c0.4,0,0.9,0,1.3-0.1c0.1,0,0.2,0,0.3,0c0.3,0,0.7-0.1,1-0.2c0.1,0,0.3-0.1,0.4-0.1c0.3-0.1,0.6-0.2,0.9-0.2c0.1,0,0.3-0.1,0.4-0.1 c0.3-0.1,0.6-0.2,1-0.4c0.1,0,0.2-0.1,0.3-0.1c0.4-0.2,0.8-0.4,1.2-0.6c0.1-0.1,0.2-0.1,0.3-0.2c0.3-0.2,0.5-0.3,0.8-0.5 c0.1-0.1,0.3-0.2,0.4-0.3c0.1-0.1,0.3-0.2,0.4-0.3L447,109.2V378.2z");
         type_svg.setAttribute("stroke", "black");
-        //type_svg.setAttribute("stroke-width", "3");  
         type_svg.setAttribute("opacity", "1");
         type_svg.setAttribute("fill", "black");
-        type_svg.setAttribute('transform', 'translate(8 3) scale('+ `${scaleString}`+')');
+        type_svg.setAttribute('transform', 'translate(8 3) scale(' + `${scaleString}` + ')');
         return type_svg;
     }
 
     private getTypeUserTask(): SVGElement {
-        var scaleString: String  = this.replaceNumberToString(0.2*this._myScale);
-        var type_svg = this.createSvgElement('svg');
-        var type_path1 = this.createSvgElement('path');
+        let scaleString: String = this.replaceNumberToString(0.2 * this._myScale);
+        let type_svg = this.createSvgElement('svg');
+        let type_path1 = this.createSvgElement('path');
         type_path1.setAttribute("d", "M47.893,47.221c11.768,0,21.341-10.592,21.341-23.611S59.66,0,47.893,0C36.125,0,26.55,10.592,26.55,23.61 C26.55,36.63,36.125,47.221,47.893,47.221z");
         type_path1.setAttribute("stroke", "black");
         type_path1.setAttribute("fill", "black");
-        type_path1.setAttribute('transform', 'translate(8 8) scale('+ `${scaleString}`+')');
+        type_path1.setAttribute('transform', 'translate(8 8) scale(' + `${scaleString}` + ')');
         type_svg.append(type_path1);
 
-        var type_path2 = this.createSvgElement('path');
+        let type_path2 = this.createSvgElement('path');
         type_path2.setAttribute("d", "M72.477,44.123c-1.244-0.269-2.524,0.272-3.192,1.355C61.65,57.847,49.34,58.204,47.962,58.204 s-13.687-0.357-21.32-12.722c-0.67-1.085-1.953-1.628-3.198-1.354C6.868,47.777,2.497,72.798,3.789,93.115 c0.101,1.58,1.411,2.811,2.994,2.811h82.36c1.583,0,2.894-1.23,2.993-2.811C93.429,72.775,89.057,47.74,72.477,44.123z");
         type_path2.setAttribute("stroke", "black");
         type_path2.setAttribute("fill", "black");
-        type_path2.setAttribute('transform', 'translate(8 8) scale('+ `${scaleString}`+')');
+        type_path2.setAttribute('transform', 'translate(8 8) scale(' + `${scaleString}` + ')');
         type_svg.append(type_path2);
-
 
         return type_svg;
     }
-// -------------------------------------------------------------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------------------------------------------------------------
-// -------------------------------------------------------------------------------------------------------------------------------------------------------
-
-
-
-
-
-
-    public createSvg2(): SVGElement {
-
-        // // Startereignis
-        //         const svg = this.createSvgElement('circle');
-        //         svg.setAttribute('cx', `${this.x}`);
-        //         svg.setAttribute('cy', `${this.y}`);
-        //         svg.setAttribute('r', '50');
-        //         svg.setAttribute('fill', 'none');
-        //         svg.setAttribute('stroke', 'black');
-        //         svg.setAttribute('stroke-width', "5");
-        //         this.registerSvg(svg);
-
-
-
-        const svg = this.createSvgElement('svg');
-        svg.setAttribute("id","test1");
-        svg.setAttribute('x', `${this.x}`);
-        svg.setAttribute('y', `${this.y}`);
-        svg.setAttribute('width', "126");
-        svg.setAttribute('height', `250`);
-      //  svg.setAttribute('outline', `3px solid green`);
-  
-        const rect = this.createSvgElement('rect');
-        rect.setAttribute('x', `1`);
-        rect.setAttribute('y', `1`);
-        rect.setAttribute('width', `125`);
-        rect.setAttribute('height', `249`);
-//        rect.setAttribute('transform', 'translate(56 56)');
-        rect.setAttribute('fill', 'none');
-        rect.setAttribute('stroke', 'black');
-        rect.setAttribute('stroke-width', "1");
-        svg.append(rect);
-
-
-
-
-        const circle = this.createSvgElement('circle');
-        circle.setAttribute('r', '50');
-        circle.setAttribute('cx', '50%');
-        circle.setAttribute('cy', '23%');
-        //circle.setAttribute('transform', 'translate(56 56)');
-        circle.setAttribute('fill', 'none');
-        circle.setAttribute('stroke', 'black');
-        circle.setAttribute('stroke-width', "9");
-        svg.append(circle);
-
-
-
-        // ----- Text Aktivitäten-Text erstellen ----
-
-
-
-
-
-
-       svg.append(this.createTextSvg());
-
-
-
-
-
-      //  circle.setAttribute("fill","green");
-
-
-        this.registerSvg(svg);
-
-
-        // // Endeereignis
-        //         const svg = this.createSvgElement('circle');
-        //         svg.setAttribute('cx', `${this.x}`);
-        //         svg.setAttribute('cy', `${this.y}`);
-        //         svg.setAttribute('r', '50');
-        //         svg.setAttribute('fill', 'none');
-        //         svg.setAttribute('stroke', 'black');
-        //         svg.setAttribute('stroke-width', "12");
-        //         this.registerSvg(svg);
-
-
-
-
-
-        //     var x: number = 250; // width
-        //     var y: number  = 150; // height
-        //     var r: number = 10; // Abrunden
-        //     var border: number  = 2;
-        //    // var label: string = "TestText  der ersten Aktivität"; // textLength
-        //    // SVG erstellen
-        //       let svg = this.createSvgElement('svg');
-        //        svg.setAttribute('width', (x+2*border).toString());
-        //        svg.setAttribute('height', (y+2*border).toString()); //160
-        //        svg.setAttribute('viewBox', "0 0 "+(x+2*border).toString()+" "+(y+2*border).toString());
-        //        svg.setAttribute('x', `${this.x}`);
-        //        svg.setAttribute('y', `${this.x}`);
-
-        //     // G Aktivitäten-Rechteck erstellen
-        //     var g = this.createSvgElement('rect');
-        //     g.setAttribute('id', 'rect1');
-        //     g.setAttribute('width', x.toString());
-        //     g.setAttribute('height', y.toString());
-        //     g.setAttribute('x', border.toString());
-        //     g.setAttribute('y', border.toString());
-        //     g.setAttribute('rx', r.toString());
-        //     g.setAttribute('ry', r.toString());
-        //     g.setAttribute('stroke', 'rgb(0,0,0)');
-        //     g.setAttribute('stroke-width', border.toString());
-        //     g.setAttribute('fill', 'white');
-        //     svg.append(g);
-
-
-
-        // // G Aktivitäten-Rechteck ende
-        // // --- G Aktivitäten-Symbole erstellen ---
-        //  var type_svg = this.getTypeSvg(); //this.createSvgElement('path');        
-        //  svg.append(type_svg);
-        // // --- G Aktivitäten-Symbole ende ---
-
-
-
-
-
-
-        return svg;
-    }
-
-
-
-private splitString(text : String) : Array<string> {
-    let A : Array<string> = text.split(" ");
-    let B: Array<string> = [""];
-    let i : number = 0; 
-    let j : number = 0; 
-
-A.forEach(Atte => {
-    if((B[j].length + Atte.length) > 16) {
-        j++;
-       // B[j] = Atte;
-        B.push(Atte);
-    } else {
-        B[j] = B[j] + " " + Atte;
-    }
-});
-    return B;
-} 
-
-    public createTextSvg(): SVGElement {
-        
-        var labelText : String = this._label + "ich bin ein test";
-
-
-
-
-
-        var g = this.createSvgElement('g');
-        g.setAttribute('text-align', 'center');
-        g.setAttribute('text-anchor', 'middle');
-        g.setAttribute('font-size', '12px');
-
-        var text = this.createSvgElement('text');
-        text.setAttribute('x', '50%');
-        text.setAttribute('y', '50%');
-
-        var textNode = document.createTextNode(this._label);
-        text.appendChild(textNode);
-        g.appendChild(text);
-
-        var text2 = this.createSvgElement('text');
-        text2.setAttribute('x', '50%');
-        text2.setAttribute('y', '55%');
-   
-        
-
-
-        var textNode2 = document.createTextNode("ich bin ein test");
-        text2.appendChild(textNode2);
-        g.appendChild(text2);
-
-
-
-
-
-        return g;
-
-        //----------------------------
-
-        // var g = this.createSvgElement('g');
-        // g.setAttribute('text-align', 'center');
-        // g.setAttribute('text-anchor', 'middle');
-        // g.setAttribute('font-size', '12px');
-
-        // var text = this.createSvgElement('text');
-        // text.setAttribute('x', '50%');
-        // text.setAttribute('y', '50%');
-
-        // var textNode = document.createTextNode(this._label);
-        // text.appendChild(textNode);
-        // g.appendChild(text);
-
-        // var text2 = this.createSvgElement('text');
-        // text2.setAttribute('x', '50%');
-        // text2.setAttribute('y', '55%');
-   
-        
-
-
-        // var textNode2 = document.createTextNode("ich bin ein test");
-        // text2.appendChild(textNode2);
-        // g.appendChild(text2);
-
-
-
-
-
-        // return g;
-// -------------------------------------
-
-
-
-
-
-
-
-
-
-        //  // var foreignObject_svg = this.createSvgElement('foreignObject');
-        // // foreignObject_svg.setAttribute('x', '2%');
-        // // foreignObject_svg.setAttribute('y', '50%');
-        // // foreignObject_svg.setAttribute('width', '96%');
-        // // foreignObject_svg.setAttribute('height', '50%');
-        // // foreignObject_svg.setAttribute('text-align', 'center');
-        // // foreignObject_svg.setAttribute('text-anchor', 'middle');
-
-
-
-        // // var div = document.createElement('div');
-        // // div.setAttribute("display","table");
-        // // div.setAttribute('width', '100%');
-        // // div.setAttribute('height', '100%');
-
-        // // var p = document.createElement('p');
-        // // p.setAttribute("text-align","center");
-        // // p.setAttribute('display', 'table-cell');
-        // // p.setAttribute('vertical-align', 'middle');
-
-        
-        // var text = this.createSvgElement('text');
-        // text.setAttribute('x', '50%');
-        // text.setAttribute('y', '50%');
-        // text.setAttribute('text-align', 'center');
-        // text.setAttribute('text-anchor', 'middle');
-        // text.setAttribute('inline-size', '125');
-        // text.setAttribute('font-size', '12px');
-        
-        // // var textNode = document.createTextNode(this._label+" ich bin ein test");
-        // // text.appendChild(textNode);
-        // // foreignObject_svg.appendChild(text);
-
-        // var textNode = document.createTextNode(this._label+" ich bin ein test");
-        // text.appendChild(textNode);
-        // svg.appendChild(text);
-
-
-        // // p.appendChild(textNode);
-        // // div.appendChild(p);
-        // // foreignObject_svg.appendChild(div);
-        // // svg.append(foreignObject_svg);
-
-        // // p.appendChild(textNode);
-        // // div.appendChild(p);
-        // // foreignObject_svg.appendChild(div);
-        // // svg.append(foreignObject_svg);
-
-
-
-        // // foreignObject_svg.appendChild(textNode);
-        // // svg.append(foreignObject_svg);
-        // // ----- Text Aktivitäten-Text ende ----
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }

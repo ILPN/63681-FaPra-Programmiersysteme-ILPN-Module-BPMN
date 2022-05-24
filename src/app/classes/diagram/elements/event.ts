@@ -24,6 +24,20 @@ export class Event extends Element {
     }
 
     public createSvg(): SVGElement {
+        const svg = this.createUndergroundSVG();
+        if (this._type === EventType.Start) svg.append(this.getStartSvg());
+        if (this._type === EventType.Intermediate) { svg.append(this.getIntermediateSvgOut()); svg.append(this.getIntermediateSvgIn()); }
+        if (this._type === EventType.End) svg.append(this.getEndSvg());
+        this.registerSvg(svg);
+        svg.append(this.getSVGText());
+        return svg;
+    }
+
+
+
+
+    private createUndergroundSVG(): SVGElement {
+        // // Startereignis
         const svg = this.createSvgElement('svg');
         svg.setAttribute('id', `${this.id}`);
         svg.setAttribute('x', `${this.x - ((this._raduis * 2 + 5) / 2)}`);
@@ -31,23 +45,14 @@ export class Event extends Element {
         svg.setAttribute('width', `${this._raduis * 2 + 5}`);
         svg.setAttribute('height', `${this._raduis * 2 + 5}`);
         svg.setAttribute('style', "overflow: visible;");
-
-        if (this._type === EventType.Start) svg.append(this.getStartSvg());
-        if (this._type === EventType.Intermediate) { svg.append(this.getIntermediateSvgOut()); svg.append(this.getIntermediateSvgIn()); }
-        if (this._type === EventType.End) svg.append(this.getEndSvg());
-        this.registerSvg(svg);
-        svg.append(this.getSVGText());
-
-
         return svg;
     }
 
-    public getStartSvg(): SVGElement {
+    private getStartSvg(): SVGElement {
         // // Startereignis
         const circle = this.createSvgElement('circle');
         circle.setAttribute('id', `${this.id}` + "_circle");
         circle.setAttribute('r', `${this._raduis}`);
-        //circle.setAttribute('transform', 'translate(56 56)');
         circle.setAttribute('cx', '50%');
         circle.setAttribute('cy', '50%');
         circle.setAttribute('fill', 'white');
@@ -58,7 +63,7 @@ export class Event extends Element {
         return circle;
     }
 
-    public getIntermediateSvgOut(): SVGElement {
+    private getIntermediateSvgOut(): SVGElement {
         // Zwischeneignis
         const circle = this.createSvgElement('circle');
         circle.setAttribute('id', `${this.id}` + "_circle");
@@ -68,14 +73,13 @@ export class Event extends Element {
         circle.setAttribute('fill', 'white');
         circle.setAttribute('stroke', 'black');
         circle.setAttribute('stroke-width', "9");
-        // svg.append(circle);
         this.distanceX = this._raduis + 4;
         this.distanceY = this._raduis + 4;
         this.addSVGtoColorChange(circle);
         return circle;
     }
 
-    public getIntermediateSvgIn(): SVGElement {
+    private getIntermediateSvgIn(): SVGElement {
         // Zwischeneignis
         const circle2 = this.createSvgElement('circle');
         circle2.setAttribute('r', `${this._raduis}`);
@@ -88,7 +92,7 @@ export class Event extends Element {
     }
 
 
-    public getEndSvg(): SVGElement {
+    private getEndSvg(): SVGElement {
         // Endeereignis
         const circle = this.createSvgElement('circle');
         circle.setAttribute('id', `${this.id}` + "_circle");
@@ -107,9 +111,7 @@ export class Event extends Element {
 
 
     private getSVGText(): SVGElement {
-        // ----- Text Aktivitäten-Text erstellen ----
-        var text = this.createSvgElement('text');
-
+        const text = this.createSvgElement('text');
         text.setAttribute('x', '50%');
         text.setAttribute('y', '120%');
         text.setAttribute('font-size', '12px');
@@ -117,12 +119,9 @@ export class Event extends Element {
         text.setAttribute('line-height', '110%');
         text.setAttribute('dominant-baseline', 'middle');
         text.setAttribute('text-anchor', 'middle');
-
-        var textNode = document.createTextNode(this._label);
+        let textNode = document.createTextNode(this._label);
         text.appendChild(textNode);
-        // svg.append(text);
         return text;
-        // ----- Text Aktivitäten-Text ende ----
     }
 
 
