@@ -4,7 +4,6 @@ import { Element } from './element';
 export class Diagram {
     private readonly _elements: Array<Element>;
 
-
     constructor() {
         this._elements = [];
     }
@@ -18,7 +17,6 @@ export class Diagram {
 
         if (!this.has(element))
             this._elements.push(element);
-
         return element;
     }
 
