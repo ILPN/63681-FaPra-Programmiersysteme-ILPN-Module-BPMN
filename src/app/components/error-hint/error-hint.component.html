@@ -1,0 +1,11 @@
+<div
+    class="error-hint"
+    *ngIf="errorVisible">
+    <button
+        class="closeButton"
+        (click)="removeMessage()">X
+    </button>
+    <p>Fehler ABC wurde gemacht</p>
+</div>
+
+<button class="mockError" (click)="showError()">Press for Error</button>
