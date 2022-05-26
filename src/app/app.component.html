@@ -10,7 +10,7 @@
 
 
     <div fxLayout="row" fxLayoutAlign="space-evenly start">
-        <app-template-button buttonText="Left button" buttonIcon="lightbulb"></app-template-button>
+        <input-field buttonText="File upload" buttonIcon="publish" (newInputEvent)="textareaFc.setValue($event)"></input-field>
         <mat-form-field appearance="outline"
                         class="textarea">
             <mat-label>Source file</mat-label>
@@ -20,7 +20,7 @@
                       cdkAutosizeMaxRows="20"
                       [formControl]="textareaFc"></textarea>
         </mat-form-field>
-        <app-template-button buttonText="Right button" buttonIcon="grade"></app-template-button>
+        <input-field buttonText="Right button" buttonIcon="grade"></input-field>
     </div>
 
     <!--  Footer  -->
