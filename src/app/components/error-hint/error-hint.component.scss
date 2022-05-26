@@ -1,0 +1,59 @@
+.error-hint{
+    -webkit-animation: fadeIn linear 1.2s;
+}
+
+.error-hint, .error-hint:hover {
+    position: absolute;
+    width: 300px;
+    height: 50px;
+    border: 3px solid black;
+    padding: 50px;
+    margin: 20px;
+    display: flex;
+    justify-content: center;
+    border-radius: 25px;
+    font-family: serif;
+    box-shadow: rgba(149, 157, 165, 0.2) 0 8px 24px;
+    right: 25px;
+    top: 0;
+}
+@keyframes fadeIn {
+    0% {opacity:0;}
+    100% {opacity:1;}
+}
+
+@-webkit-keyframes fadeIn {
+    0% {opacity:0;}
+    100% {opacity:1;}
+}
+
+.error-hint:hover {
+    border: 4px solid black;
+    box-shadow: rgba(100, 100, 111, 0.2) 0 7px 29px 0;
+}
+
+.closeButton, .closeButton:hover {
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    left: 370px;
+    top: 10px;
+    border-radius: 10px;
+    box-shadow: rgba(0, 0, 0, 0.16) 0 1px 4px;
+}
+
+.closeButton:hover {
+    color: red;
+    box-shadow: rgba(0, 0, 0, 0.24) 0 3px 8px;
+}
+
+.mockError {
+    display: flex;
+    justify-content: center;
+    position: absolute;
+    left: 200px;
+}
+
+
