@@ -1,20 +1,43 @@
 export abstract class Element {
-    private _id : string;
+    private _id: string;
     private _x: number;
     private _y: number;
+    /** Hier kann der Abstand, welcher aus der X-Achse zu diesem Element eingehalten werden sollte, um überlappungen zu verhindert, abgelesen werden.  */
+    private _distanceX: number = 0;
+    /** Hier kann der Abstand, welcher aus der Y-Achse zu diesem Element eingehalten werden sollte, um überlappungen zu verhindert, abgelesen werden.  */
+    private _distanceY: number = 0;
     private _svgElement: SVGElement | undefined;
     private _adjacentElements: Element[];
-    
+    /** Dieses Array von SVG Elementen beinhaltet alle Elemente, dessen fill Farbe sich ändern muss, um die Farbe des Elements zu ändern. */
+    private _svgColorElements: SVGElement[];
 
-    constructor(id : string) {
+
+    constructor(id: string) {
         this._id = id;
         this._x = 0;
         this._y = 0;
         this._adjacentElements = [];
+        this._svgColorElements = [];
     }
 
     get adjacentElements(): Element[] {
         return this._adjacentElements;
+    }
+
+    get distanceX(): number {
+        return this._distanceX;
+    }
+
+    set distanceX(value: number) {
+        this._distanceX = value;
+    }
+
+    get distanceY(): number {
+        return this._distanceY;
+    }
+
+    set distanceY(value: number) {
+        this._distanceY = value;
     }
 
     get id(): string {
@@ -61,14 +84,14 @@ export abstract class Element {
         if (this._svgElement === undefined) {
             return;
         }
-        this._svgElement.setAttribute('fill', 'red');
+        this.changeColor("red")
     }
 
     private processMouseUp(event: MouseEvent) {
         if (this._svgElement === undefined) {
             return;
         }
-        this._svgElement.setAttribute('fill', 'black');
+        this.changeColor("white")
     }
 
     /**
@@ -76,7 +99,6 @@ export abstract class Element {
      * @param target target of new edge
      */
     public addEdge(target: Element): void {
-
         if (!this.hasEdge(target))
             this._adjacentElements.push(target);
     }
@@ -109,5 +131,18 @@ export abstract class Element {
     }
 
 
+    /**
+     * Mit dieser Methode kann dem Element eine Farbe übergeben werden, welche es alt Hintergrundfarbe setzt.
+     * @param newColor neue Hintergrundfarbe als String
+     */
+    changeColor(newColor: string) {
+        this._svgColorElements.forEach(element => element.setAttribute('fill', newColor));
+    }
+    /** Hiermit können SVG Elemente hinzugefügt werden, welche ihre Farbe ändern sollen für den Fall das das Element gefärbt werden soll. 
+     *  @param element ein zu färbendes SVG Element
+    */
+    addSVGtoColorChange(element: SVGElement) {
+        this._svgColorElements.push(element);
+    }
 
 }
