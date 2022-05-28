@@ -96,17 +96,17 @@ export class ParserService {
         result.addElement(connector1);
 
         let connector2: Connector = new Connector("A3", "", Connectortype.InformationFlow, elementG1, elementT2);
-        connector2.addPathConnectorElement(210, 320);
+        //connector2.addPathConnectorElement(210, 320);
         result.addEdge(elementG1, elementT2);
         result.addElement(connector2);
 
         let connector3: Connector = new Connector("A4", "", Connectortype.Association, elementT1, elementG2);
-        connector3.addPathConnectorElement(675, 60);
+        //connector3.addPathConnectorElement(675, 60);
         result.addEdge(elementT1, elementG2);
         result.addElement(connector3);
 
         let connector4: Connector = new Connector("A5", "", Connectortype.InformationFlow, elementT2, elementG2);
-        connector4.addPathConnectorElement(675, 320);
+        //connector4.addPathConnectorElement(675, 320);
         result.addEdge(elementT2, elementG2);
         result.addElement(connector4);
 
@@ -123,8 +123,8 @@ export class ParserService {
         result.addElement(connector7)
 
         let connector8: Connector = new Connector("A9", "", Connectortype.InformationFlow, elementE3, elementE2);
-        connector8.addPathConnectorElement(1600, 60);
-        connector8.addPathConnectorElement(850, 60);
+        //connector8.addPathConnectorElement(1600, 60);
+        //connector8.addPathConnectorElement(850, 60);
         result.addEdge(elementE3, elementE2);
         result.addElement(connector8);
         return result;
