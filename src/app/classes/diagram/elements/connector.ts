@@ -7,6 +7,9 @@ export class Connector extends Element {
     private _label: String;
     private _type: Connectortype;
     private _pathConnectorElements: ConnectorElement[];
+    public get pathConnectorElements(): ConnectorElement[] {
+        return this._pathConnectorElements;
+    }
     private _start: Element;
     private _end: Element;
 
@@ -19,6 +22,7 @@ export class Connector extends Element {
         this._end = end;
         this._pathConnectorElements = [];
     }
+
 
     get start(): Element {
         return this._start;
@@ -49,10 +53,13 @@ export class Connector extends Element {
         * @param target target of new edge
         */
     public addPathConnectorElement(x_Point: number, y_Point: number): void {
-        let element: ConnectorElement = new ConnectorElement(this.id + "_pathID" + ConnectorElement.length);
+        let element: ConnectorElement = new ConnectorElement(this.id + "_pathID" + this._pathConnectorElements.length);
         element.x = x_Point;
         element.y = y_Point;
         this._pathConnectorElements.push(element);
+    }
+    public deleteAllPathConnectorElements(){
+        this._pathConnectorElements = []
     }
 
     private findPositionOfPathConnectorElement(x_Point: number, y_Point: number): number {

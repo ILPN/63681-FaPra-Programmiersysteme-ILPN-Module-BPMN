@@ -1,4 +1,4 @@
-import { LayeredGraph, LNode } from "./LayeredGraph";
+import { DummyNode, LayeredGraph, LNode } from "./LayeredGraph";
 import { SimpleGraph } from "./SimpleGraph";
 
 export class Sugiyama{
@@ -218,7 +218,7 @@ export class Sugiyama{
                 for (let i = 1; i < levelSpan; i++) {
                     const dummyId = a.from.id+"-"+a.to.id+"d"+ i
                     const layer = a.from.layer + i
-                    this.leveled.layers[layer].push( new LNode(dummyId,true,layer))
+                    this.leveled.layers[layer].push( new DummyNode(dummyId, a.from.id, a.to.id,layer))
                     this.leveled.addArc(prev, dummyId,arcIsInversed)   
                     prev = dummyId                   
                 }

@@ -91,7 +91,7 @@ export class ParserService {
         result.addElement(connector);
 
         let connector1: Connector = new Connector("A2", "", Connectortype.SequenceFlow, elementG1, elementT1);
-        connector1.addPathConnectorElement(210, 60);
+       // connector1.addPathConnectorElement(210, 60);
         result.addEdge(elementG1, elementT1);
         result.addElement(connector1);
 
