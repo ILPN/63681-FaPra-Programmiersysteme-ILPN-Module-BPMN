@@ -12,15 +12,11 @@ export class Sugiyama{
         this.makeMagicHappen()
         return this.getLayeredGraph()
     }
-    makeMagicHappen() {
+    private makeMagicHappen() {
         this.makeAcyclic()
         this.leveling()
         this.addDummies()
         this.ordering()
-/*         MyParser.printLGraph(this.leveled)
-        this.leveled.getAllNodes().forEach(e => {
-            console.log(`${e.id} ist auf level ${e.layer}  und order ${e.order}`)
-        }); */
         this.reverseReversedArcs()
         this.calculateCoordinates()
     }

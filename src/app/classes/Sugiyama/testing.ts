@@ -1,7 +1,7 @@
 import { LayeredGraph } from "./LayeredGraph";
-import { MyParser } from "./MyParser";
 import { SimpleGraph } from "./SimpleGraph";
 import { Sugiyama } from "./Sugiyama";
+import { SugiyamaParser } from "./SugiyamaParser";
 
 
 
@@ -40,12 +40,12 @@ export function sugiyamaTest(){
     sugi.spacingXAxis = 40
     sugi.spacingYAxis= 20
     const result :LayeredGraph = sugi.getResult()
-    MyParser.printGraph(graph)
-    MyParser.printLGraph(result)
+    SugiyamaParser.printGraph(graph)
+    SugiyamaParser.printLGraph(result)
     
     console.log("-----------------")
     result.getAllNodes().forEach(n => {
-        console.log(`id: ${n.id} layer:${n.layer} order:${n.order} x,y:(${n.x},${n.y})`)    
+        console.log(`id: ${n.id} layer:${n.layer} order:${n.order} x,y:(${n.x},${n.y})`)
     });
     //---------------------
 }
