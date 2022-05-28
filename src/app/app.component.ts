@@ -34,7 +34,7 @@ export class AppComponent implements OnDestroy {
         const result = this._parserService.parse(newSource);
         if (result !== undefined) {
             
-            //applySugiyama(result)         
+            applySugiyama(result,1000, 500,50)        
             this._displayService.display(result);
         }
     }
