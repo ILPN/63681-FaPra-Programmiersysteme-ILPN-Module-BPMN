@@ -52,7 +52,7 @@ export function applySugiyama(diagram:Diagram, w = 1000, h =500 , p = 50){
          const toLNode:LNode|undefined = result.getNode(c.end.id)
          if (fromLNode == undefined ||toLNode == undefined) continue;
          const levelSpan = toLNode.layer - fromLNode.layer
-         if(levelSpan == 1){
+         if(levelSpan == 1 && (fromLNode.y != toLNode.y)){
              if(result.layers[fromLNode.layer].length< result.layers[toLNode.layer].length){
                 c.addPathConnectorElement(fromLNode.x,toLNode.y)
 
