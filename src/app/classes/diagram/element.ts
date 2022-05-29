@@ -104,14 +104,17 @@ export abstract class Element {
                 return;
             }
             //drag on X axis
-            let diff_x: number = (evt.clientX - this.x_start) / 15;
+            let diff_x: number = (evt.clientX - this.x_start);
             let target_x: number = Number(this._svgElement.getAttribute('x')) + diff_x;
             this._svgElement.setAttribute('x', `${target_x}`);
 
             //drag on Y axis
-            let diff_y: number = (evt.clientY - this.y_start) / 15;
+            let diff_y: number = (evt.clientY - this.y_start);
             let target_y: number = Number(this._svgElement.getAttribute('y')) + diff_y;
             this._svgElement.setAttribute('y', `${target_y}`);
+
+            this.x_start = evt.clientX;
+            this.y_start = evt.clientY;
         }
     }
 
