@@ -12,6 +12,13 @@ export abstract class Element {
     private _svgColorElements: SVGElement[];
 
 
+    //for dragging
+    private x_start: number = 0;
+    private y_start: number = 0;
+    private dragging: boolean = false;
+
+
+
     constructor(id: string) {
         this._id = id;
         this._x = 0;
@@ -72,12 +79,40 @@ export abstract class Element {
 
     public registerSvg(svg: SVGElement) {
         this._svgElement = svg;
+
         this._svgElement.onmousedown = (event) => {
             this.processMouseDown(event);
         };
+
+
         this._svgElement.onmouseup = (event) => {
             this.processMouseUp(event);
         };
+
+        this._svgElement.onmousemove = (event) => {
+            this.move(event);
+        };
+        document.addEventListener('mouseup', e => {
+            this.dragging = false;
+        });
+
+    }
+
+    public move(evt: MouseEvent) {
+        if (this.dragging) {
+            if (this._svgElement === undefined) {
+                return;
+            }
+            //drag on X axis
+            let diff_x: number = (evt.clientX - this.x_start) / 15;
+            let target_x: number = Number(this._svgElement.getAttribute('x')) + diff_x;
+            this._svgElement.setAttribute('x', `${target_x}`);
+
+            //drag on Y axis
+            let diff_y: number = (evt.clientY - this.y_start) / 15;
+            let target_y: number = Number(this._svgElement.getAttribute('y')) + diff_y;
+            this._svgElement.setAttribute('y', `${target_y}`);
+        }
     }
 
     private processMouseDown(event: MouseEvent) {
@@ -85,14 +120,20 @@ export abstract class Element {
             return;
         }
         this.changeColor("red")
+        this.dragging = true;
+        this.x_start = event.clientX;
+        this.y_start = event.clientY;
     }
 
     private processMouseUp(event: MouseEvent) {
+        this.dragging = false;
         if (this._svgElement === undefined) {
             return;
         }
         this.changeColor("white")
+
     }
+
 
     /**
      * adds edge from this element to target
