@@ -29,7 +29,7 @@ export class ParserService {
         //         result.addElement(this.parseElement(line));
         //     }
         // });
-        const result = this.testDiagramm();
+        const result = this.testDiagramm2();
 
         return result;
     }
@@ -45,6 +45,9 @@ export class ParserService {
 
 
     private testDiagramm(): Diagram {
+
+        // Probleme bei der Darstellung von Elementen, welche über keine Kanten verfügen
+// Probleme mit den Längen der Kanten, diese ist nicht nachvollziehbar.
         const result = new Diagram();
         let elementE1 = new Event("E1", "Start", EventType.Start);
         elementE1.x = 60;
@@ -129,4 +132,70 @@ export class ParserService {
         result.addElement(connector8);
         return result;
     }
+
+    private testDiagramm2(): Diagram {
+        const result = new Diagram();
+        let elementE1 = new Event("E1", "Start", EventType.Start);
+        result.addElement(elementE1);
+
+        let elementE2 = new Event("E2", "", EventType.Intermediate);
+        result.addElement(elementE2);
+
+        let elementT1 = new Task("t1", "Hotel buchen", TaskType.Service);
+        result.addElement(elementT1);
+
+        let elementT2 = new Task("t2", "Flug buchen", TaskType.Manual);
+        result.addElement(elementT2);
+
+        let elementT3 = new Task("t3", "t3", TaskType.Manual);
+        result.addElement(elementT3);
+        let connector4: Connector = new Connector("A4", "", Connectortype.InformationFlow, elementE2, elementT3);
+        result.addEdge(elementE2, elementT3);
+        result.addElement(connector4);
+
+        
+        let elementT4 = new Task("t4", "t4", TaskType.Manual);
+        result.addElement(elementT4);
+        let connector5: Connector = new Connector("A4", "", Connectortype.InformationFlow, elementT3, elementT4);
+        result.addEdge(elementT3, elementT4);
+        result.addElement(connector5);
+
+        
+        // let elementT5 = new Task("t5", "t5", TaskType.Manual);
+        // result.addElement(elementT5);
+        // let connector6: Connector = new Connector("A4", "", Connectortype.InformationFlow, elementT4, elementT5);
+        // result.addEdge(elementT4, elementT5);
+        // result.addElement(connector6);
+
+        
+        // let elementT6 = new Task("t6", "t6", TaskType.Manual);
+        // result.addElement(elementT6);
+        // let connector7: Connector = new Connector("A4", "", Connectortype.InformationFlow, elementT5, elementT6);
+        // result.addEdge(elementT5, elementT6);
+        // result.addElement(connector7);
+
+        
+        // let elementT7 = new Task("t7", "t7", TaskType.Manual);
+        // result.addElement(elementT7);
+        // let connector8: Connector = new Connector("A4", "", Connectortype.InformationFlow, elementT6, elementT7);
+        // result.addEdge(elementT6, elementT7);
+        // result.addElement(connector8);
+
+        let connector: Connector = new Connector("A1", "", Connectortype.InformationFlow, elementE1, elementT1);
+        result.addEdge(elementE1, elementT1);
+        result.addElement(connector);
+
+        let connector1: Connector = new Connector("A1", "", Connectortype.InformationFlow, elementE1, elementT2);
+        result.addEdge(elementE1, elementT2);
+        result.addElement(connector1);
+
+        let connector2: Connector = new Connector("A1", "", Connectortype.InformationFlow, elementT1, elementE2);
+        result.addEdge(elementT1, elementE2);
+        result.addElement(connector2);
+
+        let connector3: Connector = new Connector("A1", "", Connectortype.InformationFlow, elementT2, elementE2);
+        result.addEdge(elementT2, elementE2);
+        result.addElement(connector3);
+        return result;
+     }
 }
