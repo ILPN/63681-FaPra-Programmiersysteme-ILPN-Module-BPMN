@@ -1,0 +1,20 @@
+<div fxLayout="column" fxLayoutAlign="start center">
+    {{buttonText}}
+
+
+    <div class="interactive-square" fxLayout="column" fxLayoutAlign="center" center appUpload 
+        (filesChangeEmiter) ="onFileDragged($event)"
+        (click)="fileUpload.click()"
+        >
+        
+        <mat-icon class="larger-icon">
+            {{buttonIcon}}
+        </mat-icon>
+
+        <p>Click or drag BPMN file here</p>
+
+        <input type="file" class="file-input" (change)="onFileSelected($event)"
+        #fileUpload>
+
+    </div>
+</div>

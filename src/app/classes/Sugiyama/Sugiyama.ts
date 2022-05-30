@@ -1,4 +1,4 @@
-import { LayeredGraph, LNode } from "./LayeredGraph";
+import { DummyNode, LayeredGraph, LNode } from "./LayeredGraph";
 import { SimpleGraph } from "./SimpleGraph";
 
 export class Sugiyama{
@@ -12,15 +12,11 @@ export class Sugiyama{
         this.makeMagicHappen()
         return this.getLayeredGraph()
     }
-    makeMagicHappen() {
+    private makeMagicHappen() {
         this.makeAcyclic()
         this.leveling()
         this.addDummies()
         this.ordering()
-/*         MyParser.printLGraph(this.leveled)
-        this.leveled.getAllNodes().forEach(e => {
-            console.log(`${e.id} ist auf level ${e.layer}  und order ${e.order}`)
-        }); */
         this.reverseReversedArcs()
         this.calculateCoordinates()
     }
@@ -222,7 +218,7 @@ export class Sugiyama{
                 for (let i = 1; i < levelSpan; i++) {
                     const dummyId = a.from.id+"-"+a.to.id+"d"+ i
                     const layer = a.from.layer + i
-                    this.leveled.layers[layer].push( new LNode(dummyId,true,layer))
+                    this.leveled.layers[layer].push( new DummyNode(dummyId, a.from.id, a.to.id,layer))
                     this.leveled.addArc(prev, dummyId,arcIsInversed)   
                     prev = dummyId                   
                 }

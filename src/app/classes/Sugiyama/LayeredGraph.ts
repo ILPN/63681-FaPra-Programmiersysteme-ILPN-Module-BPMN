@@ -23,7 +23,7 @@ export class LayeredGraph {
   import(acyc: SimpleGraph) {
     this.layers[0]=[]
       acyc.nodes.forEach(sn => {
-        this.layers[0].push(new LNode(sn.id,false))
+        this.layers[0].push(new LNode(sn.id))
       });
       acyc.arcs.forEach(sa => {
         this.addArc(sa.from,sa.to, sa.inversed)        
@@ -63,6 +63,18 @@ export class LayeredGraph {
     });
     return allNodes
   }
+  getAllNoneDummyNodes():LNode[]{
+    return this.getAllNodes().filter(n => !(n instanceof DummyNode))
+  }
+  getAllDummys():DummyNode[]{
+    const dummys: DummyNode[] = []
+    for(let n of this.getAllNodes()){
+      if (n instanceof DummyNode){
+        dummys.push(n)
+      } 
+    }
+    return dummys
+  }
   public layers: LNode[][] = [];
   public arcs: LArc[] = [];
 }
@@ -85,14 +97,6 @@ export class LNode{
   public set y(value: number) {
     this._y = value;
   }
-
-  private _isDummy = false;
-  public get isDummy() {
-    return this._isDummy;
-  }
-  public set isDummy(value) {
-    this._isDummy = value;
-  }
   private _layer = -1;
   public get layer() {
     return this._layer;
@@ -107,9 +111,8 @@ export class LNode{
   public set order(value) {
     this._order = value;
   }
-  constructor(id: string, isDummy?:boolean, layer?: number) {
+  constructor(id: string, layer?: number) {
     this._id = id;
-    if(isDummy != undefined) this._isDummy = isDummy
     if(layer != undefined) this._layer = layer
 
   }
@@ -157,4 +160,22 @@ export class LArc {
     this._to = to;
     this._reversed = reversed
   }
+}
+export class DummyNode extends LNode{
+  private _fromId: string; 
+  public get fromId(): string {
+    return this._fromId;
+  }
+  private _toId:string
+  public get toId(): string {
+    return this._toId;
+  }
+
+  constructor(id: string, from:string, to:string, layer?: number){
+    super(id,layer)
+    this._fromId = from
+    this._toId = to
+
+  }
+
 }

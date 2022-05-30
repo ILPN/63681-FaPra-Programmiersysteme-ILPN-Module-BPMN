@@ -13,11 +13,26 @@
 
 .larger-icon {
     font-size: 40px;
-    width: 40px;
-    height: 40px;
+    width: auto;
+    height: 50%;
     color: dimgrey;
 }
 
 .mouse-hover .larger-icon {
     color: black;
+}
+
+mat-icon {
+    text-align: center;
+}
+
+p {
+    font-size: small;
+    text-align: center;
+    height: 50%;
+    margin: 0;
+}
+
+.file-input{
+    display: none;
 }
