@@ -10,6 +10,7 @@ import { Task } from '../classes/diagram/elements/task';
 import { TaskType } from '../classes/diagram/elements/tasktype';
 import { Connector } from '../classes/diagram/elements/connector';
 import { Connectortype } from '../classes/diagram/elements/connectortype';
+import { EinPfeil } from '../classes/diagram/elements/EinPfeil';
 
 @Injectable({
     providedIn: 'root'
@@ -59,6 +60,8 @@ export class ParserService {
         elementE2.y = 190;
         result.addElement(elementE2);
 
+
+
         let elementE3 = new Event("E3", "Ende", EventType.End);
         elementE3.x = 1600;
         elementE3.y = 190;
@@ -93,10 +96,9 @@ export class ParserService {
         result.addEdge(elementE1, elementG1);
         result.addElement(connector);
 
-        let connector1: Connector = new Connector("A2", "", Connectortype.SequenceFlow, elementG1, elementT1);
-       // connector1.addPathConnectorElement(210, 60);
+        let pfeil = new EinPfeil("p1","label", elementG1, elementT1);
         result.addEdge(elementG1, elementT1);
-        result.addElement(connector1);
+        result.addElement(pfeil);
 
         let connector2: Connector = new Connector("A3", "", Connectortype.InformationFlow, elementG1, elementT2);
         connector2.addPathConnectorElement(210, 320);

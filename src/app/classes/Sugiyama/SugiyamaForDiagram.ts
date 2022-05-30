@@ -1,5 +1,10 @@
 import { Diagram } from "../diagram/diagram";
 import { Connector } from "../diagram/elements/connector";
+import { EinPfeil } from "../diagram/elements/EinPfeil";
+import { Gateway } from "../diagram/elements/gateway";
+import { Task } from "../diagram/elements/task";
+import { Event } from "../diagram/elements/event";
+
 import { LayeredGraph, LNode } from "./LayeredGraph";
 import { SimpleGraph } from "./SimpleGraph";
 import { Sugiyama } from "./Sugiyama";
@@ -8,13 +13,13 @@ import { SugiyamaParser } from "./SugiyamaParser";
 export function applySugiyama(diagram:Diagram, w = 1000, h =500 , p = 50){
     const input = new SimpleGraph()
     diagram.elements.forEach(el => {
-        if(!(el instanceof Connector)){
+        if((el instanceof Task || el instanceof Gateway|| el instanceof Event)){
             input.addNode(el.id)
         }
     });
 
     for (let el of diagram.elements) {
-        if(el instanceof Connector) continue;
+        if(!(el instanceof Task || el instanceof Gateway|| el instanceof Event)) continue;
         for (let child of el.adjacentElements) {
             if(child instanceof Connector){
                 continue;
@@ -65,4 +70,17 @@ export function applySugiyama(diagram:Diagram, w = 1000, h =500 , p = 50){
             }
          }
      }
+
+     const pfeile:EinPfeil[] = []
+     for (let el of diagram.elements){
+         if(el instanceof EinPfeil) pfeile.push(el)
+     }
+     for (let pfeil of pfeile){
+        const fromLNode:LNode|undefined = result.getNode(pfeil.start.id)
+        const toLNode:LNode|undefined = result.getNode(pfeil.end.id)
+        if (fromLNode == undefined ||toLNode == undefined) continue;
+        pfeil.addPfeilEcke(fromLNode.x,fromLNode.y)
+        pfeil.addPfeilEcke(fromLNode.x,toLNode.y-25)
+        pfeil.addPfeilEcke(toLNode.x,toLNode.y)
+    }
   }
