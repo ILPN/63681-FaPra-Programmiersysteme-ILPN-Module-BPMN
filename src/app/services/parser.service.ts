@@ -74,6 +74,13 @@ export class ParserService {
         elementT2.y = 320;
         result.addElement(elementT2);
 
+        let elLamborgini = new Task("tLambo", "Lamborgini buchen", TaskType.Manual);
+        elLamborgini.x = 0;
+        elLamborgini.y = 0;
+        result.addElement(elLamborgini);
+
+     
+
         let elementT3 = new Task("t3", "Drucken", TaskType.UserTask);
         elementT3.x = 1225;
         elementT3.y = 190;
@@ -130,6 +137,16 @@ export class ParserService {
         connector8.addPfeilEcke(850, 60);
         result.addEdge(elementE3, elementE2);
         result.addElement(connector8);
+
+
+        let pp = new EinPfeil("pLamboEin", "", elementG1, elLamborgini);
+        result.addEdge(elementG1, elLamborgini);
+        result.addElement(pp);
+
+        let ppp = new EinPfeil("pLamboAus", "", elLamborgini, elementG2);
+        result.addEdge(elLamborgini, elementG2);
+        result.addElement(ppp);
+
         return result;
     }
 }
