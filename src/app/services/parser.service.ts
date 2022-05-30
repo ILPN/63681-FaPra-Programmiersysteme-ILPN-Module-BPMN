@@ -30,7 +30,7 @@ export class ParserService {
         //         result.addElement(this.parseElement(line));
         //     }
         // });
-        const result = this.testDiagramm2();
+        const result = this.testDiagramm();
 
         return result;
     }
@@ -48,7 +48,7 @@ export class ParserService {
     private testDiagramm(): Diagram {
 
         // Probleme bei der Darstellung von Elementen, welche über keine Kanten verfügen
-// Probleme mit den Längen der Kanten, diese ist nicht nachvollziehbar.
+
         const result = new Diagram();
         let elementE1 = new Event("E1", "Start", EventType.Start);
         elementE1.x = 60;
@@ -60,7 +60,7 @@ export class ParserService {
         elementE2.y = 190;
         result.addElement(elementE2);
 
-
+        
 
         let elementE3 = new Event("E3", "Ende", EventType.End);
         elementE3.x = 1600;
@@ -72,15 +72,17 @@ export class ParserService {
         elementT1.y = 60;
         result.addElement(elementT1);
 
-        let elementT2 = new Task("t2", "Flug buchen", TaskType.Manual);
+        let elementT2 = new Task("t2", "Flug buchen / Auto mieten / Schiff fahren / U-Boot leihen / Fahrrad kaufen", TaskType.Manual);
         elementT2.x = 442;
         elementT2.y = 320;
         result.addElement(elementT2);
 
-        let elementT3 = new Task("t3", "Drucken", TaskType.UserTask);
+        let elementT3 = new Task("t3", "Drucken , Auftragsbestätigungen senden", TaskType.UserTask);
         elementT3.x = 1225;
         elementT3.y = 190;
         result.addElement(elementT3);
+
+
 
         let elementG1 = new Gateway("G1", GatewayType.AND_SPLIT);
         elementG1.x = 210;
@@ -96,9 +98,14 @@ export class ParserService {
         result.addEdge(elementE1, elementG1);
         result.addElement(connector);
 
+
+        let connector1: Connector = new Connector("A1", "", Connectortype.InformationFlow, elementG1, elementT1);
         let pfeil = new EinPfeil("p1","label", elementG1, elementT1);
         result.addEdge(elementG1, elementT1);
-        result.addElement(pfeil);
+        result.addElement(connector1);
+
+
+        
 
         let connector2: Connector = new Connector("A3", "", Connectortype.InformationFlow, elementG1, elementT2);
         connector2.addPathConnectorElement(210, 320);
@@ -132,7 +139,7 @@ export class ParserService {
         connector8.addPathConnectorElement(850, 60);
         result.addEdge(elementE3, elementE2);
         result.addElement(connector8);
-        return result;
+ return result;
     }
 
     private testDiagramm2(): Diagram {
@@ -199,5 +206,5 @@ export class ParserService {
         result.addEdge(elementT2, elementE2);
         result.addElement(connector3);
         return result;
-     }
+    }
 }

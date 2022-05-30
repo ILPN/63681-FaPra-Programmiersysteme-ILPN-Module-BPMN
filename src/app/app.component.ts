@@ -23,7 +23,7 @@ export class AppComponent implements OnDestroy {
         this._sub = this.textareaFc.valueChanges
             .pipe(debounceTime(400))
             .subscribe((val) => this.processSourceChange(val));
-        this.textareaFc.setValue(`What s cookin, good lookin?`);
+        this.textareaFc.setValue(`Hier könnte ihre Werbung stehen!`);
     }
 
     ngOnDestroy(): void {

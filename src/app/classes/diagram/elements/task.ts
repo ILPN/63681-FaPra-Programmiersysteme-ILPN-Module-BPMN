@@ -43,20 +43,6 @@ export class Task extends Element {
         return svg;
     }
 
-    private getText(): SVGElement {
-        let text = this.createSvgElement('text');
-        text.setAttribute('x', '50%');
-        text.setAttribute('y', '50%');
-        text.setAttribute('font-size', '12px');
-        text.setAttribute('text-align', 'justified');
-        text.setAttribute('line-height', '110%');
-        text.setAttribute('dominant-baseline', 'middle');
-        text.setAttribute('text-anchor', 'middle');
-        let textNode = document.createTextNode(this._label);
-        text.appendChild(textNode);
-        return text;
-    }
-
 
     private createUndergroundSVG(): SVGElement {
         let svg = this.createSvgElement('svg');
@@ -402,5 +388,76 @@ export class Task extends Element {
 
         return type_svg;
     }
+
+
+
+
+    private getText(): SVGElement {
+        let text = this.createSvgElement('text');
+        text.setAttribute('x', '50%');
+        text.setAttribute('y', '50%');
+        text.setAttribute('font-size', '12px');
+        text.setAttribute('text-align', 'justified');
+        text.setAttribute('line-height', '110%');
+        text.setAttribute('dominant-baseline', 'middle');
+        text.setAttribute('text-anchor', 'middle');
+
+        let textLabel = this._label + "this._label";
+        let A = this.splitString(this._label);
+        if (A.length > 4) {
+            A = A.slice(0, 3);
+            A.push("...");
+        }
+        let y: number = (this._height / 2) - (6 * (A.length - 1));
+        A.forEach(s => {
+            let textNode = this.newTSpan(`${s}`, y);
+            y = y + 15;
+            text.appendChild(textNode);
+        });
+        return text;
+    }
+
+    private newTSpan(text: string, y: number): SVGElement {
+        let tspan = this.createSvgElement('tspan');
+        tspan.setAttribute("x", '50%');
+        tspan.setAttribute("y", `${y}`);
+      
+        tspan.textContent = text;
+        return tspan;
+    }
+
+    private splitString(text: String): Array<string> {
+        let A: Array<string> = text.split(" ");
+        let B: Array<string> = [""];
+        let i: number = 0;
+        let j: number = 0;
+        let splitAfter: number = 15;
+        let index: number = 0;
+
+        A.forEach(Atte => {
+            if ((B[j].length + Atte.length) > splitAfter) {
+                j++;
+                if (Atte.length > splitAfter) {
+                    for (index = 0; (Atte.length - index) > splitAfter; index = index + splitAfter) {
+                        B.push(Atte.substring(index, index + splitAfter) + "-");
+                        j++;
+                    }
+                    B.push(Atte.substring(index, index + splitAfter));
+                } else {
+                    B.push(Atte);
+                }
+            } else {
+                B[j] = B[j] + " " + Atte;
+            }
+        });
+        return B;
+    }
+
+
+
+
+
+
+
 
 }
