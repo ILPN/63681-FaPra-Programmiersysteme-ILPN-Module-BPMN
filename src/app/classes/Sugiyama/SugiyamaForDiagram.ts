@@ -79,8 +79,19 @@ export function applySugiyama(diagram:Diagram, w = 1000, h =500 , p = 50){
         const fromLNode:LNode|undefined = result.getNode(pfeil.start.id)
         const toLNode:LNode|undefined = result.getNode(pfeil.end.id)
         if (fromLNode == undefined ||toLNode == undefined) continue;
-        pfeil.addPfeilEcke(fromLNode.x,fromLNode.y)
-        pfeil.addPfeilEcke(fromLNode.x,toLNode.y-25)
-        pfeil.addPfeilEcke(toLNode.x,toLNode.y)
+
+        pfeil.setPfeilStart(fromLNode.x,fromLNode.y)
+        pfeil.setPfeilZiel(toLNode.x,toLNode.y)
+        pfeil.clearPfeilEcken()
+        //making things square
+        if(result.layers[fromLNode.layer].length >= result.layers[toLNode.layer].length){
+            if(fromLNode.y != toLNode.y){ 
+            pfeil.addPfeilEcke(toLNode.x,fromLNode.y)
+            }
+        }else{
+            if(fromLNode.y != toLNode.y){ 
+                pfeil.addPfeilEcke(fromLNode.x,toLNode.y)
+                } 
+        } 
     }
   }
