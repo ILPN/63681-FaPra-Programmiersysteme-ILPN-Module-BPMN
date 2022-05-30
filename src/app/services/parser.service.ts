@@ -74,7 +74,7 @@ export class ParserService {
         elementT2.y = 320;
         result.addElement(elementT2);
 
-        let elLamborgini = new Task("tLambo", "Lamborgini buchen", TaskType.Manual);
+        let elLamborgini = new Task("tLambo", "Lamborghini buchen", TaskType.Manual);
         elLamborgini.x = 0;
         elLamborgini.y = 0;
         result.addElement(elLamborgini);
