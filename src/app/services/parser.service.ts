@@ -10,6 +10,7 @@ import { Task } from '../classes/diagram/elements/task';
 import { TaskType } from '../classes/diagram/elements/tasktype';
 import { Connector } from '../classes/diagram/elements/connector';
 import { Connectortype } from '../classes/diagram/elements/connectortype';
+import { EinPfeil } from '../classes/diagram/elements/EinPfeil';
 
 @Injectable({
     providedIn: 'root'
@@ -56,6 +57,8 @@ export class ParserService {
         elementE2.y = 190;
         result.addElement(elementE2);
 
+
+
         let elementE3 = new Event("E3", "Ende", EventType.End);
         elementE3.x = 1600;
         elementE3.y = 190;
@@ -70,6 +73,13 @@ export class ParserService {
         elementT2.x = 442;
         elementT2.y = 320;
         result.addElement(elementT2);
+
+        let elLamborgini = new Task("tLambo", "Lamborghini buchen", TaskType.Manual);
+        elLamborgini.x = 0;
+        elLamborgini.y = 0;
+        result.addElement(elLamborgini);
+
+     
 
         let elementT3 = new Task("t3", "Drucken", TaskType.UserTask);
         elementT3.x = 1225;
@@ -86,47 +96,57 @@ export class ParserService {
         elementG2.y = 190; 
         result.addElement(elementG2);
 
-        let connector: Connector = new Connector("A1", "", Connectortype.InformationFlow, elementE1, elementG1);
+        let connector = new EinPfeil("p1", "", elementE1, elementG1);
         result.addEdge(elementE1, elementG1);
         result.addElement(connector);
 
-        let connector1: Connector = new Connector("A2", "", Connectortype.SequenceFlow, elementG1, elementT1);
-       // connector1.addPathConnectorElement(210, 60);
+        let pfeil = new EinPfeil("p2","label", elementG1, elementT1);
         result.addEdge(elementG1, elementT1);
-        result.addElement(connector1);
+        result.addElement(pfeil);
 
-        let connector2: Connector = new Connector("A3", "", Connectortype.InformationFlow, elementG1, elementT2);
-        connector2.addPathConnectorElement(210, 320);
+        let connector2: EinPfeil = new EinPfeil("p3", "", elementG1, elementT2);
+        connector2.addPfeilEcke(210, 320);
+
         result.addEdge(elementG1, elementT2);
         result.addElement(connector2);
 
-        let connector3: Connector = new Connector("A4", "", Connectortype.Association, elementT1, elementG2);
-        connector3.addPathConnectorElement(675, 60);
+        let connector3: EinPfeil = new EinPfeil("A4", "",  elementT1, elementG2);
+        connector3.addPfeilEcke(675, 60);
         result.addEdge(elementT1, elementG2);
         result.addElement(connector3);
 
-        let connector4: Connector = new Connector("A5", "", Connectortype.InformationFlow, elementT2, elementG2);
-        connector4.addPathConnectorElement(675, 320);
+        let connector4 = new EinPfeil("A5", "", elementT2, elementG2);
+        connector4.addPfeilEcke(675, 320);
         result.addEdge(elementT2, elementG2);
         result.addElement(connector4);
 
-        let connector5: Connector = new Connector("A6", "", Connectortype.InformationFlow, elementG2, elementE2);
+        let connector5 = new EinPfeil("A6", "", elementG2, elementE2);
         result.addEdge(elementG2, elementE2);
         result.addElement(connector5)
 
-        let connector6: Connector = new Connector("A7", "", Connectortype.InformationFlow, elementE2, elementT3);
+        let connector6 = new EinPfeil("A7", "", elementE2, elementT3);
         result.addEdge(elementE2, elementT3);
         result.addElement(connector6)
 
-        let connector7: Connector = new Connector("A8", "", Connectortype.InformationFlow, elementT3, elementE3);
+        let connector7 = new EinPfeil("A8", "", elementT3, elementE3);
         result.addEdge(elementT3, elementE3);
         result.addElement(connector7)
 
-        let connector8: Connector = new Connector("A9", "", Connectortype.InformationFlow, elementE3, elementE2);
-        connector8.addPathConnectorElement(1600, 60);
-        connector8.addPathConnectorElement(850, 60);
+        let connector8 = new EinPfeil("A9", "", elementE3, elementE2);
+        connector8.addPfeilEcke(1600, 60);
+        connector8.addPfeilEcke(850, 60);
         result.addEdge(elementE3, elementE2);
         result.addElement(connector8);
+
+
+        let pp = new EinPfeil("pLamboEin", "", elementG1, elLamborgini);
+        result.addEdge(elementG1, elLamborgini);
+        result.addElement(pp);
+
+        let ppp = new EinPfeil("pLamboAus", "", elLamborgini, elementG2);
+        result.addEdge(elLamborgini, elementG2);
+        result.addElement(ppp);
+
         return result;
     }
 }
