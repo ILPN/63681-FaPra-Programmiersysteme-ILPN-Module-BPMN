@@ -13,8 +13,8 @@ export abstract class Element {
 
 
     //for dragging
-    private x_start: number = 0;
-    private y_start: number = 0;
+    private drag_start_x: number = 0;
+    private drag_start_y: number = 0;
     private dragging: boolean = false;
 
 
@@ -104,17 +104,17 @@ export abstract class Element {
                 return;
             }
             //drag on X axis
-            let diff_x: number = (evt.clientX - this.x_start);
+            let diff_x: number = (evt.clientX - this.drag_start_x);
             let target_x: number = Number(this._svgElement.getAttribute('x')) + diff_x;
             this._svgElement.setAttribute('x', `${target_x}`);
 
             //drag on Y axis
-            let diff_y: number = (evt.clientY - this.y_start);
+            let diff_y: number = (evt.clientY - this.drag_start_y);
             let target_y: number = Number(this._svgElement.getAttribute('y')) + diff_y;
             this._svgElement.setAttribute('y', `${target_y}`);
 
-            this.x_start = evt.clientX;
-            this.y_start = evt.clientY;
+            this.drag_start_x = evt.clientX;
+            this.drag_start_y = evt.clientY;
         }
     }
 
@@ -124,8 +124,8 @@ export abstract class Element {
         }
         this.changeColor("red")
         this.dragging = true;
-        this.x_start = event.clientX;
-        this.y_start = event.clientY;
+        this.drag_start_x = event.clientX;
+        this.drag_start_y = event.clientY;
     }
 
     private processMouseUp(event: MouseEvent) {
