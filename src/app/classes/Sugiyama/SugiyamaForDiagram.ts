@@ -1,6 +1,5 @@
 import { Diagram } from "../diagram/diagram";
-import { Connector } from "../diagram/elements/connector";
-import { Arrow } from "../diagram/elements/Arrow";
+import { Arrow } from "../diagram/elements/arrow/Arrow";
 import { Gateway } from "../diagram/elements/gateway";
 import { Task } from "../diagram/elements/task";
 import { Event } from "../diagram/elements/event";
@@ -8,7 +7,6 @@ import { Event } from "../diagram/elements/event";
 import { LayeredGraph, LNode } from "./LayeredGraph";
 import { SimpleGraph } from "./SimpleGraph";
 import { Sugiyama } from "./Sugiyama";
-import { SugiyamaParser } from "./SugiyamaParser";
 
 export function applySugiyama(diagram:Diagram, w = 1000, h =500 , p = 50){
     const input = new SimpleGraph()
@@ -38,31 +36,31 @@ export function applySugiyama(diagram:Diagram, w = 1000, h =500 , p = 50){
      }
      
 
-     const pfeile:Arrow[] = []
+     const arrows:Arrow[] = []
      for (let el of diagram.elements){
-         if(el instanceof Arrow) pfeile.push(el)
+         if(el instanceof Arrow) arrows.push(el)
      }
-     for (let pfeil of pfeile){
-        const fromLNode:LNode|undefined = result.getNode(pfeil.start.id)
-        const toLNode:LNode|undefined = result.getNode(pfeil.end.id)
+     for (let arrow of arrows){
+        const fromLNode:LNode|undefined = result.getNode(arrow.start.id)
+        const toLNode:LNode|undefined = result.getNode(arrow.end.id)
         if (fromLNode == undefined ||toLNode == undefined) continue;
 
-        pfeil.setArrowStart(fromLNode.x,fromLNode.y)
-        pfeil.setArrowTarget(toLNode.x,toLNode.y)
-        pfeil.clearArrowCorners()
+        arrow.setArrowStart(fromLNode.x,fromLNode.y)
+        arrow.setArrowTarget(toLNode.x,toLNode.y)
+        arrow.clearArrowCorners()
         //making things square
         if(result.layers[fromLNode.layer].length >= result.layers[toLNode.layer].length){
             if(fromLNode.y != toLNode.y){ 
-            pfeil.addPfeilEcke(toLNode.x,fromLNode.y)
+            arrow.addArrowCorner(toLNode.x,fromLNode.y)
             }
         }else{
             if(fromLNode.y != toLNode.y){ 
-               pfeil.addPfeilEcke(fromLNode.x,toLNode.y)
+               arrow.addArrowCorner(fromLNode.x,toLNode.y)
                 } 
         }    
     }
-    for (const pfeil of pfeile) {
-        for (const ecke of pfeil.corners) {
+    for (const arrow of arrows) {
+        for (const ecke of arrow.corners) {
             diagram.addElement(ecke)
         } 
     }

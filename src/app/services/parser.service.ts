@@ -8,9 +8,7 @@ import { EventType } from '../classes/diagram/elements/eventtype';
 import { GatewayType } from '../classes/diagram/elements/gatewaytype';
 import { Task } from '../classes/diagram/elements/task';
 import { TaskType } from '../classes/diagram/elements/tasktype';
-import { Connector } from '../classes/diagram/elements/connector';
-import { Connectortype } from '../classes/diagram/elements/connectortype';
-import { Arrow } from '../classes/diagram/elements/Arrow';
+import { Arrow } from '../classes/diagram/elements/arrow/Arrow';
 
 @Injectable({
     providedIn: 'root'
@@ -105,18 +103,18 @@ export class ParserService {
         result.addElement(pfeil);
 
         let connector2: Arrow = new Arrow("p3", "", elementG1, elementT2);
-        connector2.addPfeilEcke(210, 320);
+        connector2.addArrowCorner(210, 320);
 
         result.addEdge(elementG1, elementT2);
         result.addElement(connector2);
 
         let connector3: Arrow = new Arrow("A4", "",  elementT1, elementG2);
-        connector3.addPfeilEcke(675, 60);
+        connector3.addArrowCorner(675, 60);
         result.addEdge(elementT1, elementG2);
         result.addElement(connector3);
 
         let connector4 = new Arrow("A5", "", elementT2, elementG2);
-        connector4.addPfeilEcke(675, 320);
+        connector4.addArrowCorner(675, 320);
         result.addEdge(elementT2, elementG2);
         result.addElement(connector4);
 
@@ -133,8 +131,8 @@ export class ParserService {
         result.addElement(connector7)
 
         let connector8 = new Arrow("A9", "", elementE3, elementE2);
-        connector8.addPfeilEcke(1600, 60);
-        connector8.addPfeilEcke(850, 60);
+        connector8.addArrowCorner(1600, 60);
+        connector8.addArrowCorner(850, 60);
         result.addEdge(elementE3, elementE2);
         result.addElement(connector8);
 
