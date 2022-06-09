@@ -1,6 +1,6 @@
 import { Diagram } from "../diagram/diagram";
 import { Connector } from "../diagram/elements/connector";
-import { EinPfeil } from "../diagram/elements/EinPfeil";
+import { Arrow } from "../diagram/elements/Arrow";
 import { Gateway } from "../diagram/elements/gateway";
 import { Task } from "../diagram/elements/task";
 import { Event } from "../diagram/elements/event";
@@ -16,8 +16,8 @@ export function applySugiyama(diagram:Diagram, w = 1000, h =500 , p = 50){
         if((el instanceof Task || el instanceof Gateway|| el instanceof Event)){
             input.addNode(el.id)
         }
-        if (el instanceof EinPfeil){
-            const a = el as EinPfeil
+        if (el instanceof Arrow){
+            const a = el as Arrow
             input.addArc(a.start.id,a.end.id)
         }
     });
@@ -38,18 +38,18 @@ export function applySugiyama(diagram:Diagram, w = 1000, h =500 , p = 50){
      }
      
 
-     const pfeile:EinPfeil[] = []
+     const pfeile:Arrow[] = []
      for (let el of diagram.elements){
-         if(el instanceof EinPfeil) pfeile.push(el)
+         if(el instanceof Arrow) pfeile.push(el)
      }
      for (let pfeil of pfeile){
         const fromLNode:LNode|undefined = result.getNode(pfeil.start.id)
         const toLNode:LNode|undefined = result.getNode(pfeil.end.id)
         if (fromLNode == undefined ||toLNode == undefined) continue;
 
-        pfeil.setPfeilStart(fromLNode.x,fromLNode.y)
-        pfeil.setPfeilZiel(toLNode.x,toLNode.y)
-        pfeil.clearPfeilEcken()
+        pfeil.setArrowStart(fromLNode.x,fromLNode.y)
+        pfeil.setArrowTarget(toLNode.x,toLNode.y)
+        pfeil.clearArrowCorners()
         //making things square
         if(result.layers[fromLNode.layer].length >= result.layers[toLNode.layer].length){
             if(fromLNode.y != toLNode.y){ 
@@ -61,12 +61,12 @@ export function applySugiyama(diagram:Diagram, w = 1000, h =500 , p = 50){
                 } 
         }    
     }
-
-    result.getAllDummys()
     for (const pfeil of pfeile) {
-        for (const ecke of pfeil.ecken) {
+        for (const ecke of pfeil.corners) {
             diagram.addElement(ecke)
         } 
     }
+
+    //no dummys yet
     
   }

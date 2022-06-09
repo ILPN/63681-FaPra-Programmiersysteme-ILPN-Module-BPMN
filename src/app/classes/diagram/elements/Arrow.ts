@@ -6,11 +6,11 @@ import { Gateway } from './gateway';
 import { Task } from './task';
 import { Event } from './event';
 
-export class EinPfeil extends Element {
+export class Arrow extends Element {
     private _label: String;
-    private _ecken: PfeilEcke[];
-    public get ecken(){
-        return this._ecken
+    private _corners: ArrowCorner[];
+    public get corners(){
+        return this._corners
     }
     private _start: Element;
     private _end: Element;
@@ -20,15 +20,15 @@ export class EinPfeil extends Element {
         this._label = label;
         this._start = start;
         this._end = end;
-        this._ecken = [];
-        this.setPfeilStart(start.x, start.y);
-        this.setPfeilZiel(end.x, end.y);
+        this._corners = [];
+        this.setArrowStart(start.x, start.y);
+        this.setArrowTarget(end.x, end.y);
     }
-    clearPfeilEcken() {
-        this._ecken = [];
+    clearArrowCorners() {
+        this._corners = [];
     }
     addPfeilEcke(x: number, y: number) {
-        this._ecken.push(new PfeilEcke(this.id + x + ' ' + y, x, y));
+        this._corners.push(new ArrowCorner(this.id + x + ' ' + y, x, y));
     }
 
     get start(): Element {
@@ -46,40 +46,40 @@ export class EinPfeil extends Element {
     set end(value: Element) {
         this._end = value;
     }
-    private pfeilStart: Vector = new Vector();
-    setPfeilStart(x: number, y: number) {
-        this.pfeilStart.x = x;
-        this.pfeilStart.y = y;
+    private arrowStart: Vector = new Vector();
+    setArrowStart(x: number, y: number) {
+        this.arrowStart.x = x;
+        this.arrowStart.y = y;
     }
-    private pfeilZiel: Vector = new Vector();
-    setPfeilZiel(x: number, y: number) {
-        this.pfeilZiel.x = x;
-        this.pfeilZiel.y = y;
+    private arrowTarget: Vector = new Vector();
+    setArrowTarget(x: number, y: number) {
+        this.arrowTarget.x = x;
+        this.arrowTarget.y = y;
     }
 
     public createSvg(): SVGElement {
         const pointsToBeConnected: Vector[] = [];
         let secondEcke;
         let beforeLastEcke;
-        if (this._ecken.length > 0) {
-            secondEcke = this._ecken[0].toVector();
-            beforeLastEcke = this._ecken[this._ecken.length - 1].toVector();
+        if (this._corners.length > 0) {
+            secondEcke = this._corners[0].toVector();
+            beforeLastEcke = this._corners[this._corners.length - 1].toVector();
         } else {
-            secondEcke = this.pfeilZiel;
-            beforeLastEcke = this.pfeilStart;
+            secondEcke = this.arrowTarget;
+            beforeLastEcke = this.arrowStart;
         }
         const intersectionWithStartElement = this.calculateIntersection(
             secondEcke,
-            this.pfeilStart,
+            this.arrowStart,
             this.start
         );
         pointsToBeConnected.push(intersectionWithStartElement);
-        for (const ecke of this._ecken) {
+        for (const ecke of this._corners) {
             pointsToBeConnected.push(new Vector(ecke.x, ecke.y));
         }
         const intersectionWithEndElement = this.calculateIntersection(
             beforeLastEcke,
-            this.pfeilZiel,
+            this.arrowTarget,
             this.end
         );
         pointsToBeConnected.push(intersectionWithEndElement);
@@ -89,7 +89,7 @@ export class EinPfeil extends Element {
         svg.append(
             this.arrowheadSvg(
                 intersectionWithEndElement,
-                this.pfeilZiel.minus(beforeLastEcke)
+                this.arrowTarget.minus(beforeLastEcke)
             )
         );
         this.registerSvg(svg);
@@ -196,7 +196,7 @@ export class EinPfeil extends Element {
         if (!inside()) return innerPoint;
 
         const center = new Vector(el.x, el.y)
-        // lineUp, lineRight, lineLeft, lineDown
+        //boundinglines: lineUp, lineRight, lineLeft, lineDown
         const lineU = new MyLine(
             new Vector(el.x, el.y - el.distanceY),
             new Vector(10, 0)
@@ -299,7 +299,7 @@ export class EinPfeil extends Element {
                 const intersection = MyLine.intersection(intersectingLine, l);
                 if (
                     intersection.distanceTo(new Vector(g.x, g.y)) <
-                    g.distanceX + 10
+                    g.distanceX + 5
                 ) {
                     intersections.push(intersection);
                 }
@@ -325,7 +325,7 @@ export class EinPfeil extends Element {
         return svg;
     }
 }
-export class PfeilEcke extends Element {
+export class ArrowCorner extends Element {
     toVector(): Vector {
         return new Vector(this.x, this.y);
     }
