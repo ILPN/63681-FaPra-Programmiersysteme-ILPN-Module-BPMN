@@ -16,17 +16,11 @@ export function applySugiyama(diagram:Diagram, w = 1000, h =500 , p = 50){
         if((el instanceof Task || el instanceof Gateway|| el instanceof Event)){
             input.addNode(el.id)
         }
+        if (el instanceof EinPfeil){
+            const a = el as EinPfeil
+            input.addArc(a.start.id,a.end.id)
+        }
     });
-
-    for (let el of diagram.elements) {
-        if(!(el instanceof Task || el instanceof Gateway|| el instanceof Event)) continue;
-        for (let child of el.adjacentElements) {
-            if(child instanceof Connector){
-                continue;
-            }
-            input.addArc(el.id, child.id)
-         } 
-     }     
 
     const sugi = new Sugiyama(input)
     sugi.width = w 
@@ -35,15 +29,12 @@ export function applySugiyama(diagram:Diagram, w = 1000, h =500 , p = 50){
     sugi.spacingXAxis = 200
     sugi.spacingYAxis= 200
     const result :LayeredGraph = sugi.getResult()
-    SugiyamaParser.printGraph(input)
-    SugiyamaParser.printLGraph(result)
 
     for (let node of result.getAllNoneDummyNodes()) {
         const el = diagram.elements.find(e => e.id == node.id)
         if (el == undefined) continue
         el.x = node.x
         el.y = node.y
-        console.log(`${el.id}  has position ${el.x}, ${el.y} order(${node.order})layer(${node.layer})`)
      }
      
 
@@ -66,8 +57,16 @@ export function applySugiyama(diagram:Diagram, w = 1000, h =500 , p = 50){
             }
         }else{
             if(fromLNode.y != toLNode.y){ 
-                pfeil.addPfeilEcke(fromLNode.x,toLNode.y)
+               pfeil.addPfeilEcke(fromLNode.x,toLNode.y)
                 } 
+        }    
+    }
+
+    result.getAllDummys()
+    for (const pfeil of pfeile) {
+        for (const ecke of pfeil.ecken) {
+            diagram.addElement(ecke)
         } 
     }
+    
   }

@@ -2,11 +2,16 @@ import { tSCallSignatureDeclaration } from '@babel/types';
 import { Element } from '../element';
 import { ConnectorElement } from './connector-element';
 import { Connectortype } from './connectortype';
+import { Gateway } from './gateway';
 import { Task } from './task';
+import { Event } from './event';
 
 export class EinPfeil extends Element {
     private _label: String;
     private _ecken: PfeilEcke[];
+    public get ecken(){
+        return this._ecken
+    }
     private _start: Element;
     private _end: Element;
 
@@ -16,11 +21,11 @@ export class EinPfeil extends Element {
         this._start = start;
         this._end = end;
         this._ecken = [];
-        this.setPfeilStart(start.x, start.y)
-        this.setPfeilZiel(end.x, end.y)
+        this.setPfeilStart(start.x, start.y);
+        this.setPfeilZiel(end.x, end.y);
     }
-    clearPfeilEcken(){
-        this._ecken =[]
+    clearPfeilEcken() {
+        this._ecken = [];
     }
     addPfeilEcke(x: number, y: number) {
         this._ecken.push(new PfeilEcke(this.id + x + ' ' + y, x, y));
@@ -41,124 +46,274 @@ export class EinPfeil extends Element {
     set end(value: Element) {
         this._end = value;
     }
-    private pfeilStart:Vector = new Vector()
-    setPfeilStart (x:number, y:number){
-        this.pfeilStart.x = x
-        this.pfeilStart.y = y
+    private pfeilStart: Vector = new Vector();
+    setPfeilStart(x: number, y: number) {
+        this.pfeilStart.x = x;
+        this.pfeilStart.y = y;
     }
-    private pfeilZiel:Vector = new Vector()
-    setPfeilZiel (x:number, y:number){
-        this.pfeilZiel.x = x
-        this.pfeilZiel.y = y
+    private pfeilZiel: Vector = new Vector();
+    setPfeilZiel(x: number, y: number) {
+        this.pfeilZiel.x = x;
+        this.pfeilZiel.y = y;
     }
-    
 
     public createSvg(): SVGElement {
-        const spitzeLength = 10;
-        const spitzeWidth = 10;
-        let pathString = 'M ';
-        
-        let secondEcke: Vector
-        let beforeLastEcke:Vector
-        if(this._ecken.length>0){
+        const pointsToBeConnected: Vector[] = [];
+        let secondEcke;
+        let beforeLastEcke;
+        if (this._ecken.length > 0) {
             secondEcke = this._ecken[0].toVector();
             beforeLastEcke = this._ecken[this._ecken.length - 1].toVector();
-        }else{
-            secondEcke = this.pfeilZiel
-            beforeLastEcke= this.pfeilStart
+        } else {
+            secondEcke = this.pfeilZiel;
+            beforeLastEcke = this.pfeilStart;
         }
-        const intersectionWithStartElement = this.calculateIntersection(secondEcke,this.pfeilStart,this.start)
-        pathString = pathString + `${intersectionWithStartElement.x},${intersectionWithStartElement.y} `;
-        for (let i = 0; i < this._ecken.length; i++) {
-            const ecke = this._ecken[i];
-            pathString = pathString + `${ecke.x},${ecke.y} `;
+        const intersectionWithStartElement = this.calculateIntersection(
+            secondEcke,
+            this.pfeilStart,
+            this.start
+        );
+        pointsToBeConnected.push(intersectionWithStartElement);
+        for (const ecke of this._ecken) {
+            pointsToBeConnected.push(new Vector(ecke.x, ecke.y));
         }
-        //pathString = pathString+ `${lastEcke.x},${lastEcke.y}`
-        const task = this.end as Element;
-        const intersection = this.calculateIntersection(
+        const intersectionWithEndElement = this.calculateIntersection(
             beforeLastEcke,
             this.pfeilZiel,
-            task
+            this.end
         );
-        pathString = pathString + `${intersection.x},${intersection.y} `;
+        pointsToBeConnected.push(intersectionWithEndElement);
 
+        const svg = this.createUndergroundSVG();
+        svg.append(this.lineSvg(pointsToBeConnected));
+        svg.append(
+            this.arrowheadSvg(
+                intersectionWithEndElement,
+                this.pfeilZiel.minus(beforeLastEcke)
+            )
+        );
+        this.registerSvg(svg);
+        return svg;
+    }
+    private lineSvg(points: Vector[]) {
         let pathSvg = this.createSvgElement('path');
         pathSvg.setAttribute(
             'style',
             `fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1`
         );
-        pathSvg.setAttribute('d', pathString);
 
-        const dx = this.pfeilZiel.x - beforeLastEcke.x;
-        const dy = this.pfeilZiel.y - beforeLastEcke.y;
-        var theta = Math.atan2(dy, dx) + Math.PI / 2; // range (-PI, PI]
-        const spitzeSvg = this.createSvgElement('path');
-        spitzeSvg.setAttribute(
+        let pathString = 'M ';
+        for (const point of points) {
+            pathString = pathString + `${point.x},${point.y} `;
+        }
+        pathSvg.setAttribute('d', pathString);
+        return pathSvg;
+    }
+    private arrowheadSvg(position: Vector, direction: Vector): SVGElement {
+        const headLength = 10;
+        const headWidth = 10;
+
+        var theta = Math.atan2(direction.y, direction.x) + Math.PI / 2; // range (-PI, PI]
+        const arrowhead = this.createSvgElement('path');
+        arrowhead.setAttribute(
             'style',
             `fill:#000000;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1`
         );
-        const v1 = new Vector(spitzeWidth / 2, spitzeLength).rotate(theta);
-        const v2 = new Vector(-spitzeWidth, 0).rotate(theta);
+        const v1 = new Vector(headWidth / 2, headLength).rotate(theta);
+        const v2 = new Vector(-headWidth, 0).rotate(theta);
 
-        spitzeSvg.setAttribute(
+        arrowhead.setAttribute(
             'd',
-            `m ${intersection.x},${intersection.y} ${v1.x},${v1.y} ${v2.x},${v2.y}`
+            `m ${position.x},${position.y} ${v1.x},${v1.y} ${v2.x},${v2.y}`
         );
-
-
-        const svg = this.createUndergroundSVG();
-        svg.append(pathSvg);
-        svg.append(spitzeSvg);
-        this.registerSvg(svg);
-        return svg;
+        return arrowhead;
     }
     calculateIntersection(
-        outerEcke: Vector,
-        innerEcke: Vector,
-        task: Element
+        outerPoint: Vector,
+        innerPoint: Vector,
+        element: Element
+    ): Vector {
+        if (element instanceof Task) {
+            return this.intersectionWithElement(
+                outerPoint,
+                innerPoint,
+                element
+            );
+        } else if (element instanceof Gateway) {
+            return this.intersectionWithGatewayElement(
+                outerPoint,
+                innerPoint,
+                element as Gateway
+            );
+        } else if (element instanceof Event) {
+            return this.intersectionWithEventElement(
+                outerPoint,
+                innerPoint,
+                element as Event
+            );
+        }
+        return this.intersectionWithElement(outerPoint, innerPoint, element);
+    }
+    intersectionWithEventElement(
+        outerPoint: Vector,
+        innerPoint: Vector,
+        event: Event
+    ): Vector {
+        const center = new Vector(event.x, event.y);
+        const isInside = (p: Vector) => {
+            return p.distanceTo(center) < event.distanceX;
+        };
+        if (!isInside(innerPoint)) return innerPoint;
+
+        const intersectingLine = new MyLine(
+            new Vector(innerPoint.x, innerPoint.y),
+            outerPoint.minus(innerPoint)
+        );
+
+        const intersections: Vector[] = MyLine.intersectionsWithCircle(
+            center,
+            event.distanceX,
+            intersectingLine
+        );
+        intersections.sort(
+            (a: Vector, b: Vector) =>
+                a.distanceTo(outerPoint) - b.distanceTo(outerPoint)
+        );
+        return intersections[0];
+    }
+    intersectionWithElement(
+        outerPoint: Vector,
+        innerPoint: Vector,
+        el: Element
     ): Vector {
         const inside = () => {
-            if (innerEcke.x > task.x + task.distanceX) return false;
-            if (innerEcke.x < task.x - task.distanceX) return false;
-            if (innerEcke.y > task.y + task.distanceY) return false;
-            if (innerEcke.y < task.y - task.distanceY) return false;
+            if (innerPoint.x > el.x + el.distanceX) return false;
+            if (innerPoint.x < el.x - el.distanceX) return false;
+            if (innerPoint.y > el.y + el.distanceY) return false;
+            if (innerPoint.y < el.y - el.distanceY) return false;
             return true;
         };
-        if (!inside()) return new Vector(innerEcke.x, innerEcke.y);
-        else {
-            const innerPoint = new Vector(innerEcke.x, innerEcke.y);
-            const outerPoint = new Vector(outerEcke.x, outerEcke.y);
-            const dv = outerPoint.minus(innerPoint);
-            const center = new Vector(task.x, task.y);
+        if (!inside()) return innerPoint;
 
-            const schnittPunkteMitAxenDerKanten: Vector[] = [];
-            if (dv.y != 0) {
-                let axis;
-                if (dv.y < 0) axis = task.y - task.distanceY;
-                else axis = task.y + task.distanceY;
-                // geradengleichung y = ax+b
-                // x = (y-b)/a
-                const a = dv.y / dv.x;
-                const b = innerPoint.y;
-                const x = (axis - b) / a + innerPoint.x;
-                schnittPunkteMitAxenDerKanten.push(new Vector(x, axis));
+        const center = new Vector(el.x, el.y)
+        // lineUp, lineRight, lineLeft, lineDown
+        const lineU = new MyLine(
+            new Vector(el.x, el.y - el.distanceY),
+            new Vector(10, 0)
+        );
+        const lineR = new MyLine(
+            new Vector(el.x+el.distanceX, el.y),
+            new Vector(0, 10)
+        );
+        const lineD = new MyLine(
+            new Vector(el.x, el.y + el.distanceY),
+            new Vector(10, 0)
+        );
+        const lineL = new MyLine(
+            new Vector(el.x-el.distanceX, el.y),
+            new Vector(0, 10)
+        );
+
+        const boundingLines: MyLine[] = [];
+        boundingLines.push(lineU);
+        boundingLines.push(lineD);
+        boundingLines.push(lineR);
+        boundingLines.push(lineL);
+
+        const intersectingLine = new MyLine(
+            new Vector(innerPoint.x, innerPoint.y),
+            outerPoint.minus(innerPoint)
+        );
+
+        const intersections: Vector[] = [];
+
+        for (const l of boundingLines) {
+            if (!MyLine.areParallel(intersectingLine, l)) {
+                const intersection = MyLine.intersection(intersectingLine, l);
+                if (
+                    intersection.distanceTo(center) <
+                    (new Vector(el.distanceX,el.distanceY)).length()+2
+                ) {
+                    intersections.push(intersection);
+                }
             }
-            if (dv.x != 0) {
-                let axis;
-                if (dv.x < 0) axis = task.x - task.distanceX;
-                else axis = task.x + task.distanceX;
-                // geradengleichung x = ay+b
-                // y = (x-b)/a
-                const a = dv.x / dv.y;
-                const b = innerPoint.x;
-                const y = (axis - b) / a + innerPoint.y;
-                schnittPunkteMitAxenDerKanten.push(new Vector(axis, y));
-            }
-            if(schnittPunkteMitAxenDerKanten.length ==0) return new Vector(innerEcke.x, innerEcke.y)
-            return schnittPunkteMitAxenDerKanten.sort(
-                (v1, v2) => v1.distanceTo(center) - v2.distanceTo(center)
-            )[0];
         }
+        if (intersections.length == 0) {
+            return innerPoint;
+        }
+        intersections.sort(
+            (a: Vector, b: Vector) =>
+                a.distanceTo(outerPoint) - b.distanceTo(outerPoint)
+        );
+
+        return intersections[0];
+    }
+    intersectionWithGatewayElement(
+        outerPoint: Vector,
+        innerPoint: Vector,
+        g: Gateway
+    ): Vector {
+        // lineUpperLeft, lineUpperRight, lineLowerLeft, lineLowerRight
+        const lineUL = new MyLine(
+            new Vector(g.x, g.y - g.distanceY),
+            new Vector(g.distanceX, -g.distanceY)
+        );
+        const lineUR = new MyLine(
+            new Vector(g.x, g.y - g.distanceY),
+            new Vector(g.distanceX, g.distanceY)
+        );
+        const lineLL = new MyLine(
+            new Vector(g.x, g.y + g.distanceY),
+            new Vector(g.distanceX, g.distanceY)
+        );
+        const lineLR = new MyLine(
+            new Vector(g.x, g.y + g.distanceY),
+            new Vector(g.distanceX, -g.distanceY)
+        );
+
+        const boundingLines: MyLine[] = [];
+        boundingLines.push(lineUL);
+        boundingLines.push(lineUR);
+        boundingLines.push(lineLL);
+        boundingLines.push(lineLR);
+
+        const isInside = (p: Vector) => {
+            if (MyLine.pointIsLeftOfLine(p, lineUL)) return false;
+            if (MyLine.pointIsLeftOfLine(p, lineLL)) return false;
+            if (!MyLine.pointIsLeftOfLine(p, lineUR)) return false;
+            if (!MyLine.pointIsLeftOfLine(p, lineLR)) return false;
+
+            return true;
+        };
+        if (!isInside(innerPoint)) return innerPoint;
+
+        const intersectingLine = new MyLine(
+            new Vector(innerPoint.x, innerPoint.y),
+            outerPoint.minus(innerPoint)
+        );
+
+        const intersections: Vector[] = [];
+
+        for (const l of boundingLines) {
+            if (!MyLine.areParallel(intersectingLine, l)) {
+                const intersection = MyLine.intersection(intersectingLine, l);
+                if (
+                    intersection.distanceTo(new Vector(g.x, g.y)) <
+                    g.distanceX + 10
+                ) {
+                    intersections.push(intersection);
+                }
+            }
+        }
+        if (intersections.length == 0) {
+            return innerPoint;
+        }
+        intersections.sort(
+            (a: Vector, b: Vector) =>
+                a.distanceTo(outerPoint) - b.distanceTo(outerPoint)
+        );
+
+        return intersections[0];
     }
 
     private createUndergroundSVG(): SVGElement {
@@ -172,8 +327,9 @@ export class EinPfeil extends Element {
 }
 export class PfeilEcke extends Element {
     toVector(): Vector {
-return new Vector(this.x, this.y)    }
-    private _raduis: number = 10;
+        return new Vector(this.x, this.y);
+    }
+    private _raduis: number = 5;
 
     constructor(id: string, x: number, y: number) {
         super(id);
@@ -191,13 +347,22 @@ return new Vector(this.x, this.y)    }
         const circle = this.createSvgElement('circle');
         circle.setAttribute('r', `${this._raduis}`);
         circle.setAttribute('fill', 'blue');
-        // svg.appendChild(circle);
+        svg.appendChild(circle);
         // this.addSVGtoColorChange(circle);
         this.registerSvg(svg);
         return svg;
     }
 }
 class Vector {
+    toUnitVector() {
+        return this.muliplied(1 / this.length());
+    }
+    muliplied(m: number): Vector {
+        return new Vector(this.x * m, this.y * m);
+    }
+    plus(v: Vector): Vector {
+        return new Vector(this.x + v.x, this.y + v.y);
+    }
     distanceTo(to: Vector): number {
         return new Vector(this.x - to.x, this.y - to.y).length();
     }
@@ -232,5 +397,97 @@ class Vector {
             Math.cos(angle) * this.x - Math.sin(angle) * this.y,
             Math.sin(angle) * this.x + Math.cos(angle) * this.y
         );
+    }
+}
+class MyLine {
+    static intersectionsWithCircle(
+        center: Vector,
+        radius: number,
+        intersectingLine: MyLine
+    ): Vector[] {
+        const line = new MyLine(
+            intersectingLine.posV,
+            intersectingLine.dir
+        );
+
+        // find line nline that is perpendicular to line and goes through the center of circle(=>(0,0))
+        const n = new Vector(-line.dir.y, line.dir.x);
+        const nline = new MyLine(center, n);
+
+        //find intersection of line and nline
+        const closestToCenter = MyLine.intersection(line, nline);
+        // closestToCenter.distanceTo(center) must be < radius
+        if(closestToCenter.distanceTo(center)>= radius) return[]
+        // calculate distance a between intersection with circle and closestToCenter
+        const c = radius;
+        const b = closestToCenter.distanceTo(center);
+        const a = Math.sqrt(c * c - b * b);
+
+        const uV = line.dir.toUnitVector();
+
+        const Intersection1 = closestToCenter
+            .plus(uV.muliplied(a));
+        const Intersection2 = closestToCenter
+            .minus(uV.muliplied(a));
+
+        return [Intersection1, Intersection2];
+    }
+    private _positionVector = new Vector();
+    public get posV() {
+        return this._positionVector;
+    }
+    private _directionalVector = new Vector();
+    public get dir() {
+        return this._directionalVector;
+    }
+    constructor(posVector: Vector, dirVector: Vector) {
+        this._positionVector = posVector;
+        this._directionalVector = dirVector;
+    }
+
+    static intersection(line1: MyLine, line2: MyLine): Vector {
+        if (this.areParallel(line1, line2)) return new Vector();
+
+        const result = new Vector();
+
+        // line equation: posV + t * dir
+        // solve to t
+        const ax = line1.posV.x;
+        const ay = line1.posV.y;
+        const bx = line2.posV.x;
+        const by = line2.posV.y;
+
+        const dx = line1.dir.x;
+        const dy = line1.dir.y;
+        const cx = line2.dir.x;
+        const cy = line2.dir.y;
+
+        const t = (bx * cy + ay * cx - by * cx - ax * cy) / (dx * cy - dy * cx);
+        result.x = line1.posV.x + t * line1.dir.x;
+        result.y = line1.posV.y + t * line1.dir.y;
+
+        return result;
+    }
+
+    static areParallel(line1: MyLine, line2: MyLine) {
+        if (line1.dir.x == 0 && line2.dir.x == 0) return true;
+        if (line1.dir.y == 0 && line2.dir.y == 0) return true;
+        if (
+            (line1.dir.x / line2.dir.x).toFixed(10) ==
+            (line1.dir.y / line2.dir.y).toFixed(10)
+        )
+            return true;
+
+        return false;
+    }
+
+    static pointIsLeftOfLine(p: Vector, l: MyLine) {
+        if (l.dir.y == 0) return false;
+        if (l.dir.x == 0) {
+            return p.x < l.posV.x;
+        }
+        const XOfLineAtYLevelOfPoint =
+            l.posV.x + ((p.y - l.posV.y) * l.dir.x) / l.dir.y;
+        return p.x < XOfLineAtYLevelOfPoint;
     }
 }
