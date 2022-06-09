@@ -1,6 +1,5 @@
 import { Diagram } from "../diagram/diagram";
-import { Connector } from "../diagram/elements/connector";
-import { EinPfeil } from "../diagram/elements/EinPfeil";
+import { Arrow } from "../diagram/elements/arrow/Arrow";
 import { Gateway } from "../diagram/elements/gateway";
 import { Task } from "../diagram/elements/task";
 import { Event } from "../diagram/elements/event";
@@ -8,7 +7,6 @@ import { Event } from "../diagram/elements/event";
 import { LayeredGraph, LNode } from "./LayeredGraph";
 import { SimpleGraph } from "./SimpleGraph";
 import { Sugiyama } from "./Sugiyama";
-import { SugiyamaParser } from "./SugiyamaParser";
 
 export function applySugiyama(diagram:Diagram, w = 1000, h =500 , p = 50){
     const input = new SimpleGraph()
@@ -16,17 +14,11 @@ export function applySugiyama(diagram:Diagram, w = 1000, h =500 , p = 50){
         if((el instanceof Task || el instanceof Gateway|| el instanceof Event)){
             input.addNode(el.id)
         }
+        if (el instanceof Arrow){
+            const a = el as Arrow
+            input.addArc(a.start.id,a.end.id)
+        }
     });
-
-    for (let el of diagram.elements) {
-        if(!(el instanceof Task || el instanceof Gateway|| el instanceof Event)) continue;
-        for (let child of el.adjacentElements) {
-            if(child instanceof Connector){
-                continue;
-            }
-            input.addArc(el.id, child.id)
-         } 
-     }     
 
     const sugi = new Sugiyama(input)
     sugi.width = w 
@@ -35,39 +27,44 @@ export function applySugiyama(diagram:Diagram, w = 1000, h =500 , p = 50){
     sugi.spacingXAxis = 200
     sugi.spacingYAxis= 200
     const result :LayeredGraph = sugi.getResult()
-    SugiyamaParser.printGraph(input)
-    SugiyamaParser.printLGraph(result)
 
     for (let node of result.getAllNoneDummyNodes()) {
         const el = diagram.elements.find(e => e.id == node.id)
         if (el == undefined) continue
         el.x = node.x
         el.y = node.y
-        console.log(`${el.id}  has position ${el.x}, ${el.y} order(${node.order})layer(${node.layer})`)
      }
      
 
-     const pfeile:EinPfeil[] = []
+     const arrows:Arrow[] = []
      for (let el of diagram.elements){
-         if(el instanceof EinPfeil) pfeile.push(el)
+         if(el instanceof Arrow) arrows.push(el)
      }
-     for (let pfeil of pfeile){
-        const fromLNode:LNode|undefined = result.getNode(pfeil.start.id)
-        const toLNode:LNode|undefined = result.getNode(pfeil.end.id)
+     for (let arrow of arrows){
+        const fromLNode:LNode|undefined = result.getNode(arrow.start.id)
+        const toLNode:LNode|undefined = result.getNode(arrow.end.id)
         if (fromLNode == undefined ||toLNode == undefined) continue;
 
-        pfeil.setPfeilStart(fromLNode.x,fromLNode.y)
-        pfeil.setPfeilZiel(toLNode.x,toLNode.y)
-        pfeil.clearPfeilEcken()
+        arrow.setArrowStart(fromLNode.x,fromLNode.y)
+        arrow.setArrowTarget(toLNode.x,toLNode.y)
+        arrow.clearArrowCorners()
         //making things square
         if(result.layers[fromLNode.layer].length >= result.layers[toLNode.layer].length){
             if(fromLNode.y != toLNode.y){ 
-            pfeil.addPfeilEcke(toLNode.x,fromLNode.y)
+            arrow.addArrowCorner(toLNode.x,fromLNode.y)
             }
         }else{
             if(fromLNode.y != toLNode.y){ 
-                pfeil.addPfeilEcke(fromLNode.x,toLNode.y)
+               arrow.addArrowCorner(fromLNode.x,toLNode.y)
                 } 
+        }    
+    }
+    for (const arrow of arrows) {
+        for (const ecke of arrow.corners) {
+            diagram.addElement(ecke)
         } 
     }
+
+    //no dummys yet
+    
   }
