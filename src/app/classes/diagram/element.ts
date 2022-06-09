@@ -12,9 +12,10 @@ export abstract class Element {
     private _svgColorElements: SVGElement[];
 
 
-    //for dragging
+    //for calculating distance while dragging 
     private drag_start_x: number = 0;
     private drag_start_y: number = 0;
+    //for preventing mouseMove event from firing when hovering over element
     private dragging: boolean = false;
 
 
@@ -98,24 +99,49 @@ export abstract class Element {
 
     }
 
-    public move(evt: MouseEvent) {
+    public move(event: MouseEvent) {
+        //check flag dragging to prevent move event from firing on hovering over element
         if (this.dragging) {
-            if (this._svgElement === undefined) {
-                return;
-            }
-            //drag on X axis
-            let diff_x: number = (evt.clientX - this.drag_start_x);
-            let target_x: number = Number(this._svgElement.getAttribute('x')) + diff_x;
-            this._svgElement.setAttribute('x', `${target_x}`);
+            
+          //drag the element  
+          this.drag_X_axis(event);
+          this.drag_Y_axis(event);
 
-            //drag on Y axis
-            let diff_y: number = (evt.clientY - this.drag_start_y);
-            let target_y: number = Number(this._svgElement.getAttribute('y')) + diff_y;
-            this._svgElement.setAttribute('y', `${target_y}`);
+          //drag arrows
 
-            this.drag_start_x = evt.clientX;
-            this.drag_start_y = evt.clientY;
+
+          
+          
+          
         }
+    }
+
+    //drag along X axis
+    private drag_X_axis(event : MouseEvent){
+        if (this._svgElement === undefined) {
+            return;
+        }
+        let diff_x: number = (event.clientX - this.drag_start_x);
+        let target_x: number = Number(this._svgElement.getAttribute('x')) + diff_x;
+        this._svgElement.setAttribute('x', `${target_x}`);
+        this.x += diff_x;
+
+        //update start positions for next dragging
+        this.drag_start_x = event.clientX;
+    }
+
+    //drag along Y axis
+    private drag_Y_axis(event : MouseEvent){
+        if (this._svgElement === undefined) {
+            return;
+        }
+        let diff_y: number = (event.clientY - this.drag_start_y);
+        let target_y: number = Number(this._svgElement.getAttribute('y')) + diff_y;
+        this._svgElement.setAttribute('y', `${target_y}`);
+        this.y += diff_y;
+
+        //update start positions for next dragging
+        this.drag_start_y = event.clientY;
     }
 
     private processMouseDown(event: MouseEvent) {
@@ -123,13 +149,17 @@ export abstract class Element {
             return;
         }
         this.changeColor("red")
+
+        //signal that dragging has started
         this.dragging = true;
         this.drag_start_x = event.clientX;
         this.drag_start_y = event.clientY;
     }
 
     private processMouseUp(event: MouseEvent) {
+        //signal that dragging has stopped
         this.dragging = false;
+
         if (this._svgElement === undefined) {
             return;
         }
