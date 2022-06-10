@@ -1,3 +1,5 @@
+import { Arrow } from "./elements/arrow/Arrow";
+
 export abstract class Element {
     private _id: string;
     private _x: number;
@@ -18,6 +20,9 @@ export abstract class Element {
     //for preventing mouseMove event from firing when hovering over element
     private dragging: boolean = false;
 
+    //for dragging along arrows connected to the element
+    private in_arrows: Arrow[];
+    private out_arrows: Arrow[];
 
 
     constructor(id: string) {
@@ -26,6 +31,18 @@ export abstract class Element {
         this._y = 0;
         this._adjacentElements = [];
         this._svgColorElements = [];
+
+        //incoming and outgoing arrows
+        this.in_arrows = [];
+        this.out_arrows = [];
+    }
+
+    public addInArrow(arrow: Arrow) {
+        this.in_arrows.push(arrow);
+    }
+
+    public addOutArrow(arrow: Arrow) {
+        this.out_arrows.push(arrow);
     }
 
     get adjacentElements(): Element[] {
@@ -100,48 +117,55 @@ export abstract class Element {
     }
 
     public move(event: MouseEvent) {
-        //check flag dragging to prevent move event from firing on hovering over element
+        //check flag dragging to prevent move event from firing when hovering over element
         if (this.dragging) {
-            
-          //drag the element  
-          this.drag_X_axis(event);
-          this.drag_Y_axis(event);
 
-          //drag arrows
+            //calculate diffs
+            let diff_x : number = event.clientX - this.drag_start_x;
+            let diff_y : number = event.clientY - this.drag_start_y;
 
 
-          
-          
-          
+            //drag the element  
+            this.drag_X_axis(diff_x);
+            this.drag_Y_axis(diff_y);
+
+
+            //drag outgoing arrows
+            this.out_arrows.forEach((arrow) => {
+                arrow.move_to_startElement(diff_x, diff_y);
+            })
+
+             //drag incoming arrows
+             this.in_arrows.forEach((arrow) => {
+                arrow.move_to_endElement(diff_x, diff_y);
+            })
+
+            //update start positions for next move
+            this.drag_start_x = event.clientX;
+            this.drag_start_y = event.clientY;
+
         }
     }
 
     //drag along X axis
-    private drag_X_axis(event : MouseEvent){
+    private drag_X_axis(diff_x : number) {
         if (this._svgElement === undefined) {
             return;
         }
-        let diff_x: number = (event.clientX - this.drag_start_x);
+
         let target_x: number = Number(this._svgElement.getAttribute('x')) + diff_x;
         this._svgElement.setAttribute('x', `${target_x}`);
-        this.x += diff_x;
-
-        //update start positions for next dragging
-        this.drag_start_x = event.clientX;
+        this.x = target_x;
     }
 
     //drag along Y axis
-    private drag_Y_axis(event : MouseEvent){
+    private drag_Y_axis(diff_y : number) {
         if (this._svgElement === undefined) {
             return;
         }
-        let diff_y: number = (event.clientY - this.drag_start_y);
         let target_y: number = Number(this._svgElement.getAttribute('y')) + diff_y;
         this._svgElement.setAttribute('y', `${target_y}`);
-        this.y += diff_y;
-
-        //update start positions for next dragging
-        this.drag_start_y = event.clientY;
+        this.y = target_y;
     }
 
     private processMouseDown(event: MouseEvent) {
@@ -157,6 +181,7 @@ export abstract class Element {
     }
 
     private processMouseUp(event: MouseEvent) {
+
         //signal that dragging has stopped
         this.dragging = false;
 
