@@ -11,6 +11,7 @@ import { TaskType } from '../classes/diagram/elements/tasktype';
 import { Connector } from '../classes/diagram/elements/connector';
 import { Connectortype } from '../classes/diagram/elements/connectortype';
 import { EinPfeil } from '../classes/diagram/elements/EinPfeil';
+import { SwitchController } from '../classes/diagram/elements/switch-controller';
 
 @Injectable({
     providedIn: 'root'
@@ -30,7 +31,8 @@ export class ParserService {
         //         result.addElement(this.parseElement(line));
         //     }
         // });
-        const result = this.testDiagramm();
+        const result = this.testDiagrammSchaltung();
+        const controller = new SwitchController(result);
 
         return result;
     }
@@ -49,7 +51,9 @@ export class ParserService {
 
         // Probleme bei der Darstellung von Elementen, welche über keine Kanten verfügen
 
-        const result = new Diagram();
+        var result = new Diagram();
+        
+        
         let elementE1 = new Event("E1", "Start", EventType.Start);
         elementE1.x = 60;
         elementE1.y = 190;
@@ -84,12 +88,12 @@ export class ParserService {
 
 
 
-        let elementG1 = new Gateway("G1", GatewayType.AND_SPLIT);
+        let elementG1 = new Gateway("G1", GatewayType.OR_SPLIT);
         elementG1.x = 210;
         elementG1.y = 190; 
         result.addElement(elementG1);
 
-        let elementG2 = new Gateway("G2", GatewayType.AND_SPLIT);
+        let elementG2 = new Gateway("G2", GatewayType.OR_JOIN);
         elementG2.x = 675;
         elementG2.y = 190; 
         result.addElement(elementG2);
@@ -139,11 +143,11 @@ export class ParserService {
         connector8.addPathConnectorElement(850, 60);
         result.addEdge(elementE3, elementE2);
         result.addElement(connector8);
- return result;
+        return result;
     }
 
     private testDiagramm2(): Diagram {
-        const result = new Diagram();
+        var result = new Diagram();
         let elementE1 = new Event("E1", "Start", EventType.Start);
         result.addElement(elementE1);
 
@@ -205,6 +209,107 @@ export class ParserService {
         let connector3: Connector = new Connector("A1", "", Connectortype.InformationFlow, elementT2, elementE2);
         result.addEdge(elementT2, elementE2);
         result.addElement(connector3);
+        return result;
+    }
+
+
+
+    private testDiagrammSchaltung(): Diagram {
+
+        // Probleme bei der Darstellung von Elementen, welche über keine Kanten verfügen
+
+        var result = new Diagram();
+        
+        
+        let elementE1 = new Event("E1", "Start", EventType.Start);
+        result.addElement(elementE1);
+
+        let elementE2 = new Event("E2", "", EventType.Intermediate);
+        result.addElement(elementE2);
+        
+        let elementE3 = new Event("E3", "Ende", EventType.End);
+        result.addElement(elementE3);
+
+        let elementT1 = new Task("t1", "Hotel suchen", TaskType.Service);
+        result.addElement(elementT1);
+
+        let elementT11 = new Task("t11", "Hotel buchen", TaskType.Service);
+        result.addElement(elementT11);
+
+        let elementT2 = new Task("t2", "Fahrzeug suche", TaskType.Manual);
+        result.addElement(elementT2);
+
+        let elementT21 = new Task("t21", "Flug buchen / Auto mieten / Schiff fahren / U-Boot leihen / Fahrrad kaufen", TaskType.Manual);
+        result.addElement(elementT21);
+
+        let elementT3 = new Task("t3", "Drucken , Auftragsbestätigungen senden", TaskType.UserTask);
+        result.addElement(elementT3);
+
+
+
+        let elementG1 = new Gateway("G1", GatewayType.OR_SPLIT);
+        result.addElement(elementG1);
+
+        let elementG2 = new Gateway("G2", GatewayType.OR_JOIN);
+        result.addElement(elementG2);
+
+        let connector: Connector = new Connector("A1", "", Connectortype.InformationFlow, elementE1, elementG1);
+        result.addEdge(elementE1, elementG1);
+        result.addElement(connector);
+
+
+        let connector1: Connector = new Connector("A1", "", Connectortype.InformationFlow, elementG1, elementT1);
+       // let pfeil = new EinPfeil("p1","label", elementG1, elementT1);
+        result.addEdge(elementG1, elementT1);
+        result.addElement(connector1);
+        
+
+        let connector2: Connector = new Connector("A3", "", Connectortype.InformationFlow, elementG1, elementT2);
+        result.addEdge(elementG1, elementT2);
+        result.addElement(connector2);
+
+
+        let connector11: Connector = new Connector("A11", "", Connectortype.InformationFlow, elementT1, elementT11);
+       // let pfeil1 = new EinPfeil("p11","label", elementG1, elementT1);
+        result.addEdge(elementT1, elementT11);
+        result.addElement(connector11);
+        
+
+        let connector21: Connector = new Connector("A21", "", Connectortype.InformationFlow, elementT2, elementT21);
+
+        result.addEdge(elementT2, elementT21);
+        result.addElement(connector21);
+
+
+
+
+
+
+
+
+        let connector3: Connector = new Connector("A4", "", Connectortype.Association, elementT11, elementG2);
+        result.addEdge(elementT11, elementG2);
+        result.addElement(connector3);
+
+        let connector4: Connector = new Connector("A5", "", Connectortype.InformationFlow, elementT21, elementG2);
+        result.addEdge(elementT21, elementG2);
+        result.addElement(connector4);
+
+        let connector5: Connector = new Connector("A6", "", Connectortype.InformationFlow, elementG2, elementE2);
+        result.addEdge(elementG2, elementE2);
+        result.addElement(connector5)
+
+        let connector6: Connector = new Connector("A7", "", Connectortype.InformationFlow, elementE2, elementT3);
+        result.addEdge(elementE2, elementT3);
+        result.addElement(connector6)
+
+        let connector7: Connector = new Connector("A8", "", Connectortype.InformationFlow, elementT3, elementE3);
+        result.addEdge(elementT3, elementE3);
+        result.addElement(connector7)
+
+        let connector8: Connector = new Connector("A9", "", Connectortype.InformationFlow, elementE3, elementE2);
+        result.addEdge(elementE3, elementE2);
+        result.addElement(connector8);
         return result;
     }
 }

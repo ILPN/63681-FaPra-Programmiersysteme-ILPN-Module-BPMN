@@ -1,3 +1,6 @@
+import { SwitchController } from './elements/switch-controller';
+import { SwitchstateType } from './elements/switchstatetype'
+
 export abstract class Element {
     private _id: string;
     private _x: number;
@@ -10,6 +13,8 @@ export abstract class Element {
     private _adjacentElements: Element[];
     /** Dieses Array von SVG Elementen beinhaltet alle Elemente, dessen fill Farbe sich ändern muss, um die Farbe des Elements zu ändern. */
     private _svgColorElements: SVGElement[];
+    private _switchState: SwitchstateType = SwitchstateType.disable;
+    private _switchController: SwitchController | undefined; 
 
 
     constructor(id: string) {
@@ -18,6 +23,25 @@ export abstract class Element {
         this._y = 0;
         this._adjacentElements = [];
         this._svgColorElements = [];
+    }
+
+    get switchState(): SwitchstateType {
+        return this._switchState;
+    }
+
+    set switchState(value: SwitchstateType) {
+        this._switchState = value;
+    }
+
+    // get switchController(): SwitchController {
+    //     if (this._switchController === undefined) {
+    //         return;
+    //     }
+    //     return this._switchController;
+    // }
+
+    set switchController(value: SwitchController) {
+        this._switchController = value;
     }
 
     get adjacentElements(): Element[] {
@@ -84,14 +108,21 @@ export abstract class Element {
         if (this._svgElement === undefined) {
             return;
         }
-        this.changeColor("red")
+        //this.changeColor("red");
+        //this.switch();
+
+
+         if (this._switchController === undefined) {
+                return;
+         }
+         this._switchController.press(this);
     }
 
     private processMouseUp(event: MouseEvent) {
         if (this._svgElement === undefined) {
             return;
         }
-        this.changeColor("white")
+        this. colorToDefault()
     }
 
     /**
@@ -144,5 +175,65 @@ export abstract class Element {
     addSVGtoColorChange(element: SVGElement) {
         this._svgColorElements.push(element);
     }
+
+    /** Mit dieser Methode wird die Farbe des Elementes  */
+    colorToDefault(): void {
+        if (this._svgElement === undefined) {
+            return;
+        }
+        this.changeColor(this.getColor())
+    }
+
+    private getColor(): string {
+        switch (this._switchState) {
+            case SwitchstateType.disable: {
+                return "white";
+                break;
+            }
+            case SwitchstateType.enableable: {
+                return "yellow";
+                break;
+            }
+            case SwitchstateType.enable: {
+                return "lightgreen";
+                break;
+            }
+            case SwitchstateType.geschaltet: {
+                return "lightgray";
+                break;
+            }
+            default: {
+                return "red";
+                break;
+            }
+        }
+    }
+
+    switch() : void {
+        switch (this._switchState) {
+            case SwitchstateType.disable: {
+                this._switchState =  SwitchstateType.enableable
+                break;
+            }
+            case SwitchstateType.enableable: {
+                this._switchState =  SwitchstateType.enable;
+                break;
+            }
+            case SwitchstateType.enable: {
+                this._switchState =  SwitchstateType.geschaltet;
+                break;
+            }
+            case SwitchstateType.geschaltet: {
+                this._switchState =  SwitchstateType.geschaltet;
+                break;
+            }
+            default: {
+                this._switchState =  SwitchstateType.disable
+                break;
+            }
+        }
+        this.colorToDefault();
+    }
+
 
 }

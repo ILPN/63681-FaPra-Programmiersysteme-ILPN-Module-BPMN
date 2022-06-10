@@ -99,7 +99,7 @@ export class Connector extends Element {
         for (let i = 0; i < this._pathConnectorElements.length; i++) {
             toElement = this._pathConnectorElements[i];
             svg.append(toElement.createSvg());
-            this.kawieichdasdingnennensoll(svg, fromElement, toElement);
+            this.addLine(svg, fromElement, toElement);
             if (firstLine && this._type === Connectortype.InformationFlow) {
                 svg.append(this.getCircleIfIsInformationFlow(fromElement.x, fromElement.y, toElement.x, toElement.y, fromElement.distanceX, fromElement.distanceY));
                 firstLine = false;
@@ -108,7 +108,7 @@ export class Connector extends Element {
         }
 
         toElement = this._end;
-        this.kawieichdasdingnennensoll(svg, fromElement, toElement);
+        this.addLine(svg, fromElement, toElement);
 
         if (firstLine && this._type === Connectortype.InformationFlow) {
             svg.append(this.getCircleIfIsInformationFlow(fromElement.x, fromElement.y, toElement.x, toElement.y, fromElement.distanceX, fromElement.distanceY));
@@ -120,7 +120,7 @@ export class Connector extends Element {
         return svg;
     }
 
-    private kawieichdasdingnennensoll(svg: SVGElement, fromElement: Element, toElement: Element): void {
+    private addLine(svg: SVGElement, fromElement: Element, toElement: Element): void {
         if (fromElement.x < toElement.x) svg.append(this.getLinie((fromElement.x + fromElement.distanceX), fromElement.y, toElement.x - toElement.distanceX, toElement.y));
         if (fromElement.x > toElement.x) svg.append(this.getLinie((fromElement.x - fromElement.distanceX), fromElement.y, toElement.x + toElement.distanceX, toElement.y));
         if (fromElement.y < toElement.y) svg.append(this.getLinie(fromElement.x, fromElement.y + fromElement.distanceY, toElement.x, toElement.y - toElement.distanceY));

@@ -41,7 +41,7 @@ export class Gateway extends Element {
         return svg;
     }
 
-    private createRect(): SVGElement {
+    private createRect(): SVGElement { 
         let rect = this.createSvgElement('rect');
         rect.setAttribute('width', `${this._width}`);
         rect.setAttribute('height', `${this._height}`);

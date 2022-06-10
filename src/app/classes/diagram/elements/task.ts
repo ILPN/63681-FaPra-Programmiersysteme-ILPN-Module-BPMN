@@ -421,7 +421,6 @@ export class Task extends Element {
         let tspan = this.createSvgElement('tspan');
         tspan.setAttribute("x", '50%');
         tspan.setAttribute("y", `${y}`);
-      
         tspan.textContent = text;
         return tspan;
     }

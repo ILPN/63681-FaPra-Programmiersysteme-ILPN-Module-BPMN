@@ -1,6 +1,7 @@
 
 import { Element } from './../element'
 import { EventType } from './eventtype'
+import { SwitchstateType } from './switchstatetype';
 
 export class Event extends Element {
     private _label: string;
@@ -12,6 +13,7 @@ export class Event extends Element {
         super(id);
         this._label = label;
         this._type = type;
+        if(type === EventType.Start) this.switchState = SwitchstateType.enableable;
         this.distanceX = this._raduis + 2;
         this.distanceY = this._raduis + 2;
     }
@@ -30,6 +32,7 @@ export class Event extends Element {
         if (this._type === EventType.End) svg.append(this.getEndSvg());
         this.registerSvg(svg);
         svg.append(this.getSVGText());
+        this.colorToDefault();
         return svg;
     }
 
