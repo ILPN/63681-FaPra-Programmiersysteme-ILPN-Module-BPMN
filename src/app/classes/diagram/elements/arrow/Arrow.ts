@@ -14,11 +14,6 @@ export class Arrow extends Element {
     private _start: Element;
     private _end: Element;
 
-    //SVG parts of the arrow
-    private lineSvgElement!: SVGElement;
-    private parentSvgElement!: SVGElement;
-    private arrowHeadSvgElement!: SVGElement;
-
     constructor(id: string, label: string, start: Element, end: Element) {
         super(id);
         this._label = label;
@@ -65,92 +60,19 @@ export class Arrow extends Element {
         this.arrowTarget.y = y;
     }
 
-    /**
-     * moves the outgoing arrow when the element is moved
-     * @param diff_x distance of mouse movement along X axis
-     * @param diff_y distance of mouse movement along Y axis
-     */
-    public move_to_startElement(diff_x: number, diff_y: number) {
-
-        //new coordinates and new path
-        let old_path = this.lineSvgElement.getAttribute("d")!;
-        let new_path = this.calc_new_path(diff_x, diff_y, old_path, 1)
-
-        //create new svg with new path and replace old svg element
-        let new_svg = this.lineSvgElement;
-        new_svg.setAttribute("d", new_path!);
-
-        this.parentSvgElement.replaceChild(new_svg, this.lineSvgElement);
-        this.lineSvgElement = new_svg;
-    }
-
-    /**
-     * moves the incoming arrow, when the element is dragged
-     * @param diff_x distance of mouse movement along X axis
-     * @param diff_y distance of mouse movement along Y axis
-     */
-    public move_to_endElement(diff_x: number, diff_y: number) {
-
-        this.move_arrowHead(diff_x, diff_y);
-
-        //move line connected to arrow head
-
-        //if arrow is straight, path has 2 parts, i.e. endline coordinates are at index 1
-        //if arrow has a corner, path has 3 parts, i.e. endline coordinates are at index 2
-        let old_path = this.lineSvgElement.getAttribute("d");
-        let endOfLine_index_in_path = old_path?.trim().split(" ").length! - 1;
-
-        this.move_line(diff_x, diff_y, endOfLine_index_in_path)
-    }
-
-    //moves the arrow head  when the arrow is dragged along with another element
-    private move_arrowHead(diff_x: number, diff_y: number) {
-
-        let old_path = this.arrowHeadSvgElement.getAttribute("d")!;
-        let new_path = this.calc_new_path(diff_x, diff_y, old_path, 1);
-
-        let new_svg = this.arrowHeadSvgElement;
-        new_svg.setAttribute("d", new_path!);
-
-        this.parentSvgElement.replaceChild(new_svg, this.arrowHeadSvgElement);
-        this.arrowHeadSvgElement = new_svg;
-    }
-
-    //moves the arrow line when the arrow is dragged along with another element
-    private move_line(diff_x: number, diff_y: number, index_in_path: number) {
-
-        //new coordinates and new path
-        let old_path = this.lineSvgElement.getAttribute("d")!;
-        let new_path = this.calc_new_path(diff_x, diff_y, old_path, index_in_path);
-
-        //create new svg with new path and replace old svg element
-        let new_svg = this.lineSvgElement;
-        new_svg.setAttribute("d", new_path!);
-
-        this.parentSvgElement.replaceChild(new_svg, this.lineSvgElement);
-        this.lineSvgElement = new_svg;
-    }
-
-    //calculates new coordinates when the arrow is dragged along with another element
-    private calc_new_path(diff_x: number, diff_y: number, old_path: string, index_in_path: number): string {
-        let new_x = Number(old_path?.split(" ")[index_in_path].split(",")[0]) + diff_x;
-        let new_y = Number(old_path?.split(" ")[index_in_path].split(",")[1]) + diff_y;
-        return old_path?.replace(old_path?.split(" ")[index_in_path], new_x + "," + new_y)
-    }
-
+ 
     public createSvg(): SVGElement {
-        this.parentSvgElement = this.createUndergroundSVG();
+        const parentSvgElement = this.createUndergroundSVG();
         const lineSvgResult = this.lineSvg();
-        this.lineSvgElement = lineSvgResult.svg;
+        const lineSvgElement = lineSvgResult.svg;
 
-        this.parentSvgElement.append(this.lineSvgElement);
-        this.arrowHeadSvgElement = this.arrowheadSvg(
+        parentSvgElement.append(lineSvgElement);
+        parentSvgElement.append(this.arrowheadSvg(
             lineSvgResult.endOfLine,
             lineSvgResult.directionOfEnd
-        );
-        this.parentSvgElement.append(this.arrowHeadSvgElement);
-        this.registerSvg(this.parentSvgElement);
-        return this.parentSvgElement;
+        ));
+        this.registerSvg(parentSvgElement);
+        return parentSvgElement;
     }
     private lineSvg(): {
         svg: SVGElement;
@@ -328,7 +250,7 @@ export class Arrow extends Element {
                 const intersection = Line.intersection(intersectingLine, l);
                 if (
                     intersection.distanceTo(center) <
-                    new Vector(el.distanceX, el.distanceY).length() + 2
+                    new Vector(el.distanceX, el.distanceY).length() + 0.1
                 ) {
                     intersections.push(intersection);
                 }
@@ -395,7 +317,7 @@ export class Arrow extends Element {
                 const intersection = Line.intersection(intersectingLine, l);
                 if (
                     intersection.distanceTo(new Vector(g.x, g.y)) <
-                    g.distanceX + 5
+                    g.distanceX + 0.2
                 ) {
                     intersections.push(intersection);
                 }
