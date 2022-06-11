@@ -1,6 +1,6 @@
 import { Arrow } from "./elements/arrow/Arrow";
 import { Gateway } from "./elements/gateway";
-import { Task }  from "./elements/task";
+import { Task } from "./elements/task";
 
 export abstract class Element {
     private _id: string;
@@ -118,38 +118,37 @@ export abstract class Element {
 
     }
 
-    private updateDrawnSvg(){
+    private updateDrawnSvg() {
         this._svgElement?.replaceWith(this.createSvg())
     }
     public move(event: MouseEvent) {
-        if(!this.dragging) return
-        if(this instanceof Gateway){
-             //calculate diffs
-             let diff_x : number = event.clientX - this.drag_start_x;
-             let diff_y : number = event.clientY - this.drag_start_y;
- 
+        if (!this.dragging) return
 
-             //drag the element  
+        //calculate diffs
+        let diff_x: number = event.clientX - this.drag_start_x;
+        let diff_y: number = event.clientY - this.drag_start_y;
 
-             this.x = this.x + diff_x
-             this.y = this.y + diff_y
-             this.updateDrawnSvg()
 
-              //drag incoming arrows
-              for (const arrow of this.in_arrows) {
-                arrow.setArrowTarget(this.x,this.y)
-                arrow.updateDrawnSvg()              
-              } 
-              //drag incoming arrows
-              for (const arrow of this.out_arrows) {
-                arrow.setArrowStart(this.x,this.y)
-                arrow.updateDrawnSvg()              
-              } 
+        //drag the element  
+        this.x = this.x + diff_x
+        this.y = this.y + diff_y
+        this.updateDrawnSvg()
 
-             //update start positions for next move
-             this.drag_start_x = event.clientX;
-             this.drag_start_y = event.clientY;
+        //drag incoming arrows
+        for (const arrow of this.in_arrows) {
+            arrow.setArrowTarget(this.x, this.y)
+            arrow.updateDrawnSvg()
         }
+        //drag outgoing arrows
+        for (const arrow of this.out_arrows) {
+            arrow.setArrowStart(this.x, this.y)
+            arrow.updateDrawnSvg()
+        }
+
+        //update start positions for next move
+        this.drag_start_x = event.clientX;
+        this.drag_start_y = event.clientY;
+
     }
 
     private processMouseDown(event: MouseEvent) {
