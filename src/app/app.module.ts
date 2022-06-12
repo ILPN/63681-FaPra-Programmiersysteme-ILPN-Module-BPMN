@@ -21,7 +21,7 @@ import {ErrorHintComponent} from './components/error-hint/error-hint.component';
         FooterComponent,
         ErrorHintComponent,
         InputFieldComponent,
-        InputDirective
+        InputDirective,
     ],
     imports: [
         BrowserModule,

@@ -7,10 +7,11 @@ import { Event } from "../diagram/elements/event";
 import { LayeredGraph, LNode } from "./LayeredGraph";
 import { SimpleGraph } from "./SimpleGraph";
 import { Sugiyama } from "./Sugiyama";
+import { MyDiagram } from "../diagram/MyDiagram";
 
-export function applySugiyama(diagram:Diagram, w = 1000, h =500 , p = 50){
+export function applySugiyama(diagram:MyDiagram, w = 1000, h =500 , p = 50){
     const input = new SimpleGraph()
-    diagram.elements.forEach(el => {
+    diagram.getElems().forEach(el => {
         if((el instanceof Task || el instanceof Gateway|| el instanceof Event)){
             input.addNode(el.id)
         }
@@ -29,7 +30,7 @@ export function applySugiyama(diagram:Diagram, w = 1000, h =500 , p = 50){
     const result :LayeredGraph = sugi.getResult()
 
     for (let node of result.getAllNoneDummyNodes()) {
-        const el = diagram.elements.find(e => e.id == node.id)
+        const el = diagram.getElems().find(e => e.id == node.id)
         if (el == undefined) continue
         el.x = node.x
         el.y = node.y
@@ -37,7 +38,7 @@ export function applySugiyama(diagram:Diagram, w = 1000, h =500 , p = 50){
      
 
      const arrows:Arrow[] = []
-     for (let el of diagram.elements){
+     for (let el of diagram.getElems()){
          if(el instanceof Arrow) arrows.push(el)
      }
      for (let arrow of arrows){
@@ -59,12 +60,6 @@ export function applySugiyama(diagram:Diagram, w = 1000, h =500 , p = 50){
                 } 
         }    
     }
-    for (const arrow of arrows) {
-        for (const ecke of arrow.corners) {
-            diagram.addElement(ecke)
-        } 
-    }
-
     //no dummys yet
     
   }

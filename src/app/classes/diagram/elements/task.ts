@@ -1,7 +1,11 @@
-import { Element } from "../element";
+import { MyDiagram } from "../MyDiagram";
+import { MainElement } from "./MainElement";
 import { TaskType } from "./tasktype";
 
-export class Task extends Element {
+export class Task extends MainElement {
+    move(event: MouseEvent) {
+        throw new Error("Method not implemented.");
+    }
     private _label: string;
     private _type: TaskType;
     private _width: number = 170; // width 170
@@ -10,8 +14,8 @@ export class Task extends Element {
     private _border: number = 2;
     private _myScale: number = 1;
 
-    constructor(id: string, label: string, type: TaskType) {
-        super(id);
+    constructor(id: string, label: string, type: TaskType, diagram:MyDiagram) {
+        super(id, diagram);
         this._label = label;
         this._type = type;
         this.distanceX = this._width / 2;
@@ -39,7 +43,6 @@ export class Task extends Element {
         svg.append(this.createRect());
         svg.append(this.createTypeSvg());
         svg.append(this.getText());
-        this.registerSvg(svg);
         return svg;
     }
 
@@ -60,6 +63,7 @@ export class Task extends Element {
 
     private createUndergroundSVG(): SVGElement {
         let svg = this.createSvgElement('svg');
+        svg.setAttribute('id', this.id);
         svg.setAttribute('width', `${this._width + 2 * this._border}`);
         svg.setAttribute('height', `${this._height + 2 * this._border}`);
         svg.setAttribute('viewBox', "0 0 " + `${this._width + 2 * this._border}` + " " + `${this._height + 2 * this._border}`);
@@ -71,7 +75,6 @@ export class Task extends Element {
 
     private createRect(): SVGElement {
         let rect = this.createSvgElement('rect');
-        rect.setAttribute('id', 'rect1');
         rect.setAttribute('width', `${this._width}`);
         rect.setAttribute('height', `${this._height}`);
         rect.setAttribute('x', `${this._border}`);
@@ -81,7 +84,6 @@ export class Task extends Element {
         rect.setAttribute('stroke', 'rgb(0,0,0)');
         rect.setAttribute('stroke-width', `${this._border}`);
         rect.setAttribute('fill', 'white');
-        this.addSVGtoColorChange(rect);
         return rect;
     }
 
@@ -123,7 +125,6 @@ export class Task extends Element {
         type_path.setAttribute("fill", "white");
         type_path.setAttribute('transform', 'translate(8 8) scale(' + `${scaleString}` + ')');
         type_svg.append(type_path);
-        this.addSVGtoColorChange(type_path);
         return type_svg;
     }
 
@@ -241,10 +242,6 @@ export class Task extends Element {
         type_rect2.setAttribute('transform', 'translate(8 8) scale(' + scale + ')');
         type_svg.append(type_rect2);
 
-        this.addSVGtoColorChange(type_rect);
-        this.addSVGtoColorChange(type_rect1);
-        this.addSVGtoColorChange(type_rect2);
-
     }
 
     private AddTypeServiceFrontGear(type_svg: SVGElement, scale: String): void {
@@ -322,8 +319,6 @@ export class Task extends Element {
         type_rect.setAttribute('stroke-miterlimit', `10`);
         type_rect.setAttribute('transform', transformString);
         type_svg.append(type_rect);
-        this.addSVGtoColorChange(type_rect);
-
         let type_rect1 = this.createSvgElement('rect');
         type_rect1.setAttribute('x', `60`);
         type_rect1.setAttribute('y', `60`);

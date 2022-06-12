@@ -4,8 +4,18 @@ import { Task } from '../task';
 import { Event } from '../event';
 import { Vector } from './Vector';
 import { Line } from './Line';
+import { MainElement } from '../MainElement';
+import { ArrowCorner } from './ArrowCorner';
+import { MyDiagram } from '../../MyDiagram';
 
 export class Arrow extends Element {
+    removeCorner(corner: ArrowCorner) {
+        this._corners = this._corners.filter((c)=> c!==corner)
+        this.diagram.removeAndRender(corner)
+        this.updateSvg()
+    }
+    onDragTo(dx: number, dy: number) {
+    }
     private _label: String;
     private _corners: ArrowCorner[];
     public get corners() {
@@ -14,24 +24,31 @@ export class Arrow extends Element {
     private _start: Element;
     private _end: Element;
 
-    constructor(id: string, label: string, start: Element, end: Element) {
-        super(id);
+    constructor(id: string, label: string, start: MainElement, end: MainElement, diagram:MyDiagram) {
+        super(id, diagram);
         this._label = label;
         this._start = start;
         this._end = end;
         this._corners = [];
-        this.setArrowStart(start.x, start.y);
-        this.setArrowTarget(end.x, end.y);
+        this.arrowStart = new ArrowCorner(this.id+"StartCorner", start.x,start.y,this, diagram)
+        this.arrowTarget = new ArrowCorner(this.id+"TargetCorner", end.x,end.y,this, diagram)
+        this.arrowStart.visible = false
+        this.arrowTarget.visible =false
 
         //for dragging: add arrow object to the connected elements 
         start.addOutArrow(this);
         end.addInArrow(this);
     }
     clearArrowCorners() {
+        for (const corner of this.corners) {
+            this.diagram.removeAndRender(corner)
+        }
         this._corners = [];
     }
     addArrowCorner(x: number, y: number) {
-        this._corners.push(new ArrowCorner(this.id + x + ' ' + y, x, y));
+        const corner = new ArrowCorner(this.id +this.corners.length, x, y, this, this.diagram)
+        this._corners.push(corner);
+        this.diagram.addAndRender(corner)
     }
 
     get start(): Element {
@@ -49,30 +66,36 @@ export class Arrow extends Element {
     set end(value: Element) {
         this._end = value;
     }
-    private arrowStart: Vector = new Vector();
+    private arrowStart
     setArrowStart(x: number, y: number) {
         this.arrowStart.x = x;
         this.arrowStart.y = y;
     }
-    private arrowTarget: Vector = new Vector();
+    private arrowTarget
     setArrowTarget(x: number, y: number) {
         this.arrowTarget.x = x;
         this.arrowTarget.y = y;
     }
+    getArrowTarget() {
+        return this.arrowTarget
+    }
+    getArrowStart() {
+        return this.arrowStart
+    }
 
  
     public createSvg(): SVGElement {
-        const parentSvgElement = this.createUndergroundSVG();
+        const svg = this.createContainerSVG();
         const lineSvgResult = this.lineSvg();
-        const lineSvgElement = lineSvgResult.svg;
-
-        parentSvgElement.append(lineSvgElement);
-        parentSvgElement.append(this.arrowheadSvg(
+        svg.append(lineSvgResult.svg);
+        svg.append(this.arrowheadSvg(
             lineSvgResult.endOfLine,
             lineSvgResult.directionOfEnd
         ));
-        this.registerSvg(parentSvgElement);
-        return parentSvgElement;
+        for (const corner of this.corners) {
+            this.diagram.addAndRender(corner)
+        }
+        return svg;
     }
     private lineSvg(): {
         svg: SVGElement;
@@ -83,16 +106,16 @@ export class Arrow extends Element {
         let secondCorner;
         let beforeLastCorner;
         if (this._corners.length > 0) {
-            secondCorner = this._corners[0].toVector();
+            secondCorner = this._corners[0].posVector();
             beforeLastCorner =
-                this._corners[this._corners.length - 1].toVector();
+                this._corners[this._corners.length - 1].posVector();
         } else {
-            secondCorner = this.arrowTarget;
-            beforeLastCorner = this.arrowStart;
+            secondCorner = this.arrowTarget.posVector();
+            beforeLastCorner = this.arrowStart.posVector();
         }
         const intersectionWithStartElement = this.calculateIntersection(
             secondCorner,
-            this.arrowStart,
+            this.arrowStart.posVector(),
             this.start
         );
         pointsToBeConnected.push(intersectionWithStartElement);
@@ -101,7 +124,7 @@ export class Arrow extends Element {
         }
         const intersectionWithEndElement = this.calculateIntersection(
             beforeLastCorner,
-            this.arrowTarget,
+            this.arrowTarget.posVector(),
             this.end
         );
         pointsToBeConnected.push(intersectionWithEndElement);
@@ -334,7 +357,7 @@ export class Arrow extends Element {
         return intersections[0];
     }
 
-    private createUndergroundSVG(): SVGElement {
+    private createContainerSVG(): SVGElement {
         const svg = this.createSvgElement('svg');
         svg.setAttribute('id', `${this.id}`);
         svg.setAttribute('x', '0');
@@ -343,31 +366,4 @@ export class Arrow extends Element {
         return svg;
     }
 }
-export class ArrowCorner extends Element {
-    toVector(): Vector {
-        return new Vector(this.x, this.y);
-    }
-    private _raduis: number = 5;
 
-    constructor(id: string, x: number, y: number) {
-        super(id);
-        this.x = x;
-        this.y = y;
-    }
-
-    public createSvg(): SVGElement {
-        const svg = this.createSvgElement('svg');
-        svg.setAttribute('id', `${this.id}`);
-        svg.setAttribute('x', `${this.x}`);
-        svg.setAttribute('y', `${this.y}`);
-        svg.setAttribute('style', 'overflow: visible;');
-
-        const circle = this.createSvgElement('circle');
-        circle.setAttribute('r', `${this._raduis}`);
-        circle.setAttribute('style', 'fill:#00b8ff;stroke:none;stroke-width:3.77953;fill-opacity:0.28961748');
-        svg.appendChild(circle);
-        // this.addSVGtoColorChange(circle);
-        this.registerSvg(svg);
-        return svg;
-    }
-}

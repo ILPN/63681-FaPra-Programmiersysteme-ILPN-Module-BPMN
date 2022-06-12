@@ -3,4 +3,15 @@
     height: 500px;
     border-style: dotted;
     border-color: lightgrey;
+
+    // so text of SVG does not get selected when dragging
+    cursor: default;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+
+        
 }
+
+

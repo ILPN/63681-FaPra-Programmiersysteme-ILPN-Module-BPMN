@@ -1,21 +1,23 @@
-import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnDestroy, ViewChild, ViewEncapsulation } from '@angular/core';
 import { DisplayService } from '../../services/display.service';
 import { Subscription } from 'rxjs';
 import { LayoutService } from '../../services/layout.service';
 import { SvgService } from '../../services/svg.service';
-import { Diagram } from '../../classes/diagram/diagram';
+import { MyDiagram } from 'src/app/classes/diagram/MyDiagram';
 
 @Component({
     selector: 'app-display',
     templateUrl: './display.component.html',
-    styleUrls: ['./display.component.scss']
+    styleUrls: ['./display.component.scss'],
+    encapsulation: ViewEncapsulation.None
+
 })
 export class DisplayComponent implements OnDestroy {
 
     @ViewChild('drawingArea') drawingArea: ElementRef<SVGElement> | undefined;
 
     private _sub: Subscription;
-    private _diagram: Diagram | undefined;
+    private _diagram: MyDiagram | undefined;
 
     constructor(private _layoutService: LayoutService,
         private _svgService: SvgService,
@@ -43,13 +45,24 @@ export class DisplayComponent implements OnDestroy {
             console.debug('drawing area not ready yet')
             return;
         }
+        console.log("draw is called")
 
         this.clearDrawingArea();
         const elements = this._svgService.createSvgElements(this._displayService.diagram);
         for (const element of elements) {
             this.drawingArea.nativeElement.appendChild(element);
         }
+        
+        
 
+        
+       /*const el1 = new Gateway("1", GatewayType.AND_JOIN)
+       const el2 = new MyElement("2")
+
+       this.drawingArea.nativeElement.appendChild(el1.getSVGThatWillBeAttachedToDom())
+       this.drawingArea.nativeElement.appendChild(el2.getSvgWithListeners())
+        */
+        
     }
 
     private clearDrawingArea() {

@@ -1,15 +1,16 @@
-import { Element } from './../element'
+import { MyDiagram } from '../MyDiagram';
 import { GatewayType } from './gatewaytype'
+import { MainElement } from './MainElement';
 
-export class Gateway extends Element {
+export class Gateway extends MainElement {
     private _type: GatewayType;
     private _width: number = 50;
     private _height: number = this._width;
     private _border: number = 2;
     private _scale: String = '1';
 
-    constructor(id: string, type: GatewayType) {
-        super(id);
+    constructor(id: string, type: GatewayType, diagram:MyDiagram) {
+        super(id,diagram);
         this._type = type;
         this.distanceX = this._width - 14;
         this.distanceY = this._width - 14;
@@ -27,7 +28,6 @@ export class Gateway extends Element {
         let rect = this.createRect();
         svg.append(rect);
         svg.append(this.createTypeSvg());
-        this.registerSvg(svg);
         return svg;
     }
 
@@ -49,7 +49,6 @@ export class Gateway extends Element {
         rect.setAttribute('stroke-width', `${this._border}`);
         rect.setAttribute('fill', 'white');
         rect.setAttribute('transform', 'rotate(-45 ' + `${(this._width / 2)}` + ' ' + `${this._height / 2}` + ')');
-        this.addSVGtoColorChange(rect);
         return rect;
     }
 
@@ -96,7 +95,6 @@ export class Gateway extends Element {
         type_svg.setAttribute('fill', 'none');
         type_svg.setAttribute('stroke', 'black');
         type_svg.setAttribute('stroke-width', '4');
-        this.addSVGtoColorChange(type_svg);
         return type_svg;
     }
 }

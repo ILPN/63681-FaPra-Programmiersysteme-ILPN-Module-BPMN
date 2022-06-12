@@ -1,15 +1,20 @@
 
+import { MyDiagram } from '../MyDiagram';
 import { Element } from './../element'
 import { EventType } from './eventtype'
+import { MainElement } from './MainElement';
 
-export class Event extends Element {
+export class Event extends MainElement {
+    move(event: MouseEvent) {
+        throw new Error('Method not implemented.');
+    }
     private _label: string;
     private _type: EventType;
     private _raduis: number = 35;
 
 
-    constructor(id: string, label: string, type: EventType) {
-        super(id);
+    constructor(id: string, label: string, type: EventType, diagram:MyDiagram) {
+        super(id, diagram);
         this._label = label;
         this._type = type;
         this.distanceX = this._raduis + 2;
@@ -28,7 +33,6 @@ export class Event extends Element {
         if (this._type === EventType.Start) svg.append(this.getStartSvg());
         if (this._type === EventType.Intermediate) { svg.append(this.getIntermediateSvgOut()); svg.append(this.getIntermediateSvgIn()); }
         if (this._type === EventType.End) svg.append(this.getEndSvg());
-        this.registerSvg(svg);
         svg.append(this.getSVGText());
         return svg;
     }
@@ -59,7 +63,6 @@ export class Event extends Element {
         circle.setAttribute('stroke', 'black');
         circle.setAttribute('stroke-width', "3");
         circle.appendChild(this.getSVGText());
-        this.addSVGtoColorChange(circle);
         return circle;
     }
 
@@ -75,7 +78,6 @@ export class Event extends Element {
         circle.setAttribute('stroke-width', "9");
         this.distanceX = this._raduis + 4;
         this.distanceY = this._raduis + 4;
-        this.addSVGtoColorChange(circle);
         return circle;
     }
 
@@ -102,7 +104,6 @@ export class Event extends Element {
         circle.setAttribute('fill', 'white');
         circle.setAttribute('stroke', 'black');
         circle.setAttribute('stroke-width', "9");
-        this.addSVGtoColorChange(circle);
         this.distanceX = this._raduis + 4;
         this.distanceY = this._raduis + 4;
         return circle;
