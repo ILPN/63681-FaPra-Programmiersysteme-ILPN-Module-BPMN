@@ -4,19 +4,16 @@ import { Arrow } from './Arrow';
 import { Vector } from './Vector';
 
 export class ArrowCorner extends Element {
-    private arrow:Arrow
+    private _arrow: Arrow;
+    public get arrow(): Arrow {
+        return this._arrow;
+    }
     private _visible = true;
     public get visible() {
         return this._visible;
     }
     public set visible(value) {
         this._visible = value;
-    }
-    onDragTo(ax: number, ay: number) {
-        this.x =ax;
-        this.y =ay;
-        this.updateSvg()
-        this.arrow.updateSvg()
     }
     posVector(): Vector {
         return new Vector(this.x, this.y);
@@ -27,7 +24,7 @@ export class ArrowCorner extends Element {
         super(id, diagram);
         this.x = x;
         this.y = y;
-        this.arrow = associatedArrrow
+        this._arrow = associatedArrrow
     }
 
 

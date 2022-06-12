@@ -5,6 +5,7 @@ import { ArrowCorner } from "./elements/arrow/ArrowCorner"
 import { Vector } from "./elements/arrow/Vector"
 import { MainElement } from "./elements/MainElement"
 import { MainElementDragHelper } from "./DragHelpers/MainElementDragHelper"
+import { CornerDragHelper } from "./DragHelpers/CornerDragHelper"
 
 export class MyDiagram{
     removeAndRender(corner: ArrowCorner) {
@@ -20,6 +21,10 @@ export class MyDiagram{
     onChildrenMouseDown(e: MouseEvent, element: Element) {
         if(element instanceof MainElement){
             this.dragHelper = new MainElementDragHelper()
+            this.dragHelper.startDrag(element,e)
+        }
+        if(element instanceof ArrowCorner){
+            this.dragHelper = new CornerDragHelper()
             this.dragHelper.startDrag(element,e)
         }
     }
