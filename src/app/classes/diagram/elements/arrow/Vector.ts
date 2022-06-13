@@ -1,5 +1,12 @@
 export class Vector {
+    isAlmostZero() {
+        const threshold = 0.0001
+        return(Math.abs(this.x) <threshold && this.y < threshold)
+    }
     toUnitVector() {
+        if(this.length() == 0){
+            return new Vector(0,0)
+        }
         return this.muliplied(1 / this.length());
     }
     muliplied(m: number): Vector {

@@ -11,9 +11,32 @@ import { ArrowEndCorner } from './ArrowEndCorner';
 import { ArrowInnerCorner } from './ArrowInnerCorner';
 
 export class Arrow extends Element {
+    addCornerBeforeCorner(corner: ArrowCorner): void {
+        let point1, point2
+        if(corner.cornerBefore == this.arrowStart && corner.cornerBefore instanceof ArrowEndCorner)
+            point1 = corner.cornerBefore.intersectionPos
+        else
+            point1 = corner.cornerBefore!.posVector()
+
+        if(corner == this.arrowTarget && corner instanceof ArrowEndCorner)
+            point2 = corner.intersectionPos
+        else
+            point2 = corner.posVector()
+
+        const pos = point1.plus(point2).muliplied(0.5)
+
+        if(corner == this.arrowTarget)
+            this.addArrowCorner(pos.x,pos.y)
+        else{
+            const index = this.corners.findIndex(c => c == corner)
+            console.log("der index ist" + index)
+            this.addArrowCorner(pos.x,pos.y,index)
+        }
+
+    }
     removeCorner(corner: ArrowCorner) {
         this._corners = this._corners.filter((c) => c !== corner);
-        this.diagram.removeAndRender(corner);
+        this.registerCornerNeighbours()
         this.updateSvg();
     }
     onDragTo(dx: number, dy: number) {}
@@ -60,7 +83,7 @@ export class Arrow extends Element {
         this._corners = [];
         this.updateSvg();
     }
-    addArrowCorner(x: number, y: number) {
+    addArrowCorner(x: number, y: number, atPosition:number = -1) {
         const corner = new ArrowInnerCorner(
             this.id + this.corners.length,
             x,
@@ -68,35 +91,31 @@ export class Arrow extends Element {
             this,
             this.diagram
         );
-        this._corners.push(corner);
+        if(atPosition == -1){
+            this._corners.push(corner);
+        }else{
+            this._corners.splice(atPosition,0,corner)
+        }
         this.registerCornerNeighbours();
         this.updateSvg();
     }
     private registerCornerNeighbours() {
         //tell each corner who are his neighbours
         const length = this.corners.length;
-        for (let i = 1; i < length - 1; i++) {
-            const corner = this.corners[i];
-            corner.cornerBefore = this.corners[i - 1];
-            corner.cornerAfter = this.corners[i + 1];
-        }
         if (length == 0) {
             this.arrowStart.cornerAfter = this.arrowTarget
             this.arrowTarget.cornerBefore = this.arrowStart
-
-        } else if (length == 1) {
-            this.arrowStart.cornerAfter = this.corners[0]
-            this.corners[0].cornerBefore = this.arrowStart
-            this.corners[0].cornerAfter = this.arrowTarget
-            this.arrowTarget.cornerBefore = this.corners[0]
-
-        } else {
-            this.corners[0].cornerBefore = this.arrowStart;
-            this.corners[0].cornerAfter = this.corners[1];
-            const lastIndex = length - 1;
-            this.corners[lastIndex].cornerBefore = this.corners[lastIndex - 1];
-            this.corners[lastIndex].cornerAfter = this.arrowTarget;
         }
+        this.arrowStart.cornerAfter = this.corners[0]
+        this.arrowTarget.cornerBefore = this.corners[length-1]
+        for (let i = 0; i < length ; i++) {
+            const before =  (i==0)? this.arrowStart: this.corners[i - 1]
+            const corner = this.corners[i];
+            const after = (i==length-1)? this.arrowTarget: this.corners[i + 1]
+            corner.cornerBefore = before
+            corner.cornerAfter = after
+        }
+        
     }
 
     get start(): Element {

@@ -11,13 +11,13 @@
     user-select: none;
 }
 
-.background{
+.background {
     fill: #acacac;
 }
 
 .arrowEndCircle {
     visibility: hidden;
-    fill:#ff0000 ;
+    fill: #ff0000;
 }
 .arrowLineInElement {
     visibility: hidden;
@@ -27,9 +27,8 @@
     stroke-opacity: 1;
 }
 .arrowIntersection:hover {
-    ~.arrowEndCircle{
+    ~ .arrowEndCircle {
         visibility: visible;
-
     }
     ~ .arrowLineInElement {
         visibility: visible;
@@ -39,7 +38,7 @@
     .arrowEndCircle {
         visibility: visible;
     }
-    .arrowLineInElement{
+    .arrowLineInElement {
         visibility: visible;
     }
 }
@@ -48,15 +47,33 @@
     stroke: none;
     stroke-width: 3.77953;
     //fill-opacity:0.4;
-   // transition: fill 0.5s;
+    // transition: fill 0.5s;
 }
 
-
-.arrowCornerCircle{
-    fill:#00b7ff92
+.arrowCornerCircle {
+    fill: #00b7ff92;
 }
-.dragTwoCircle{
-    fill:#ff000092
-
+.arrowCornerCircle:hover {
+    ~ .cornerFeatures {
+        visibility: visible;
+        transition-property: visibility;
+        transition-delay: 0s;
+    }
 }
-
+.cornerFeatures:hover {
+    visibility: visible;
+}
+.cornerFeatures {
+    visibility: hidden;
+    transition-property: visibility;
+    transition-delay: 0.5s;
+}
+.dragedCornerFeatures{
+    visibility: visible;
+}
+.dragTwoCircle {
+    fill: #ff000092;
+}
+.plusCircle {
+    fill: #2fff0092;
+}

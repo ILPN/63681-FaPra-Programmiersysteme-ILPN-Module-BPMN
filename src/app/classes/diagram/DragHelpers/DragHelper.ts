@@ -32,7 +32,6 @@ export abstract class DragHelper<T extends Element> implements DragHelperInterfa
         this.elementStartPos.y = element.y
         this.mouseStartPos.x = event.clientX
         this.mouseStartPos.y = event.clientY
-        
         this.dragedElement.draged = true
 
     }
