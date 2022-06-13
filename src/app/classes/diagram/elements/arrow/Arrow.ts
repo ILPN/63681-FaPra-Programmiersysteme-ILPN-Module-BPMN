@@ -7,6 +7,7 @@ import { Line } from './Line';
 import { MainElement } from '../MainElement';
 import { ArrowCorner } from './ArrowCorner';
 import { MyDiagram } from '../../MyDiagram';
+import { ArrowEndCorner } from './ArrowEndCorner';
 
 export class Arrow extends Element {
     removeCorner(corner: ArrowCorner) {
@@ -30,25 +31,21 @@ export class Arrow extends Element {
         this._start = start;
         this._end = end;
         this._corners = [];
-        this.arrowStart = new ArrowCorner(this.id+"StartCorner", start.x,start.y,this, diagram)
-        this.arrowTarget = new ArrowCorner(this.id+"TargetCorner", end.x,end.y,this, diagram)
-        this.arrowStart.visible = false
-        this.arrowTarget.visible =false
+        this.arrowStart = new ArrowEndCorner(this.id+"StartCorner", start.x,start.y,this, diagram)
+        this.arrowTarget = new ArrowEndCorner(this.id+"TargetCorner", end.x,end.y,this, diagram)
 
         //for dragging: add arrow object to the connected elements 
         start.addOutArrow(this);
         end.addInArrow(this);
     }
     clearArrowCorners() {
-        for (const corner of this.corners) {
-            this.diagram.removeAndRender(corner)
-        }
         this._corners = [];
+        this.updateSvg()
     }
     addArrowCorner(x: number, y: number) {
         const corner = new ArrowCorner(this.id +this.corners.length, x, y, this, this.diagram)
         this._corners.push(corner);
-        this.diagram.addAndRender(corner)
+        this.updateSvg()
     }
 
     get start(): Element {
@@ -66,12 +63,12 @@ export class Arrow extends Element {
     set end(value: Element) {
         this._end = value;
     }
-    private arrowStart
+    private arrowStart:ArrowEndCorner
     setArrowStart(x: number, y: number) {
         this.arrowStart.x = x;
         this.arrowStart.y = y;
     }
-    private arrowTarget
+    private arrowTarget: ArrowEndCorner
     setArrowTarget(x: number, y: number) {
         this.arrowTarget.x = x;
         this.arrowTarget.y = y;
@@ -87,18 +84,26 @@ export class Arrow extends Element {
     public createSvg(): SVGElement {
         const svg = this.createContainerSVG();
         const lineSvgResult = this.lineSvg();
+
+        this.arrowStart.intersectionPos = lineSvgResult.startOfLine
+        this.arrowTarget.intersectionPos = lineSvgResult.endOfLine
+        
         svg.append(lineSvgResult.svg);
         svg.append(this.arrowheadSvg(
             lineSvgResult.endOfLine,
             lineSvgResult.directionOfEnd
         ));
         for (const corner of this.corners) {
-            this.diagram.addAndRender(corner)
+            svg.appendChild(corner.updateSvg())
         }
+        svg.appendChild(this.arrowStart.updateSvg())
+        svg.appendChild(this.arrowTarget.updateSvg())
+
         return svg;
     }
     private lineSvg(): {
         svg: SVGElement;
+        startOfLine: Vector;
         endOfLine: Vector;
         directionOfEnd: Vector;
     } {
@@ -146,6 +151,7 @@ export class Arrow extends Element {
 
         return {
             svg: pathSvg,
+            startOfLine: intersectionWithStartElement,
             endOfLine: endOfLine,
             directionOfEnd: directionOfEnd,
         };

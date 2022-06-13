@@ -1,5 +1,4 @@
 import { DragHelper } from "./DragHelper";
-import { Arrow } from "../elements/arrow/Arrow";
 import { Vector } from "../elements/arrow/Vector";
 import { ArrowCorner } from "../elements/arrow/ArrowCorner";
 

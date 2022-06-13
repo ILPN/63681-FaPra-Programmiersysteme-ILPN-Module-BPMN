@@ -4,7 +4,7 @@ import { Arrow } from './Arrow';
 import { Vector } from './Vector';
 
 export class ArrowCorner extends Element {
-    private _arrow: Arrow;
+    protected _arrow: Arrow;
     public get arrow(): Arrow {
         return this._arrow;
     }
@@ -18,7 +18,7 @@ export class ArrowCorner extends Element {
     posVector(): Vector {
         return new Vector(this.x, this.y);
     }
-    private _raduis: number = 10;
+    protected _raduis: number = 5;
 
     constructor(id: string, x: number, y: number, associatedArrrow:Arrow, diagram:MyDiagram) {
         super(id, diagram);

@@ -8,6 +8,16 @@ export abstract class Element {
     private _halfWidth: number = 0;
     private _halfHeight: number = 0;
     private domSVG: SVGElement | undefined;
+    public draged = false
+
+    protected _childrenElements: Element[] = [];
+    public get childrenElements(): Element[] {
+        return this._childrenElements;
+    }
+    addChildrenElement(child:Element){
+        if(this.childrenElements.find(e => e == child))return
+        this._childrenElements.push(child)
+    }
 
     /*
     private domSvgRoot: SVGElement | undefined;
@@ -85,7 +95,7 @@ export abstract class Element {
     }
 
 
-    private addEventListenersToSvg(svg: SVGElement) {
+    protected addEventListenersToSvg(svg: SVGElement) {
         svg.onmousedown = (event) => {
             this.onMouseDown(event)
         };

@@ -6,8 +6,12 @@ import { Vector } from "./elements/arrow/Vector"
 import { MainElement } from "./elements/MainElement"
 import { MainElementDragHelper } from "./DragHelpers/MainElementDragHelper"
 import { CornerDragHelper } from "./DragHelpers/CornerDragHelper"
+import { ArrowEndCorner } from "./elements/arrow/ArrowEndCorner"
 
 export class MyDiagram{
+    notifyChange() {
+        throw new Error('Method not implemented.')
+    }
     removeAndRender(corner: ArrowCorner) {
         corner.updateSvg().remove()
         this.elements = this.elements.filter(e => e != corner)
@@ -23,7 +27,7 @@ export class MyDiagram{
             this.dragHelper = new MainElementDragHelper()
             this.dragHelper.startDrag(element,e)
         }
-        if(element instanceof ArrowCorner){
+        if(element instanceof ArrowCorner || element instanceof ArrowEndCorner){
             this.dragHelper = new CornerDragHelper()
             this.dragHelper.startDrag(element,e)
         }

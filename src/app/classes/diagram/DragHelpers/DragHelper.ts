@@ -33,10 +33,15 @@ export abstract class DragHelper<T extends Element>{
         this.elementStartPos.y = element.y
         this.mouseStartPos.x = event.clientX
         this.mouseStartPos.y = event.clientY
+        
+        this.dragedElement.draged = true
 
     }
 
     stopDrag(){
+        if(this.dragedElement == undefined) return 
+        this.dragedElement.draged = false
+        this.dragedElement.updateSvg()
         this.dragedElement = undefined
     }
 }
