@@ -8,44 +8,95 @@ import { MainElement } from '../MainElement';
 import { ArrowCorner } from './ArrowCorner';
 import { MyDiagram } from '../../MyDiagram';
 import { ArrowEndCorner } from './ArrowEndCorner';
+import { ArrowInnerCorner } from './ArrowInnerCorner';
 
 export class Arrow extends Element {
     removeCorner(corner: ArrowCorner) {
-        this._corners = this._corners.filter((c)=> c!==corner)
-        this.diagram.removeAndRender(corner)
-        this.updateSvg()
+        this._corners = this._corners.filter((c) => c !== corner);
+        this.diagram.removeAndRender(corner);
+        this.updateSvg();
     }
-    onDragTo(dx: number, dy: number) {
-    }
+    onDragTo(dx: number, dy: number) {}
     private _label: String;
-    private _corners: ArrowCorner[];
+    private _corners: ArrowInnerCorner[];
     public get corners() {
         return this._corners;
     }
     private _start: Element;
     private _end: Element;
 
-    constructor(id: string, label: string, start: MainElement, end: MainElement, diagram:MyDiagram) {
+    constructor(
+        id: string,
+        label: string,
+        start: MainElement,
+        end: MainElement,
+        diagram: MyDiagram
+    ) {
         super(id, diagram);
         this._label = label;
         this._start = start;
         this._end = end;
         this._corners = [];
-        this.arrowStart = new ArrowEndCorner(this.id+"StartCorner", start.x,start.y,this, diagram)
-        this.arrowTarget = new ArrowEndCorner(this.id+"TargetCorner", end.x,end.y,this, diagram)
+        this.arrowStart = new ArrowEndCorner(
+            this.id + 'StartCorner',
+            start.x,
+            start.y,
+            this,
+            diagram
+        );
+        this.arrowTarget = new ArrowEndCorner(
+            this.id + 'TargetCorner',
+            end.x,
+            end.y,
+            this,
+            diagram
+        );
 
-        //for dragging: add arrow object to the connected elements 
+        //for dragging: add arrow object to the connected elements
         start.addOutArrow(this);
         end.addInArrow(this);
     }
     clearArrowCorners() {
         this._corners = [];
-        this.updateSvg()
+        this.updateSvg();
     }
     addArrowCorner(x: number, y: number) {
-        const corner = new ArrowCorner(this.id +this.corners.length, x, y, this, this.diagram)
+        const corner = new ArrowInnerCorner(
+            this.id + this.corners.length,
+            x,
+            y,
+            this,
+            this.diagram
+        );
         this._corners.push(corner);
-        this.updateSvg()
+        this.registerCornerNeighbours();
+        this.updateSvg();
+    }
+    private registerCornerNeighbours() {
+        //tell each corner who are his neighbours
+        const length = this.corners.length;
+        for (let i = 1; i < length - 1; i++) {
+            const corner = this.corners[i];
+            corner.cornerBefore = this.corners[i - 1];
+            corner.cornerAfter = this.corners[i + 1];
+        }
+        if (length == 0) {
+            this.arrowStart.cornerAfter = this.arrowTarget
+            this.arrowTarget.cornerBefore = this.arrowStart
+
+        } else if (length == 1) {
+            this.arrowStart.cornerAfter = this.corners[0]
+            this.corners[0].cornerBefore = this.arrowStart
+            this.corners[0].cornerAfter = this.arrowTarget
+            this.arrowTarget.cornerBefore = this.corners[0]
+
+        } else {
+            this.corners[0].cornerBefore = this.arrowStart;
+            this.corners[0].cornerAfter = this.corners[1];
+            const lastIndex = length - 1;
+            this.corners[lastIndex].cornerBefore = this.corners[lastIndex - 1];
+            this.corners[lastIndex].cornerAfter = this.arrowTarget;
+        }
     }
 
     get start(): Element {
@@ -63,41 +114,42 @@ export class Arrow extends Element {
     set end(value: Element) {
         this._end = value;
     }
-    private arrowStart:ArrowEndCorner
+    private arrowStart: ArrowEndCorner;
     setArrowStart(x: number, y: number) {
         this.arrowStart.x = x;
         this.arrowStart.y = y;
     }
-    private arrowTarget: ArrowEndCorner
+    private arrowTarget: ArrowEndCorner;
     setArrowTarget(x: number, y: number) {
         this.arrowTarget.x = x;
         this.arrowTarget.y = y;
     }
     getArrowTarget() {
-        return this.arrowTarget
+        return this.arrowTarget;
     }
     getArrowStart() {
-        return this.arrowStart
+        return this.arrowStart;
     }
 
- 
     public createSvg(): SVGElement {
         const svg = this.createContainerSVG();
         const lineSvgResult = this.lineSvg();
 
-        this.arrowStart.intersectionPos = lineSvgResult.startOfLine
-        this.arrowTarget.intersectionPos = lineSvgResult.endOfLine
-        
+        this.arrowStart.intersectionPos = lineSvgResult.startOfLine;
+        this.arrowTarget.intersectionPos = lineSvgResult.endOfLine;
+
         svg.append(lineSvgResult.svg);
-        svg.append(this.arrowheadSvg(
-            lineSvgResult.endOfLine,
-            lineSvgResult.directionOfEnd
-        ));
+        svg.append(
+            this.arrowheadSvg(
+                lineSvgResult.endOfLine,
+                lineSvgResult.directionOfEnd
+            )
+        );
         for (const corner of this.corners) {
-            svg.appendChild(corner.updateSvg())
+            svg.appendChild(corner.updateSvg());
         }
-        svg.appendChild(this.arrowStart.updateSvg())
-        svg.appendChild(this.arrowTarget.updateSvg())
+        svg.appendChild(this.arrowStart.updateSvg());
+        svg.appendChild(this.arrowTarget.updateSvg());
 
         return svg;
     }
@@ -372,4 +424,3 @@ export class Arrow extends Element {
         return svg;
     }
 }
-

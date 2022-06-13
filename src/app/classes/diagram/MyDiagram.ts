@@ -2,11 +2,12 @@ import { Utility } from "../Utility"
 import { DragHelper } from "./DragHelpers/DragHelper"
 import { Element } from "./element"
 import { ArrowCorner } from "./elements/arrow/ArrowCorner"
-import { Vector } from "./elements/arrow/Vector"
 import { MainElement } from "./elements/MainElement"
 import { MainElementDragHelper } from "./DragHelpers/MainElementDragHelper"
 import { CornerDragHelper } from "./DragHelpers/CornerDragHelper"
 import { ArrowEndCorner } from "./elements/arrow/ArrowEndCorner"
+import { DragHelperInterface } from "./DragHelpers/DragHelperInterface"
+import { MultiDragHelper } from "./DragHelpers/MultiDragHelper"
 
 export class MyDiagram{
     notifyChange() {
@@ -21,15 +22,38 @@ export class MyDiagram{
         //render
     }
 
-    private dragHelper: DragHelper<Element> | undefined
-    onChildrenMouseDown(e: MouseEvent, element: Element) {
+    readonly DRAG_BEFORE_FLAG = 2
+    readonly DRAG_AFTER_FLAG = 3
+
+    private dragHelper: DragHelperInterface<Element> | undefined
+    onChildrenMouseDown(e: MouseEvent, element: Element, FLAG:number = 0) {
         if(element instanceof MainElement){
-            this.dragHelper = new MainElementDragHelper()
-            this.dragHelper.startDrag(element,e)
+            this.dragHelper = new MainElementDragHelper(element)
+            this.dragHelper.startDrag(e)
+            return
         }
         if(element instanceof ArrowCorner || element instanceof ArrowEndCorner){
-            this.dragHelper = new CornerDragHelper()
-            this.dragHelper.startDrag(element,e)
+
+            if(FLAG == this.DRAG_AFTER_FLAG){
+                this.dragHelper = new MultiDragHelper()
+                const multiHelper = this.dragHelper as MultiDragHelper
+                multiHelper.addDragHelper(new CornerDragHelper(element))
+                multiHelper.addDragHelper(new CornerDragHelper(element.cornerAfter!))
+                multiHelper.startDrag(e)
+                return
+            }
+
+            if(FLAG == this.DRAG_BEFORE_FLAG){
+                this.dragHelper = new MultiDragHelper()
+                const multiHelper = this.dragHelper as MultiDragHelper
+                multiHelper.addDragHelper(new CornerDragHelper(element))
+                multiHelper.addDragHelper(new CornerDragHelper(element.cornerBefore!))
+                multiHelper.startDrag(e)
+                return
+            }
+            this.dragHelper = new CornerDragHelper(element)
+            this.dragHelper.startDrag(e)
+            return
         }
     }
     onChildrenMouseUp(e: MouseEvent, element: Element) {
@@ -62,7 +86,7 @@ export class MyDiagram{
         const background = Utility.createSvgElement("rect")
         background.setAttribute('width', `100%`);
         background.setAttribute('height', `100%`);
-        background.setAttribute('fill', 'white');
+        background.classList.add("background");
         d.id = this.ID
         d.appendChild(background)
         d.onmouseup = (event) =>{this.onMousUp(event)}

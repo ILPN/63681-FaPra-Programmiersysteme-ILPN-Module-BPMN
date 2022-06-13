@@ -8,13 +8,22 @@ export class ArrowCorner extends Element {
     public get arrow(): Arrow {
         return this._arrow;
     }
-    private _visible = true;
-    public get visible() {
-        return this._visible;
+
+    protected _cornerBefore: ArrowCorner | undefined;
+    public get cornerBefore(): ArrowCorner | undefined {
+        return this._cornerBefore;
     }
-    public set visible(value) {
-        this._visible = value;
+    public set cornerBefore(value: ArrowCorner | undefined) {
+        this._cornerBefore = value;
     }
+    protected _cornerAfter: ArrowCorner | undefined;
+     get cornerAfter(): ArrowCorner | undefined {
+        return this._cornerAfter;
+    }
+     set cornerAfter(value: ArrowCorner | undefined) {
+        this._cornerAfter = value;
+    }
+
     posVector(): Vector {
         return new Vector(this.x, this.y);
     }
@@ -30,19 +39,15 @@ export class ArrowCorner extends Element {
 
     public createSvg(): SVGElement {
         const svg = this.createSvgElement('svg')
-        if(!this.visible){
-            return svg
-            //svg.setAttribute("visibility","hidden")
-        } 
         svg.setAttribute('id', `${this.id}`);
-        svg.setAttribute('x', `${this.x}`);
-        svg.setAttribute('y', `${this.y}`);
+        //svg.setAttribute('x', `${this.x}`);
+        //svg.setAttribute('y', `${this.y}`);
         svg.setAttribute('style', 'overflow: visible;');
-        
-
         const circle = this.createSvgElement('circle');
+        circle.classList.add("arrowCornerCircle")
         circle.setAttribute('r', `${this._raduis}`);
-        circle.setAttribute('style', 'fill:#00b8ff;stroke:none;stroke-width:3.77953;fill-opacity:0.28961748');
+        circle.setAttribute('cx', `${this.x}`);
+        circle.setAttribute('cy', `${this.y}`);
         svg.appendChild(circle);
         return svg;
     }

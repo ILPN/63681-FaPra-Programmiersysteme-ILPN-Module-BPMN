@@ -5,14 +5,14 @@ import { MainElement } from "../elements/MainElement";
 
 export class MainElementDragHelper extends DragHelper<MainElement>{
     private arrowStartPositions: Map<Arrow,Vector> = new Map()
-    override startDrag(element: MainElement, event: MouseEvent): void {
-        super.startDrag(element, event)
+    override startDrag( event: MouseEvent): void {
+        super.startDrag(event)
         this.arrowStartPositions = new Map()
-        for (const arrow of element.in_arrows) {
+        for (const arrow of this.dragedElement.in_arrows) {
             const startPos = new Vector(arrow.getArrowTarget().x, arrow.getArrowTarget().y )
             this.arrowStartPositions.set(arrow, startPos )
         }
-        for (const arrow of element.out_arrows) {
+        for (const arrow of this.dragedElement.out_arrows) {
             const startPos = new Vector(arrow.getArrowStart().x, arrow.getArrowStart().y )
             this.arrowStartPositions.set(arrow, startPos )
         }
