@@ -35,7 +35,6 @@ export class ArrowEndCorner extends ArrowCorner {
         const intersectionCircle = this.createSvgElement('circle');
         intersectionCircle.setAttribute('cx', `${this.intersectionPos.x}`);
         intersectionCircle.setAttribute('cy', `${this.intersectionPos.y}`);
-        intersectionCircle.setAttribute('r', `${this._raduis}`);
         intersectionCircle.classList.add('arrowIntersection');
         svg.appendChild(intersectionCircle);
         this.svgIntersection = intersectionCircle;
@@ -56,7 +55,6 @@ export class ArrowEndCorner extends ArrowCorner {
 
         return svg;
     }
-
     private svgIntersection: SVGElement | undefined;
     override addEventListenersToSvg(svg: SVGElement) {
         if (this.svgIntersection != undefined) {

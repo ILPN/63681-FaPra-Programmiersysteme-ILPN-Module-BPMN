@@ -12,17 +12,29 @@
 }
 
 .background {
-    fill: #acacac;
+    fill: #ffffff;
 }
+
+$drag-color: #00b7ff92;
+$add-color: #00ff7b92;
+$arrow-inside-element-color: #ff006a;
+$deleteColor: #ff000092;
+$radiusSmall: 3px;
+$radius: 4px;
+$radiusMiddle: 4px;
+$radiusLarge: 6px;
+
+
 
 .arrowEndCircle {
     visibility: hidden;
-    fill: #ff0000;
+    fill: $arrow-inside-element-color;
+    r:$radiusSmall
 }
 .arrowLineInElement {
     visibility: hidden;
     fill: none;
-    stroke: #ff0000;
+    stroke: $arrow-inside-element-color;
     stroke-width: 1px;
     stroke-opacity: 1;
 }
@@ -41,19 +53,29 @@
     .arrowLineInElement {
         visibility: visible;
     }
+    .arrowIntersection {
+        r:$radiusLarge
+    }
 }
 .arrowIntersection {
-    fill: #00ffb792;
-    stroke: none;
-    stroke-width: 3.77953;
-    //fill-opacity:0.4;
-    // transition: fill 0.5s;
+    fill: $drag-color;
+    r:$radiusSmall
+}
+
+.arrowIntersection:hover {
+    r:$radiusLarge
 }
 
 .arrowCornerCircle {
-    fill: #00b7ff92;
+    fill: $drag-color;
+    r:$radius
+}
+.draged .arrowCornerCircle{
+    r:10px
+
 }
 .arrowCornerCircle:hover {
+    r:$radiusLarge;
     ~ .cornerFeatures {
         visibility: visible;
         transition-property: visibility;
@@ -72,8 +94,26 @@
     visibility: visible;
 }
 .dragTwoCircle {
-    fill: #ff000092;
+    fill: $drag-color;
+    r: $radiusSmall
 }
 .plusCircle {
-    fill: #2fff0092;
+    fill: $add-color;
+    r: $radiusSmall;
+}
+.deleteCircle{
+    fill: $deleteColor;
+    r: $radiusSmall;
+
+}
+
+.plusCircleAlone {
+    fill: $add-color;
+    r: $radiusSmall;
+    transition: r 1;
+}
+.plusCircleAlone:hover{
+    r: $radiusLarge;
+    transition: r 1;
+
 }

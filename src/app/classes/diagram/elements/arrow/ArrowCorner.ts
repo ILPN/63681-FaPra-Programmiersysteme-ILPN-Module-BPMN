@@ -27,7 +27,7 @@ export class ArrowCorner extends Element {
     posVector(): Vector {
         return new Vector(this.x, this.y);
     }
-    protected _raduis: number = 5;
+    protected _radius: number = 5;
 
     constructor(id: string, x: number, y: number, associatedArrrow:Arrow, diagram:MyDiagram) {
         super(id, diagram);
@@ -45,7 +45,7 @@ export class ArrowCorner extends Element {
         svg.setAttribute('style', 'overflow: visible;');
         const circle = this.createSvgElement('circle');
         circle.classList.add("arrowCornerCircle")
-        circle.setAttribute('r', `${this._raduis}`);
+        circle.setAttribute('r', `${this._radius}`);
         circle.setAttribute('cx', `${this.x}`);
         circle.setAttribute('cy', `${this.y}`);
         svg.appendChild(circle);

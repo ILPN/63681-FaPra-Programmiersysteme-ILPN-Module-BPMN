@@ -9,6 +9,7 @@ import { ArrowCorner } from './ArrowCorner';
 import { MyDiagram } from '../../MyDiagram';
 import { ArrowEndCorner } from './ArrowEndCorner';
 import { ArrowInnerCorner } from './ArrowInnerCorner';
+import { Utility } from 'src/app/classes/Utility';
 
 export class Arrow extends Element {
     addCornerBeforeCorner(corner: ArrowCorner): void {
@@ -169,8 +170,25 @@ export class Arrow extends Element {
         }
         svg.appendChild(this.arrowStart.updateSvg());
         svg.appendChild(this.arrowTarget.updateSvg());
-
+        if(this.corners.length ==0) svg.appendChild(this.plusCircle())
         return svg;
+    }
+    private svgPlusCircle:SVGElement| undefined
+    plusCircle(): SVGElement {
+        const circle = this.createSvgElement("circle")
+        circle.classList.add("plusCircleAlone")
+        const pos = this.arrowStart.intersectionPos.plus(this.arrowTarget.intersectionPos).muliplied(0.5)
+        circle.setAttribute("cx",""+pos.x)
+        circle.setAttribute("cy",""+pos.y)
+        this.svgPlusCircle = circle
+        return circle
+    }
+    override addEventListenersToSvg(){
+        if(this.svgPlusCircle != undefined){
+            const newCornerPos = this.arrowStart.intersectionPos.plus(this.arrowTarget.intersectionPos).muliplied(0.5)
+            Utility.addSimulatedClickListener(this.svgPlusCircle, e => this.addArrowCorner(newCornerPos.x,newCornerPos.y))
+        }
+
     }
     private lineSvg(): {
         svg: SVGElement;
@@ -246,7 +264,7 @@ export class Arrow extends Element {
         );
         return arrowhead;
     }
-    calculateIntersection(
+    private calculateIntersection(
         outerPoint: Vector,
         innerPoint: Vector,
         element: Element
@@ -272,7 +290,7 @@ export class Arrow extends Element {
         }
         return this.intersectionWithElement(outerPoint, innerPoint, element);
     }
-    intersectionWithEventElement(
+    private intersectionWithEventElement(
         outerPoint: Vector,
         innerPoint: Vector,
         event: Event
@@ -299,7 +317,7 @@ export class Arrow extends Element {
         );
         return intersections[0];
     }
-    intersectionWithElement(
+    private intersectionWithElement(
         outerPoint: Vector,
         innerPoint: Vector,
         el: Element
@@ -366,7 +384,7 @@ export class Arrow extends Element {
 
         return intersections[0];
     }
-    intersectionWithGatewayElement(
+    private intersectionWithGatewayElement(
         outerPoint: Vector,
         innerPoint: Vector,
         g: Gateway

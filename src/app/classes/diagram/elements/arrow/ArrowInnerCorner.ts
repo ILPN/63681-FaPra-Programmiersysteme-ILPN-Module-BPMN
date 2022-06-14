@@ -1,3 +1,4 @@
+import { Utility } from 'src/app/classes/Utility';
 import { Element } from '../../element';
 import { MyDiagram } from '../../MyDiagram';
 import { Arrow } from './Arrow';
@@ -24,7 +25,6 @@ export class ArrowInnerCorner extends ArrowCorner {
         const circle = this.createSvgElement('circle');
         circle.classList.add("arrowCornerCircle")
         if(this.draged) circle.classList.add("draged")
-        circle.setAttribute('r', `${this._raduis}`);
         circle.setAttribute('cx', `${this.x}`);
         circle.setAttribute('cy', `${this.y}`);
         svg.appendChild(circle);
@@ -49,7 +49,6 @@ export class ArrowInnerCorner extends ArrowCorner {
         if(this.cornerBefore != undefined){
             const beforeDrag = this.createSvgElement("circle")
             beforeDrag.classList.add("dragTwoCircle")
-            beforeDrag.setAttribute('r', `${radius}`);
             const beforeDir = this.cornerBefore.posVector().minus(this.posVector()).toUnitVector()
             const beforeDragPos = this.posVector().plus(beforeDir.muliplied(distance))
             beforeDrag.setAttribute('cx', `${beforeDragPos.x}`);
@@ -59,7 +58,6 @@ export class ArrowInnerCorner extends ArrowCorner {
 
             const beforePlus = this.createSvgElement("circle")
             beforePlus.classList.add("plusCircle")
-            beforePlus.setAttribute('r', `${radius}`);
             const plusPos = this.posVector().plus(beforeDir.muliplied(distance2))
             beforePlus.setAttribute('cx', `${plusPos.x}`);
             beforePlus.setAttribute('cy', `${plusPos.y}`);
@@ -69,7 +67,6 @@ export class ArrowInnerCorner extends ArrowCorner {
         if(this.cornerAfter != undefined){
             const afterDrag = this.createSvgElement("circle")
             afterDrag.classList.add("dragTwoCircle")
-            afterDrag.setAttribute('r', `${radius}`);
             const dir = this.cornerAfter.posVector().minus(this.posVector()).toUnitVector()
             const dragPos = this.posVector().plus(dir.muliplied(distance))
             afterDrag.setAttribute('cx', `${dragPos.x}`);
@@ -80,7 +77,6 @@ export class ArrowInnerCorner extends ArrowCorner {
 
             const afterPlus = this.createSvgElement("circle")
             afterPlus.classList.add("plusCircle")
-            afterPlus.setAttribute('r', `${radius}`);
             const afterPos = this.posVector().plus(dir.muliplied(distance2))
             afterPlus.setAttribute('cx', `${afterPos.x}`);
             afterPlus.setAttribute('cy', `${afterPos.y}`);
@@ -90,8 +86,7 @@ export class ArrowInnerCorner extends ArrowCorner {
 
         if(this.cornerAfter != undefined && this.cornerBefore != undefined){
             const svgDelete = this.createSvgElement("circle")
-            svgDelete.classList.add("dragTwoCircle")
-            svgDelete.setAttribute('r', `${radius}`);
+            svgDelete.classList.add("deleteCircle")
             const dir1 = this.cornerAfter.posVector().minus(this.posVector()).toUnitVector()
             const dir2 = this.cornerBefore.posVector().minus(this.posVector()).toUnitVector()
             let dir = dir1.plus(dir2).muliplied(-1)
@@ -128,29 +123,20 @@ export class ArrowInnerCorner extends ArrowCorner {
             this.svgDragAfter.onmousedown = e => this.diagram.onChildrenMouseDown(e,this, this.diagram.DRAG_AFTER_FLAG)
         }
 
-        const addSimulatedClickListener =(svg:SVGElement, onCLick: (e:MouseEvent)=>void ) =>{
-             let mouseDown = false
-             svg.onmousedown =(e) => mouseDown = true
-             svg.onmouseup =(e) => {
-                if (mouseDown)onCLick(e)
-            }
-            svg.onmouseleave =(e) =>mouseDown = false
-        }
-
         if(this.svgDelete != undefined){
             //somehow onclick doesnt work after having draged the corner
             //this.svgDelete.onclick = e => this.arrow.removeCorner(this)
             //this.svgDelete.addEventListener("click", () => this.arrow.removeCorner(this));
-            addSimulatedClickListener(this.svgDelete,(e) => this.arrow.removeCorner(this))
+            Utility.addSimulatedClickListener(this.svgDelete,(e) => this.arrow.removeCorner(this))
         }
 
         if(this.svgPlusBefore != undefined){
-            addSimulatedClickListener(this.svgPlusBefore,(e) =>{
+            Utility.addSimulatedClickListener(this.svgPlusBefore,(e) =>{
                 this.arrow.addCornerBeforeCorner(this)
             })
         }
         if(this.svgPlusAfter != undefined){
-            addSimulatedClickListener(this.svgPlusAfter,(e) =>{
+            Utility.addSimulatedClickListener(this.svgPlusAfter,(e) =>{
                 this.arrow.addCornerBeforeCorner(this.cornerAfter!)
             } )
         }
