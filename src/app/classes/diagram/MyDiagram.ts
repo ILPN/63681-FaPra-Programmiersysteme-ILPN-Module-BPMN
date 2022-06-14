@@ -22,8 +22,7 @@ export class MyDiagram{
         //render
     }
 
-    readonly DRAG_BEFORE_FLAG = 2
-    readonly DRAG_AFTER_FLAG = 3
+    readonly DRAG_TWO_CORNERS = 2
 
     private dragHelper: DragHelperInterface<Element> | undefined
     onChildrenMouseDown(e: MouseEvent, element: Element, FLAG:number = 0) {
@@ -33,25 +32,21 @@ export class MyDiagram{
             return
         }
         if(element instanceof ArrowCorner || element instanceof ArrowEndCorner){
-
-            if(FLAG == this.DRAG_AFTER_FLAG){
+            if(FLAG == this.DRAG_TWO_CORNERS){
                 this.dragHelper = new MultiDragHelper()
                 const multiHelper = this.dragHelper as MultiDragHelper
-                multiHelper.addDragHelper(new CornerDragHelper(element))
-                multiHelper.addDragHelper(new CornerDragHelper(element.cornerAfter!))
+                const dH1 = new CornerDragHelper(element)
+                //dH1.setGrid(10)
+                multiHelper.addDragHelper(dH1)
+                const dH2 = new CornerDragHelper(element.cornerAfter!)
+                //dH2.setGrid(10)
+                multiHelper.addDragHelper(dH2)
                 multiHelper.startDrag(e)
                 return
             }
-
-            if(FLAG == this.DRAG_BEFORE_FLAG){
-                this.dragHelper = new MultiDragHelper()
-                const multiHelper = this.dragHelper as MultiDragHelper
-                multiHelper.addDragHelper(new CornerDragHelper(element))
-                multiHelper.addDragHelper(new CornerDragHelper(element.cornerBefore!))
-                multiHelper.startDrag(e)
-                return
-            }
-            this.dragHelper = new CornerDragHelper(element)
+             const dh  = new CornerDragHelper(element)
+             dh.setSnapToNeighbour(true)
+            this.dragHelper = dh
             this.dragHelper.startDrag(e)
             return
         }

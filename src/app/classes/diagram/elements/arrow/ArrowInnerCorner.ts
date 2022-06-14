@@ -20,11 +20,11 @@ export class ArrowInnerCorner extends ArrowCorner {
         svg.setAttribute('id', `${this.id}`);
         //svg.setAttribute('x', `${this.x}`);
         //svg.setAttribute('y', `${this.y}`);
+        if(this.draged) svg.classList.add("draged")
         
-        svg.setAttribute('style', 'overflow: visible;');
+        //svg.setAttribute('style', 'overflow: visible;');
         const circle = this.createSvgElement('circle');
         circle.classList.add("arrowCornerCircle")
-        if(this.draged) circle.classList.add("draged")
         circle.setAttribute('cx', `${this.x}`);
         circle.setAttribute('cy', `${this.y}`);
         svg.appendChild(circle);
@@ -37,8 +37,7 @@ export class ArrowInnerCorner extends ArrowCorner {
         const distance = radius * 2 + 2
         const distance2 = radius * 4 + 2
         const c = this.createSvgElement("svg")
- 
-        c.classList.add(this.draged? "dragedCornerFeatures":"cornerFeatures")
+        c.classList.add("cornerFeatures")
         if(this._cornerBefore == undefined && this._cornerAfter == undefined) return c
         const hoverDummy = this.createSvgElement("circle")
             hoverDummy.setAttribute('r', `${distance2}`);
@@ -117,10 +116,10 @@ export class ArrowInnerCorner extends ArrowCorner {
             this.svgCircle.onmousedown = e => this.diagram.onChildrenMouseDown(e,this)
         }
         if(this.svgDragBefore != undefined){
-            this.svgDragBefore.onmousedown = e => this.diagram.onChildrenMouseDown(e,this, this.diagram.DRAG_BEFORE_FLAG)
+            this.svgDragBefore.onmousedown = e => this.diagram.onChildrenMouseDown(e,this.cornerBefore!, this.diagram.DRAG_TWO_CORNERS)
         }
         if(this.svgDragAfter != undefined){
-            this.svgDragAfter.onmousedown = e => this.diagram.onChildrenMouseDown(e,this, this.diagram.DRAG_AFTER_FLAG)
+            this.svgDragAfter.onmousedown = e => this.diagram.onChildrenMouseDown(e,this, this.diagram.DRAG_TWO_CORNERS)
         }
 
         if(this.svgDelete != undefined){

@@ -1,4 +1,7 @@
 export class Vector {
+    equals(v: Vector) {
+        return (this.x == v.x && this.y == v.y)
+    }
     isAlmostZero() {
         const threshold = 0.0001
         return(Math.abs(this.x) <threshold && this.y < threshold)
