@@ -52,14 +52,14 @@ export function applySugiyama(diagram:MyDiagram, w = 1000, h =500 , p = 50){
         //making things square
         if(result.layers[fromLNode.layer].length >= result.layers[toLNode.layer].length){
             if(fromLNode.y != toLNode.y){ 
-            arrow.addArrowCorner(toLNode.x,fromLNode.y)
+            arrow.addArrowCornerXY(toLNode.x,fromLNode.y)
             }
         }else{
             if(fromLNode.y != toLNode.y){ 
-               arrow.addArrowCorner(fromLNode.x,toLNode.y)
+               arrow.addArrowCornerXY(fromLNode.x,toLNode.y)
                 } 
         }    
     }
     //no dummys yet
-    
+    diagram.setSugiyamaResult(result)
   }

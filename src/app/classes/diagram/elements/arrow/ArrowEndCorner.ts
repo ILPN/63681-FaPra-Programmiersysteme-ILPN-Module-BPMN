@@ -5,16 +5,15 @@ import { ArrowCorner } from './ArrowCorner';
 import { Vector } from './Vector';
 
 export class ArrowEndCorner extends ArrowCorner {
+    
     constructor(
         id: string,
-        x: number,
-        y: number,
+        x:number,y:number,
         associatedArrrow: Arrow,
+        public intersectingElement:Element,
         diagram: MyDiagram
     ) {
-        super(id, x, y, associatedArrrow, diagram);
-        this.x = x;
-        this.y = y;
+        super(id, x,y, associatedArrrow, diagram);
     }
 
     private _intersectionPos = new Vector();
@@ -37,9 +36,8 @@ export class ArrowEndCorner extends ArrowCorner {
         intersectionCircle.setAttribute('cy', `${this.intersectionPos.y}`);
         intersectionCircle.classList.add('arrowIntersection');
         svg.appendChild(intersectionCircle);
-        this.svgIntersection = intersectionCircle;
 
-        if (this.posVector().distanceTo(this.intersectionPos) >= 0.01) {
+        if (this.getPos().distanceTo(this.intersectionPos) >= 0.01) {
             let path = this.createSvgElement('path');
             path.classList.add('arrowLineInElement');
             let pathString = `M ${this.x},${this.y} ${this.intersectionPos.x},${this.intersectionPos.y}`;
@@ -53,21 +51,16 @@ export class ArrowEndCorner extends ArrowCorner {
             svg.appendChild(circle);
         }
 
-        return svg;
-    }
-    private svgIntersection: SVGElement | undefined;
-    override addEventListenersToSvg(svg: SVGElement) {
-        if (this.svgIntersection != undefined) {
-            this.svgIntersection.onmousedown = (event) => {
-                console.log('clicked the boy');
-                this.onMouseDown(event);
-            };
-        }
+        intersectionCircle.onmousedown = (event) => {
+            this.diagram.onChildrenMouseDown(event,this);
+        };
         svg.onmouseup = (event) => {
-            this.onMousUp(event);
+            this.diagram.onChildrenMouseUp(event, this);
         };
         svg.onmousemove = (event) => {
-            this.onMousMove(event);
+            this.diagram.onChildrenMouseMove(event,this);
         };
+
+        return svg;
     }
 }

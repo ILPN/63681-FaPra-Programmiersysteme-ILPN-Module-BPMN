@@ -47,52 +47,42 @@ export class ParserService {
     private testDiagramm(): MyDiagram {
         const result = new MyDiagram();
         let elementE1 = new Event("E1", "Start", EventType.Start,result);
-        elementE1.x = 60;
-        elementE1.y = 190;
+        elementE1.setPosXY(60,190);
         result.addElement(elementE1);
 
         let elementE2 = new Event("E2", "", EventType.Intermediate,result);
-        elementE2.x = 850;
-        elementE2.y = 190;
+        elementE2.setPosXY(850,190) ;
         result.addElement(elementE2);
 
 
 
         let elementE3 = new Event("E3", "Ende", EventType.End, result);
-        elementE3.x = 1600;
-        elementE3.y = 190;
+        elementE3.setPosXY(1600,190)
         result.addElement(elementE3);
 
         let elementT1 = new Task("t1", "Hotel buchen", TaskType.Service, result);
-        elementT1.x = 442;
-        elementT1.y = 60;
+        elementT1.setPosXY(442,60) 
         result.addElement(elementT1);
 
         let elementT2 = new Task("t2", "Flug buchen", TaskType.Manual, result);
-        elementT2.x = 442;
-        elementT2.y = 320;
+        elementT2.setPosXY(442,320);
         result.addElement(elementT2);
 
         let elLamborgini = new Task("tLambo", "Lamborghini buchen", TaskType.Manual, result);
-        elLamborgini.x = 0;
-        elLamborgini.y = 0;
         result.addElement(elLamborgini);
 
      
 
         let elementT3 = new Task("t3", "Drucken", TaskType.UserTask, result);
-        elementT3.x = 1225;
-        elementT3.y = 190;
+        elementT3.setPosXY(1225,190)
         result.addElement(elementT3);
 
         let elementG1 = new Gateway("G1", GatewayType.AND_SPLIT, result);
-        elementG1.x = 210;
-        elementG1.y = 190; 
+        elementG1.setPosXY(210,190);
         result.addElement(elementG1);
 
         let elementG2 = new Gateway("G2", GatewayType.AND_SPLIT,result);
-        elementG2.x = 675;
-        elementG2.y = 190; 
+        elementG2.setPosXY(675,190);
         result.addElement(elementG2);
 
         let connector = new Arrow("p1", "", elementE1, elementG1,result);
@@ -102,16 +92,16 @@ export class ParserService {
         result.addElement(pfeil);
 
         let connector2: Arrow = new Arrow("p3", "", elementG1, elementT2, result);
-        connector2.addArrowCorner(210, 320);
+        connector2.addArrowCornerXY(210, 320);
 
         result.addElement(connector2);
 
         let connector3: Arrow = new Arrow("A4", "",  elementT1, elementG2, result);
-        connector3.addArrowCorner(675, 60);
+        connector3.addArrowCornerXY(675, 60);
         result.addElement(connector3);
 
         let connector4 = new Arrow("A5", "", elementT2, elementG2, result);
-        connector4.addArrowCorner(675, 320);
+        connector4.addArrowCornerXY(675, 320);
         result.addElement(connector4);
 
         let connector5 = new Arrow("A6", "", elementG2, elementE2, result);
@@ -124,8 +114,8 @@ export class ParserService {
         result.addElement(connector7)
 
         let connector8 = new Arrow("A9", "", elementE3, elementE2, result);
-        connector8.addArrowCorner(1600, 60);
-        connector8.addArrowCorner(850, 60);
+        connector8.addArrowCornerXY(1600, 60);
+        connector8.addArrowCornerXY(850, 60);
         result.addElement(connector8);
 
 

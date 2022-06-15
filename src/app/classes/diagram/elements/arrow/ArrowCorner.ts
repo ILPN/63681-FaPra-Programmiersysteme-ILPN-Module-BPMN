@@ -23,16 +23,12 @@ export class ArrowCorner extends Element {
      set cornerAfter(value: ArrowCorner | undefined) {
         this._cornerAfter = value;
     }
-
-    posVector(): Vector {
-        return new Vector(this.x, this.y);
-    }
     protected _radius: number = 5;
 
-    constructor(id: string, x: number, y: number, associatedArrrow:Arrow, diagram:MyDiagram) {
+    constructor(id: string,x:number,y:number, associatedArrrow:Arrow, diagram:MyDiagram) {
         super(id, diagram);
-        this.x = x;
-        this.y = y;
+        this.x =x
+        this.y = y
         this._arrow = associatedArrrow
     }
 

@@ -11,23 +11,11 @@ export class CornerDragHelper extends DragHelper<ArrowCorner>{
     override stopDrag(): void {
         super.stopDrag()
     }
-    private snapToNeighbours = false
-    private snapToNeighbourThreshold = 10
-
-    setSnapToNeighbour(snaping:boolean, threshold:number=10){
-        this.snapToNeighbours = snaping
-        this.snapToNeighbourThreshold = threshold
-    }
     
-    onDrag(ax: number, ay: number, delta:Vector): void {
+    onDrag(absolute:Vector, delta:Vector): void {
         const el = this.dragedElement
         if(el == undefined) return
-        el.x =ax;
-        el.y =ay;
-        if(this.snapToNeighbours){
-            this.snapXOrY(el,el.cornerBefore, this.snapToNeighbourThreshold)
-            this.snapXOrY(el,el.cornerAfter, this.snapToNeighbourThreshold)
-        }
+        el.setPos(absolute)
         el.updateSvg()
         el.arrow.updateSvg()
     }

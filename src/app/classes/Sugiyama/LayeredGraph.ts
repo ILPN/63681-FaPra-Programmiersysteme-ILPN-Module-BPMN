@@ -1,6 +1,10 @@
 import { SimpleGraph } from "./SimpleGraph";
 
 export class LayeredGraph {
+  getXOfLayer(layer: number) {
+    if(layer > this.layers.length) return 0
+    else return this.layers[layer][0].x
+  }
   getArc(a: LArc) :LArc {
       const arc = this.arcs.find(ar=> ar == a)
       if (arc == undefined) throw Error("Arc not found")

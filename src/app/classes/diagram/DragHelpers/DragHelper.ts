@@ -1,46 +1,48 @@
 import { Vector } from "../elements/arrow/Vector"
 import { Element } from "../element"
 import { DragHelperInterface } from "./DragHelperInterface"
+import { SnapElement } from "./SnapElement"
+import { Utility } from "../../Utility"
 export abstract class DragHelper<T extends Element> implements DragHelperInterface<T>{
 
-    protected snapXOrY(e:Element, to:Element|undefined, th:number){
-        if(e == undefined || to == undefined) return
-        if(Math.abs(to.x - e.x)<= th) e.x = to.x
-        if(Math.abs(to.y - e.y)<= th) e.y = to.y
+    private snapElements: SnapElement[] = []
+    public addSnapElement(snapElement: SnapElement){
+        this.snapElements.push(snapElement)
     }
-    private elemMoveToPosJustBefore = new Vector()
+    private snapSvg:SVGElement | undefined
+    getSnapSvg(){
+       const svg = Utility.createSvgElement("svg")
+       svg.id = "snapSvgs"
+       for (const snapEl of this.snapElements) {
+        svg.appendChild(snapEl.createSVG())
+       }
+       this.snapSvg = svg
+       return svg
+    }
+
+    private actualPos = new Vector()
     dragElement(e: MouseEvent) {
         if(!this.dragging) return
         const currentMousePos = new Vector( e.clientX, e.clientY)
         const delta = currentMousePos.minus(this.mouseStartPos)
-        const elemMoveToPos = this.elementStartPos.plus(delta)
+        let newPos = this.elementStartPos.plus(delta)
 
-        console.log("called here"+ this._grid)
-
-        if (this._grid != -1){
-            console.log("called it")
-            elemMoveToPos.x = Math.round(elemMoveToPos.x/this._grid)* this._grid
-            elemMoveToPos.y = Math.round(elemMoveToPos.y/this._grid)* this._grid
-
+        for (const snapElement of this.snapElements) {
+            newPos = snapElement.snap(newPos)
         }
 
-        if (!elemMoveToPos.equals(this.elemMoveToPosJustBefore)){
-            this.onDrag(elemMoveToPos.x,elemMoveToPos.y,delta)
+        if (!newPos.equals(this.actualPos)){
+            this.onDrag(newPos,delta)
         }
-        this.elemMoveToPosJustBefore = elemMoveToPos
+        this.actualPos = newPos
     }
 
-   abstract onDrag(ax: number, ay: number, delta:Vector):void  
+   abstract onDrag(absolute:Vector, delta:Vector):void  
 
     public dragedElement:T
     private dragging = false
-    private elementStartPos:Vector
+    protected elementStartPos:Vector
     private mouseStartPos:Vector
-    private _grid = -1
-    setGrid(grid:number){
-        this._grid = grid
-        console.log("setgrid to"+ this._grid)
-    }
     constructor(element:T , startPos:Vector = new Vector(), mouseStartPos:Vector = new Vector){
         this.dragedElement = element
         this.elementStartPos = startPos
@@ -50,8 +52,7 @@ export abstract class DragHelper<T extends Element> implements DragHelperInterfa
     startDrag(event:MouseEvent){
         this.dragging = true
         const element = this.dragedElement
-        this.elementStartPos.x = element.x
-        this.elementStartPos.y = element.y
+        this.elementStartPos = element.getPos()
         this.mouseStartPos.x = event.clientX
         this.mouseStartPos.y = event.clientY
         this.dragedElement.draged = true
@@ -61,6 +62,7 @@ export abstract class DragHelper<T extends Element> implements DragHelperInterfa
     stopDrag(){
         this.dragging = false
         this.dragedElement.draged = false
+        this.snapSvg?.remove()
         this.dragedElement.updateSvg()
     }
 }

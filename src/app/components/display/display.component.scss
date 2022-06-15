@@ -129,3 +129,23 @@ $radiusLarge: 6px;
     transition: r 1;
 
 }
+
+
+.snapLine{
+    fill:none;
+    stroke:#ff000023;
+    stroke-width:1px;
+    stroke-linecap:butt;
+    stroke-linejoin:miter;
+    stroke-dasharray:4,4;
+    stroke-opacity:1
+}
+.snapPoint{
+    fill:none;
+    stroke:#ff000023;
+    stroke-width:1px;
+    stroke-linecap:butt;
+    stroke-linejoin:miter;
+    stroke-dasharray:4,4;
+    stroke-opacity:1
+}

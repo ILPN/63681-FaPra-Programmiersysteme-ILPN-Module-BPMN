@@ -5,6 +5,7 @@ import { EventType } from './eventtype'
 import { MainElement } from './MainElement';
 
 export class Event extends MainElement {
+
     move(event: MouseEvent) {
         throw new Error('Method not implemented.');
     }
@@ -34,6 +35,7 @@ export class Event extends MainElement {
         if (this._type === EventType.Intermediate) { svg.append(this.getIntermediateSvgOut()); svg.append(this.getIntermediateSvgIn()); }
         if (this._type === EventType.End) svg.append(this.getEndSvg());
         svg.append(this.getSVGText());
+        this.addStandardListeners(svg)
         return svg;
     }
 
@@ -44,8 +46,8 @@ export class Event extends MainElement {
         // // Startereignis
         const svg = this.createSvgElement('svg');
         svg.setAttribute('id', `${this.id}`);
-        svg.setAttribute('x', `${this.x - ((this._raduis * 2 + 5) / 2)}`);
-        svg.setAttribute('y', `${this.y - ((this._raduis * 2 + 5) / 2)}`);
+        svg.setAttribute('x', `${this.getPos().x - ((this._raduis * 2 + 5) / 2)}`);
+        svg.setAttribute('y', `${this.getPos().y - ((this._raduis * 2 + 5) / 2)}`);
         svg.setAttribute('width', `${this._raduis * 2 + 5}`);
         svg.setAttribute('height', `${this._raduis * 2 + 5}`);
         svg.setAttribute('style', "overflow: visible;");

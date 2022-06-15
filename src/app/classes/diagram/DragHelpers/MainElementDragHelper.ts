@@ -4,35 +4,34 @@ import { Vector } from "../elements/arrow/Vector";
 import { MainElement } from "../elements/MainElement";
 
 export class MainElementDragHelper extends DragHelper<MainElement>{
-    private arrowStartPositions: Map<Arrow,Vector> = new Map()
+    private arrowStartDeltas: Map<Arrow,Vector> = new Map()
     override startDrag( event: MouseEvent): void {
         super.startDrag(event)
-        this.arrowStartPositions = new Map()
+        this.arrowStartDeltas = new Map()
         for (const arrow of this.dragedElement.in_arrows) {
-            const startPos = new Vector(arrow.getArrowTarget().x, arrow.getArrowTarget().y )
-            this.arrowStartPositions.set(arrow, startPos )
+            const startPos = arrow.getArrowTarget().getPos()
+            this.arrowStartDeltas.set(arrow, startPos.minus(this.elementStartPos) )
         }
         for (const arrow of this.dragedElement.out_arrows) {
-            const startPos = new Vector(arrow.getArrowStart().x, arrow.getArrowStart().y )
-            this.arrowStartPositions.set(arrow, startPos )
+            const startPos =arrow.getArrowStart().getPos()
+            this.arrowStartDeltas.set(arrow, startPos.minus(this.elementStartPos) )
         }
     }
     override stopDrag(): void {
         super.stopDrag()
-        this.arrowStartPositions = new Map()
+        this.arrowStartDeltas = new Map()
     }
-    onDrag(ax: number, ay: number, delta:Vector): void {
+    onDrag(absolute:Vector, delta:Vector): void {
         const el = this.dragedElement
         if(el == undefined) return
-        el.x =ax;
-        el.y =ay;     
+        el.setPos(absolute)  
         el.updateSvg();
 
         //drag incoming arrows
         for (const arrow of el.in_arrows) {
-            const startPos =this.arrowStartPositions.get(arrow)
-            if( startPos != undefined){
-                const aPos = startPos.plus(delta)
+            const startDelta =this.arrowStartDeltas.get(arrow)
+            if( startDelta != undefined){
+                const aPos = absolute.plus(startDelta)
                 arrow.setArrowTarget(aPos.x, aPos.y);
                 arrow.updateSvg();
             }
@@ -40,9 +39,9 @@ export class MainElementDragHelper extends DragHelper<MainElement>{
         }
         //drag outgoing arrows
         for (const arrow of el.out_arrows) {
-            const startPos =this.arrowStartPositions.get(arrow)
-            if( startPos != undefined){
-                const aPos = startPos.plus(delta)
+            const startDelta =this.arrowStartDeltas.get(arrow)
+            if( startDelta != undefined){
+                const aPos = absolute.plus(startDelta)
                 arrow.setArrowStart(aPos.x, aPos.y);
                 arrow.updateSvg();
             }

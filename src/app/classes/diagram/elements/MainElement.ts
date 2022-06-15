@@ -3,11 +3,9 @@ import { Element } from './../element';
 import { Arrow } from './arrow/Arrow';
 export abstract class MainElement extends Element {
     abstract override createSvg(): SVGElement;
-
     constructor(id: string, diagram:MyDiagram) {
         super(id, diagram)
     }
-
     //for dragging along arrows connected to the element
     private _in_arrows: Arrow[] = [];
     public get in_arrows(): Arrow[] {

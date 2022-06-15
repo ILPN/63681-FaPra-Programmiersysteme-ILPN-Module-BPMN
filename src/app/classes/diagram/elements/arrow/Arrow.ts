@@ -13,31 +13,30 @@ import { Utility } from 'src/app/classes/Utility';
 
 export class Arrow extends Element {
     addCornerBeforeCorner(corner: ArrowCorner): void {
-        let point1, point2
-        if(corner.cornerBefore == this.arrowStart && corner.cornerBefore instanceof ArrowEndCorner)
-            point1 = corner.cornerBefore.intersectionPos
-        else
-            point1 = corner.cornerBefore!.posVector()
+        let point1, point2;
+        if (
+            corner.cornerBefore == this.arrowStart &&
+            corner.cornerBefore instanceof ArrowEndCorner
+        )
+            point1 = corner.cornerBefore.intersectionPos;
+        else point1 = corner.cornerBefore!.getPos();
 
-        if(corner == this.arrowTarget && corner instanceof ArrowEndCorner)
-            point2 = corner.intersectionPos
-        else
-            point2 = corner.posVector()
+        if (corner == this.arrowTarget && corner instanceof ArrowEndCorner)
+            point2 = corner.intersectionPos;
+        else point2 = corner.getPos();
 
-        const pos = point1.plus(point2).muliplied(0.5)
+        const pos = point1.plus(point2).muliplied(0.5);
 
-        if(corner == this.arrowTarget)
-            this.addArrowCorner(pos.x,pos.y)
-        else{
-            const index = this.corners.findIndex(c => c == corner)
-            console.log("der index ist" + index)
-            this.addArrowCorner(pos.x,pos.y,index)
+        if (corner == this.arrowTarget) this.addArrowCorner(pos);
+        else {
+            const index = this.corners.findIndex((c) => c == corner);
+            console.log('der index ist' + index);
+            this.addArrowCorner(pos, index);
         }
-
     }
     removeCorner(corner: ArrowCorner) {
         this._corners = this._corners.filter((c) => c !== corner);
-        this.registerCornerNeighbours()
+        this.registerCornerNeighbours();
         this.updateSvg();
     }
     onDragTo(dx: number, dy: number) {}
@@ -66,6 +65,7 @@ export class Arrow extends Element {
             start.x,
             start.y,
             this,
+            start,
             diagram
         );
         this.arrowTarget = new ArrowEndCorner(
@@ -73,6 +73,7 @@ export class Arrow extends Element {
             end.x,
             end.y,
             this,
+            end,
             diagram
         );
 
@@ -82,20 +83,23 @@ export class Arrow extends Element {
     }
     clearArrowCorners() {
         this._corners = [];
+        this.registerCornerNeighbours()
         this.updateSvg();
     }
-    addArrowCorner(x: number, y: number, atPosition:number = -1) {
+    addArrowCornerXY(x: number, y: number) {
+        this.addArrowCorner(new Vector(x, y));
+    }
+    addArrowCorner(pos: Vector, atPosition: number = -1) {
         const corner = new ArrowInnerCorner(
             this.id + this.corners.length,
-            x,
-            y,
+            pos.x,pos.y,
             this,
             this.diagram
         );
-        if(atPosition == -1){
+        if (atPosition == -1) {
             this._corners.push(corner);
-        }else{
-            this._corners.splice(atPosition,0,corner)
+        } else {
+            this._corners.splice(atPosition, 0, corner);
         }
         this.registerCornerNeighbours();
         this.updateSvg();
@@ -104,19 +108,20 @@ export class Arrow extends Element {
         //tell each corner who are his neighbours
         const length = this.corners.length;
         if (length == 0) {
-            this.arrowStart.cornerAfter = this.arrowTarget
-            this.arrowTarget.cornerBefore = this.arrowStart
+            this.arrowStart.cornerAfter = this.arrowTarget;
+            this.arrowTarget.cornerBefore = this.arrowStart;
+            return
         }
-        this.arrowStart.cornerAfter = this.corners[0]
-        this.arrowTarget.cornerBefore = this.corners[length-1]
-        for (let i = 0; i < length ; i++) {
-            const before =  (i==0)? this.arrowStart: this.corners[i - 1]
+        this.arrowStart.cornerAfter = this.corners[0];
+        this.arrowTarget.cornerBefore = this.corners[length - 1];
+        for (let i = 0; i < length; i++) {
+            const before = i == 0 ? this.arrowStart : this.corners[i - 1];
             const corner = this.corners[i];
-            const after = (i==length-1)? this.arrowTarget: this.corners[i + 1]
-            corner.cornerBefore = before
-            corner.cornerAfter = after
+            const after =
+                i == length - 1 ? this.arrowTarget : this.corners[i + 1];
+            corner.cornerBefore = before;
+            corner.cornerAfter = after;
         }
-        
     }
 
     get start(): Element {
@@ -170,26 +175,27 @@ export class Arrow extends Element {
         }
         svg.appendChild(this.arrowStart.updateSvg());
         svg.appendChild(this.arrowTarget.updateSvg());
-        if(this.corners.length ==0) svg.appendChild(this.plusCircle())
+        if (this.corners.length == 0) svg.appendChild(this.plusCircle());
         return svg;
     }
-    private svgPlusCircle:SVGElement| undefined
     plusCircle(): SVGElement {
-        const circle = this.createSvgElement("circle")
-        circle.classList.add("plusCircleAlone")
-        const pos = this.arrowStart.intersectionPos.plus(this.arrowTarget.intersectionPos).muliplied(0.5)
-        circle.setAttribute("cx",""+pos.x)
-        circle.setAttribute("cy",""+pos.y)
-        this.svgPlusCircle = circle
-        return circle
+        const circle = this.createSvgElement('circle');
+        circle.classList.add('plusCircleAlone');
+        const pos = this.arrowStart.intersectionPos
+            .plus(this.arrowTarget.intersectionPos)
+            .muliplied(0.5);
+        circle.setAttribute('cx', '' + pos.x);
+        circle.setAttribute('cy', '' + pos.y);
+        
+        const newCornerPos = this.arrowStart.intersectionPos
+                .plus(this.arrowTarget.intersectionPos)
+                .muliplied(0.5);
+            Utility.addSimulatedClickListener(circle, (e) =>
+                this.addArrowCorner(newCornerPos)
+            );
+        return circle;
     }
-    override addEventListenersToSvg(){
-        if(this.svgPlusCircle != undefined){
-            const newCornerPos = this.arrowStart.intersectionPos.plus(this.arrowTarget.intersectionPos).muliplied(0.5)
-            Utility.addSimulatedClickListener(this.svgPlusCircle, e => this.addArrowCorner(newCornerPos.x,newCornerPos.y))
-        }
 
-    }
     private lineSvg(): {
         svg: SVGElement;
         startOfLine: Vector;
@@ -200,25 +206,24 @@ export class Arrow extends Element {
         let secondCorner;
         let beforeLastCorner;
         if (this._corners.length > 0) {
-            secondCorner = this._corners[0].posVector();
-            beforeLastCorner =
-                this._corners[this._corners.length - 1].posVector();
+            secondCorner = this._corners[0].getPos();
+            beforeLastCorner = this._corners[this._corners.length - 1].getPos();
         } else {
-            secondCorner = this.arrowTarget.posVector();
-            beforeLastCorner = this.arrowStart.posVector();
+            secondCorner = this.arrowTarget.getPos();
+            beforeLastCorner = this.arrowStart.getPos();
         }
         const intersectionWithStartElement = this.calculateIntersection(
             secondCorner,
-            this.arrowStart.posVector(),
+            this.arrowStart.getPos(),
             this.start
         );
         pointsToBeConnected.push(intersectionWithStartElement);
         for (const corner of this._corners) {
-            pointsToBeConnected.push(new Vector(corner.x, corner.y));
+            pointsToBeConnected.push(corner.getPos());
         }
         const intersectionWithEndElement = this.calculateIntersection(
             beforeLastCorner,
-            this.arrowTarget.posVector(),
+            this.arrowTarget.getPos(),
             this.end
         );
         pointsToBeConnected.push(intersectionWithEndElement);
@@ -295,7 +300,7 @@ export class Arrow extends Element {
         innerPoint: Vector,
         event: Event
     ): Vector {
-        const center = new Vector(event.x, event.y);
+        const center = event.getPos();
         const isInside = (p: Vector) => {
             return p.distanceTo(center) < event.distanceX;
         };
@@ -323,30 +328,30 @@ export class Arrow extends Element {
         el: Element
     ): Vector {
         const inside = () => {
-            if (innerPoint.x > el.x + el.distanceX) return false;
-            if (innerPoint.x < el.x - el.distanceX) return false;
-            if (innerPoint.y > el.y + el.distanceY) return false;
-            if (innerPoint.y < el.y - el.distanceY) return false;
+            if (innerPoint.x > el.getPos().x + el.distanceX) return false;
+            if (innerPoint.x < el.getPos().x - el.distanceX) return false;
+            if (innerPoint.y > el.getPos().y + el.distanceY) return false;
+            if (innerPoint.y < el.getPos().y - el.distanceY) return false;
             return true;
         };
         if (!inside()) return innerPoint;
 
-        const center = new Vector(el.x, el.y);
+        const center = el.getPos();
         //boundinglines: lineUp, lineRight, lineLeft, lineDown
         const lineU = new Line(
-            new Vector(el.x, el.y - el.distanceY),
+            center.plusXY(0, -el.distanceY),
             new Vector(10, 0)
         );
         const lineR = new Line(
-            new Vector(el.x + el.distanceX, el.y),
+            el.getPos().plusXY(el.distanceX, 0),
             new Vector(0, 10)
         );
         const lineD = new Line(
-            new Vector(el.x, el.y + el.distanceY),
+            center.plusXY(0, el.distanceY),
             new Vector(10, 0)
         );
         const lineL = new Line(
-            new Vector(el.x - el.distanceX, el.y),
+            el.getPos().plusXY(-el.distanceX, 0),
             new Vector(0, 10)
         );
 
@@ -391,19 +396,19 @@ export class Arrow extends Element {
     ): Vector {
         // lineUpperLeft, lineUpperRight, lineLowerLeft, lineLowerRight
         const lineUL = new Line(
-            new Vector(g.x, g.y - g.distanceY),
+            new Vector(g.getPos().x, g.getPos().y - g.distanceY),
             new Vector(g.distanceX, -g.distanceY)
         );
         const lineUR = new Line(
-            new Vector(g.x, g.y - g.distanceY),
+            new Vector(g.getPos().x, g.getPos().y - g.distanceY),
             new Vector(g.distanceX, g.distanceY)
         );
         const lineLL = new Line(
-            new Vector(g.x, g.y + g.distanceY),
+            new Vector(g.getPos().x, g.getPos().y + g.distanceY),
             new Vector(g.distanceX, g.distanceY)
         );
         const lineLR = new Line(
-            new Vector(g.x, g.y + g.distanceY),
+            new Vector(g.getPos().x, g.getPos().y + g.distanceY),
             new Vector(g.distanceX, -g.distanceY)
         );
 
@@ -433,10 +438,7 @@ export class Arrow extends Element {
         for (const l of boundingLines) {
             if (!Line.areParallel(intersectingLine, l)) {
                 const intersection = Line.intersection(intersectingLine, l);
-                if (
-                    intersection.distanceTo(new Vector(g.x, g.y)) <
-                    g.distanceX + 0.2
-                ) {
+                if (intersection.distanceTo(g.getPos()) < g.distanceX + 0.2) {
                     intersections.push(intersection);
                 }
             }

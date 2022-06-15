@@ -43,6 +43,7 @@ export class Task extends MainElement {
         svg.append(this.createRect());
         svg.append(this.createTypeSvg());
         svg.append(this.getText());
+        this.addStandardListeners(svg)
         return svg;
     }
 
@@ -68,8 +69,8 @@ export class Task extends MainElement {
         svg.setAttribute('height', `${this._height + 2 * this._border}`);
         svg.setAttribute('viewBox', "0 0 " + `${this._width + 2 * this._border}` + " " + `${this._height + 2 * this._border}`);
         svg.setAttribute('preserveAspectRatio', "xMidYMid meet");
-        svg.setAttribute('x', `${this.x - ((this._width + 2 * this._border) / 2)}`);
-        svg.setAttribute('y', `${this.y - ((this._height + 2 * this._border) / 2)}`);
+        svg.setAttribute('x', `${this.getPos().x - ((this._width + 2 * this._border) / 2)}`);
+        svg.setAttribute('y', `${this.getPos().y - ((this._height + 2 * this._border) / 2)}`);
         return svg;
     }
 

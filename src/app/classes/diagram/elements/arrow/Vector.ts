@@ -1,4 +1,13 @@
 export class Vector {
+    static zero(): Vector {
+        return new Vector(0,0)
+    }
+    plusXY(x: number, y: number): Vector {
+        return new Vector(this._x + x,  this._y + y)
+    }
+    copy() {
+        return new Vector(this.x, this.y)
+    }
     equals(v: Vector) {
         return (this.x == v.x && this.y == v.y)
     }

@@ -28,6 +28,7 @@ export class Gateway extends MainElement {
         let rect = this.createRect();
         svg.append(rect);
         svg.append(this.createTypeSvg());
+        this.addStandardListeners(svg)
         return svg;
     }
 
@@ -35,8 +36,8 @@ export class Gateway extends MainElement {
         let svg = this.createSvgElement('svg');
         svg.setAttribute('width', `${this._width}`);
         svg.setAttribute('height', `${this._height}`);
-        svg.setAttribute('x', `${this.x - this._width / 2}`);
-        svg.setAttribute('y', `${this.y - this._height / 2}`);
+        svg.setAttribute('x', `${this.getPos().x - this._width / 2}`);
+        svg.setAttribute('y', `${this.getPos().y - this._height / 2}`);
         svg.setAttribute('style', 'overflow: visible;');
         return svg;
     }
