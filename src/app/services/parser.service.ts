@@ -10,7 +10,6 @@ import { Task } from '../classes/diagram/elements/task';
 import { TaskType } from '../classes/diagram/elements/tasktype';
 import { Connector } from '../classes/diagram/elements/connector';
 import { Connectortype } from '../classes/diagram/elements/connectortype';
-import { EinPfeil } from '../classes/diagram/elements/EinPfeil';
 import { SwitchController } from '../classes/diagram/elements/switch-controller';
 import { Arrow } from '../classes/diagram/elements/arrow/Arrow';
 
@@ -116,10 +115,6 @@ export class ParserService {
         let connector: Connector = new Connector("A1", "", Connectortype.InformationFlow, elementE1, elementG1);
         result.addEdge(elementE1, elementG1);
         result.addElement(connector);
-
-
-        let connector1: Connector = new Connector("A1", "", Connectortype.InformationFlow, elementG1, elementT1);
-        let pfeil = new EinPfeil("p1","label", elementG1, elementT1);
 
         let connector = new Arrow("p1", "", elementE1, elementG1);
         result.addEdge(elementE1, elementG1);
