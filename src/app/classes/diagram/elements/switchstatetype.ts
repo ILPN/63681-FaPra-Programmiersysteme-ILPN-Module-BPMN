@@ -1,8 +1,8 @@
-export enum SwitchstateType { disable, enableable, enable, geschaltet};
+export enum SwitchstateType { disable, enableable, enable, switched};
 
 /**
- * deaktiviert = weiß
- * schaltbar = gelb
- * aktiv = grün
- * geschaltet = grau
+ * disable = weiß
+ * enableable = gelb
+ * enable = grün
+ * switched = grau
  */

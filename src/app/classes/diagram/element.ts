@@ -198,7 +198,7 @@ export abstract class Element {
                 return "lightgreen";
                 break;
             }
-            case SwitchstateType.geschaltet: {
+            case SwitchstateType.switched: {
                 return "lightgray";
                 break;
             }
@@ -220,11 +220,11 @@ export abstract class Element {
                 break;
             }
             case SwitchstateType.enable: {
-                this._switchState =  SwitchstateType.geschaltet;
+                this._switchState =  SwitchstateType.switched;
                 break;
             }
-            case SwitchstateType.geschaltet: {
-                this._switchState =  SwitchstateType.geschaltet;
+            case SwitchstateType.switched: {
+                this._switchState =  SwitchstateType.switched;
                 break;
             }
             default: {

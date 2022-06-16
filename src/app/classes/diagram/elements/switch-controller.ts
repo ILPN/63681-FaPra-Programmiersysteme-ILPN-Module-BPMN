@@ -51,13 +51,14 @@ export class SwitchController {
      */
     public press(element: Element) {
         if (element.switchState === SwitchstateType.enableable) {
+            console.log("Schalte das Element mit der ID: " +element.id);
             let elementsToSwitch: Element[] = [];
             if (this.switchStartEvernt(element)) this.disableAllOtherStartEvent(element);
             this.addElementsToSwitch(elementsToSwitch, element);
             elementsToSwitch.forEach(e => { if (this.isItPosibleToSwitchElement(e)) e.switch() });
             this.checkAllEnableableElementStillEnableable();
         } else {
-            // Dieses Objekt kann nicht geschaltet werden.
+            console.log("Dieses Objekt kann nicht geschaltet werden, da es nicht aktivierbar ist.");
             if (element.switchState === SwitchstateType.enable && element instanceof Event && element.type === EventType.End) {
                 this.newGame();
             }
@@ -115,8 +116,12 @@ export class SwitchController {
     */
     private switchAndSplit(elementsToSwitch: Element[], before: Element): void {
         this.addToArray(elementsToSwitch, before);
-        this.getAllElementsAfter(before).forEach(after => {
+        let elementsBefore : Element[] =  this.getAllElementsAfter(before);
+        elementsBefore.forEach(after => {
             this.addToArray(elementsToSwitch, after);
+        });
+        // Fügt man beide Anweisung in eine forEach dann werden womöglich die nachfolgenden Elemente (Gateway Join) auf aktivierbarkeit geprüft, bevor das letzte Element aktiviert ist.
+        elementsBefore.forEach(after => {
             this.getAllElementsAfter(after).forEach(afterAfter => this.addToArray(elementsToSwitch, afterAfter));
         });
     }
@@ -161,11 +166,9 @@ export class SwitchController {
             let b: boolean = true;
             if (element.type === GatewayType.AND_JOIN) {
                 arrayOfElements.forEach(e => { if (!(e.switchState === SwitchstateType.enable)) b = false; });
-                return true;
+                return b;
             }
-                if (element.type === GatewayType.OR_JOIN) {  // ACHTUNG REKURSIVER AUFRUF
-                    // let arrayOfElements = this.getAllElementsBefore(element);
-                    // let b: boolean = true;
+                if (element.type === GatewayType.OR_JOIN) {
                     let i: number = 0;
                     arrayOfElements.forEach(e => {
                         if (e.switchState === SwitchstateType.enable) { i++; } else {
@@ -310,7 +313,7 @@ export class SwitchController {
         let b: boolean = true;
         if (element instanceof Gateway) {
             if (gatewayArray.length === 0) {
-                if (element.switchState === SwitchstateType.enable || element.switchState === SwitchstateType.geschaltet) b = false;
+                if (element.switchState === SwitchstateType.enable || element.switchState === SwitchstateType.switched) b = false;
                 return b;
             }
             let onlyOnce: boolean = true;
@@ -345,7 +348,8 @@ export class SwitchController {
             this.disableElement(diagramElement);
         });
         this._startEvents.forEach(event => {
-            this.disableElement(event);
+            event.switchState = SwitchstateType.enableable;
+            event.colorToDefault();
         });
     }
 
