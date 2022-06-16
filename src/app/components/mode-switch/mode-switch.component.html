@@ -1,0 +1,10 @@
+<p>
+    <mat-button-toggle-group [(value)]="selectedToggle" #group="matButtonToggleGroup" multiple=false>
+        <mat-button-toggle *ngFor="let item of toggleOptions;" (change)="selectionChanged($event)" [value]="item">
+            {{item}}</mat-button-toggle>
+    </mat-button-toggle-group>
+
+</p>
+<div><button (click)="onDeleteAllCorners()" *ngIf="isFreeMode" mat-raised-button>Delete all corners</button>
+<button (click)="onMakeSquare()" *ngIf="isFreeMode" style="margin-left:15px" mat-raised-button>Make square</button>
+</div>

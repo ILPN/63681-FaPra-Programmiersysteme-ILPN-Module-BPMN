@@ -170,9 +170,30 @@ export class DummyNode extends LNode{
   public get toId(): string {
     return this._toId;
   }
+  
 
   constructor(id: string, from:string, to:string, layer?: number){
     super(id,layer)
+    this._fromId = from
+    this._toId = to
+
+  }
+
+}
+
+export class DummyGroup{
+  private _fromId: string; 
+  public get fromId(): string {
+    return this._fromId;
+  }
+  
+  private _toId:string
+  public get toId(): string {
+    return this._toId;
+  }
+  
+
+  constructor(from:string, to:string){
     this._fromId = from
     this._toId = to
 
