@@ -50,6 +50,9 @@ export class ParserService {
 
 
     private testDiagramm(): Diagram {
+
+        // Probleme bei der Darstellung von Elementen, welche über keine Kanten verfügen
+
         var result = new Diagram();
         
         
