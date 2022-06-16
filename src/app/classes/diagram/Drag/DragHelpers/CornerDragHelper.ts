@@ -1,7 +1,6 @@
 import { DragHelper } from "./DragHelper";
-import { Vector } from "../elements/arrow/Vector";
-import { ArrowCorner } from "../elements/arrow/ArrowCorner";
-import { Element } from "../element";
+import { ArrowCorner } from "../../elements/arrow/ArrowCorner";
+import { Vector } from "src/app/classes/Utils/Vector";
 
 export class CornerDragHelper extends DragHelper<ArrowCorner>{
     override startDrag(event: MouseEvent): void {

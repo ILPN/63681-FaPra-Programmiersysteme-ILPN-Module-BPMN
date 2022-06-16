@@ -1,9 +1,6 @@
-import { Vector } from "../elements/arrow/Vector";
-import { ArrowCorner } from "../elements/arrow/ArrowCorner";
-import { CornerDragHelper } from "./CornerDragHelper";
-import { Element } from "../element";
-import { DragHelperInterface } from "./DragHelperInterface";
+import { Element } from "../../element";
 import { DragHelper } from "./DragHelper";
+import { DragHelperInterface } from "./DragHelperInterface";
 
 export class MultiDragHelper implements DragHelperInterface<Element>{
 

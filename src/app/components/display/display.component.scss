@@ -16,6 +16,11 @@
 }
 
 $drag-color: #00b7ff92;
+$dummyColor: #002fff92;
+
+$hoverDummyColor: #32323292;
+
+
 $add-color: #00ff7b92;
 $arrow-inside-element-color: #ff006a;
 $deleteColor: #ff000092;
@@ -80,32 +85,22 @@ $radiusLarge: 6px;
 }
 .arrowCornerCircle:hover {
     r:$radiusLarge;
-    ~ .cornerFeatures {
+    ~ .deleteSvg {
         visibility: visible;
-        transition-property: visibility;
-        transition-delay: 0s;
     }
 }
 .draged .arrowCornerCircle:hover {
     r:$radiusLarge;
-    ~ .cornerFeatures {
+    ~ .deleteSvg {
         visibility: hidden;
     }
 }
-.cornerFeatures:hover {
-    visibility: visible;
+.hoverDummy{
+    r:12px;
+     fill:#32323292
 }
-.cornerFeatures {
-    visibility: hidden;
-    transition-property: visibility;
-    transition-delay: 0.5s;
-}
-.draged{
-    .CornerFeatures{
-        visibility: hidden;
-    }
-} 
-.dragTwoCircle {
+
+.doubleDragCircle {
     fill: $drag-color;
     r: $radiusSmall
 }
@@ -116,18 +111,17 @@ $radiusLarge: 6px;
 .deleteCircle{
     fill: $deleteColor;
     r: $radiusSmall;
-
+}
+.deleteSvg{
+    visibility: hidden;
+}
+.deleteSvg:hover{
+    visibility: visible;
 }
 
-.plusCircleAlone {
-    fill: $add-color;
-    r: $radiusSmall;
-    transition: r 1;
-}
-.plusCircleAlone:hover{
+.dummyNodeCircle{
     r: $radiusLarge;
-    transition: r 1;
-
+    fill:$dummyColor
 }
 
 

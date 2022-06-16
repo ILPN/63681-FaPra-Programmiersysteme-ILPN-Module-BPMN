@@ -1,19 +1,19 @@
-import { Utility } from "../Utility"
-import { DragHelper } from "./DragHelpers/DragHelper"
+import { Utility } from "../Utils/Utility"
 import { Element } from "./element"
 import { ArrowCorner } from "./elements/arrow/ArrowCorner"
 import { MainElement } from "./elements/MainElement"
-import { MainElementDragHelper } from "./DragHelpers/MainElementDragHelper"
-import { CornerDragHelper } from "./DragHelpers/CornerDragHelper"
 import { ArrowEndCorner } from "./elements/arrow/ArrowEndCorner"
-import { DragHelperInterface } from "./DragHelpers/DragHelperInterface"
-import { MultiDragHelper } from "./DragHelpers/MultiDragHelper"
-import { SnapX } from "./DragHelpers/SnapX"
-import { SnapY } from "./DragHelpers/SnapY"
-import { SnapPoint } from "./DragHelpers/SnapPoint"
-import { SnapGrid } from "./DragHelpers/SnapGrid"
 import { LayeredGraph } from "../Sugiyama/LayeredGraph"
-import { OrderDragHelper } from "./DragHelpers/OrderDragHelper"
+import { DragHelperInterface } from "./Drag/DragHelpers/DragHelperInterface"
+import { MainElementDragHelper } from "./Drag/DragHelpers/MainElementDragHelper"
+import { MultiDragHelper } from "./Drag/DragHelpers/MultiDragHelper"
+import { CornerDragHelper } from "./Drag/DragHelpers/CornerDragHelper"
+import { SnapGrid } from "./Drag/SnapElements/SnapGrid"
+import { SnapX } from "./Drag/SnapElements/SnapX"
+import { SnapY } from "./Drag/SnapElements/SnapY"
+import { OrderDragHelper2 } from "./Drag/DragHelpers/OrderDragHelper"
+import { DummyNodeCorner } from "./elements/arrow/DummyNodeCorner"
+import { DragHelper } from "./Drag/DragHelpers/DragHelper"
 
 export class MyDiagram{
 
@@ -27,11 +27,11 @@ export class MyDiagram{
         this.elements = this.elements.filter(e => e != corner)
     }
 
-    readonly DRAG_TWO_CORNERS = 2
+    readonly DRAG_THIS_CORNER_AND_ITS_AFTER_CORNER = 2
 
     private dragHelper: DragHelperInterface<Element> | undefined
     onChildrenMouseDown(e: MouseEvent, element: Element, FLAG:number = 0) {
-        if(element instanceof MainElement){
+        if(element instanceof MainElement || element instanceof DummyNodeCorner){
 
             /*
             const dh= new MainElementDragHelper(element)
@@ -47,13 +47,25 @@ export class MyDiagram{
             this.svg.appendChild(dh.getSnapSvg())
              this.dragHelper = dh*/
 
-             const dh= new OrderDragHelper(element)
+             let dhOfElement:DragHelper<Element>
+             if(element instanceof  MainElement){
+                dhOfElement = new MainElementDragHelper(element)
+             }else{
+                dhOfElement = new CornerDragHelper(element)
+             }
+
+             
+             const dh= new OrderDragHelper2(dhOfElement)
              if(this.suiyamaResultGraph!= undefined){
                  const layer = this.suiyamaResultGraph.getNode(element.id)!.layer
                  for (const node of this.suiyamaResultGraph.layers[layer]) {
                     const el =  this.elements.find(e => e.id == node.id)
-                    if(el != undefined && el instanceof MainElement){
+                    if(el != undefined ){
+                        if(el instanceof  MainElement)
                         dh.addDragHelper(new MainElementDragHelper(el))
+                        else if(el instanceof DummyNodeCorner){
+                            dh.addDragHelper(new CornerDragHelper(el))
+                        }
                     }
                  }
  
@@ -64,7 +76,7 @@ export class MyDiagram{
             return
         }
         if(element instanceof ArrowCorner || element instanceof ArrowEndCorner){
-            if(FLAG == this.DRAG_TWO_CORNERS){
+            if(FLAG == this.DRAG_THIS_CORNER_AND_ITS_AFTER_CORNER){
                 this.dragHelper = new MultiDragHelper()
                 const multiHelper = this.dragHelper as MultiDragHelper
                 const dH1 = new CornerDragHelper(element)

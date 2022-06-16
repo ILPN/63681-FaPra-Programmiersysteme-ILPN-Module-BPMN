@@ -1,4 +1,17 @@
 export class Vector {
+    static center(...args: Vector[]) {
+        let sum = Vector.zero()
+        for (const v of args) {
+            sum = sum.plus(v)
+        }
+        return sum.divided(args.length)
+    }
+    divided(by: number) {
+        return this.muliplied(1/by)
+        }
+    half() {
+        return this.muliplied(0.5)
+    }
     static zero(): Vector {
         return new Vector(0,0)
     }

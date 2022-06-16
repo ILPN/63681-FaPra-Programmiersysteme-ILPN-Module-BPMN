@@ -1,9 +1,15 @@
 import { Element } from '../../element';
 import { MyDiagram } from '../../MyDiagram';
 import { Arrow } from './Arrow';
-import { Vector } from './Vector';
 
 export class ArrowCorner extends Element {
+    private _shouldBeDrawnByArrow = true;
+    public get shouldBeDrawnByArrow() {
+        return this._shouldBeDrawnByArrow;
+    }
+    public set shouldBeDrawnByArrow(value) {
+        this._shouldBeDrawnByArrow = value;
+    }
     protected _arrow: Arrow;
     public get arrow(): Arrow {
         return this._arrow;

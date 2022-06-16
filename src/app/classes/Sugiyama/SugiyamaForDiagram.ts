@@ -8,6 +8,7 @@ import { LayeredGraph, LNode } from "./LayeredGraph";
 import { SimpleGraph } from "./SimpleGraph";
 import { Sugiyama } from "./Sugiyama";
 import { MyDiagram } from "../diagram/MyDiagram";
+import { DummyNodeCorner } from "../diagram/elements/arrow/DummyNodeCorner";
 
 export function applySugiyama(diagram:MyDiagram, w = 1000, h =500 , p = 50){
     const input = new SimpleGraph()
@@ -41,6 +42,7 @@ export function applySugiyama(diagram:MyDiagram, w = 1000, h =500 , p = 50){
      for (let el of diagram.getElems()){
          if(el instanceof Arrow) arrows.push(el)
      }
+
      for (let arrow of arrows){
         const fromLNode:LNode|undefined = result.getNode(arrow.start.id)
         const toLNode:LNode|undefined = result.getNode(arrow.end.id)
@@ -49,7 +51,12 @@ export function applySugiyama(diagram:MyDiagram, w = 1000, h =500 , p = 50){
         arrow.setArrowStart(fromLNode.x,fromLNode.y)
         arrow.setArrowTarget(toLNode.x,toLNode.y)
         arrow.clearArrowCorners()
+        const dummys = result.getSortedDummysForEdge(arrow.start.id,arrow.end.id)
+        for (const dN of dummys) {
+            arrow.addDummyNodeCorner(dN.id,dN.x,dN.y)
+        }
         //making things square
+        /*
         if(result.layers[fromLNode.layer].length >= result.layers[toLNode.layer].length){
             if(fromLNode.y != toLNode.y){ 
             arrow.addArrowCornerXY(toLNode.x,fromLNode.y)
@@ -58,8 +65,7 @@ export function applySugiyama(diagram:MyDiagram, w = 1000, h =500 , p = 50){
             if(fromLNode.y != toLNode.y){ 
                arrow.addArrowCornerXY(fromLNode.x,toLNode.y)
                 } 
-        }    
+        }    */
     }
-    //no dummys yet
     diagram.setSugiyamaResult(result)
   }

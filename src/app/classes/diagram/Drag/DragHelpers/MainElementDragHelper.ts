@@ -1,7 +1,8 @@
+import { Vector } from "src/app/classes/Utils/Vector";
+import { Arrow } from "../../elements/arrow/Arrow";
+import { MainElement } from "../../elements/MainElement";
 import { DragHelper } from "./DragHelper";
-import { Arrow } from "../elements/arrow/Arrow";
-import { Vector } from "../elements/arrow/Vector";
-import { MainElement } from "../elements/MainElement";
+
 
 export class MainElementDragHelper extends DragHelper<MainElement>{
     private arrowStartDeltas: Map<Arrow,Vector> = new Map()

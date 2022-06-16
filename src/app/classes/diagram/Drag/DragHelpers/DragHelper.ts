@@ -1,8 +1,8 @@
-import { Vector } from "../elements/arrow/Vector"
-import { Element } from "../element"
+import { Utility } from "src/app/classes/Utils/Utility";
+import { Vector } from "src/app/classes/Utils/Vector";
+import { SnapElement } from "../SnapElements/SnapElement"
 import { DragHelperInterface } from "./DragHelperInterface"
-import { SnapElement } from "./SnapElement"
-import { Utility } from "../../Utility"
+import { Element } from "../../element"
 export abstract class DragHelper<T extends Element> implements DragHelperInterface<T>{
 
     private snapElements: SnapElement[] = []
@@ -20,7 +20,13 @@ export abstract class DragHelper<T extends Element> implements DragHelperInterfa
        return svg
     }
 
-    private actualPos = new Vector()
+    private _actualPos = new Vector();
+    public get actualPos() {
+        return this._actualPos;
+    }
+    public set actualPos(value) {
+        this._actualPos = value;
+    }
     dragElement(e: MouseEvent) {
         if(!this.dragging) return
         const currentMousePos = new Vector( e.clientX, e.clientY)
@@ -41,11 +47,17 @@ export abstract class DragHelper<T extends Element> implements DragHelperInterfa
 
     public dragedElement:T
     private dragging = false
-    protected elementStartPos:Vector
+    private _elementStartPos: Vector;
+     get elementStartPos(): Vector {
+        return this._elementStartPos;
+    }
+     set elementStartPos(value: Vector) {
+        this._elementStartPos = value;
+    }
     private mouseStartPos:Vector
     constructor(element:T , startPos:Vector = new Vector(), mouseStartPos:Vector = new Vector){
         this.dragedElement = element
-        this.elementStartPos = startPos
+        this._elementStartPos = startPos
         this.mouseStartPos = mouseStartPos
     }
 

@@ -1,8 +1,8 @@
+import { Vector } from 'src/app/classes/Utils/Vector';
 import { Element } from '../../element';
 import { MyDiagram } from '../../MyDiagram';
 import { Arrow } from './Arrow';
 import { ArrowCorner } from './ArrowCorner';
-import { Vector } from './Vector';
 
 export class ArrowEndCorner extends ArrowCorner {
     
@@ -21,6 +21,7 @@ export class ArrowEndCorner extends ArrowCorner {
         return this._intersectionPos;
     }
     public set intersectionPos(value) {
+        if(value != undefined)
         this._intersectionPos = value;
     }
 

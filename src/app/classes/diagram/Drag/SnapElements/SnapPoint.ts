@@ -1,5 +1,4 @@
-import { Utility } from "../../Utility";
-import { Vector } from "../elements/arrow/Vector";
+import { Vector } from "src/app/classes/Utils/Vector";
 import { SnapElement } from "./SnapElement";
 
 export class SnapPoint extends SnapElement{

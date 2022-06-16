@@ -1,5 +1,4 @@
-import { ForwardRefHandling, typeWithParameters } from '@angular/compiler/src/render3/util';
-import { Vector } from './elements/arrow/Vector';
+import { Vector } from '../Utils/Vector';
 import { MyDiagram } from './MyDiagram';
 import { Position } from './Position';
 
@@ -10,15 +9,6 @@ export abstract class Element implements Position {
     private _halfHeight: number = 0;
     private domSVG: SVGElement | undefined;
     public draged = false
-    protected _childrenElements: Element[] = [];
-    public get childrenElements(): Element[] {
-        return this._childrenElements;
-    }
-
-    addChildrenElement(child:Element){
-        if(this.childrenElements.find(e => e == child))return
-        this._childrenElements.push(child)
-    }
 
     /*
     private domSvgRoot: SVGElement | undefined;

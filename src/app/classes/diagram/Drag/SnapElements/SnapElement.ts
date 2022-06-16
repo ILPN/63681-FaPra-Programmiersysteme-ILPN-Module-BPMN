@@ -1,4 +1,4 @@
-import { Vector } from "../elements/arrow/Vector";
+import { Vector } from "src/app/classes/Utils/Vector"
 
 export  abstract class SnapElement{    
     snap(toBeSnaped:Vector):Vector{

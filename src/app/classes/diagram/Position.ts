@@ -1,4 +1,4 @@
-import { Vector } from "./elements/arrow/Vector";
+import { Vector } from "../Utils/Vector"
 
 export interface Position{
     getPos():Vector

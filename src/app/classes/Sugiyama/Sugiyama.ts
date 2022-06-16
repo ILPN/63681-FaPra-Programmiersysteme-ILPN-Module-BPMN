@@ -58,6 +58,14 @@ export class Sugiyama{
             this.leveled.removeArc(ra.from.id,ra.to.id)
             this.leveled.addArc(ra.to.id,ra.from.id)
         });
+
+        for (const dummy of this.leveled.getAllDummys()) {
+            const from = dummy.fromId
+            const to = dummy.toId
+            dummy.toId = from
+            dummy.fromId = to
+            dummy.arcIsInversed = false
+        }
     }
     private ordering() {
          /**
@@ -218,7 +226,7 @@ export class Sugiyama{
                 for (let i = 1; i < levelSpan; i++) {
                     const dummyId = a.from.id+"-"+a.to.id+"d"+ i
                     const layer = a.from.layer + i
-                    this.leveled.layers[layer].push( new DummyNode(dummyId, a.from.id, a.to.id,layer))
+                    this.leveled.layers[layer].push( new DummyNode(dummyId, a.from.id, a.to.id,arcIsInversed,layer))
                     this.leveled.addArc(prev, dummyId,arcIsInversed)   
                     prev = dummyId                   
                 }

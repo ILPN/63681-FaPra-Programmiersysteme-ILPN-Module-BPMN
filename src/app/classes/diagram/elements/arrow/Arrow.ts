@@ -2,14 +2,14 @@ import { Element } from '../../element';
 import { Gateway } from '../gateway';
 import { Task } from '../task';
 import { Event } from '../event';
-import { Vector } from './Vector';
-import { Line } from './Line';
-import { MainElement } from '../MainElement';
+import { Utility } from "src/app/classes/Utils/Utility";
+import { Vector } from "src/app/classes/Utils/Vector";import { MainElement } from '../MainElement';
 import { ArrowCorner } from './ArrowCorner';
 import { MyDiagram } from '../../MyDiagram';
 import { ArrowEndCorner } from './ArrowEndCorner';
 import { ArrowInnerCorner } from './ArrowInnerCorner';
-import { Utility } from 'src/app/classes/Utility';
+import { Line } from 'src/app/classes/Utils/Line';
+import { DummyNodeCorner } from './DummyNodeCorner';
 
 export class Arrow extends Element {
     addCornerBeforeCorner(corner: ArrowCorner): void {
@@ -30,7 +30,6 @@ export class Arrow extends Element {
         if (corner == this.arrowTarget) this.addArrowCorner(pos);
         else {
             const index = this.corners.findIndex((c) => c == corner);
-            console.log('der index ist' + index);
             this.addArrowCorner(pos, index);
         }
     }
@@ -41,7 +40,7 @@ export class Arrow extends Element {
     }
     onDragTo(dx: number, dy: number) {}
     private _label: String;
-    private _corners: ArrowInnerCorner[];
+    private _corners: ArrowCorner[];
     public get corners() {
         return this._corners;
     }
@@ -82,12 +81,21 @@ export class Arrow extends Element {
         end.addInArrow(this);
     }
     clearArrowCorners() {
-        this._corners = [];
+        this._corners = this._corners.filter(c => c instanceof DummyNodeCorner);
         this.registerCornerNeighbours()
         this.updateSvg();
     }
     addArrowCornerXY(x: number, y: number) {
         this.addArrowCorner(new Vector(x, y));
+    }
+    addDummyNodeCorner(id:string,x:number,y:number){
+        const dNC = new DummyNodeCorner(id,x,y,this,this.diagram)
+        dNC.shouldBeDrawnByArrow = false
+        this.diagram.addElement(dNC)
+        this._corners.push(dNC);
+        this.registerCornerNeighbours();
+        this.updateSvg();
+
     }
     addArrowCorner(pos: Vector, atPosition: number = -1) {
         const corner = new ArrowInnerCorner(
@@ -171,28 +179,84 @@ export class Arrow extends Element {
             )
         );
         for (const corner of this.corners) {
-            svg.appendChild(corner.updateSvg());
+            if(corner.shouldBeDrawnByArrow){
+                svg.appendChild(corner.updateSvg());
+            }
         }
         svg.appendChild(this.arrowStart.updateSvg());
         svg.appendChild(this.arrowTarget.updateSvg());
-        if (this.corners.length == 0) svg.appendChild(this.plusCircle());
+        this.appendPlusAndDoubleDragCircles(svg)
         return svg;
     }
-    plusCircle(): SVGElement {
+    appendPlusAndDoubleDragCircles(svg: SVGElement) {
+        const spacingHalf= 3
+        if (this.corners.length == 0){
+            const center = Vector.center(this.arrowStart.intersectionPos,this.arrowTarget.intersectionPos)
+
+            svg.appendChild(this.plusCircle(center,center,0));
+            return
+        }
+        const distinctionOfCases = (elBefore:Element,el:Element,index:number) =>{
+            const dir = el.getPos().minus(elBefore.getPos()).toUnitVector()
+            if(elBefore instanceof ArrowEndCorner && el instanceof ArrowInnerCorner){
+                const center = Vector.center(el.getPos(), elBefore.intersectionPos)
+                svg.appendChild(this.plusCircle(center.minus(dir.muliplied(spacingHalf)),center,index))
+                svg.appendChild(this.doubleDragCircle(center.plus(dir.muliplied(spacingHalf)),elBefore))
+                return
+            }
+            if(elBefore instanceof ArrowInnerCorner && el instanceof ArrowEndCorner){
+                const center = Vector.center(el.intersectionPos, elBefore.getPos())
+                svg.appendChild(this.plusCircle(center.minus(dir.muliplied(spacingHalf)),center,index))
+                svg.appendChild(this.doubleDragCircle(center.plus(dir.muliplied(spacingHalf)),elBefore))
+                return
+            }  
+            if(elBefore instanceof ArrowInnerCorner && el instanceof ArrowInnerCorner){
+                const center = Vector.center(el.getPos(), elBefore.getPos())
+                svg.appendChild(this.plusCircle(center.minus(dir.muliplied(spacingHalf)),center,index))
+                svg.appendChild(this.doubleDragCircle(center.plus(dir.muliplied(spacingHalf)),elBefore))
+                return
+            }    
+            if((elBefore instanceof ArrowInnerCorner && el instanceof DummyNodeCorner)||
+            (elBefore instanceof DummyNodeCorner && el instanceof ArrowInnerCorner)){
+                const center = Vector.center(el.getPos(), elBefore.getPos())
+                svg.appendChild(this.plusCircle(center,center,index))
+                return
+            }
+            if((elBefore instanceof ArrowEndCorner && el instanceof DummyNodeCorner)){
+                const center = Vector.center(elBefore.intersectionPos, el.getPos())
+                svg.appendChild(this.plusCircle(center,center,index))
+                return
+            } 
+            if((elBefore instanceof DummyNodeCorner && el instanceof ArrowEndCorner)){
+                const center = Vector.center(elBefore.getPos(), el.intersectionPos)
+                svg.appendChild(this.plusCircle(center,center,index))
+                return
+            } 
+        }
+        for (let i = 0; i < this.corners.length; i++) {
+            const el = this.corners[i];
+            const elBefore = el.cornerBefore
+            if(elBefore == undefined) continue
+            distinctionOfCases(elBefore,el,i)           
+        }
+        distinctionOfCases(this.corners[this._corners.length-1],this.arrowTarget,this.corners.length)
+    }
+    plusCircle(pos:Vector,newCornerPos:Vector, addAtIndex:number): SVGElement {
         const circle = this.createSvgElement('circle');
-        circle.classList.add('plusCircleAlone');
-        const pos = this.arrowStart.intersectionPos
-            .plus(this.arrowTarget.intersectionPos)
-            .muliplied(0.5);
+        circle.classList.add('plusCircle');
         circle.setAttribute('cx', '' + pos.x);
         circle.setAttribute('cy', '' + pos.y);
-        
-        const newCornerPos = this.arrowStart.intersectionPos
-                .plus(this.arrowTarget.intersectionPos)
-                .muliplied(0.5);
             Utility.addSimulatedClickListener(circle, (e) =>
-                this.addArrowCorner(newCornerPos)
+                this.addArrowCorner(newCornerPos,addAtIndex)
             );
+        return circle;
+    }
+    doubleDragCircle(pos:Vector, draged:Element): SVGElement {
+        const circle = this.createSvgElement('circle');
+        circle.classList.add('doubleDragCircle');
+        circle.setAttribute('cx', '' + pos.x);
+        circle.setAttribute('cy', '' + pos.y);
+        circle.onmousedown = e => this.diagram.onChildrenMouseDown(e,draged, this.diagram.DRAG_THIS_CORNER_AND_ITS_AFTER_CORNER)
         return circle;
     }
 
@@ -217,7 +281,9 @@ export class Arrow extends Element {
             this.arrowStart.getPos(),
             this.start
         );
-        pointsToBeConnected.push(intersectionWithStartElement);
+        if(intersectionWithStartElement != undefined){
+            pointsToBeConnected.push(intersectionWithStartElement);
+        }
         for (const corner of this._corners) {
             pointsToBeConnected.push(corner.getPos());
         }
@@ -226,7 +292,9 @@ export class Arrow extends Element {
             this.arrowTarget.getPos(),
             this.end
         );
-        pointsToBeConnected.push(intersectionWithEndElement);
+        if(intersectionWithEndElement != undefined){
+            pointsToBeConnected.push(intersectionWithEndElement);
+        }
 
         let pathSvg = this.createSvgElement('path');
         pathSvg.setAttribute(
