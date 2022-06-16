@@ -10,6 +10,10 @@ export abstract class DragHelper<T extends Element> implements DragHelperInterfa
         this.snapElements.push(snapElement)
     }
     private snapSvg:SVGElement | undefined
+    /**
+     * 
+     * @returns svg representing where drag will snap to
+     */
     getSnapSvg(){
        const svg = Utility.createSvgElement("svg")
        svg.id = "snapSvgs"
@@ -27,6 +31,10 @@ export abstract class DragHelper<T extends Element> implements DragHelperInterfa
     public set actualPos(value) {
         this._actualPos = value;
     }
+    /**
+     * gets called in mouseMove
+     * @param e
+     */
     dragElement(e: MouseEvent) {
         if(!this.dragging) return
         const currentMousePos = new Vector( e.clientX, e.clientY)
@@ -43,16 +51,18 @@ export abstract class DragHelper<T extends Element> implements DragHelperInterfa
         this.actualPos = newPos
     }
 
+/**
+ * should update position of draged Element
+ * @param absolute absolute position where element should be draged to
+ * @param delta 
+ */
    abstract onDrag(absolute:Vector, delta:Vector):void  
 
     public dragedElement:T
     private dragging = false
-    private _elementStartPos: Vector;
+    protected _elementStartPos: Vector;
      get elementStartPos(): Vector {
         return this._elementStartPos;
-    }
-     set elementStartPos(value: Vector) {
-        this._elementStartPos = value;
     }
     private mouseStartPos:Vector
     constructor(element:T , startPos:Vector = new Vector(), mouseStartPos:Vector = new Vector){
@@ -61,16 +71,23 @@ export abstract class DragHelper<T extends Element> implements DragHelperInterfa
         this.mouseStartPos = mouseStartPos
     }
 
+    /**
+     * called on mouseDown
+     * @param event 
+     */
     startDrag(event:MouseEvent){
         this.dragging = true
         const element = this.dragedElement
-        this.elementStartPos = element.getPos()
+        this._elementStartPos = element.getPos()
         this.mouseStartPos.x = event.clientX
         this.mouseStartPos.y = event.clientY
         this.dragedElement.draged = true
 
     }
 
+    /**
+     * called on mouseUp
+     */
     stopDrag(){
         this.dragging = false
         this.dragedElement.draged = false

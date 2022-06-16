@@ -1,4 +1,4 @@
-import { MyDiagram } from '../MyDiagram';
+import { DragDiagram } from '../DragDiagram';
 import { GatewayType } from './gatewaytype'
 import { MainElement } from './MainElement';
 
@@ -9,7 +9,7 @@ export class Gateway extends MainElement {
     private _border: number = 2;
     private _scale: String = '1';
 
-    constructor(id: string, type: GatewayType, diagram:MyDiagram) {
+    constructor(id: string, type: GatewayType, diagram:DragDiagram) {
         super(id,diagram);
         this._type = type;
         this.distanceX = this._width - 14;

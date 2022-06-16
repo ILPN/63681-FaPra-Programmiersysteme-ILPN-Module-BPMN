@@ -3,7 +3,7 @@ import { DisplayService } from '../../services/display.service';
 import { Subscription } from 'rxjs';
 import { LayoutService } from '../../services/layout.service';
 import { SvgService } from '../../services/svg.service';
-import { MyDiagram } from 'src/app/classes/diagram/MyDiagram';
+import { DragDiagram } from 'src/app/classes/diagram/DragDiagram';
 
 @Component({
     selector: 'app-display',
@@ -17,7 +17,7 @@ export class DisplayComponent implements OnDestroy {
     @ViewChild('drawingArea') drawingArea: ElementRef<SVGElement> | undefined;
 
     private _sub: Subscription;
-    private _diagram: MyDiagram | undefined;
+    private _diagram: DragDiagram | undefined;
 
     constructor(private _layoutService: LayoutService,
         private _svgService: SvgService,

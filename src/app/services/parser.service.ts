@@ -9,7 +9,7 @@ import { GatewayType } from '../classes/diagram/elements/gatewaytype';
 import { Task } from '../classes/diagram/elements/task';
 import { TaskType } from '../classes/diagram/elements/tasktype';
 import { Arrow } from '../classes/diagram/elements/arrow/Arrow';
-import { MyDiagram } from '../classes/diagram/MyDiagram';
+import { DragDiagram } from '../classes/diagram/DragDiagram';
 
 @Injectable({
     providedIn: 'root'
@@ -19,7 +19,7 @@ export class ParserService {
     constructor() {
     }
 
-    parse(text: string): MyDiagram | undefined {
+    parse(text: string): DragDiagram | undefined {
         const lines = text.split('\n');
 
         // const result = new Diagram();
@@ -44,8 +44,8 @@ export class ParserService {
     }
 */
 
-    private testDiagramm(): MyDiagram {
-        const result = new MyDiagram();
+    private testDiagramm(): DragDiagram {
+        const result = new DragDiagram();
         let elementE1 = new Event("E1", "Start", EventType.Start,result);
         elementE1.setPosXY(60,190);
         result.addElement(elementE1);

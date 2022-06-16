@@ -33,7 +33,7 @@ export class MainElementDragHelper extends DragHelper<MainElement>{
             const startDelta =this.arrowStartDeltas.get(arrow)
             if( startDelta != undefined){
                 const aPos = absolute.plus(startDelta)
-                arrow.setArrowTarget(aPos.x, aPos.y);
+                arrow.setArrowTargetPos(aPos.x, aPos.y);
                 arrow.updateSvg();
             }
             
@@ -43,7 +43,7 @@ export class MainElementDragHelper extends DragHelper<MainElement>{
             const startDelta =this.arrowStartDeltas.get(arrow)
             if( startDelta != undefined){
                 const aPos = absolute.plus(startDelta)
-                arrow.setArrowStart(aPos.x, aPos.y);
+                arrow.setArrowStartPos(aPos.x, aPos.y);
                 arrow.updateSvg();
             }
             

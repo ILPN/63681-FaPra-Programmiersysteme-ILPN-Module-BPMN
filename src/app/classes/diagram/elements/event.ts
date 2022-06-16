@@ -1,5 +1,5 @@
 
-import { MyDiagram } from '../MyDiagram';
+import { DragDiagram } from '../DragDiagram';
 import { Element } from './../element'
 import { EventType } from './eventtype'
 import { MainElement } from './MainElement';
@@ -14,7 +14,7 @@ export class Event extends MainElement {
     private _raduis: number = 35;
 
 
-    constructor(id: string, label: string, type: EventType, diagram:MyDiagram) {
+    constructor(id: string, label: string, type: EventType, diagram:DragDiagram) {
         super(id, diagram);
         this._label = label;
         this._type = type;

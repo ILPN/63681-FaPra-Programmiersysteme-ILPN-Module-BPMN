@@ -1,9 +1,12 @@
+import { DragDiagram } from '../../DragDiagram';
 import { Element } from '../../element';
-import { MyDiagram } from '../../MyDiagram';
 import { Arrow } from './Arrow';
 
 export class ArrowCorner extends Element {
     private _shouldBeDrawnByArrow = true;
+    /**
+     * returns whether the svg returned by this.createSvg() should be attached to ther arrows svg
+     */
     public get shouldBeDrawnByArrow() {
         return this._shouldBeDrawnByArrow;
     }
@@ -31,7 +34,7 @@ export class ArrowCorner extends Element {
     }
     protected _radius: number = 5;
 
-    constructor(id: string,x:number,y:number, associatedArrrow:Arrow, diagram:MyDiagram) {
+    constructor(id: string,x:number,y:number, associatedArrrow:Arrow, diagram:DragDiagram) {
         super(id, diagram);
         this.x =x
         this.y = y

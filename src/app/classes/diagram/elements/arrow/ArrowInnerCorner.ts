@@ -1,5 +1,5 @@
 import { Utility } from 'src/app/classes/Utils/Utility';
-import { MyDiagram } from '../../MyDiagram';
+import { DragDiagram } from '../../DragDiagram';
 import { Arrow } from './Arrow';
 import { ArrowCorner } from './ArrowCorner';
 
@@ -9,7 +9,7 @@ export class ArrowInnerCorner extends ArrowCorner {
         x: number,
         y: number,
         associatedArrrow: Arrow,
-        diagram: MyDiagram
+        diagram: DragDiagram
     ) {
         super(id, x, y, associatedArrrow, diagram);
         this._arrow = associatedArrrow;

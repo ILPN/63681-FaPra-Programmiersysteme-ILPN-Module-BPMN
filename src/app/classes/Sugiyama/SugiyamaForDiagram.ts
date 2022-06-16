@@ -7,10 +7,10 @@ import { Event } from "../diagram/elements/event";
 import { LayeredGraph, LNode } from "./LayeredGraph";
 import { SimpleGraph } from "./SimpleGraph";
 import { Sugiyama } from "./Sugiyama";
-import { MyDiagram } from "../diagram/MyDiagram";
+import { DragDiagram } from "../diagram/DragDiagram";
 import { DummyNodeCorner } from "../diagram/elements/arrow/DummyNodeCorner";
 
-export function applySugiyama(diagram:MyDiagram, w = 1000, h =500 , p = 50){
+export function applySugiyama(diagram:DragDiagram, w = 1000, h =500 , p = 50){
     const input = new SimpleGraph()
     diagram.getElems().forEach(el => {
         if((el instanceof Task || el instanceof Gateway|| el instanceof Event)){
@@ -48,8 +48,8 @@ export function applySugiyama(diagram:MyDiagram, w = 1000, h =500 , p = 50){
         const toLNode:LNode|undefined = result.getNode(arrow.end.id)
         if (fromLNode == undefined ||toLNode == undefined) continue;
 
-        arrow.setArrowStart(fromLNode.x,fromLNode.y)
-        arrow.setArrowTarget(toLNode.x,toLNode.y)
+        arrow.setArrowStartPos(fromLNode.x,fromLNode.y)
+        arrow.setArrowTargetPos(toLNode.x,toLNode.y)
         arrow.clearArrowCorners()
         const dummys = result.getSortedDummysForEdge(arrow.start.id,arrow.end.id)
         for (const dN of dummys) {

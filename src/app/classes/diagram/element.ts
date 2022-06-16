@@ -1,27 +1,17 @@
 import { Vector } from '../Utils/Vector';
-import { MyDiagram } from './MyDiagram';
+import { DragDiagram } from './DragDiagram';
 import { Position } from './Position';
 
 export abstract class Element implements Position {
-    public  diagram: MyDiagram
+    public  diagram: DragDiagram
     private _id: string;
     private _halfWidth: number = 0;
     private _halfHeight: number = 0;
     private domSVG: SVGElement | undefined;
     public draged = false
-
-    /*
-    private domSvgRoot: SVGElement | undefined;
-    public getSvgRoot(){
-        if(this.domSvgRoot == undefined){
-            const root = document.getElementById("rootsvg")
-            this.domSvgRoot = document.getElementById("rootsvg") as SVGElement
-        }
-    }*/
-    constructor(id: string, diagram:MyDiagram) {
+    constructor(id: string, diagram:DragDiagram) {
         this._id = id;
         this.diagram = diagram
-        this.placHolderSvg = this.createSvgElement('svg');
     }
     setPosXY(x: number, y: number): void {
         this.x = x
@@ -89,25 +79,6 @@ export abstract class Element implements Position {
         }
         this.domSVG = newSvg;
         return this.domSVG
-    }
-
-    placHolderSvg: SVGElement;
-
-
-    private moveSVGToLastPositionInDOM() {
-        // move svgelement in dom to last position so it stays visible over other svgelements
-        if (this.domSVG == undefined) return;
-        const parentNode: ParentNode | null | undefined =
-            this.domSVG.parentNode;
-        const root = document.getElementById('rootsvg');
-        //console.log(parentNode)
-        parentNode?.replaceChild(this.placHolderSvg, this.domSVG);
-        root?.append(this.domSVG);
-    }
-    private moveSVGBackToOriginalPositionInDOM() {
-        if (this.domSVG == undefined) return;
-        this.domSVG.remove;
-        this.placHolderSvg.replaceWith(this.domSVG);
     }
 
     protected addStandardListeners(svg: SVGElement){

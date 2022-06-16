@@ -1,6 +1,6 @@
 import { Vector } from 'src/app/classes/Utils/Vector';
+import { DragDiagram } from '../../DragDiagram';
 import { Element } from '../../element';
-import { MyDiagram } from '../../MyDiagram';
 import { Arrow } from './Arrow';
 import { ArrowCorner } from './ArrowCorner';
 
@@ -11,11 +11,14 @@ export class ArrowEndCorner extends ArrowCorner {
         x:number,y:number,
         associatedArrrow: Arrow,
         public intersectingElement:Element,
-        diagram: MyDiagram
+        diagram: DragDiagram
     ) {
         super(id, x,y, associatedArrrow, diagram);
     }
 
+    /**
+     * position where arrow intersects with edge of  this.intersectingElement
+     */
     private _intersectionPos = new Vector();
     public get intersectionPos() {
         return this._intersectionPos;
@@ -55,6 +58,7 @@ export class ArrowEndCorner extends ArrowCorner {
         intersectionCircle.onmousedown = (event) => {
             this.diagram.onChildrenMouseDown(event,this);
         };
+        
         svg.onmouseup = (event) => {
             this.diagram.onChildrenMouseUp(event, this);
         };

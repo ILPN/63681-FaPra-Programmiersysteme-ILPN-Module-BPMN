@@ -1,9 +1,9 @@
-import { MyDiagram } from '../MyDiagram';
+import { DragDiagram } from '../DragDiagram';
 import { Element } from './../element';
 import { Arrow } from './arrow/Arrow';
 export abstract class MainElement extends Element {
     abstract override createSvg(): SVGElement;
-    constructor(id: string, diagram:MyDiagram) {
+    constructor(id: string, diagram:DragDiagram) {
         super(id, diagram)
     }
     //for dragging along arrows connected to the element

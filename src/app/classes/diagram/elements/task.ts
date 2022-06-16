@@ -1,4 +1,4 @@
-import { MyDiagram } from "../MyDiagram";
+import { DragDiagram } from "../DragDiagram";
 import { MainElement } from "./MainElement";
 import { TaskType } from "./tasktype";
 
@@ -14,7 +14,7 @@ export class Task extends MainElement {
     private _border: number = 2;
     private _myScale: number = 1;
 
-    constructor(id: string, label: string, type: TaskType, diagram:MyDiagram) {
+    constructor(id: string, label: string, type: TaskType, diagram:DragDiagram) {
         super(id, diagram);
         this._label = label;
         this._type = type;
