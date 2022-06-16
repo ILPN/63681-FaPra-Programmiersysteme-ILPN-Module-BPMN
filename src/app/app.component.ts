@@ -4,7 +4,6 @@ import { ParserService } from './services/parser.service';
 import { DisplayService } from './services/display.service';
 import { debounceTime, Subscription } from 'rxjs';
 import { applySugiyama } from './classes/Sugiyama/SugiyamaForDiagram';
-import { SvgService } from './services/svg.service';
 
 @Component({
     selector: 'app-root',
@@ -34,7 +33,8 @@ export class AppComponent implements OnDestroy {
     private processSourceChange(newSource: string) {
         const result = this._parserService.parse(newSource);
         if (result !== undefined) {
-            applySugiyama(result,1000, 500,50)        
+            
+            applySugiyama(result,900, 350,50)        
             this._displayService.display(result);
         }
     }

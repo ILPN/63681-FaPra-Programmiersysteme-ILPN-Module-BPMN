@@ -1,8 +1,5 @@
 import { SwitchController } from './elements/switch-controller';
 import { SwitchstateType } from './elements/switchstatetype'
-import { Arrow } from "./elements/arrow/Arrow";
-import { Gateway } from "./elements/gateway";
-import { Task } from "./elements/task";
 
 export abstract class Element {
     private _id: string;
@@ -20,35 +17,12 @@ export abstract class Element {
     private _switchController: SwitchController | undefined; 
 
 
-    //for calculating distance while dragging 
-    private drag_start_x: number = 0;
-    private drag_start_y: number = 0;
-    //for preventing mouseMove event from firing when hovering over element
-    private dragging: boolean = false;
-
-    //for dragging along arrows connected to the element
-    private in_arrows: Arrow[];
-    private out_arrows: Arrow[];
-
-
     constructor(id: string) {
         this._id = id;
         this._x = 0;
         this._y = 0;
         this._adjacentElements = [];
         this._svgColorElements = [];
-
-        //incoming and outgoing arrows
-        this.in_arrows = [];
-        this.out_arrows = [];
-    }
-
-    public addInArrow(arrow: Arrow) {
-        this.in_arrows.push(arrow);
-    }
-
-    public addOutArrow(arrow: Arrow) {
-        this.out_arrows.push(arrow);
     }
 
     get switchState(): SwitchstateType {
@@ -122,87 +96,34 @@ export abstract class Element {
 
     public registerSvg(svg: SVGElement) {
         this._svgElement = svg;
-
         this._svgElement.onmousedown = (event) => {
             this.processMouseDown(event);
         };
-
-
         this._svgElement.onmouseup = (event) => {
             this.processMouseUp(event);
         };
-
-        this._svgElement.onmousemove = (event) => {
-            this.move(event);
-        };
-        document.addEventListener('mouseup', e => {
-            this.dragging = false;
-        });
-
-    }
-
-    private updateDrawnSvg() {
-        this._svgElement?.replaceWith(this.createSvg())
-    }
-    public move(event: MouseEvent) {
-        if (!this.dragging) return
-
-        //calculate diffs
-        let diff_x: number = event.clientX - this.drag_start_x;
-        let diff_y: number = event.clientY - this.drag_start_y;
-
-
-        //drag the element  
-        this.x = this.x + diff_x
-        this.y = this.y + diff_y
-        this.updateDrawnSvg()
-
-        //drag incoming arrows
-        for (const arrow of this.in_arrows) {
-            arrow.setArrowTarget(this.x, this.y)
-            arrow.updateDrawnSvg()
-        }
-        //drag outgoing arrows
-        for (const arrow of this.out_arrows) {
-            arrow.setArrowStart(this.x, this.y)
-            arrow.updateDrawnSvg()
-        }
-
-        //update start positions for next move
-        this.drag_start_x = event.clientX;
-        this.drag_start_y = event.clientY;
-
     }
 
     private processMouseDown(event: MouseEvent) {
         if (this._svgElement === undefined) {
             return;
         }
+        //this.changeColor("red");
+        //this.switch();
+
 
          if (this._switchController === undefined) {
                 return;
          }
          this._switchController.press(this);
-
-
-        //signal that dragging has started
-        this.dragging = true;
-        this.drag_start_x = event.clientX;
-        this.drag_start_y = event.clientY;
-
     }
 
     private processMouseUp(event: MouseEvent) {
-
-        //signal that dragging has stopped
-        this.dragging = false;
-
         if (this._svgElement === undefined) {
             return;
         }
         this. colorToDefault()
     }
-
 
     /**
      * adds edge from this element to target
