@@ -1,6 +1,5 @@
 import {Injectable, OnDestroy} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
-import {Diagram} from '../classes/diagram/diagram';
 import { DragDiagram } from '../classes/diagram/DragDiagram';
 
 @Injectable({

@@ -28,11 +28,10 @@ export class DisplayComponent implements OnDestroy {
             if( this.drawingArea != undefined){
                 const width = this.drawingArea.nativeElement.clientWidth;
                 const height = this.drawingArea.nativeElement.clientHeight;
-
                 this._layoutService.layout(this._diagram,width, height);
             }
             
-            this.draw();
+            this.draw(this._diagram.createDiagramSVG());
         });
     }
 
@@ -40,7 +39,7 @@ export class DisplayComponent implements OnDestroy {
         this._sub.unsubscribe();
     }
 
-    private draw() {
+    private draw(svg:SVGElement) {
         if (this.drawingArea === undefined) {
             console.debug('drawing area not ready yet')
             return;
@@ -48,10 +47,15 @@ export class DisplayComponent implements OnDestroy {
         console.log("draw is called")
 
         this.clearDrawingArea();
+
+        this.drawingArea.nativeElement.appendChild(svg)
+        
+        /*
         const elements = this._svgService.createSvgElements(this._displayService.diagram);
         for (const element of elements) {
             this.drawingArea.nativeElement.appendChild(element);
         }
+        */
         
         
 
