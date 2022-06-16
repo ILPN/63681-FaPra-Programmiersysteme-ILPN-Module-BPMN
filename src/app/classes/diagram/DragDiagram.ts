@@ -24,8 +24,8 @@ export class DragDiagram {
     onChildrenMouseDown(e: MouseEvent, ...els: Element[]) {
         const el = els[0];
         if (el instanceof MainElement || el instanceof DummyNodeCorner) {
-            //this.startFreeDragWithSomeSnaps(e,elements);
-            this.startReOrderDrag(e, el);
+            this.startFreeDragWithSomeSnaps(e,el);
+            //this.startReOrderDrag(e, el);
             return;
         }
         if (
