@@ -13,6 +13,9 @@ import {FooterComponent} from './components/footer/footer.component';
 import {InputFieldComponent} from './components/input-field/input-field.component';
 import {InputDirective} from './directives/input.directive';
 import {ErrorHintComponent} from './components/error-hint/error-hint.component';
+import { ModeSwitchComponent } from './components/mode-switch/mode-switch.component';
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import { FormsModule } from '@angular/forms';
 
 @NgModule({
     declarations: [
@@ -21,7 +24,8 @@ import {ErrorHintComponent} from './components/error-hint/error-hint.component';
         FooterComponent,
         ErrorHintComponent,
         InputFieldComponent,
-        InputDirective
+        InputDirective,
+        ModeSwitchComponent
     ],
     imports: [
         BrowserModule,
@@ -30,6 +34,8 @@ import {ErrorHintComponent} from './components/error-hint/error-hint.component';
         MatFormFieldModule,
         MatInputModule,
         MatButtonModule,
+        MatButtonToggleModule,
+        FormsModule,    
         MatIconModule,
         ReactiveFormsModule,
     ],
