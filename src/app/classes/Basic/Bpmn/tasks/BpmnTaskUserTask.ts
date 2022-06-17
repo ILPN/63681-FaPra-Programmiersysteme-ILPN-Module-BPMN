@@ -1,10 +1,10 @@
 import { Svg } from "../../Svg/Svg"
 import { BpmnTask } from "./BpmnTask"
 
-export class BpmnTaskSending extends BpmnTask{
+export class BpmnTaskUserTask extends BpmnTask{
     override createSvg(){
         const c = super.createSvg()
-        c.appendChild(Svg.logoSending(this.logoX,this.logoY, 20))
+        c.appendChild(Svg.logoUserTask(this.logoX, this.logoY))
         return c
     }
 

@@ -9,6 +9,9 @@ import { SvgInterface } from './SvgInterface';
 import { BpmnTask } from './Bpmn/tasks/BpmnTask';
 import { BpmnTaskSending } from './Bpmn/tasks/BpmnTaskSending';
 import { BpmnTaskManual } from './Bpmn/tasks/BpmnTaskManual';
+import { BpmnTaskReceiving } from './Bpmn/tasks/BpmnTaskReceiving';
+import { BpmnTaskUserTask } from './Bpmn/tasks/BpmnTaskUserTask';
+import { BpmnTaskService } from './Bpmn/tasks/BpmnTaskService';
 
 export class BpmnGraph
     extends BGraph<BpmnEdge, BpmnNode>
@@ -65,7 +68,7 @@ export class BpmnGraph
         node3.setPosXY(300,100)
         g.nodes.push(node3)
 
-        const t1 = new BpmnTaskManual("TheDude")
+        const t1 = new BpmnTaskService("TheDude")
         t1.label = "BpmnTaskManual"
         t1.setPosXY(100,200)
         g.nodes.push(t1)

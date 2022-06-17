@@ -5,8 +5,8 @@ export class BpmnTask extends BpmnNode{
 
     readonly width:number = 170
     readonly heigth:number = 100
-    protected logoX = ()=>{ return -this.width/2 + 10}
-    protected logoY = ()=>{ return -this.heigth/2 + 10}
+    protected readonly logoX = -this.width/2 + 10
+    protected readonly logoY =  -this.heigth/2 + 10
 
     override createSvg(){
         const c = Svg.relativeContainer(this.x,this.y)

@@ -4,7 +4,7 @@ import { BpmnTask } from "./BpmnTask"
 export class BpmnTaskManual extends BpmnTask{
     override createSvg(){
         const c = super.createSvg()
-        c.appendChild(Svg.logoManual())
+        c.appendChild(Svg.logoManual(this.logoX, this.logoY))
         return c
     }
 
