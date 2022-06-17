@@ -1,7 +1,6 @@
 import { Vector } from '../Utils/Vector';
 import { DragDiagram } from './DragDiagram';
-import { Position } from './Position';
-
+import { Position } from '../Basic/Position';
 export abstract class Element implements Position {
     public  diagram: DragDiagram
     private _id: string;

@@ -4,6 +4,7 @@ import { Subscription } from 'rxjs';
 import { LayoutService } from '../../services/layout.service';
 import { SvgService } from '../../services/svg.service';
 import { DragDiagram } from 'src/app/classes/diagram/DragDiagram';
+import { BpmnGraph } from 'src/app/classes/Basic/BpmnGraph';
 
 @Component({
     selector: 'app-display',
@@ -31,7 +32,9 @@ export class DisplayComponent implements OnDestroy {
                 this._layoutService.layout(this._diagram,width, height);
             }
             
-            this.draw(this._diagram.createDiagramSVG());
+            //this.draw(this._diagram.createDiagramSVG());
+            this.draw(BpmnGraph.sampleGraph().getSvg());
+
         });
     }
 
