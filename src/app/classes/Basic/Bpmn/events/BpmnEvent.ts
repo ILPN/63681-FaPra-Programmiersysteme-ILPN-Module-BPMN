@@ -4,8 +4,7 @@ import { Svg } from "../../Svg/Svg";
 export class BpmnEvent extends BpmnNode{
 
     readonly radius:number = 35
-    readonly circleTextSpacing = 15
-
+    readonly textY =  this.radius+15
     override createSvg(){
         const c = Svg.relativeContainer(this.x,this.y)
         c.append(Svg.circleStroke(0,0,this.radius))
@@ -13,7 +12,7 @@ export class BpmnEvent extends BpmnNode{
         return c
     }
     protected getTextSvg(): SVGElement {
-        const text = Svg.text(this.label, 0, this.radius+this.circleTextSpacing,12)
+        const text = Svg.text(this.label, 0, this.textY,12)
         return text;
     }
 

@@ -12,6 +12,8 @@ import { BpmnTaskManual } from './Bpmn/tasks/BpmnTaskManual';
 import { BpmnTaskReceiving } from './Bpmn/tasks/BpmnTaskReceiving';
 import { BpmnTaskUserTask } from './Bpmn/tasks/BpmnTaskUserTask';
 import { BpmnTaskService } from './Bpmn/tasks/BpmnTaskService';
+import { BpmnTaskBusinessRule } from './Bpmn/tasks/BpmnTaskBusinessRule';
+import { BpmnGateway } from './Bpmn/gateways/BpmnGateway';
 
 export class BpmnGraph
     extends BGraph<BpmnEdge, BpmnNode>
@@ -68,12 +70,10 @@ export class BpmnGraph
         node3.setPosXY(300,100)
         g.nodes.push(node3)
 
-        const t1 = new BpmnTaskService("TheDude")
+        const t1 = new BpmnGateway("TheDude")
         t1.label = "BpmnTaskManual"
         t1.setPosXY(100,200)
         g.nodes.push(t1)
-
-
         return g
     }
 }

@@ -4,7 +4,7 @@ import { BpmnTask } from "./BpmnTask"
 export class BpmnTaskService extends BpmnTask{
     override createSvg(){
         const c = super.createSvg()
-        c.appendChild(Svg.logoService(this.logoX, this.logoY))
+        c.appendChild(Svg.image("/ilovepetrinets/template/assets/service.svg",this.logoX, this.logoY))
         return c
     }
 
