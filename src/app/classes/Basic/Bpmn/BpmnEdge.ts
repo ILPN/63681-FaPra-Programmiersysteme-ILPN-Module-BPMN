@@ -1,9 +1,13 @@
+import { Line } from "../../Utils/Line";
 import { Vector } from "../../Utils/Vector";
 import { BEdge } from "../B/BEdge";
 import { Position } from "../Position";
 import { Svg } from "../Svg/Svg";
 import { SvgInterface } from "../SvgInterface";
 import { BpmnNode } from "./BpmnNode";
+import { BpmnEvent } from "./events/BpmnEvent";
+import { BpmnGateway } from "./gateways/BpmnGateway";
+import { BpmnTask } from "./tasks/BpmnTask";
 
 export class BpmnEdge extends BEdge implements SvgInterface{
     private readonly _id: string
@@ -15,7 +19,6 @@ export class BpmnEdge extends BEdge implements SvgInterface{
     public get corners() {
         return this._corners;
     }
-    private pointsToBeConnected: Vector[] = []
     private from: BpmnNode;
     private to: BpmnNode;
 
@@ -28,7 +31,9 @@ export class BpmnEdge extends BEdge implements SvgInterface{
         this._id = id
         this.from = from;
         this.to = to;
-        this._corners = [];
+        this._corners = 
+        [new BpmnEdgeCorner(from.getPos().x,from.getPos().y),
+             new BpmnEdgeCorner(to.getPos().x,to.getPos().y)];
     }
     private _svg: SVGElement | undefined;
     getSvg(): SVGElement {
@@ -77,22 +82,17 @@ export class BpmnEdge extends BEdge implements SvgInterface{
 
         svg.append(lineSvgResult.svg);
         svg.append(
-            this.arrowheadSvg(
+            Svg.pointer(
                 lineSvgResult.endOfLine,
                 lineSvgResult.directionOfEnd
             )
         );
-        for (const corner of this.corners) {
-            if(corner.shouldBeDrawnByArrow){
-                svg.appendChild(corner.updateSvg());
-            }
-        }
-        svg.appendChild(this.arrowStart.updateSvg());
-        svg.appendChild(this.arrowTarget.updateSvg());
-        this.appendPlusAndDoubleDragCircles(svg)
         return svg;
     }
 
+
+    public nodeIntersection1 = new Vector()
+    public nodeIntersection2 = new Vector()
     /**
      * 
      * @returns a svg path, representing the line of the arrow
@@ -104,45 +104,30 @@ export class BpmnEdge extends BEdge implements SvgInterface{
         directionOfEnd: Vector;
     } {
         const pointsToBeConnected: Vector[] = [];
-        let secondCorner;
-        let beforeLastCorner;
-        if (this._corners.length > 0) {
-            secondCorner = this._corners[0].getPos();
-            beforeLastCorner = this._corners[this._corners.length - 1].getPos();
-        } else {
-            secondCorner = this.arrowTarget.getPos();
-            beforeLastCorner = this.arrowStart.getPos();
-        }
         const intersectionWithStartElement = this.calculateIntersection(
-            secondCorner,
-            this.arrowStart.getPos(),
-            this.start
+            this._corners[1].getPos(),
+            this._corners[0].getPos(),
+            this.from
         );
-        if(intersectionWithStartElement != undefined){
-            pointsToBeConnected.push(intersectionWithStartElement);
-        }
-        for (const corner of this._corners) {
+       this.nodeIntersection1 = intersectionWithStartElement
+        pointsToBeConnected.push(intersectionWithStartElement);
+        
+        for (let i = 1; i < this._corners.length-1; i++) {
+            const corner = this._corners[i];
             pointsToBeConnected.push(corner.getPos());
-        }
-        const intersectionWithEndElement = this.calculateIntersection(
-            beforeLastCorner,
-            this.arrowTarget.getPos(),
-            this.end
-        );
-        if(intersectionWithEndElement != undefined){
-            pointsToBeConnected.push(intersectionWithEndElement);
-        }
 
-        let pathSvg = this.createSvgElement('path');
-        pathSvg.setAttribute(
-            'style',
-            `fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1`
-        );
-        let pathString = 'M ';
-        for (const point of pointsToBeConnected) {
-            pathString = pathString + `${point.x},${point.y} `;
         }
-        pathSvg.setAttribute('d', pathString);
+        const lastIndex = this.corners.length -1 
+        const intersectionWithEndElement = this.calculateIntersection(
+            this._corners[lastIndex -1].getPos(),
+            this._corners[lastIndex].getPos(),
+            this.to
+        );
+        this.nodeIntersection2 = intersectionWithEndElement
+        pointsToBeConnected.push(intersectionWithEndElement);
+
+        const pathSvg = Svg.path(pointsToBeConnected)
+        
         const endOfLine = pointsToBeConnected[pointsToBeConnected.length - 1];
         const directionOfEnd = endOfLine.minus(
             pointsToBeConnected[pointsToBeConnected.length - 2]
@@ -155,59 +140,40 @@ export class BpmnEdge extends BEdge implements SvgInterface{
             directionOfEnd: directionOfEnd,
         };
     }
-    private arrowheadSvg(position: Vector, direction: Vector): SVGElement {
-        const headLength = 10;
-        const headWidth = 10;
-
-        var theta = Math.atan2(direction.y, direction.x) + Math.PI / 2; // range (-PI, PI]
-        const arrowhead = this.createSvgElement('path');
-        arrowhead.setAttribute(
-            'style',
-            `fill:#000000;stroke:none;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1`
-        );
-        const v1 = new Vector(headWidth / 2, headLength).rotate(theta);
-        const v2 = new Vector(-headWidth, 0).rotate(theta);
-
-        arrowhead.setAttribute(
-            'd',
-            `m ${position.x},${position.y} ${v1.x},${v1.y} ${v2.x},${v2.y}`
-        );
-        return arrowhead;
-    }
     private calculateIntersection(
         outerPoint: Vector,
         innerPoint: Vector,
-        element: Element
+        node: BpmnNode
     ): Vector {
-        if (element instanceof Task) {
-            return this.intersectionWithElement(
+        if (node instanceof BpmnTask) {
+            return this.intersectionWithTask(
                 outerPoint,
                 innerPoint,
-                element
+                node
             );
-        } else if (element instanceof Gateway) {
-            return this.intersectionWithGatewayElement(
+        } else if (node instanceof BpmnGateway) {
+            return this.intersectionWithGateway(
                 outerPoint,
                 innerPoint,
-                element as Gateway
+                node
             );
-        } else if (element instanceof Event) {
-            return this.intersectionWithEventElement(
+        } else if (node instanceof BpmnEvent) {
+            return this.intersectionWithNode(
                 outerPoint,
                 innerPoint,
-                element as Event
+                node 
             );
         }
-        return this.intersectionWithElement(outerPoint, innerPoint, element);
+        return this.intersectionWithNode(outerPoint, innerPoint, node);
     }
-    private intersectionWithEventElement(
+    private intersectionWithNode(
         outerPoint: Vector,
         innerPoint: Vector,
-        event: Event
+        node: BpmnNode
     ): Vector {
-        const center = event.getPos();
+        const center = node.getPos();
         const isInside = (p: Vector) => {
-            return p.distanceTo(center) < event.distanceX;
+            return p.distanceTo(center) < node.radius;
         };
         if (!isInside(innerPoint)) return innerPoint;
 
@@ -218,7 +184,7 @@ export class BpmnEdge extends BEdge implements SvgInterface{
 
         const intersections: Vector[] = Line.intersectionsWithCircle(
             center,
-            event.distanceX,
+            node.radius,
             intersectingLine
         );
         intersections.sort(
@@ -227,36 +193,37 @@ export class BpmnEdge extends BEdge implements SvgInterface{
         );
         return intersections[0];
     }
-    private intersectionWithElement(
+    private intersectionWithTask(
         outerPoint: Vector,
         innerPoint: Vector,
-        el: Element
+        el: BpmnTask
     ): Vector {
         const inside = () => {
-            if (innerPoint.x > el.getPos().x + el.distanceX) return false;
-            if (innerPoint.x < el.getPos().x - el.distanceX) return false;
-            if (innerPoint.y > el.getPos().y + el.distanceY) return false;
-            if (innerPoint.y < el.getPos().y - el.distanceY) return false;
+            if (innerPoint.x > el.getPos().x + el.width/2) return false;
+            if (innerPoint.x < el.getPos().x - el.width/2) return false;
+            if (innerPoint.y > el.getPos().y + el.heigth/2) return false;
+            if (innerPoint.y < el.getPos().y - el.heigth/2) return false;
             return true;
         };
         if (!inside()) return innerPoint;
-
         const center = el.getPos();
         //boundinglines: lineUp, lineRight, lineLeft, lineDown
+        const halfWidth = el.width/2
+        const halfHeight = el.heigth/2
         const lineU = new Line(
-            center.plusXY(0, -el.distanceY),
+            center.plusXY(0, -halfHeight),
             new Vector(10, 0)
         );
         const lineR = new Line(
-            el.getPos().plusXY(el.distanceX, 0),
+            el.getPos().plusXY(halfWidth, 0),
             new Vector(0, 10)
         );
         const lineD = new Line(
-            center.plusXY(0, el.distanceY),
+            center.plusXY(0, halfHeight),
             new Vector(10, 0)
         );
         const lineL = new Line(
-            el.getPos().plusXY(-el.distanceX, 0),
+            el.getPos().plusXY(-halfWidth, 0),
             new Vector(0, 10)
         );
 
@@ -278,7 +245,7 @@ export class BpmnEdge extends BEdge implements SvgInterface{
                 const intersection = Line.intersection(intersectingLine, l);
                 if (
                     intersection.distanceTo(center) <
-                    new Vector(el.distanceX, el.distanceY).length() + 0.1
+                    new Vector(halfWidth, halfHeight).length() + 0.1
                 ) {
                     intersections.push(intersection);
                 }
@@ -294,27 +261,29 @@ export class BpmnEdge extends BEdge implements SvgInterface{
 
         return intersections[0];
     }
-    private intersectionWithGatewayElement(
+    private intersectionWithGateway(
         outerPoint: Vector,
         innerPoint: Vector,
-        g: Gateway
+        g: BpmnGateway
     ): Vector {
         // lineUpperLeft, lineUpperRight, lineLowerLeft, lineLowerRight
+        const halfWidth = g.width
+        const halfHeight = g.width/2
         const lineUL = new Line(
-            new Vector(g.getPos().x, g.getPos().y - g.distanceY),
-            new Vector(g.distanceX, -g.distanceY)
+            new Vector(g.getPos().x, g.getPos().y - halfHeight),
+            new Vector(halfWidth, -halfHeight)
         );
         const lineUR = new Line(
-            new Vector(g.getPos().x, g.getPos().y - g.distanceY),
-            new Vector(g.distanceX, g.distanceY)
+            new Vector(g.getPos().x, g.getPos().y - halfHeight),
+            new Vector(halfWidth, halfHeight)
         );
         const lineLL = new Line(
-            new Vector(g.getPos().x, g.getPos().y + g.distanceY),
-            new Vector(g.distanceX, g.distanceY)
+            new Vector(g.getPos().x, g.getPos().y + halfHeight),
+            new Vector(halfWidth, halfHeight)
         );
         const lineLR = new Line(
-            new Vector(g.getPos().x, g.getPos().y + g.distanceY),
-            new Vector(g.distanceX, -g.distanceY)
+            new Vector(g.getPos().x, g.getPos().y + halfHeight),
+            new Vector(halfWidth, -halfHeight)
         );
 
         const boundingLines: Line[] = [];
@@ -343,7 +312,7 @@ export class BpmnEdge extends BEdge implements SvgInterface{
         for (const l of boundingLines) {
             if (!Line.areParallel(intersectingLine, l)) {
                 const intersection = Line.intersection(intersectingLine, l);
-                if (intersection.distanceTo(g.getPos()) < g.distanceX + 0.2) {
+                if (intersection.distanceTo(g.getPos()) < halfWidth + 0.2) {
                     intersections.push(intersection);
                 }
             }

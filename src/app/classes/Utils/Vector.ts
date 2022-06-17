@@ -1,4 +1,10 @@
 export class Vector {
+    radians():number {
+        return Math.atan2(this.y, this.x) + Math.PI / 2;
+    }
+    degree():number {
+        return this.radians()/(Math.PI *2) *360;
+    }
     static center(...args: Vector[]) {
         let sum = Vector.zero()
         for (const v of args) {

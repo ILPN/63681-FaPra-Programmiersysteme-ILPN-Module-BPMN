@@ -46,6 +46,9 @@ export class BpmnGraph
         for (const n of this.nodes) {
             c.appendChild(n.getSvg())
         }
+        for (const e of this.edges) {
+            c.appendChild(e.getSvg())
+        }
         return c
     }
  
@@ -74,6 +77,11 @@ export class BpmnGraph
         t1.label = "BpmnTaskManual"
         t1.setPosXY(100,200)
         g.nodes.push(t1)
+
+
+        const e = new BpmnEdge("theEdge",node3,t1)
+        g.edges.push(e)
+
         return g
     }
 }

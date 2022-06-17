@@ -5,6 +5,7 @@ import { Svg } from '../Svg/Svg';
 import { SvgInterface } from '../SvgInterface';
 
 export  abstract class BpmnNode extends BNode implements Position, SvgInterface {
+    readonly radius:number = 35
     getPos(): Vector {
         return new Vector(this.x, this.y);
     }
@@ -62,6 +63,6 @@ export  abstract class BpmnNode extends BNode implements Position, SvgInterface 
         return newSvg;
     }
     protected createSvg():SVGElement{
-        return Svg.circleStroke(this.x,this.y, 10, 3)
+        return Svg.circleStroke(this.x,this.y, this.radius, 3)
     }
 }

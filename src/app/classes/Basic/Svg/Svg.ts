@@ -1,6 +1,45 @@
 import { Vector } from "../../Utils/Vector";
 
 export class Svg{
+    static pointer(position: Vector, direction:Vector) {
+        const headLength = 20;
+        const headWidth = 10;
+        const half = headWidth/2
+
+        const pointerPath = `m 0,0 ${half},${headLength} ${-headWidth},${0}`
+       
+        const pointer = this.createSvgElement('path');
+        pointer.setAttribute(
+            'd',
+            pointerPath
+        );
+        //pointer.setAttribute("transform",`translate(0 0) rotate(${direction.radians()}rad)`)
+        const deg = direction.toUnitVector().degree().toFixed(0) ;
+        console.log(deg)
+        pointer.setAttribute("transform",`translate(${position.x} ${position.y}) rotate(${deg}) `)
+        //translate(${position.x} ${position.y})
+        pointer.setAttribute(
+            'style',
+            `fill:#000000;stroke:none;stroke-width:0px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1`
+        );
+       return pointer
+    }
+    static fillPath(pointsToBeConnected: Vector[]) {
+        throw new Error("Method not implemented.");
+    }
+    static path(pointsToBeConnected: Vector[]) {
+        let pathSvg = this.createSvgElement('path');
+        pathSvg.setAttribute(
+            'style',
+            `fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1`
+        );
+        let pathString = 'M ';
+        for (const point of pointsToBeConnected) {
+            pathString = pathString + `${point.x},${point.y} `;
+        }
+        pathSvg.setAttribute('d', pathString);
+        return pathSvg
+    }
     private static readonly strokeWidth = 3
     static rotatetSquare(x:number, y:number, diagonal: number = 50):SVGElement {
         const width = Math.sqrt(diagonal*diagonal/2)

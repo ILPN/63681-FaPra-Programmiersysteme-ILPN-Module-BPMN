@@ -2,8 +2,6 @@ import { BpmnNode } from "../BpmnNode";
 import { Svg } from "../../Svg/Svg";
 
 export class BpmnEvent extends BpmnNode{
-
-    readonly radius:number = 35
     readonly textY =  this.radius+15
     override createSvg(){
         const c = Svg.relativeContainer(this.x,this.y)
