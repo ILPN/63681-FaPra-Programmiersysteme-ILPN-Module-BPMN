@@ -1,10 +1,10 @@
 import { Vector } from '../../Utils/Vector';
 import { BNode } from '../B/BNode';
-import { Position } from '../Position';
+import { Position } from '../Interfaces/Position';
 import { Svg } from '../Svg/Svg';
-import { SvgInterface } from '../SvgInterface';
+import { SvgInterface } from '../Interfaces/SvgInterface';
 
-export  abstract class BpmnNode extends BNode implements Position, SvgInterface {
+export  class BpmnNode extends BNode implements Position, SvgInterface {
     readonly radius:number = 35
     getPos(): Vector {
         return new Vector(this.x, this.y);
@@ -46,20 +46,14 @@ export  abstract class BpmnNode extends BNode implements Position, SvgInterface 
     }
 
     private _svg: SVGElement | undefined;
-    getSvg(): SVGElement {
-       this._svg = this.updateSvg();
-        return this._svg;
-    }
-    setSvg(value: SVGElement): void {
-        if(this._svg != undefined &&this._svg.isConnected){
-            this._svg.replaceWith(value);
-        }
-        this._svg = value;
-    }
-
     updateSvg(): SVGElement {
         const newSvg = this.createSvg();
-        this.setSvg(newSvg)
+        
+        if(this._svg != undefined &&this._svg.isConnected){
+            this._svg.replaceWith(newSvg);
+        }
+        this._svg = newSvg;
+
         return newSvg;
     }
     protected createSvg():SVGElement{

@@ -5,14 +5,7 @@ import { BpmnEventIntermediate } from './Bpmn/events/BpmnEventIntermediate';
 import { BpmnEventStart } from './Bpmn/events/BpmnEventStart';
 import { BpmnNode } from './Bpmn/BpmnNode';
 import { Svg } from './Svg/Svg';
-import { SvgInterface } from './SvgInterface';
-import { BpmnTask } from './Bpmn/tasks/BpmnTask';
-import { BpmnTaskSending } from './Bpmn/tasks/BpmnTaskSending';
-import { BpmnTaskManual } from './Bpmn/tasks/BpmnTaskManual';
-import { BpmnTaskReceiving } from './Bpmn/tasks/BpmnTaskReceiving';
-import { BpmnTaskUserTask } from './Bpmn/tasks/BpmnTaskUserTask';
-import { BpmnTaskService } from './Bpmn/tasks/BpmnTaskService';
-import { BpmnTaskBusinessRule } from './Bpmn/tasks/BpmnTaskBusinessRule';
+import { SvgInterface } from './Interfaces/SvgInterface';
 import { BpmnGateway } from './Bpmn/gateways/BpmnGateway';
 
 export class BpmnGraph
@@ -44,12 +37,27 @@ export class BpmnGraph
         const c = Svg.container()
         c.appendChild(Svg.background())
         for (const n of this.nodes) {
-            c.appendChild(n.getSvg())
+            c.appendChild(n.updateSvg())
         }
         for (const e of this.edges) {
-            c.appendChild(e.getSvg())
+            c.appendChild(e.updateSvg())
         }
         return c
+    }
+
+    addNode(node:BpmnNode){
+        if(this.nodes.findIndex(n => n.id == node.id) == -1)
+            this.nodes.push(node)
+            else
+            console.log("couldn't add node "+ node.id)
+
+    }
+
+    addEdge(edge:BpmnEdge){
+        if(this.edges.findIndex(e => e.id == edge.id) == -1)
+            this.edges.push(edge)
+        else
+        console.log("couldn't add edge "+ edge.id)
     }
  
 
@@ -79,7 +87,8 @@ export class BpmnGraph
         g.nodes.push(t1)
 
 
-        const e = new BpmnEdge("theEdge",node3,t1)
+        const e = new BpmnEdge("theEdge",node2,t1)
+        e.addArrowCornerXY(100,100)
         g.edges.push(e)
 
         return g

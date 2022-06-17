@@ -14,8 +14,7 @@ export class Svg{
             pointerPath
         );
         //pointer.setAttribute("transform",`translate(0 0) rotate(${direction.radians()}rad)`)
-        const deg = direction.toUnitVector().degree().toFixed(0) ;
-        console.log(deg)
+        const deg = direction.toUnitVector().degree().toFixed(1) ;
         pointer.setAttribute("transform",`translate(${position.x} ${position.y}) rotate(${deg}) `)
         //translate(${position.x} ${position.y})
         pointer.setAttribute(

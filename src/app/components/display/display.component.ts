@@ -5,6 +5,7 @@ import { LayoutService } from '../../services/layout.service';
 import { SvgService } from '../../services/svg.service';
 import { DragDiagram } from 'src/app/classes/diagram/DragDiagram';
 import { BpmnGraph } from 'src/app/classes/Basic/BpmnGraph';
+import { DragWrapperGraph } from 'src/app/classes/Basic/Drag/DragWrapperGraph';
 
 @Component({
     selector: 'app-display',
@@ -33,7 +34,9 @@ export class DisplayComponent implements OnDestroy {
             }
             
             //this.draw(this._diagram.createDiagramSVG());
-            this.draw(BpmnGraph.sampleGraph().getSvg());
+            const g = BpmnGraph.sampleGraph()
+            const dg = new DragWrapperGraph(g)
+            this.draw(dg.updateSvg());
 
         });
     }

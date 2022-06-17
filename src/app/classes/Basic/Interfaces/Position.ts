@@ -1,4 +1,4 @@
-import { Vector } from "../Utils/Vector"
+import { Vector } from "../../Utils/Vector"
 
 export interface Position{
     getPos():Vector

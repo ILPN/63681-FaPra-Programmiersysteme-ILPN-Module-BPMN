@@ -1,9 +1,9 @@
 import { Line } from "../../Utils/Line";
 import { Vector } from "../../Utils/Vector";
 import { BEdge } from "../B/BEdge";
-import { Position } from "../Position";
+import { Position } from "../Interfaces/Position";
 import { Svg } from "../Svg/Svg";
-import { SvgInterface } from "../SvgInterface";
+import { SvgInterface } from "../Interfaces/SvgInterface";
 import { BpmnNode } from "./BpmnNode";
 import { BpmnEvent } from "./events/BpmnEvent";
 import { BpmnGateway } from "./gateways/BpmnGateway";
@@ -63,8 +63,9 @@ export class BpmnEdge extends BEdge implements SvgInterface{
     }
     addArrowCorner(pos: Vector, atPosition: number = -1) {
         const corner = new BpmnEdgeCorner(pos.x,pos.y);
+        const lastIndex = this._corners.length -1
         if (atPosition == -1) {
-            this._corners.push(corner);
+            this._corners.splice(lastIndex, 0, corner);
         } else {
             this._corners.splice(atPosition, 0, corner);
         }
@@ -267,7 +268,7 @@ export class BpmnEdge extends BEdge implements SvgInterface{
         g: BpmnGateway
     ): Vector {
         // lineUpperLeft, lineUpperRight, lineLowerLeft, lineLowerRight
-        const halfWidth = g.width
+        const halfWidth = g.width/2
         const halfHeight = g.width/2
         const lineUL = new Line(
             new Vector(g.getPos().x, g.getPos().y - halfHeight),
@@ -332,9 +333,11 @@ export class BpmnEdge extends BEdge implements SvgInterface{
 }
 
 class BpmnEdgeCorner implements Position{
+    public _deletable: boolean;
     constructor(x:number = 0, y:number = 0){
         this._x = x
         this._y = y
+        this._deletable = true
     }
     getPos(): Vector {
         return new Vector(this.x, this.y);
