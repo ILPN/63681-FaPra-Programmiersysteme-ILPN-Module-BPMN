@@ -3,8 +3,7 @@ import { DisplayService } from '../../services/display.service';
 import { Subscription } from 'rxjs';
 import { LayoutService } from '../../services/layout.service';
 import { SvgService } from '../../services/svg.service';
-import { DragDiagram } from 'src/app/classes/diagram/DragDiagram';
-import { BpmnGraph } from 'src/app/classes/Basic/BpmnGraph';
+import { BpmnGraph } from 'src/app/classes/Basic/Bpmn/BpmnGraph';
 import { DragWrapperGraph } from 'src/app/classes/Basic/Drag/DragWrapperGraph';
 
 @Component({
@@ -19,7 +18,7 @@ export class DisplayComponent implements OnDestroy {
     @ViewChild('drawingArea') drawingArea: ElementRef<SVGElement> | undefined;
 
     private _sub: Subscription;
-    private _diagram: DragDiagram | undefined;
+    private _diagram: BpmnGraph | undefined;
 
     constructor(private _layoutService: LayoutService,
         private _svgService: SvgService,
@@ -34,8 +33,8 @@ export class DisplayComponent implements OnDestroy {
             }
             
             //this.draw(this._diagram.createDiagramSVG());
-            const g = BpmnGraph.sampleGraph()
-            const dg = new DragWrapperGraph(g)
+            //const g = BpmnGraph.sampleGraph()
+            const dg = new DragWrapperGraph(diagram)
             this.draw(dg.updateSvg());
 
         });

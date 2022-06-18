@@ -30,69 +30,6 @@ $radiusMiddle: 4px;
 $radiusLarge: 6px;
 
 
-
-
-.arrowIntersection:hover {
-    ~ .arrowEndCircle {
-        visibility: visible;
-    }
-    ~ .arrowLineInElement {
-        visibility: visible;
-    }
-}
-.draged {
-    .arrowEndCircle {
-        visibility: visible;
-    }
-    .arrowLineInElement {
-        visibility: visible;
-    }
-    .arrowIntersection {
-        r:$radiusLarge
-    }
-}
-.arrowIntersection {
-    fill: $drag-color;
-    r:$radiusSmall
-}
-
-.arrowIntersection:hover {
-    r:$radiusLarge
-}
-
-.arrowCornerCircle {
-    fill: $drag-color;
-    r:$radius
-}
-.draged{
-    .arrowCornerCircle{
-        r:$radiusLarge
-}
-  .arrowCornerCircle:hover{
-    r:$radiusLarge  }
-
-}
-.arrowCornerCircle:hover {
-    r:$radiusLarge;
-    ~ .deleteSvg {
-        visibility: visible;
-    }
-}
-.draged .arrowCornerCircle:hover {
-    r:$radiusLarge;
-    ~ .deleteSvg {
-        visibility: hidden;
-    }
-}
-.hoverDummy{
-    r:12px;
-     fill:#32323292
-}
-
-.doubleDragCircle {
-    fill: $drag-color;
-    r: $radiusSmall
-}
 .plusCircle {
     fill: $add-color;
     r: $radiusSmall;
@@ -101,12 +38,7 @@ $radiusLarge: 6px;
     fill: $deleteColor;
     r: $radiusSmall;
 }
-.deleteSvg{
-    visibility: hidden;
-}
-.deleteSvg:hover{
-    visibility: visible;
-}
+
 
 .dummyNodeCircle{
     r: $radiusLarge;
@@ -133,10 +65,6 @@ $radiusLarge: 6px;
     stroke-opacity:1
 }
 
-
-.red{
-    fill: red;
-}
 
 
 

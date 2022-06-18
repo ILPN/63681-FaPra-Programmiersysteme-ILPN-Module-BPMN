@@ -1,4 +1,4 @@
-import { SnapElement } from "../../diagram/Drag/SnapElements/SnapElement";
+import { SnapElement } from "./SnapElements/SnapElement";
 import { Utility } from "../../Utils/Utility";
 import { Vector } from "../../Utils/Vector";
 import { Position } from "../Interfaces/Position";

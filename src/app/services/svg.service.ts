@@ -1,20 +1,12 @@
 import {Injectable} from '@angular/core';
-import {Diagram} from '../classes/diagram/diagram';
-import {Element} from '../classes/diagram/element';
-import { DragDiagram } from '../classes/diagram/DragDiagram';
+import { BpmnGraph } from '../classes/Basic/Bpmn/BpmnGraph';
 
 @Injectable({
     providedIn: 'root'
 })
 export class SvgService {
 
-    public createSvgElements(diagram: DragDiagram): Array<SVGElement> {
-        /*
-        const result: Array<SVGElement> = [];
-        diagram.getElems().forEach(el => {
-            result.push(el.updatedSvg())
-        });*/
-
-        return [diagram.createDiagramSVG()];
+    public createSvgElements(diagram: BpmnGraph): Array<SVGElement> {
+        return [diagram.updateSvg()];
     }
 }

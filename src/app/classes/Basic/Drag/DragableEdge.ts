@@ -1,10 +1,8 @@
-import { from } from "rxjs";
-import { SnapX } from "../../diagram/Drag/SnapElements/SnapX";
-import { SnapY } from "../../diagram/Drag/SnapElements/SnapY";
+import { SnapX } from "./SnapElements/SnapX";
+import { SnapY } from "./SnapElements/SnapY";
 import { Utility } from "../../Utils/Utility";
 import { Vector } from "../../Utils/Vector";
 import { BpmnEdge, BpmnEdgeCorner } from "../Bpmn/BpmnEdge";
-import { BpmnNode } from "../Bpmn/BpmnNode";
 import { Position } from "../Interfaces/Position";
 import { SvgInterface } from "../Interfaces/SvgInterface";
 import { Svg } from "../Svg/Svg";

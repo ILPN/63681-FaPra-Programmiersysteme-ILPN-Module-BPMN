@@ -10,6 +10,12 @@ import { BpmnGateway } from "./gateways/BpmnGateway";
 import { BpmnTask } from "./tasks/BpmnTask";
 
 export class BpmnEdge extends BEdge implements SvgInterface{
+    setStartPos(x: number, y: number) {
+        this._corners[0].setPosXY(x,y)
+    }
+    setEndPos(x: number, y: number) {
+        this._corners[this._corners.length-1].setPosXY(x,y)
+    }
     removeCorner(at:number) {
         console.log(this.corners)
         if(at == 0  || at >= this._corners.length-1) return
@@ -58,9 +64,9 @@ export class BpmnEdge extends BEdge implements SvgInterface{
      * removes all corners from the arrow if deletable
      */
     clearArrowCorners() {
-        this._corners = []
+        this._corners = [this._corners[0], this._corners[this._corners.length-1]]
     }
-    addArrowCornerXY(x: number, y: number) {
+    addCornerXY(x: number, y: number) {
         this.addCorner(new Vector(x, y));
     }
     addCorner(pos: Vector, atPosition: number = -1):BpmnEdgeCorner {

@@ -1,6 +1,6 @@
-import { SnapX } from '../../diagram/Drag/SnapElements/SnapX';
+import { SnapX } from './SnapElements/SnapX';
 import { BpmnNode } from '../Bpmn/BpmnNode';
-import { BpmnGraph } from '../BpmnGraph';
+import { BpmnGraph } from '../Bpmn/BpmnGraph';
 import { Position } from '../Interfaces/Position';
 import { SvgInterface } from '../Interfaces/SvgInterface';
 import { Svg } from '../Svg/Svg';
