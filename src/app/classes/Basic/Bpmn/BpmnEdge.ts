@@ -63,7 +63,7 @@ export class BpmnEdge extends BEdge implements SvgInterface{
     /**
      * removes all corners from the arrow if deletable
      */
-    clearArrowCorners() {
+    clearCorners() {
         this._corners = [this._corners[0], this._corners[this._corners.length-1]]
     }
     addCornerXY(x: number, y: number) {
