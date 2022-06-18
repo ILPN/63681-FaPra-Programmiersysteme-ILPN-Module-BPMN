@@ -1,4 +1,4 @@
-.error-hint{
+.error-hint {
     -webkit-animation: fadeIn linear 1.2s;
 }
 
@@ -17,14 +17,23 @@
     right: 25px;
     top: 0;
 }
+
 @keyframes fadeIn {
-    0% {opacity:0;}
-    100% {opacity:1;}
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 
 @-webkit-keyframes fadeIn {
-    0% {opacity:0;}
-    100% {opacity:1;}
+    0% {
+        opacity: 0;
+    }
+    100% {
+        opacity: 1;
+    }
 }
 
 .error-hint:hover {
@@ -48,12 +57,3 @@
     color: red;
     box-shadow: rgba(0, 0, 0, 0.24) 0 3px 8px;
 }
-
-.mockError {
-    display: flex;
-    justify-content: center;
-    position: absolute;
-    left: 200px;
-}
-
-

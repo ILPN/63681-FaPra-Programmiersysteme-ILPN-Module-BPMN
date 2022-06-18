@@ -1,9 +1,10 @@
-import { Component, ElementRef, OnDestroy, ViewChild } from '@angular/core';
-import { DisplayService } from '../../services/display.service';
-import { Subscription } from 'rxjs';
-import { LayoutService } from '../../services/layout.service';
-import { SvgService } from '../../services/svg.service';
-import { Diagram } from '../../classes/diagram/diagram';
+import {Component, ElementRef, OnDestroy, ViewChild} from '@angular/core';
+import {DisplayService} from '../../services/display.service';
+import {Subscription} from 'rxjs';
+import {LayoutService} from '../../services/layout.service';
+import {SvgService} from '../../services/svg.service';
+import {Diagram} from '../../classes/diagram/diagram';
+import {DisplayErrorService} from "../../services/display-error.service";
 
 @Component({
     selector: 'app-display',
@@ -18,18 +19,19 @@ export class DisplayComponent implements OnDestroy {
     private _diagram: Diagram | undefined;
 
     constructor(private _layoutService: LayoutService,
-        private _svgService: SvgService,
-        private _displayService: DisplayService) {
+                private _svgService: SvgService,
+                private _displayService: DisplayService,
+                private displayErrorService: DisplayErrorService) {
 
         this._sub = this._displayService.diagram$.subscribe(diagram => {
             this._diagram = diagram;
-            if( this.drawingArea != undefined){
+            if (this.drawingArea != undefined) {
                 const width = this.drawingArea.nativeElement.clientWidth;
                 const height = this.drawingArea.nativeElement.clientHeight;
 
-                this._layoutService.layout(this._diagram,width, height);
+                this._layoutService.layout(this._diagram, width, height);
             }
-            
+
             this.draw();
         });
     }
@@ -41,6 +43,7 @@ export class DisplayComponent implements OnDestroy {
     private draw() {
         if (this.drawingArea === undefined) {
             console.debug('drawing area not ready yet')
+            this.displayErrorService.displayError("drawing area not ready yet");
             return;
         }
 
