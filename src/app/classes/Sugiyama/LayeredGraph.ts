@@ -1,6 +1,18 @@
 import { SimpleGraph } from "./SimpleGraph";
 
 export class LayeredGraph {
+  getSortedDummysForEdge(from: string, to: string) {
+    const dummys = this.getAllDummys().filter(dn => dn.fromId == from && dn.toId == to)
+
+   
+    const edgeAscending = ()=> (this.getNode(from)!.layer< this.getNode(to)!.layer)
+   
+    return dummys.sort((a,b) => edgeAscending()? a.layer-b.layer: b.layer - a.layer)
+  }
+  getXOfLayer(layer: number) {
+    if(layer > this.layers.length) return 0
+    else return this.layers[layer][0].x
+  }
   getArc(a: LArc) :LArc {
       const arc = this.arcs.find(ar=> ar == a)
       if (arc == undefined) throw Error("Arc not found")
@@ -166,37 +178,31 @@ export class DummyNode extends LNode{
   public get fromId(): string {
     return this._fromId;
   }
-  private _toId:string
+  public set fromId(value: string) {
+    this._fromId = value;
+  }
+
+  private _toId: string;
   public get toId(): string {
     return this._toId;
   }
+  public set toId(value: string) {
+    this._toId = value;
+  }
   
 
-  constructor(id: string, from:string, to:string, layer?: number){
+  private _arcIsInversed: boolean;
+  public get arcIsInversed(): boolean {
+    return this._arcIsInversed;
+  }
+  public set arcIsInversed(value: boolean) {
+    this._arcIsInversed = value;
+  }
+  constructor(id: string, from:string, to:string,arcIsInversed:boolean, layer?: number, ){
     super(id,layer)
     this._fromId = from
     this._toId = to
-
-  }
-
-}
-
-export class DummyGroup{
-  private _fromId: string; 
-  public get fromId(): string {
-    return this._fromId;
-  }
-  
-  private _toId:string
-  public get toId(): string {
-    return this._toId;
-  }
-  
-
-  constructor(from:string, to:string){
-    this._fromId = from
-    this._toId = to
-
+    this._arcIsInversed = arcIsInversed
   }
 
 }

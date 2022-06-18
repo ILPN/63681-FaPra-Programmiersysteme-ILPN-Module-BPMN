@@ -1,5 +1,43 @@
 export class Vector {
+    radians():number {
+        return Math.atan2(this.y, this.x) + Math.PI / 2;
+    }
+    degree():number {
+        return this.radians()/(Math.PI *2) *360;
+    }
+    static center(...args: Vector[]) {
+        let sum = Vector.zero()
+        for (const v of args) {
+            sum = sum.plus(v)
+        }
+        return sum.divided(args.length)
+    }
+    divided(by: number) {
+        return this.muliplied(1/by)
+        }
+    half() {
+        return this.muliplied(0.5)
+    }
+    static zero(): Vector {
+        return new Vector(0,0)
+    }
+    plusXY(x: number, y: number): Vector {
+        return new Vector(this._x + x,  this._y + y)
+    }
+    copy() {
+        return new Vector(this.x, this.y)
+    }
+    equals(v: Vector) {
+        return (this.x == v.x && this.y == v.y)
+    }
+    isAlmostZero() {
+        const threshold = 0.0001
+        return(Math.abs(this.x) <threshold && this.y < threshold)
+    }
     toUnitVector() {
+        if(this.length() == 0){
+            return new Vector(0,0)
+        }
         return this.muliplied(1 / this.length());
     }
     muliplied(m: number): Vector {
