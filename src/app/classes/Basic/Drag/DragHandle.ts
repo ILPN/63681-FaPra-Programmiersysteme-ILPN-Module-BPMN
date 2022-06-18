@@ -5,14 +5,20 @@ import { Position } from "../Interfaces/Position";
 import { Svg } from "../Svg/Svg";
 
 export class DragHandle{
-    private doAfterDrag: ()=>void = ()=>{console.log("no afterDrag callback")}
+    private afterDrag: ()=>void = ()=>{console.log("no afterDrag callback")}
     addCallbackAfterDrag(afterDrag: () => void) {
-       this.doAfterDrag = afterDrag;
+       this.afterDrag = afterDrag;
     }
     private beforeStartDrag: ((dragedElement: Position, dragHandle: DragHandle) => void) | undefined 
     addCallbackbeforeStartDrag(beforeStartDrag: (dragedElement:Position, dragHandle:DragHandle) => void) {
        this.beforeStartDrag = beforeStartDrag;
     }
+
+    private afterStopDrag: ((dragedElement: Position, dragHandle: DragHandle) => void) | undefined 
+    addCallbackAfterStopDrag(afterStopDrag: (dragedElement:Position, dragHandle:DragHandle) => void) {
+       this.afterStopDrag = afterStopDrag;
+    }
+    
     protected dragedElement:Position
     constructor(dragedElement:Position,){
         this.dragedElement = dragedElement
@@ -66,7 +72,7 @@ export class DragHandle{
         dh.onDrag(delta)
     }
 
-    this.doAfterDrag()
+    this.afterDrag()
     
    }
 
@@ -92,6 +98,9 @@ export class DragHandle{
         for (const dragHandle of this.dragedAlong) {
             dragHandle.stopDrag()
         }
+
+        if(this.afterStopDrag != undefined)
+            this.afterStopDrag(this.dragedElement,this)
     }
 
 }

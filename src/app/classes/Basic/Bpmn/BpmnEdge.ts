@@ -61,9 +61,9 @@ export class BpmnEdge extends BEdge implements SvgInterface{
         this._corners = []
     }
     addArrowCornerXY(x: number, y: number) {
-        this.addArrowCorner(new Vector(x, y));
+        this.addCorner(new Vector(x, y));
     }
-    addArrowCorner(pos: Vector, atPosition: number = -1) {
+    addCorner(pos: Vector, atPosition: number = -1):BpmnEdgeCorner {
         const corner = new BpmnEdgeCorner(pos.x,pos.y);
         const lastIndex = this._corners.length -1
         if (atPosition == -1) {
@@ -71,6 +71,7 @@ export class BpmnEdge extends BEdge implements SvgInterface{
         } else {
             this._corners.splice(atPosition, 0, corner);
         }
+        return corner
     }
 
 
