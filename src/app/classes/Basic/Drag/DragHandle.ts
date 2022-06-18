@@ -19,9 +19,13 @@ export class DragHandle{
        this.afterStopDrag = afterStopDrag;
     }
     
-    protected dragedElement:Position
+    private _dragedElement: Position;
+    public get dragedElement(): Position {
+        return this._dragedElement;
+    }
+
     constructor(dragedElement:Position,){
-        this.dragedElement = dragedElement
+        this._dragedElement = dragedElement
      }
 
     addDraggedAlong(dragedAlong:DragHandle){
