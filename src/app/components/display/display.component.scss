@@ -31,18 +31,7 @@ $radiusLarge: 6px;
 
 
 
-.arrowEndCircle {
-    visibility: hidden;
-    fill: $arrow-inside-element-color;
-    r:$radiusSmall
-}
-.arrowLineInElement {
-    visibility: hidden;
-    fill: none;
-    stroke: $arrow-inside-element-color;
-    stroke-width: 1px;
-    stroke-opacity: 1;
-}
+
 .arrowIntersection:hover {
     ~ .arrowEndCircle {
         visibility: visible;
@@ -154,4 +143,20 @@ $radiusLarge: 6px;
 .dragHandleInnerCorner{
     r:$radiusLarge;
     fill: $drag-color
+}
+
+.dragHandleEndCorner{
+    r:$radiusMiddle;
+    fill: $drag-color
+}
+
+.endCircle {
+    fill: $arrow-inside-element-color;
+    r:$radiusSmall
+}
+.edgeLineInNode {
+    fill: none;
+    stroke: $arrow-inside-element-color;
+    stroke-width: 1px;
+    stroke-opacity: 1;
 }

@@ -76,7 +76,7 @@ export class BpmnEdge extends BEdge implements SvgInterface{
 
 
 
-    protected createSvg(): SVGElement {
+     createSvg(): SVGElement {
         const svg = Svg.container();
         const lineSvgResult = this.lineSvg();
 

@@ -4,17 +4,38 @@ import { BpmnGraph } from '../BpmnGraph';
 import { Position } from '../Interfaces/Position';
 import { SvgInterface } from '../Interfaces/SvgInterface';
 import { Svg } from '../Svg/Svg';
+import { DragableEdge } from './DragableEdge';
+import { DragableNode } from './DragableNode';
 import { DragHandle } from './DragHandle';
-import { DragHandleEdgeCorner } from './DragHandleEdgeCorner';
-import { DragHandleEdgeInnerCorner } from './DragHandleEdgeInnerCorner';
-import { DragHandleNode } from './DragHandleNode';
 
 export class DragWrapperGraph implements SvgInterface {
+    reload() {
+        console.log("whole thing should reload")
+    }
     private bpmnGraph: BpmnGraph;
     constructor(bpmnGraph: BpmnGraph) {
         this.bpmnGraph = bpmnGraph;
-    }
+        this.dEdges = bpmnGraph.edges.map((e,i)=>{
+            const dragableEdge = new DragableEdge(e,this)
+            return dragableEdge
+        })
 
+        this.dNodes = bpmnGraph.nodes.map((n,i)=>{
+            const dragableNode = new DragableNode(n,this)
+            const outDEdges = this.dEdges.filter((dE)=> dE.edge.from == n)
+            for (const dragableEdge of outDEdges) {
+                dragableNode.dragHandle.addDraggedAlong(dragableEdge.getStartCornerDragHandle())
+            }
+
+            const inDEdges = this.dEdges.filter((dE)=> dE.edge.to == n)
+            for (const dragableEdge of inDEdges) {
+                dragableNode.dragHandle.addDraggedAlong(dragableEdge.getEndCornerDragHandle())
+            }
+            return dragableNode
+        })
+    }
+    private dEdges: DragableEdge[] = []
+    private dNodes: DragableNode[] = []
     private snapSvgs: SVGElement | undefined;
     updateSvg(): SVGElement {
         const c = Svg.container();
@@ -31,37 +52,18 @@ export class DragWrapperGraph implements SvgInterface {
             this.drag(event);
         };
 
-        const nodeDHs: Map<BpmnNode, DragHandleNode> = new Map(); 
-        for (const n of this.bpmnGraph.nodes) {
-            const dragHandle = new DragHandleNode(n, this);
+        for (const n of this.dNodes) {
             cNodes.appendChild(n.updateSvg());
-            cDragHandles.appendChild(dragHandle.updateSvg());
-
-            nodeDHs.set(n, dragHandle);
         }
 
-        for (const e of this.bpmnGraph.edges) {
+        
+        for (const e of this.dEdges) {
             cEdges.appendChild(e.updateSvg());
-
-            for (const [i, corner] of e.corners.entries()) {
-                let dragHandle;
-                if (i == 0) {
-                    dragHandle = new DragHandleEdgeInnerCorner(corner, e, this);
-                    nodeDHs.get(e.from)?.addDraggedAlong(dragHandle)
-                } else if (i == e.corners.length - 1) {
-                    dragHandle = new DragHandleEdgeInnerCorner(corner, e, this);
-                    nodeDHs.get(e.to)?.addDraggedAlong(dragHandle)
-                } else {
-                    dragHandle = new DragHandleEdgeInnerCorner(corner, e, this);
-                }
-                cDragHandles.appendChild(dragHandle.updateSvg());
-            }
         }
 
         this.snapSvgs = Svg.container('snapSvgs');
         c.appendChild(cNodes);
         c.appendChild(this.snapSvgs);
-        c.appendChild(cDragHandles);
         c.appendChild(cEdges);
         return c;
     }
@@ -71,7 +73,6 @@ export class DragWrapperGraph implements SvgInterface {
     startDrag(event: MouseEvent, dh: DragHandle<Position>) {
         this.dragHandle = dh;
         this.dragHandle.startDrag(event);
-        this.dragHandle.addSnapElement(new SnapX(100));
         this.snapSvgs?.appendChild(dh.getSnapSvg());
     }
     drag(event: MouseEvent) {

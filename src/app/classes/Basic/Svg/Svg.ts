@@ -49,6 +49,16 @@ export class Svg{
         pathSvg.setAttribute('d', pathString);
         return pathSvg
     }
+    static pathNoStyle(pointsToBeConnected: Vector[], cssClass?:string) {
+        let pathSvg = this.createSvgElement('path');
+        if(cssClass) pathSvg.classList.add(cssClass)
+        let pathString = 'M ';
+        for (const point of pointsToBeConnected) {
+            pathString = pathString + `${point.x},${point.y} `;
+        }
+        pathSvg.setAttribute('d', pathString);
+        return pathSvg
+    }
     private static readonly strokeWidth = 3
     static rotatetSquare(x:number, y:number, diagonal: number = 50):SVGElement {
         const width = Math.sqrt(diagonal*diagonal/2)
