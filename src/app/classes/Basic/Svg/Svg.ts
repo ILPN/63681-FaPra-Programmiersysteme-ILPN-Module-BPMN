@@ -1,6 +1,16 @@
 import { Vector } from "../../Utils/Vector";
 
 export class Svg{
+    static circleNoStyle(pos:Vector, cssClass?:string) {
+        const cir = Svg.createSvgElement('circle');
+        cir.setAttribute('cx', pos.x.toString());
+        cir.setAttribute('cy', pos.y.toString());
+        if(cssClass) cir.setAttribute("class", cssClass)
+        return cir;
+    }
+    static empty(): SVGElement {
+        return this.createSvgElement("svg")
+    }
     static pointer(position: Vector, direction:Vector) {
         const headLength = 20;
         const headWidth = 10;
@@ -32,6 +42,16 @@ export class Svg{
             'style',
             `fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1`
         );
+        let pathString = 'M ';
+        for (const point of pointsToBeConnected) {
+            pathString = pathString + `${point.x},${point.y} `;
+        }
+        pathSvg.setAttribute('d', pathString);
+        return pathSvg
+    }
+    static pathNoStyle(pointsToBeConnected: Vector[], cssClass?:string) {
+        let pathSvg = this.createSvgElement('path');
+        if(cssClass) pathSvg.classList.add(cssClass)
         let pathString = 'M ';
         for (const point of pointsToBeConnected) {
             pathString = pathString + `${point.x},${point.y} `;
@@ -116,6 +136,19 @@ static image(url:string, x:number,y:number,width:number=this.logoWidth){
             stroke-width:${strokeWidth}px;
             fill:white
             `
+        );
+        return circle;
+    }
+
+    static circle(pos:Vector,radius:number){
+        const circle = Svg.createSvgElement('circle');
+        circle.setAttribute('cx', pos.x.toString());
+        circle.setAttribute('cy', pos.y.toString());
+        circle.setAttribute('r', `${radius}`);
+        circle.setAttribute(
+            'style',
+            `stroke:none;
+            fill:black`
         );
         return circle;
     }

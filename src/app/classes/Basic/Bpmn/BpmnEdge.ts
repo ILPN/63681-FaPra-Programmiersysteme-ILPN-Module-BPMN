@@ -10,6 +10,20 @@ import { BpmnGateway } from "./gateways/BpmnGateway";
 import { BpmnTask } from "./tasks/BpmnTask";
 
 export class BpmnEdge extends BEdge implements SvgInterface{
+    setStartPos(x: number, y: number) {
+        this._corners[0].setPosXY(x,y)
+    }
+    setEndPos(x: number, y: number) {
+        this._corners[this._corners.length-1].setPosXY(x,y)
+    }
+    removeCorner(at:number) {
+        console.log(this.corners)
+        if(at == 0  || at >= this._corners.length-1) return
+        this._corners.splice(at, 1);
+        console.log(this._corners)
+
+        this.updateSvg()
+    }
     private readonly _id: string
     public get id(): string {
         return this._id
@@ -19,8 +33,8 @@ export class BpmnEdge extends BEdge implements SvgInterface{
     public get corners() {
         return this._corners;
     }
-    private from: BpmnNode;
-    private to: BpmnNode;
+    from: BpmnNode;
+    to: BpmnNode;
 
     constructor(
         id: string,
@@ -36,32 +50,26 @@ export class BpmnEdge extends BEdge implements SvgInterface{
              new BpmnEdgeCorner(to.getPos().x,to.getPos().y)];
     }
     private _svg: SVGElement | undefined;
-    getSvg(): SVGElement {
-       this._svg = this.updateSvg();
-        return this._svg;
-    }
-    setSvg(value: SVGElement): void {
-        if(this._svg != undefined &&this._svg.isConnected){
-            this._svg.replaceWith(value);
-        }
-        this._svg = value;
-    }
-
     updateSvg(): SVGElement {
         const newSvg = this.createSvg();
-        this.setSvg(newSvg)
+        
+        if(this._svg != undefined &&this._svg.isConnected){
+            this._svg.replaceWith(newSvg);
+        }
+        this._svg = newSvg;
+
         return newSvg;
     }
     /**
      * removes all corners from the arrow if deletable
      */
     clearArrowCorners() {
-        this._corners = []
+        this._corners = [this._corners[0], this._corners[this._corners.length-1]]
     }
-    addArrowCornerXY(x: number, y: number) {
-        this.addArrowCorner(new Vector(x, y));
+    addCornerXY(x: number, y: number) {
+        this.addCorner(new Vector(x, y));
     }
-    addArrowCorner(pos: Vector, atPosition: number = -1) {
+    addCorner(pos: Vector, atPosition: number = -1):BpmnEdgeCorner {
         const corner = new BpmnEdgeCorner(pos.x,pos.y);
         const lastIndex = this._corners.length -1
         if (atPosition == -1) {
@@ -69,12 +77,13 @@ export class BpmnEdge extends BEdge implements SvgInterface{
         } else {
             this._corners.splice(atPosition, 0, corner);
         }
+        return corner
     }
 
 
 
 
-    protected createSvg(): SVGElement {
+     createSvg(): SVGElement {
         const svg = Svg.container();
         const lineSvgResult = this.lineSvg();
 
@@ -332,7 +341,7 @@ export class BpmnEdge extends BEdge implements SvgInterface{
 
 }
 
-class BpmnEdgeCorner implements Position{
+export class BpmnEdgeCorner implements Position{
     public _deletable: boolean;
     constructor(x:number = 0, y:number = 0){
         this._x = x

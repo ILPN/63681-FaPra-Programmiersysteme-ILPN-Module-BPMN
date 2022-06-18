@@ -56,7 +56,7 @@ export  class BpmnNode extends BNode implements Position, SvgInterface {
 
         return newSvg;
     }
-    protected createSvg():SVGElement{
+    createSvg():SVGElement{
         return Svg.circleStroke(this.x,this.y, this.radius, 3)
     }
 }

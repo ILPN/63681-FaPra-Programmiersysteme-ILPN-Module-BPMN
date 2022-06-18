@@ -1,0 +1,106 @@
+import { SnapElement } from "./SnapElements/SnapElement";
+import { Utility } from "../../Utils/Utility";
+import { Vector } from "../../Utils/Vector";
+import { Position } from "../Interfaces/Position";
+import { Svg } from "../Svg/Svg";
+
+export class DragHandle{
+    private afterDrag: ()=>void = ()=>{console.log("no afterDrag callback")}
+    addCallbackAfterDrag(afterDrag: () => void) {
+       this.afterDrag = afterDrag;
+    }
+    private beforeStartDrag: ((dragedElement: Position, dragHandle: DragHandle) => void) | undefined 
+    addCallbackbeforeStartDrag(beforeStartDrag: (dragedElement:Position, dragHandle:DragHandle) => void) {
+       this.beforeStartDrag = beforeStartDrag;
+    }
+
+    private afterStopDrag: ((dragedElement: Position, dragHandle: DragHandle) => void) | undefined 
+    addCallbackAfterStopDrag(afterStopDrag: (dragedElement:Position, dragHandle:DragHandle) => void) {
+       this.afterStopDrag = afterStopDrag;
+    }
+    
+    protected dragedElement:Position
+    constructor(dragedElement:Position,){
+        this.dragedElement = dragedElement
+     }
+
+    addDraggedAlong(dragedAlong:DragHandle){
+        if(dragedAlong.dragedElement == this.dragedElement) return
+        Utility.pushIfNotInArray<DragHandle>(dragedAlong, this.dragedAlong)
+    }
+    
+    private snapElements: SnapElement[] = []
+    public addSnapElement(snapElement: SnapElement){
+        this.snapElements.push(snapElement)
+    }
+    private snapSvg:SVGElement | undefined
+    /**
+     * 
+     * @returns svg representing where drag will snap to
+     */
+    getSnapSvg(){
+       const svg = Svg.container()
+       svg.id = "snapSvgs"
+       for (const snapEl of this.snapElements) {
+        svg.appendChild(snapEl.createSVG())
+       }
+       this.snapSvg = svg
+       return svg
+    }
+
+    draging(e: MouseEvent) {
+        const currentMousePos = new Vector( e.clientX, e.clientY)
+        const delta = currentMousePos.minus(this.mouseStartPos)
+        
+        let newPos = this.startPos.plus(delta)
+
+        for (const snapElement of this.snapElements) {
+            newPos = snapElement.snap(newPos)
+        }
+        const deltaEL = newPos.minus(this.startPos)
+        //only call onDrag if position is changing
+        if (!newPos.equals(this.dragedElement.getPos())){
+            this.onDrag(deltaEL)
+        }
+    }
+
+
+   protected onDrag(delta:Vector):void{
+    const newPos = this.startPos.plus(delta)
+    this.dragedElement.setPos(newPos)
+    for (const dh of this.dragedAlong) {
+        dh.onDrag(delta)
+    }
+
+    this.afterDrag()
+    
+   }
+
+    private dragedAlong:DragHandle[] =[]
+
+    protected startPos: Vector = new Vector();
+
+    private mouseStartPos:Vector = new Vector()
+
+    startDrag(event:MouseEvent){
+        if(this.beforeStartDrag != undefined)
+            this.beforeStartDrag(this.dragedElement,this)
+        this.startPos = this.dragedElement.getPos()
+        this.mouseStartPos.x = event.clientX
+        this.mouseStartPos.y = event.clientY
+        for (const dragHandle of this.dragedAlong) {
+            dragHandle.startDrag(event)
+        }
+    }
+    stopDrag(){
+        this.snapSvg?.remove()
+        this.snapElements =[]
+        for (const dragHandle of this.dragedAlong) {
+            dragHandle.stopDrag()
+        }
+
+        if(this.afterStopDrag != undefined)
+            this.afterStopDrag(this.dragedElement,this)
+    }
+
+}

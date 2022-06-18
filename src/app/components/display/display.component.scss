@@ -30,80 +30,6 @@ $radiusMiddle: 4px;
 $radiusLarge: 6px;
 
 
-
-.arrowEndCircle {
-    visibility: hidden;
-    fill: $arrow-inside-element-color;
-    r:$radiusSmall
-}
-.arrowLineInElement {
-    visibility: hidden;
-    fill: none;
-    stroke: $arrow-inside-element-color;
-    stroke-width: 1px;
-    stroke-opacity: 1;
-}
-.arrowIntersection:hover {
-    ~ .arrowEndCircle {
-        visibility: visible;
-    }
-    ~ .arrowLineInElement {
-        visibility: visible;
-    }
-}
-.draged {
-    .arrowEndCircle {
-        visibility: visible;
-    }
-    .arrowLineInElement {
-        visibility: visible;
-    }
-    .arrowIntersection {
-        r:$radiusLarge
-    }
-}
-.arrowIntersection {
-    fill: $drag-color;
-    r:$radiusSmall
-}
-
-.arrowIntersection:hover {
-    r:$radiusLarge
-}
-
-.arrowCornerCircle {
-    fill: $drag-color;
-    r:$radius
-}
-.draged{
-    .arrowCornerCircle{
-        r:$radiusLarge
-}
-  .arrowCornerCircle:hover{
-    r:$radiusLarge  }
-
-}
-.arrowCornerCircle:hover {
-    r:$radiusLarge;
-    ~ .deleteSvg {
-        visibility: visible;
-    }
-}
-.draged .arrowCornerCircle:hover {
-    r:$radiusLarge;
-    ~ .deleteSvg {
-        visibility: hidden;
-    }
-}
-.hoverDummy{
-    r:12px;
-     fill:#32323292
-}
-
-.doubleDragCircle {
-    fill: $drag-color;
-    r: $radiusSmall
-}
 .plusCircle {
     fill: $add-color;
     r: $radiusSmall;
@@ -112,12 +38,7 @@ $radiusLarge: 6px;
     fill: $deleteColor;
     r: $radiusSmall;
 }
-.deleteSvg{
-    visibility: hidden;
-}
-.deleteSvg:hover{
-    visibility: visible;
-}
+
 
 .dummyNodeCircle{
     r: $radiusLarge;
@@ -127,8 +48,8 @@ $radiusLarge: 6px;
 
 .snapLine{
     fill:none;
-    stroke:#ff000023;
-    stroke-width:1px;
+    stroke:#ff00005e;
+    stroke-width:2px;
     stroke-linecap:butt;
     stroke-linejoin:miter;
     stroke-dasharray:4,4;
@@ -145,10 +66,25 @@ $radiusLarge: 6px;
 }
 
 
-.red{
-    fill: red;
+
+
+.dragHandleInnerCorner{
+    r:$radiusLarge;
+    fill: $drag-color
 }
 
+.dragHandleEndCorner{
+    r:$radiusMiddle;
+    fill: $drag-color
+}
 
-
-
+.endCircle {
+    fill: $arrow-inside-element-color;
+    r:$radiusSmall
+}
+.edgeLineInNode {
+    fill: none;
+    stroke: $arrow-inside-element-color;
+    stroke-width: 1px;
+    stroke-opacity: 1;
+}

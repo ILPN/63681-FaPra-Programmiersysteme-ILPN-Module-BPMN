@@ -15,4 +15,11 @@ export class Utility{
        }
        svg.onmouseleave =(e) =>mouseDown = false
    }
+
+   static pushIfNotInArray<T>( toBePushed:T, arr:T[]):boolean{
+        if(arr.findIndex(o => o == toBePushed) != -1) return false
+        arr.push(toBePushed)
+        return true
+
+   }
 }

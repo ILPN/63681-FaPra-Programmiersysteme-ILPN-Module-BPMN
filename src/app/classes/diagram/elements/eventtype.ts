@@ -1,1 +1,0 @@
-export enum EventType { Start, End, Intermediate };
