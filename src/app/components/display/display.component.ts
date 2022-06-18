@@ -35,7 +35,7 @@ export class DisplayComponent implements OnDestroy {
             //this.draw(this._diagram.createDiagramSVG());
             //const g = BpmnGraph.sampleGraph()
             const dg = new DraggableGraph(diagram)
-            
+
             this.draw(dg.updateSvg());
             //this.draw(diagram.updateSvg());
 
