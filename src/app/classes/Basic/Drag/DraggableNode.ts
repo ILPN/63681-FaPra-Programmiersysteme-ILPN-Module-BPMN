@@ -2,16 +2,16 @@ import { BpmnNode } from "../Bpmn/BpmnNode";
 import { SvgInterface } from "../Interfaces/SvgInterface";
 import { Svg } from "../Svg/Svg";
 import { DragHandle } from "./DragHandle";
-import { DragWrapperGraph } from "./DragWrapperGraph";
+import { DraggableGraph } from "./DraggableGraph";
 
-export class DragableNode implements SvgInterface{
+export class DraggableNode implements SvgInterface{
     private node:BpmnNode
-    private dwg:DragWrapperGraph
+    private dwg:DraggableGraph
     private _dragHandle: DragHandle
     public get dragHandle(): DragHandle {
         return this._dragHandle;
     }
-    constructor(node:BpmnNode, dwg:DragWrapperGraph){
+    constructor(node:BpmnNode, dwg:DraggableGraph){
         this.node = node
         this.dwg = dwg
         this._dragHandle = new DragHandle(node)

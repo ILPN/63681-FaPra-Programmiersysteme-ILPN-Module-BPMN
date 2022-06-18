@@ -7,18 +7,18 @@ import { Position } from "../Interfaces/Position";
 import { SvgInterface } from "../Interfaces/SvgInterface";
 import { Svg } from "../Svg/Svg";
 import { DragHandle } from "./DragHandle";
-import { DragWrapperGraph } from "./DragWrapperGraph";
+import { DraggableGraph } from "./DraggableGraph";
 
-export class DragableEdge implements SvgInterface{
+export class DraggableEdge implements SvgInterface{
     private _edge: BpmnEdge;
     public get edge(): BpmnEdge {
         return this._edge;
     }
     private dragged = false
 
-    private dwg:DragWrapperGraph
+    private dwg:DraggableGraph
     private dragHandles:Map<BpmnEdgeCorner,DragHandle> = new Map()
-    constructor(edge:BpmnEdge, dwg:DragWrapperGraph){
+    constructor(edge:BpmnEdge, dwg:DraggableGraph){
         this._edge = edge
         this.dwg = dwg
 

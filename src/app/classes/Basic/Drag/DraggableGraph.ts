@@ -1,27 +1,21 @@
-import { SnapX } from './SnapElements/SnapX';
-import { BpmnNode } from '../Bpmn/BpmnNode';
 import { BpmnGraph } from '../Bpmn/BpmnGraph';
-import { Position } from '../Interfaces/Position';
 import { SvgInterface } from '../Interfaces/SvgInterface';
 import { Svg } from '../Svg/Svg';
-import { DragableEdge } from './DragableEdge';
-import { DragableNode } from './DragableNode';
+import { DraggableEdge } from './DraggableEdge';
+import { DraggableNode } from './DraggableNode';
 import { DragHandle } from './DragHandle';
 
-export class DragWrapperGraph implements SvgInterface {
-    reload() {
-        console.log("whole thing should reload")
-    }
+export class DraggableGraph implements SvgInterface {
     private bpmnGraph: BpmnGraph;
     constructor(bpmnGraph: BpmnGraph) {
         this.bpmnGraph = bpmnGraph;
         this.dEdges = bpmnGraph.edges.map((e,i)=>{
-            const dragableEdge = new DragableEdge(e,this)
+            const dragableEdge = new DraggableEdge(e,this)
             return dragableEdge
         })
 
         this.dNodes = bpmnGraph.nodes.map((n,i)=>{
-            const dragableNode = new DragableNode(n,this)
+            const dragableNode = new DraggableNode(n,this)
             const outDEdges = this.dEdges.filter((dE)=> dE.edge.from == n)
             for (const dragableEdge of outDEdges) {
                 dragableNode.dragHandle.addDraggedAlong(dragableEdge.getStartCornerDragHandle())
@@ -34,8 +28,8 @@ export class DragWrapperGraph implements SvgInterface {
             return dragableNode
         })
     }
-    private dEdges: DragableEdge[] = []
-    private dNodes: DragableNode[] = []
+    private dEdges: DraggableEdge[] = []
+    private dNodes: DraggableNode[] = []
     private snapSvgs: SVGElement | undefined;
     updateSvg(): SVGElement {
         const c = Svg.container();

@@ -33,7 +33,7 @@ export function applySugiyama(diagram:BpmnGraph, w = 1000, h =500 , p = 50){
 
         edge.setStartPos(fromLNode.x,fromLNode.y)
         edge.setEndPos(toLNode.x,toLNode.y)
-        edge.clearArrowCorners()
+        edge.clearCorners()
         //const dummys = result.getSortedDummysForEdge(arrow.start.id,arrow.end.id)
        // for (const dN of dummys) {
          //   arrow.addDummyNodeCorner(dN.id,dN.x,dN.y)
