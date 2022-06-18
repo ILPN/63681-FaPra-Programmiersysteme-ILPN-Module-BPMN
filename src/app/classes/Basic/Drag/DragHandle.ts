@@ -6,24 +6,23 @@ import { SvgInterface } from "../Interfaces/SvgInterface";
 import { Svg } from "../Svg/Svg";
 import { DragWrapperGraph } from "./DragWrapperGraph";
 
-export class DragHandle implements SvgInterface{
-    private dragedElement:Position
+export class DragHandle<T extends Position> implements SvgInterface{
+    protected dragedElement:T
     private draged = false
     private dg:DragWrapperGraph
-    constructor(dragedElement:Position, dg:DragWrapperGraph){
+    constructor(dragedElement:T, dg:DragWrapperGraph){
         this.dragedElement = dragedElement
         this.dg = dg
     }
 
-    addDraggedAlong(dragedAlong:DragHandle){
+    addDraggedAlong(dragedAlong:DragHandle<Position>){
         if(dragedAlong.dragedElement == this.dragedElement) return
-        Utility.pushIfNotInArray<DragHandle>(dragedAlong, this.dragedAlong)
+        Utility.pushIfNotInArray<DragHandle<Position>>(dragedAlong, this.dragedAlong)
     }
     
-    private _svg: SVGElement | undefined;
+    protected _svg: SVGElement | undefined;
     updateSvg(): SVGElement {
         const newSvg = this.createSvg();
-        
         if(this._svg != undefined &&this._svg.isConnected){
             this._svg.replaceWith(newSvg);
         }
@@ -31,12 +30,15 @@ export class DragHandle implements SvgInterface{
         return newSvg;
     }
 
-    private createSvg() {
+    protected createSvg() {
         const svg =Svg.circle(this.dragedElement.getPos(), 10)
+        this.appendListenerTo(svg)
+        return svg
+    }
+    protected appendListenerTo(svg:SVGElement){
         svg.onmousedown = (event) => {
             this.dg.startDrag(event, this);
         };
-        return svg
     }
 
 
@@ -65,7 +67,7 @@ export class DragHandle implements SvgInterface{
        return svg
     }
 
-    dragElement(e: MouseEvent) {
+    draging(e: MouseEvent) {
         const currentMousePos = new Vector( e.clientX, e.clientY)
         const delta = currentMousePos.minus(this.mouseStartPos)
         
@@ -74,25 +76,26 @@ export class DragHandle implements SvgInterface{
         for (const snapElement of this.snapElements) {
             newPos = snapElement.snap(newPos)
         }
-
-        //only call onDrag and dragalong if position is changing
+        const deltaEL = newPos.minus(this.startPos)
+        //only call onDrag if position is changing
         if (!newPos.equals(this.dragedElement.getPos())){
-            this.onDrag(newPos,delta)
-            for (const dragHandle of this.dragedAlong) {
-                dragHandle.dragElement(e)
-            }
+            this.onDrag(deltaEL)
         }
     }
 
 
-   protected onDrag(absolute:Vector, delta:Vector):void{
-    this.dragedElement.setPos(absolute)
+   protected onDrag(delta:Vector):void{
+    const newPos = this.startPos.plus(delta)
+    this.dragedElement.setPos(newPos)
     this.updateAffectedSvgs()
 
+    for (const dh of this.dragedAlong) {
+        dh.onDrag(delta)
+    }
     
    }
 
-    private dragedAlong:DragHandle[] =[]
+    private dragedAlong:DragHandle<Position>[] =[]
 
     protected startPos: Vector = new Vector();
 

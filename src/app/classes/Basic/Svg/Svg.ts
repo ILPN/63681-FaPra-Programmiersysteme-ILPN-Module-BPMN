@@ -1,6 +1,16 @@
 import { Vector } from "../../Utils/Vector";
 
 export class Svg{
+    static circleNoStyle(pos:Vector, cssClass?:string) {
+        const cir = Svg.createSvgElement('circle');
+        cir.setAttribute('cx', pos.x.toString());
+        cir.setAttribute('cy', pos.y.toString());
+        if(cssClass) cir.setAttribute("class", cssClass)
+        return cir;
+    }
+    static empty(): SVGElement {
+        return this.createSvgElement("svg")
+    }
     static pointer(position: Vector, direction:Vector) {
         const headLength = 20;
         const headWidth = 10;

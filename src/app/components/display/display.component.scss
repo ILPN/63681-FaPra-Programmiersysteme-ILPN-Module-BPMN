@@ -127,8 +127,8 @@ $radiusLarge: 6px;
 
 .snapLine{
     fill:none;
-    stroke:#ff000023;
-    stroke-width:1px;
+    stroke:#ff00005e;
+    stroke-width:2px;
     stroke-linecap:butt;
     stroke-linejoin:miter;
     stroke-dasharray:4,4;
@@ -151,4 +151,7 @@ $radiusLarge: 6px;
 
 
 
-
+.dragHandleInnerCorner{
+    r:$radiusLarge;
+    fill: $drag-color
+}

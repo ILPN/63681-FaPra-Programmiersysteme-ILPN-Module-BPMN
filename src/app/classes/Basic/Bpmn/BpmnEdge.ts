@@ -10,6 +10,14 @@ import { BpmnGateway } from "./gateways/BpmnGateway";
 import { BpmnTask } from "./tasks/BpmnTask";
 
 export class BpmnEdge extends BEdge implements SvgInterface{
+    removeCorner(at:number) {
+        console.log(this.corners)
+        if(at == 0  || at >= this._corners.length-1) return
+        this._corners.splice(at, 1);
+        console.log(this._corners)
+
+        this.updateSvg()
+    }
     private readonly _id: string
     public get id(): string {
         return this._id
@@ -19,8 +27,8 @@ export class BpmnEdge extends BEdge implements SvgInterface{
     public get corners() {
         return this._corners;
     }
-    private from: BpmnNode;
-    private to: BpmnNode;
+    from: BpmnNode;
+    to: BpmnNode;
 
     constructor(
         id: string,
