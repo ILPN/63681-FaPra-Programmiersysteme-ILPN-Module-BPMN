@@ -1,6 +1,5 @@
 import { Diagram } from "../diagram/diagram";
-import { Connector } from "../diagram/elements/connector";
-import { EinPfeil } from "../diagram/elements/EinPfeil";
+import { Arrow } from "../diagram/elements/arrow/Arrow";
 import { Gateway } from "../diagram/elements/gateway";
 import { Task } from "../diagram/elements/task";
 import { Event } from "../diagram/elements/event";
@@ -8,25 +7,20 @@ import { Event } from "../diagram/elements/event";
 import { LayeredGraph, LNode } from "./LayeredGraph";
 import { SimpleGraph } from "./SimpleGraph";
 import { Sugiyama } from "./Sugiyama";
-import { SugiyamaParser } from "./SugiyamaParser";
+import { DragDiagram } from "../diagram/DragDiagram";
+import { DummyNodeCorner } from "../diagram/elements/arrow/DummyNodeCorner";
 
-export function applySugiyama(diagram:Diagram, w = 1000, h =500 , p = 50){
+export function applySugiyama(diagram:DragDiagram, w = 1000, h =500 , p = 50){
     const input = new SimpleGraph()
-    diagram.elements.forEach(el => {
+    diagram.getElems().forEach(el => {
         if((el instanceof Task || el instanceof Gateway|| el instanceof Event)){
             input.addNode(el.id)
         }
+        if (el instanceof Arrow){
+            const a = el as Arrow
+            input.addArc(a.start.id,a.end.id)
+        }
     });
-
-    for (let el of diagram.elements) {
-        if(!(el instanceof Task || el instanceof Gateway|| el instanceof Event)) continue;
-        for (let child of el.adjacentElements) {
-            if(child instanceof Connector){
-                continue;
-            }
-            input.addArc(el.id, child.id)
-         } 
-     }     
 
     const sugi = new Sugiyama(input)
     sugi.width = w 
@@ -35,39 +29,43 @@ export function applySugiyama(diagram:Diagram, w = 1000, h =500 , p = 50){
     sugi.spacingXAxis = 200
     sugi.spacingYAxis= 200
     const result :LayeredGraph = sugi.getResult()
-    SugiyamaParser.printGraph(input)
-    SugiyamaParser.printLGraph(result)
 
     for (let node of result.getAllNoneDummyNodes()) {
-        const el = diagram.elements.find(e => e.id == node.id)
+        const el = diagram.getElems().find(e => e.id == node.id)
         if (el == undefined) continue
         el.x = node.x
         el.y = node.y
-        console.log(`${el.id}  has position ${el.x}, ${el.y} order(${node.order})layer(${node.layer})`)
      }
      
 
-     const pfeile:EinPfeil[] = []
-     for (let el of diagram.elements){
-         if(el instanceof EinPfeil) pfeile.push(el)
+     const arrows:Arrow[] = []
+     for (let el of diagram.getElems()){
+         if(el instanceof Arrow) arrows.push(el)
      }
-     for (let pfeil of pfeile){
-        const fromLNode:LNode|undefined = result.getNode(pfeil.start.id)
-        const toLNode:LNode|undefined = result.getNode(pfeil.end.id)
+
+     for (let arrow of arrows){
+        const fromLNode:LNode|undefined = result.getNode(arrow.start.id)
+        const toLNode:LNode|undefined = result.getNode(arrow.end.id)
         if (fromLNode == undefined ||toLNode == undefined) continue;
 
-        pfeil.setPfeilStart(fromLNode.x,fromLNode.y)
-        pfeil.setPfeilZiel(toLNode.x,toLNode.y)
-        pfeil.clearPfeilEcken()
+        arrow.setArrowStartPos(fromLNode.x,fromLNode.y)
+        arrow.setArrowTargetPos(toLNode.x,toLNode.y)
+        arrow.clearArrowCorners()
+        const dummys = result.getSortedDummysForEdge(arrow.start.id,arrow.end.id)
+        for (const dN of dummys) {
+            arrow.addDummyNodeCorner(dN.id,dN.x,dN.y)
+        }
         //making things square
+        /*
         if(result.layers[fromLNode.layer].length >= result.layers[toLNode.layer].length){
             if(fromLNode.y != toLNode.y){ 
-            pfeil.addPfeilEcke(toLNode.x,fromLNode.y)
+            arrow.addArrowCornerXY(toLNode.x,fromLNode.y)
             }
         }else{
             if(fromLNode.y != toLNode.y){ 
-                pfeil.addPfeilEcke(fromLNode.x,toLNode.y)
+               arrow.addArrowCornerXY(fromLNode.x,toLNode.y)
                 } 
-        } 
+        }    */
     }
+    diagram.setSugiyamaResult(result)
   }

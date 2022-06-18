@@ -1,43 +1,57 @@
-export abstract class Element {
+import { Vector } from '../Utils/Vector';
+import { DragDiagram } from './DragDiagram';
+import { Position } from '../Basic/Interfaces/Position';
+export abstract class Element implements Position {
+    public  diagram: DragDiagram
     private _id: string;
-    private _x: number;
-    private _y: number;
-    /** Hier kann der Abstand, welcher aus der X-Achse zu diesem Element eingehalten werden sollte, um überlappungen zu verhindert, abgelesen werden.  */
-    private _distanceX: number = 0;
-    /** Hier kann der Abstand, welcher aus der Y-Achse zu diesem Element eingehalten werden sollte, um überlappungen zu verhindert, abgelesen werden.  */
-    private _distanceY: number = 0;
-    private _svgElement: SVGElement | undefined;
-    private _adjacentElements: Element[];
-    /** Dieses Array von SVG Elementen beinhaltet alle Elemente, dessen fill Farbe sich ändern muss, um die Farbe des Elements zu ändern. */
-    private _svgColorElements: SVGElement[];
-
-
-    constructor(id: string) {
+    private _halfWidth: number = 0;
+    private _halfHeight: number = 0;
+    private domSVG: SVGElement | undefined;
+    public draged = false
+    constructor(id: string, diagram:DragDiagram) {
         this._id = id;
-        this._x = 0;
-        this._y = 0;
-        this._adjacentElements = [];
-        this._svgColorElements = [];
+        this.diagram = diagram
     }
-
-    get adjacentElements(): Element[] {
-        return this._adjacentElements;
+    setPosXY(x: number, y: number): void {
+        this.x = x
+        this.y = y
+    }
+    getPos(): Vector {
+        return new Vector(this.x,this.y)
+    }
+    setPos(pos: Vector): void {
+        this.x = pos.x
+        this.y = pos.y
+    }
+    private _x: number =0;
+    public get x(): number {
+        return this._x;
+    }
+    public set x(value: number) {
+        this._x = value;
+    }
+    private _y: number = 0;
+    public get y(): number {
+        return this._y;
+    }
+    public set y(value: number) {
+        this._y = value;
     }
 
     get distanceX(): number {
-        return this._distanceX;
+        return this._halfWidth;
     }
 
     set distanceX(value: number) {
-        this._distanceX = value;
+        this._halfWidth = value;
     }
 
     get distanceY(): number {
-        return this._distanceY;
+        return this._halfHeight;
     }
 
     set distanceY(value: number) {
-        this._distanceY = value;
+        this._halfHeight = value;
     }
 
     get id(): string {
@@ -48,101 +62,33 @@ export abstract class Element {
         this._id = value;
     }
 
-    get x(): number {
-        return this._x;
-    }
-
-    set x(value: number) {
-        this._x = value;
-    }
-
-    get y(): number {
-        return this._y;
-    }
-
-    set y(value: number) {
-        this._y = value;
-    }
-
     public abstract createSvg(): SVGElement;
 
     createSvgElement(name: string): SVGElement {
         return document.createElementNS('http://www.w3.org/2000/svg', name);
     }
 
-    public registerSvg(svg: SVGElement) {
-        this._svgElement = svg;
-        this._svgElement.onmousedown = (event) => {
-            this.processMouseDown(event);
+
+    public updateSvg():SVGElement {
+        const newSvg = this.createSvg();
+        if (this.domSVG != undefined && this.domSVG.isConnected ) {
+            this.domSVG!.replaceWith(newSvg);
+            this.domSVG = newSvg;
+            return this.domSVG
+        }
+        this.domSVG = newSvg;
+        return this.domSVG
+    }
+
+    protected addStandardListeners(svg: SVGElement){
+        svg.onmousedown = (event) => {
+            this.diagram.onChildrenMouseDown(event,this);
         };
-        this._svgElement.onmouseup = (event) => {
-            this.processMouseUp(event);
+        svg.onmouseup = (event) => {
+            this.diagram.onChildrenMouseUp(event, this);
+        };
+        svg.onmousemove = (event) => {
+            this.diagram.onChildrenMouseMove(event,this);
         };
     }
-
-    private processMouseDown(event: MouseEvent) {
-        if (this._svgElement === undefined) {
-            return;
-        }
-        this.changeColor("red")
-    }
-
-    private processMouseUp(event: MouseEvent) {
-        if (this._svgElement === undefined) {
-            return;
-        }
-        this.changeColor("white")
-    }
-
-    /**
-     * adds edge from this element to target
-     * @param target target of new edge
-     */
-    public addEdge(target: Element): void {
-        if (!this.hasEdge(target))
-            this._adjacentElements.push(target);
-    }
-
-    /**
-     * removes edge from this element to target
-     * @param target 
-     * @returns 
-     */
-    public removeEdge(target: Element): Element | null {
-
-        const index = this._adjacentElements.findIndex(
-            (element) => Object.is(element, target)
-        );
-
-        if (index > -1) {
-            return this._adjacentElements.splice(index, 1)[0];
-        }
-
-        return null;
-    }
-
-    /**
-     * checks if there is edge from this element to target
-     * @param target 
-     * @returns true if there is edge from this element to target
-     */
-    public hasEdge(target: Element): boolean {
-        return this._adjacentElements.some(element => element === target);
-    }
-
-
-    /**
-     * Mit dieser Methode kann dem Element eine Farbe übergeben werden, welche es alt Hintergrundfarbe setzt.
-     * @param newColor neue Hintergrundfarbe als String
-     */
-    changeColor(newColor: string) {
-        this._svgColorElements.forEach(element => element.setAttribute('fill', newColor));
-    }
-    /** Hiermit können SVG Elemente hinzugefügt werden, welche ihre Farbe ändern sollen für den Fall das das Element gefärbt werden soll. 
-     *  @param element ein zu färbendes SVG Element
-    */
-    addSVGtoColorChange(element: SVGElement) {
-        this._svgColorElements.push(element);
-    }
-
 }
