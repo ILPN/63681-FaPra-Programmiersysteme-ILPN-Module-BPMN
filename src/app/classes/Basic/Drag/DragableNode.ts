@@ -7,15 +7,15 @@ import { DragWrapperGraph } from "./DragWrapperGraph";
 export class DragableNode implements SvgInterface{
     private node:BpmnNode
     private dwg:DragWrapperGraph
-    private _dragHandle: DragHandle<BpmnNode>;
-    public get dragHandle(): DragHandle<BpmnNode> {
+    private _dragHandle: DragHandle
+    public get dragHandle(): DragHandle {
         return this._dragHandle;
     }
     constructor(node:BpmnNode, dwg:DragWrapperGraph){
         this.node = node
         this.dwg = dwg
-        this._dragHandle = new DragHandle<BpmnNode>(node)
-        this.dragHandle.addCallback(() =>{
+        this._dragHandle = new DragHandle(node)
+        this.dragHandle.addCallbackAfterDrag(() =>{
             this.updateSvg()
         })
     }

@@ -68,9 +68,9 @@ export class DragWrapperGraph implements SvgInterface {
         return c;
     }
 
-    private dragHandle: DragHandle<Position> | undefined;
+    private dragHandle: DragHandle | undefined;
 
-    startDrag(event: MouseEvent, dh: DragHandle<Position>) {
+    startDrag(event: MouseEvent, dh: DragHandle) {
         this.dragHandle = dh;
         this.dragHandle.startDrag(event);
         this.snapSvgs?.appendChild(dh.getSnapSvg());

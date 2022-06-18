@@ -4,19 +4,23 @@ import { Vector } from "../../Utils/Vector";
 import { Position } from "../Interfaces/Position";
 import { Svg } from "../Svg/Svg";
 
-export class DragHandle<T extends Position>{
-    private doAfterDrag: ()=>any = ()=>{console.log("no afterDrag callback")}
-    addCallback(afterDrag: () => void) {
+export class DragHandle{
+    private doAfterDrag: ()=>void = ()=>{console.log("no afterDrag callback")}
+    addCallbackAfterDrag(afterDrag: () => void) {
        this.doAfterDrag = afterDrag;
     }
-    protected dragedElement:T
-    constructor(dragedElement:T,){
+    private beforeStartDrag: ((dragedElement: Position, dragHandle: DragHandle) => void) | undefined 
+    addCallbackbeforeStartDrag(beforeStartDrag: (dragedElement:Position, dragHandle:DragHandle) => void) {
+       this.beforeStartDrag = beforeStartDrag;
+    }
+    protected dragedElement:Position
+    constructor(dragedElement:Position,){
         this.dragedElement = dragedElement
      }
 
-    addDraggedAlong(dragedAlong:DragHandle<Position>){
+    addDraggedAlong(dragedAlong:DragHandle){
         if(dragedAlong.dragedElement == this.dragedElement) return
-        Utility.pushIfNotInArray<DragHandle<Position>>(dragedAlong, this.dragedAlong)
+        Utility.pushIfNotInArray<DragHandle>(dragedAlong, this.dragedAlong)
     }
     
     private snapElements: SnapElement[] = []
@@ -66,13 +70,15 @@ export class DragHandle<T extends Position>{
     
    }
 
-    private dragedAlong:DragHandle<Position>[] =[]
+    private dragedAlong:DragHandle[] =[]
 
     protected startPos: Vector = new Vector();
 
     private mouseStartPos:Vector = new Vector()
 
     startDrag(event:MouseEvent){
+        if(this.beforeStartDrag != undefined)
+            this.beforeStartDrag(this.dragedElement,this)
         this.startPos = this.dragedElement.getPos()
         this.mouseStartPos.x = event.clientX
         this.mouseStartPos.y = event.clientY
