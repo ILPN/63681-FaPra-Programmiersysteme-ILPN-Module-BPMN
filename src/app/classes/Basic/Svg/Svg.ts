@@ -119,6 +119,19 @@ static image(url:string, x:number,y:number,width:number=this.logoWidth){
         );
         return circle;
     }
+
+    static circle(pos:Vector,radius:number){
+        const circle = Svg.createSvgElement('circle');
+        circle.setAttribute('cx', pos.x.toString());
+        circle.setAttribute('cy', pos.y.toString());
+        circle.setAttribute('r', `${radius}`);
+        circle.setAttribute(
+            'style',
+            `stroke:none;
+            fill:black`
+        );
+        return circle;
+    }
     static container(id?:string){
         const c = Svg.createSvgElement('svg');
         if(id) c.setAttribute('id', id);

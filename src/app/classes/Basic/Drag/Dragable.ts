@@ -3,7 +3,7 @@ import { DragWrapperGraph } from "./DragWrapperGraph";
 
 export interface Dragable{
     setPos(value: Vector):void ;
-    updateSvg():SVGElement;
+    updateAffectedSvgs():void;
     getPos():Vector
     addDragablenessToSvg(svg:SVGElement):void
     get draggableGraph():DragWrapperGraph

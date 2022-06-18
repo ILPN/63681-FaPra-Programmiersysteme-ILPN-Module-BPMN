@@ -1,3 +1,4 @@
+import { StyleUtils } from "@angular/flex-layout";
 import { SnapElement } from "src/app/classes/diagram/Drag/SnapElements/SnapElement";
 import { Utility } from "src/app/classes/Utils/Utility";
 import { Vector } from "src/app/classes/Utils/Vector";
@@ -23,13 +24,7 @@ export class BDragHelper{
        return svg
     }
 
-    private _actualPos = new Vector();
-    public get actualPos() {
-        return this._actualPos;
-    }
-    public set actualPos(value) {
-        this._actualPos = value;
-    }
+    private actualPos = new Vector();
     /**
      * gets called in mouseMove
      * @param e
@@ -52,10 +47,23 @@ export class BDragHelper{
 
    protected onDrag(absolute:Vector, delta:Vector):void{
     this.dragedElement.setPos(absolute)
-    this.dragedElement.updateSvg()
+    this.dragedElement.updateAffectedSvgs()
+
+
+    for (const dragable of this.dragedAlong) {
+        const startPos = this.startPositions.get(dragable)
+        dragable.setPos(startPos!.plus(delta))
+    }
+
+
+
+
    }
 
-    public dragedElement:Dragable
+    private dragedElement:Dragable
+
+    private dragedAlong:Dragable[] =[]
+    private startPositions: Map<Dragable,Vector> = new Map()
 
     protected _elementStartPos: Vector;
      get elementStartPos(): Vector {
@@ -68,16 +76,34 @@ export class BDragHelper{
         this.mouseStartPos = new Vector()
     }
 
+    addDraggedAlong(dragedAlong:Dragable){
+        if(dragedAlong == this.dragedElement) return
+        Utility.pushIfNotInArray<Dragable>(dragedAlong, this.dragedAlong)
+    }
+
 
     startDrag(event:MouseEvent){
         this._elementStartPos = this.dragedElement.getPos()
         this.mouseStartPos.x = event.clientX
         this.mouseStartPos.y = event.clientY
         this.dragedElement.dragged = true
+
+        for (const dragable of this.dragedAlong) {
+            this.startPositions.set(dragable, dragable.getPos())
+            dragable.dragged = true
+        }
     }
     stopDrag(){
         this.dragedElement.dragged = false
+        this.dragedElement.updateAffectedSvgs()
+
+        for (const dragable of this.dragedAlong) {
+            this.startPositions.set(dragable, dragable.getPos())
+            dragable.dragged = false
+            dragable.updateAffectedSvgs()
+        }
         this.snapSvg?.remove()
-        this.dragedElement.updateSvg()
+        this.startPositions.clear()
+        this.dragedAlong = []
     }
 }

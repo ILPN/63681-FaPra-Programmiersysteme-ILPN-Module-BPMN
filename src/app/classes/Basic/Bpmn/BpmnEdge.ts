@@ -36,20 +36,14 @@ export class BpmnEdge extends BEdge implements SvgInterface{
              new BpmnEdgeCorner(to.getPos().x,to.getPos().y)];
     }
     private _svg: SVGElement | undefined;
-    getSvg(): SVGElement {
-       this._svg = this.updateSvg();
-        return this._svg;
-    }
-    setSvg(value: SVGElement): void {
-        if(this._svg != undefined &&this._svg.isConnected){
-            this._svg.replaceWith(value);
-        }
-        this._svg = value;
-    }
-
     updateSvg(): SVGElement {
         const newSvg = this.createSvg();
-        this.setSvg(newSvg)
+        
+        if(this._svg != undefined &&this._svg.isConnected){
+            this._svg.replaceWith(newSvg);
+        }
+        this._svg = newSvg;
+
         return newSvg;
     }
     /**
@@ -332,7 +326,7 @@ export class BpmnEdge extends BEdge implements SvgInterface{
 
 }
 
-class BpmnEdgeCorner implements Position{
+export class BpmnEdgeCorner implements Position{
     public _deletable: boolean;
     constructor(x:number = 0, y:number = 0){
         this._x = x
