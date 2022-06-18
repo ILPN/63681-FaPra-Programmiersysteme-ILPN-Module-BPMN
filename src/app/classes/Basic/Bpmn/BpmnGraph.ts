@@ -17,23 +17,17 @@ export class BpmnGraph
 {
     constructor(){
         super()
-        this._svg = this.updateSvg()
+        //this._svg = this.updateSvg()
     }
-    private _svg: SVGElement;
-    getSvg(): SVGElement {
-        this.updateSvg();
-        return this._svg;
-    }
-    setSvg(value: SVGElement): void {
-        if(this._svg != undefined &&this._svg.isConnected){
-            this._svg.replaceWith(value);
-        }
-        this._svg = value;
-    }
-
+    private _svg: SVGElement | undefined;
     updateSvg(): SVGElement {
         const newSvg = this.createSvg();
-        this.setSvg(newSvg)
+        
+        if(this._svg != undefined &&this._svg.isConnected){
+            this._svg.replaceWith(newSvg);
+        }
+        this._svg = newSvg;
+
         return newSvg;
     }
     createSvg() {

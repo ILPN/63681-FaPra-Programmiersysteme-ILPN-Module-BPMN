@@ -9,11 +9,12 @@ export class DraggableGraph implements SvgInterface {
     private bpmnGraph: BpmnGraph;
     constructor(bpmnGraph: BpmnGraph) {
         this.bpmnGraph = bpmnGraph;
+
+
         this.dEdges = bpmnGraph.edges.map((e,i)=>{
             const dragableEdge = new DraggableEdge(e,this)
             return dragableEdge
         })
-
         this.dNodes = bpmnGraph.nodes.map((n,i)=>{
             const dragableNode = new DraggableNode(n,this)
             const outDEdges = this.dEdges.filter((dE)=> dE.edge.from == n)
@@ -35,8 +36,6 @@ export class DraggableGraph implements SvgInterface {
         const c = Svg.container();
         const cNodes = Svg.container('nodes');
         const cEdges = Svg.container('edges');
-        const cDragHandles = Svg.container('dragHandles');
-
         c.appendChild(Svg.background());
 
         c.onmouseup = (event) => {
