@@ -12,24 +12,22 @@ import { Vector } from '../classes/Utils/Vector';
     providedIn: 'root'
 })
 export class LayoutService {
+    getSnapsFor(id: string):SnapElement[] {
+        //if(this.sugiResult == undefined)return []
+        return[]
+        
+    }
 
-    public snapsForLayer: SnapElement[] =[]
     initalLayoutHasBeenDone = false;
     public layout(bpmnGraph: BpmnGraph, drawingArea:SVGElement): void {
         
         const w = drawingArea.clientWidth;
         const h = drawingArea.clientHeight;
-       console.log("layout")
-        this.initalLayoutHasBeenDone = true
         const sugi = this.getSugiyamaResult(bpmnGraph, w, h, 100);
         //drawingArea.setAttribute("viewBox", `0 0 ${sugi.neededWidth} ${sugi.neededHeight}`) // so 
         this.setCoordinates(bpmnGraph,w,h)
-        this.setSnaps()
-    }
-    setSnaps() {
-        for (const layer of this.sugiResult!.layers) {
-            this.snapsForLayer.push(new SnapX(layer[0].x))
-        }
+
+        this.initalLayoutHasBeenDone = true
     }
     setCoordinates(bpmnGraph: BpmnGraph, w:number, h:number) {
         for (const bpmnNode of bpmnGraph.nodes) {

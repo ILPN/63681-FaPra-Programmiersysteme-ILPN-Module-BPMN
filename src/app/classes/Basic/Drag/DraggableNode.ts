@@ -5,7 +5,7 @@ import { DragHandle } from "./DragHandle";
 import { DraggableGraph } from "./DraggableGraph";
 
 export class DraggableNode implements SvgInterface{
-    private node:BpmnNode
+    public  node:BpmnNode
     private dwg:DraggableGraph
     private _dragHandle: DragHandle
     public get dragHandle(): DragHandle {
