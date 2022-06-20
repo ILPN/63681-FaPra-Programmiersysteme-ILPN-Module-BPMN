@@ -71,12 +71,15 @@ export class DraggableEdge implements SvgInterface{
             if(i== this.edge.corners.length-1) cornerPos = this.edge.nodeIntersection2
 
 
-            const pos = Vector.center(cornerBeforePos,cornerPos)
+            if(cornerBeforePos.distanceTo(cornerPos)> 20 ){
+                const pos = Vector.center(cornerBeforePos,cornerPos)
             const plusCircle = Svg.circleNoStyle(pos,"plusCircle")
             Utility.addSimulatedClickListener(plusCircle,() =>{
                 this.addCorner(i,pos)
             })
             c.appendChild(plusCircle)
+            }
+            
         }    
         return c    
     }

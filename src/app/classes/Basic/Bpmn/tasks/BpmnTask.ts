@@ -3,8 +3,8 @@ import { Svg } from "../../Svg/Svg";
 
 export class BpmnTask extends BpmnNode{
 
-    readonly width:number = 170
-    readonly heigth:number = 100
+    readonly width:number = 150//170 
+    readonly heigth:number = 90// 100 
     protected readonly logoX = -this.width/2 + 10
     protected readonly logoY =  -this.heigth/2 + 10
 

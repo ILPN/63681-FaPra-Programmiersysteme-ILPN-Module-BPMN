@@ -76,8 +76,19 @@ export class BpmnGraph
         let elementE3 = new BpmnEventEnd("E3");
         elementE3.setPosXY(1600,190)
         elementE3.label = "BpmnEventEnd"
-
         g.addNode(elementE3);
+
+
+        let elementEe3 = new BpmnEventEnd("Ee3");
+        elementEe3.setPosXY(1600,190)
+        elementEe3.label = "ende gelaende"
+        g.addNode(elementEe3);
+
+        let copou = new BpmnEdge("1vvv",elementEe3, elementE3);
+        g.addEdge(copou);
+
+
+
 
         let elementT1 = new BpmnTaskService("t1");
         elementT1.setPosXY(442,60) 

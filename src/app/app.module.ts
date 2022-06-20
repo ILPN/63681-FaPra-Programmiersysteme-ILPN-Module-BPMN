@@ -16,6 +16,7 @@ import {ErrorHintComponent} from './components/error-hint/error-hint.component';
 import { ModeSwitchComponent } from './components/mode-switch/mode-switch.component';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import { FormsModule } from '@angular/forms';
+import { DisplayDraggableGraphComponent } from './components/display-draggable-graph/display-draggable-graph.component';
 
 @NgModule({
     declarations: [
@@ -25,7 +26,8 @@ import { FormsModule } from '@angular/forms';
         ErrorHintComponent,
         InputFieldComponent,
         InputDirective,
-        ModeSwitchComponent
+        ModeSwitchComponent,
+        DisplayDraggableGraphComponent
     ],
     imports: [
         BrowserModule,

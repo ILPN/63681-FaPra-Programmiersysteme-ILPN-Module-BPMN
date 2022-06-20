@@ -4,12 +4,12 @@ import { Svg } from '../Svg/Svg';
 import { DraggableEdge } from './DraggableEdge';
 import { DraggableNode } from './DraggableNode';
 import { DragHandle } from './DragHandle';
+import { SnapElement } from './SnapElements/SnapElement';
 
 export class DraggableGraph implements SvgInterface {
     private bpmnGraph: BpmnGraph;
-    constructor(bpmnGraph: BpmnGraph) {
+    constructor(bpmnGraph: BpmnGraph, snaps?:SnapElement[]) {
         this.bpmnGraph = bpmnGraph;
-
 
         this.dEdges = bpmnGraph.edges.map((e,i)=>{
             const dragableEdge = new DraggableEdge(e,this)

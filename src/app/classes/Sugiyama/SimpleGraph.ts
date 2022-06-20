@@ -1,3 +1,5 @@
+import { BpmnGraph } from "../Basic/Bpmn/BpmnGraph"
+
 export class SimpleGraph{
   addArc(fromId: string, toId: string) {
     this.arcs.push(new SimpleArc(fromId, toId))
@@ -26,7 +28,6 @@ export class SimpleGraph{
         clone._arcs = [...this._arcs]
         return clone
     }
-
     getSinks() {
         return this.nodes.filter(n => 
             this.getOutArcs(n.id).length == 0
@@ -63,7 +64,6 @@ export class SimpleGraph{
             ra => a.to==ra.to && a.from == ra.from
         ));
     }
-
     removeIsolatedNodes() {
         this._nodes = this.nodes.filter(n=> this.getInOutArcs(n.id).length!=0 );
     }
@@ -100,6 +100,19 @@ export class SimpleGraph{
         return this.arcs.filter( a => a.from == id || a.to == id)
     }
    
+    
+
+
+    static convert(bpmnGraph:BpmnGraph):SimpleGraph{
+        const sGraph = new SimpleGraph()
+        for (const node of bpmnGraph.nodes) {
+            sGraph.addNode(node.id)
+        }
+        for (const edge of bpmnGraph.edges) {
+            sGraph.addArc(edge.fromId,edge.toId)
+        }
+        return sGraph
+    }
 }
 export class SimpleNode{
     private readonly _id: string

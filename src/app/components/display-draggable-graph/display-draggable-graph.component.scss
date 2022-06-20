@@ -1,0 +1,90 @@
+.canvas {
+    width: 100%;
+    height: 500px;
+    border-style: dotted;
+    border-color: lightgrey;
+    // so text of SVG does not get selected when dragging
+    cursor: default;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+.background {
+    fill: #ffffff;
+}
+
+$drag-color: #00b7ff92;
+$dummyColor: #002fff92;
+
+$hoverDummyColor: #32323292;
+
+
+$add-color: #00ff7b92;
+$arrow-inside-element-color: #ff006a;
+$deleteColor: #ff000092;
+$radiusSmall: 3px;
+$radius: 4px;
+$radiusMiddle: 4px;
+$radiusLarge: 6px;
+
+
+.plusCircle {
+    fill: $add-color;
+    r: $radiusSmall;
+}
+.deleteCircle{
+    fill: $deleteColor;
+    r: $radiusSmall;
+}
+
+
+.dummyNodeCircle{
+    r: $radiusLarge;
+    fill:$dummyColor
+}
+
+
+.snapLine{
+    fill:none;
+    stroke:#ff00005e;
+    stroke-width:2px;
+    stroke-linecap:butt;
+    stroke-linejoin:miter;
+    stroke-dasharray:4,4;
+    stroke-opacity:1
+}
+.snapPoint{
+    fill:none;
+    stroke:#ff000023;
+    stroke-width:1px;
+    stroke-linecap:butt;
+    stroke-linejoin:miter;
+    stroke-dasharray:4,4;
+    stroke-opacity:1
+}
+
+
+
+
+.dragHandleInnerCorner{
+    r:$radiusLarge;
+    fill: $drag-color
+}
+
+.dragHandleEndCorner{
+    r:$radiusMiddle;
+    fill: $drag-color
+}
+
+.endCircle {
+    fill: $arrow-inside-element-color;
+    r:$radiusSmall
+}
+.edgeLineInNode {
+    fill: none;
+    stroke: $arrow-inside-element-color;
+    stroke-width: 1px;
+    stroke-opacity: 1;
+}
