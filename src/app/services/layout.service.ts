@@ -14,7 +14,13 @@ import { Vector } from '../classes/Utils/Vector';
 export class LayoutService {
 
     public snapsForLayer: SnapElement[] =[]
-    public layout(bpmnGraph: BpmnGraph, w:number, h:number, drawingArea:SVGElement): void {
+    initalLayoutHasBeenDone = false;
+    public layout(bpmnGraph: BpmnGraph, drawingArea:SVGElement): void {
+        
+        const w = drawingArea.clientWidth;
+        const h = drawingArea.clientHeight;
+       console.log("layout")
+        this.initalLayoutHasBeenDone = true
         const sugi = this.getSugiyamaResult(bpmnGraph, w, h, 100);
         //drawingArea.setAttribute("viewBox", `0 0 ${sugi.neededWidth} ${sugi.neededHeight}`) // so 
         this.setCoordinates(bpmnGraph,w,h)

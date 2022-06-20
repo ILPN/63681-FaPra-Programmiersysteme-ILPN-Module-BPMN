@@ -34,21 +34,25 @@ export class DisplayDraggableGraphComponent implements OnDestroy,  AfterViewInit
   }
     ngAfterViewInit(): void {
         this._sub = this._displayService.diagram$.subscribe((diagram) => {
+            if(diagram == undefined)return
+            if(diagram.isEmpty())return
             this._diagram = diagram;
             if (this.drawingArea != undefined) {
-                const width = this.drawingArea.nativeElement.clientWidth;
-                const height = this.drawingArea.nativeElement.clientHeight;
-                this._layoutService.layout(
-                    this._diagram,
-                    width,
-                    height,
-                    this.drawingArea.nativeElement
-                );
-                //this.draw(this._diagram.createDiagramSVG());
-                //const g = BpmnGraph.sampleGraph()
+                if(!this._layoutService.initalLayoutHasBeenDone){
+                    this._layoutService.layout(
+                        this._diagram,
+                        this.drawingArea.nativeElement
+                    );
+      
+                }
+                
                 const dg = new DraggableGraph(diagram);
   
                 this.draw(dg.updateSvg());
+                
+                //this.draw(this._diagram.createDiagramSVG());
+                //const g = BpmnGraph.sampleGraph()
+                
                 //this.draw(diagram.updateSvg());
             }
         });

@@ -15,6 +15,7 @@ export class BpmnGraph
     extends BGraph<BpmnEdge, BpmnNode>
     implements SvgInterface
 {
+    
     constructor(){
         super()
         //this._svg = this.updateSvg()
