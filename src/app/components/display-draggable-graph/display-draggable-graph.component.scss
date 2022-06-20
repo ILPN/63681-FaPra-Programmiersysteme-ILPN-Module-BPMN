@@ -11,8 +11,8 @@
     user-select: none;
 }
 
-.background {
-    fill: #ffffff;
+.backgroundDraggableGraph {
+    fill: #b4b4b4;
 }
 
 $drag-color: #00b7ff92;
@@ -56,13 +56,9 @@ $radiusLarge: 6px;
     stroke-opacity:1
 }
 .snapPoint{
-    fill:none;
-    stroke:#ff000023;
-    stroke-width:1px;
-    stroke-linecap:butt;
-    stroke-linejoin:miter;
-    stroke-dasharray:4,4;
-    stroke-opacity:1
+    fill:#ff00005e;
+    stroke:none;
+    r: $radiusLarge
 }
 
 
@@ -76,6 +72,10 @@ $radiusLarge: 6px;
 .dragHandleEndCorner{
     r:$radiusMiddle;
     fill: $drag-color
+}
+.dragHandleDummyCorner{
+    r:$radiusLarge;
+    fill: $dummyColor
 }
 
 .endCircle {

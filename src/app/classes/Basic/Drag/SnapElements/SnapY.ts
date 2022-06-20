@@ -23,7 +23,7 @@ export class SnapY extends SnapElement{
     createSVG(): SVGElement {
         let pathSvg = Utility.createSvgElement('path');
         pathSvg.classList.add("snapLine")
-        pathSvg.setAttribute('d', `M 0,${this._y} 10000,${this._y}  `);
+        pathSvg.setAttribute('d', `M -10000,${this._y} 10000,${this._y}  `);
         return pathSvg
     }
 }

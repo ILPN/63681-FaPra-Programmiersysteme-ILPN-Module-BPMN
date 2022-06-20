@@ -1,13 +1,15 @@
-import { Line } from "../../Utils/Line";
-import { Vector } from "../../Utils/Vector";
-import { BEdge } from "../B/BEdge";
-import { Position } from "../Interfaces/Position";
-import { Svg } from "../Svg/Svg";
-import { SvgInterface } from "../Interfaces/SvgInterface";
-import { BpmnNode } from "./BpmnNode";
-import { BpmnEvent } from "./events/BpmnEvent";
-import { BpmnGateway } from "./gateways/BpmnGateway";
-import { BpmnTask } from "./tasks/BpmnTask";
+import { Line } from "../../../Utils/Line";
+import { Vector } from "../../../Utils/Vector";
+import { BEdge } from "../../B/BEdge";
+import { Position } from "../../Interfaces/Position";
+import { Svg } from "../../Svg/Svg";
+import { SvgInterface } from "../../Interfaces/SvgInterface";
+import { BpmnNode } from "../BpmnNode";
+import { BpmnEvent } from "../events/BpmnEvent";
+import { BpmnGateway } from "../gateways/BpmnGateway";
+import { BpmnTask } from "../tasks/BpmnTask";
+import { BpmnEdgeCorner } from "./BpmnEdgeCorner";
+import { BpmnDummyEdgeCorner } from "./BpmnDummyEdgeCorner";
 
 export class BpmnEdge extends BEdge implements SvgInterface{
     setStartPos(x: number, y: number) {
@@ -84,8 +86,8 @@ export class BpmnEdge extends BEdge implements SvgInterface{
         return corner
     }
 
-    addDummyCorner(pos: Vector, at: number = -1):BpmnEdgeCorner {
-        const corner = new BpmnEdgeCorner(pos.x,pos.y);
+    addDummyCorner(id:string, pos: Vector, at: number = -1):BpmnEdgeCorner {
+        const corner = new BpmnDummyEdgeCorner(id,pos);
         corner._deletable = false
         this.addCornerr(corner,at)
         return corner
@@ -349,40 +351,5 @@ export class BpmnEdge extends BEdge implements SvgInterface{
         return intersections[0];
     }
 
-
-}
-
-export class BpmnEdgeCorner implements Position{
-    public _deletable: boolean;
-    constructor(x:number = 0, y:number = 0){
-        this._x = x
-        this._y = y
-        this._deletable = true
-    }
-    getPos(): Vector {
-        return new Vector(this.x, this.y);
-    }
-    setPos(pos: Vector): void {
-        this.x = pos.x;
-        this.y = pos.y;
-    }
-    setPosXY(x: number, y: number): void {
-        this.x = x;
-        this.y = y;
-    }
-    private _x: number = 0;
-    public get x(): number {
-        return this._x;
-    }
-    public set x(value: number) {
-        this._x = value;
-    }
-    private _y: number = 0;
-    public get y(): number {
-        return this._y;
-    }
-    public set y(value: number) {
-        this._y = value;
-    }
 
 }

@@ -1,4 +1,5 @@
 import { LayoutService } from 'src/app/services/layout.service';
+import { BpmnDummyEdgeCorner } from '../Bpmn/BpmnEdge/BpmnDummyEdgeCorner';
 import { BpmnGraph } from '../Bpmn/BpmnGraph';
 import { SvgInterface } from '../Interfaces/SvgInterface';
 import { Svg } from '../Svg/Svg';
@@ -9,15 +10,37 @@ import { SnapElement } from './SnapElements/SnapElement';
 
 export class DraggableGraph implements SvgInterface {
     private bpmnGraph: BpmnGraph;
-    constructor(bpmnGraph: BpmnGraph, layoutService:LayoutService) {
+    constructor(bpmnGraph: BpmnGraph, layoutService:LayoutService, rootSvg:SVGElement) {
         this.bpmnGraph = bpmnGraph;
         this.convertToDraggableNodesAndEdges()
+        this.attachListenersForDragging(rootSvg)
+        this.attachSnapings(layoutService)
 
+    }
+    attachSnapings(layoutService:LayoutService) {
 
+        //for nodes
+        for (const dn of this.dNodes) {
+            dn.dragHandle.addSnapElements(layoutService.getSnapsFor(dn.node.id))
 
+        }
 
+        //for dummyNodes
+        for (const de of this.dEdges) {
+            for (const corner of de.edge.corners) {
+                if(corner instanceof BpmnDummyEdgeCorner)
+                corner.dragHandle.addSnapElements(layoutService.getSnapsFor(corner.id))
 
-       
+            }
+        }
+    }
+    attachListenersForDragging(rootSvg: SVGElement) {
+        rootSvg.onmouseup = (event) => {
+            this.stopDrag(event);
+        };
+        rootSvg.onmousemove = (event) => {
+            this.drag(event);
+        };
     }
     convertToDraggableNodesAndEdges() {
         this.dEdges = this.bpmnGraph.edges.map((e,i)=>{
@@ -44,14 +67,7 @@ export class DraggableGraph implements SvgInterface {
         const c = Svg.container();
         const cNodes = Svg.container('nodes');
         const cEdges = Svg.container('edges');
-        c.appendChild(Svg.background());
-
-        c.onmouseup = (event) => {
-            this.stopDrag(event);
-        };
-        c.onmousemove = (event) => {
-            this.drag(event);
-        };
+        
 
         for (const n of this.dNodes) {
             cNodes.appendChild(n.updateSvg());

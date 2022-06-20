@@ -1,5 +1,5 @@
 import { BGraph } from '../B/BGraph';
-import { BpmnEdge } from './BpmnEdge';
+import { BpmnEdge } from './BpmnEdge/BpmnEdge';
 import { BpmnEventEnd } from './events/BpmnEventEnd';
 import { BpmnEventIntermediate } from './events/BpmnEventIntermediate';
 import { BpmnEventStart } from './events/BpmnEventStart';
@@ -33,7 +33,6 @@ export class BpmnGraph
     }
     createSvg() {
         const c = Svg.container()
-        c.appendChild(Svg.background())
         for (const n of this.nodes) {
             c.appendChild(n.updateSvg())
         }

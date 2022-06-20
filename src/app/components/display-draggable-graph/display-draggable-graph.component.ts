@@ -21,6 +21,7 @@ import { DraggableGraph } from 'src/app/classes/Basic/Drag/DraggableGraph';
 })
 export class DisplayDraggableGraphComponent implements OnDestroy,  AfterViewInit {
   @ViewChild('drawingArea') drawingArea: ElementRef<SVGElement> | undefined;
+  @ViewChild('rootSvg') rootSvg: ElementRef<SVGElement> | undefined;
 
   private _sub: Subscription |  undefined;
   private _diagram: BpmnGraph | undefined;
@@ -36,17 +37,19 @@ export class DisplayDraggableGraphComponent implements OnDestroy,  AfterViewInit
         this._sub = this._displayService.diagram$.subscribe((diagram) => {
             if(diagram == undefined)return
             if(diagram.isEmpty())return
+            if (this.rootSvg == undefined || this.drawingArea == undefined) return 
             this._diagram = diagram;
-            if (this.drawingArea != undefined) {
                 if(!this._layoutService.initalLayoutHasBeenDone){
                     this._layoutService.layout(
                         this._diagram,
-                        this.drawingArea.nativeElement
+                        this.rootSvg!.nativeElement.clientWidth,
+                        this.rootSvg!.nativeElement.clientHeight
                     );
                 }
+
                 this._layoutService.setViewBox(this.drawingArea.nativeElement)
                 
-                const dg = new DraggableGraph(diagram, this._layoutService);
+                const dg = new DraggableGraph(diagram, this._layoutService, this.rootSvg!.nativeElement);
   
                 this.draw(dg.updateSvg());
                 
@@ -54,7 +57,7 @@ export class DisplayDraggableGraphComponent implements OnDestroy,  AfterViewInit
                 //const g = BpmnGraph.sampleGraph()
                 
                 //this.draw(diagram.updateSvg());
-            }
+            
         });
     }
 
@@ -67,25 +70,8 @@ export class DisplayDraggableGraphComponent implements OnDestroy,  AfterViewInit
           console.debug('drawing area not ready yet');
           return;
       }
-      console.log('draw is called');
-
       this.clearDrawingArea();
-
       this.drawingArea.nativeElement.appendChild(svg);
-
-      /*
-      const elements = this._svgService.createSvgElements(this._displayService.diagram);
-      for (const element of elements) {
-          this.drawingArea.nativeElement.appendChild(element);
-      }
-      */
-
-      /*const el1 = new Gateway("1", GatewayType.AND_JOIN)
-     const el2 = new MyElement("2")
-
-     this.drawingArea.nativeElement.appendChild(el1.getSVGThatWillBeAttachedToDom())
-     this.drawingArea.nativeElement.appendChild(el2.getSvgWithListeners())
-      */
   }
 
   private clearDrawingArea() {

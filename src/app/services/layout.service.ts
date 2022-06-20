@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { BpmnGraph } from '../classes/Basic/Bpmn/BpmnGraph';
 import { SnapElement } from '../classes/Basic/Drag/SnapElements/SnapElement';
+import { SnapPoint } from '../classes/Basic/Drag/SnapElements/SnapPoint';
 import { SnapX } from '../classes/Basic/Drag/SnapElements/SnapX';
 import { LayeredGraph, LNode } from '../classes/Sugiyama/LayeredGraph';
 import { SimpleGraph } from '../classes/Sugiyama/SimpleGraph';
@@ -12,9 +13,17 @@ import { Vector } from '../classes/Utils/Vector';
 })
 export class LayoutService {
     getSnapsFor(id: string):SnapElement[] {
-        //if(this.sugiResult == undefined)return []
-        return[]
-        
+        const ln = this.sugiResult?.getNode(id)
+        if(ln == undefined) return[]
+        const snaps = []
+        snaps.push(new SnapX(this.getPosForLayerAndOrder(ln.layer,ln.order).x))
+
+        const biggestOrderIndex = [...this.sugiResult!.layers].sort((l1,l2) =>l2.length -l1.length)[0].length-1
+        for (let i = 0; i <= biggestOrderIndex; i++) {
+            snaps.push(new SnapPoint(this.getPosForLayerAndOrder(ln.layer,i)))
+            
+        }
+        return snaps
     }
 
     initalLayoutHasBeenDone = false;
@@ -25,22 +34,27 @@ export class LayoutService {
     private spacingYAxis= 100
     private padding = new Vector(100,100)
     public setViewBox(drawingArea:SVGElement){
-        drawingArea.setAttribute("viewBox", `0 0 ${this.width} ${this.height}`)
+        const centerOfView = (new Vector(this.width,this.height)).half()
+        const centerOfGraph = this._graphDimensions!.half()
+        const shift = centerOfGraph.minus(centerOfView)
+        drawingArea.setAttribute("viewBox", `${shift.x } ${shift.y} ${this.width} ${this.height}`)
     }
 
-    public layout(bpmnGraph: BpmnGraph, drawingArea:SVGElement): void {
+    public layout(bpmnGraph: BpmnGraph, w:number, h:number): void {
         this.getSugiyamaResult(bpmnGraph);
 
-         this.width = drawingArea.clientWidth;
-         this.height = drawingArea.clientHeight;
+         this.width = w
+         this.height = h
 
          this.getGraphDimensions()
-         this.scaleWidthAndHeightIfGraphToBig(drawingArea)
+         this.scaleWidthAndHeightIfGraphToBig()
+
+        
         this.setCoordinates(bpmnGraph)
 
         this.initalLayoutHasBeenDone = true
     }
-    scaleWidthAndHeightIfGraphToBig(drawingArea:SVGElement) {
+    scaleWidthAndHeightIfGraphToBig() {
         const xRatio = (this._graphDimensions!.x+ 2* this.padding.x) / this.width
         const yRatio = (this._graphDimensions!.y+ 2* this.padding.y) / this.height
         const scalingFactor = (xRatio>yRatio)? xRatio:yRatio
@@ -53,7 +67,7 @@ export class LayoutService {
     setCoordinates(bpmnGraph: BpmnGraph) {
         for (const bpmnNode of bpmnGraph.nodes) {
             const ln = this.sugiResult!.getNode(bpmnNode.id)
-            bpmnNode.setPos(this.getRealPosForNode(ln!))
+            bpmnNode.setPos(this.getPosForLayerAndOrder(ln!.layer,ln!.order))
 
             const inEdges = bpmnGraph.edges.filter(e => e.to == bpmnNode)
             for (const inEdge of inEdges) {
@@ -72,7 +86,7 @@ export class LayoutService {
         for (const edge of bpmnGraph.edges) {
             const dNodes = this.sugiResult!.getSortedDummysForEdge(edge.fromId,edge.toId)
             for (const d of dNodes) {
-                edge.addCorner(this.getRealPosForNode(d))
+                edge.addDummyCorner(d.id,this.getPosForLayerAndOrder(d.layer,d.order))
             }
         }
     }
@@ -85,20 +99,17 @@ export class LayoutService {
         let biggestX = 0
         let biggestY = 0
         for (const n of this.sugiResult!.getAllNodes()) {
-            const pos = this.getRawPosForNode(n)
+            const pos = this.getPosForLayerAndOrder(n.layer,n.order)
             if(pos.x> biggestX) biggestX = pos.x
             if(pos.y> biggestY) biggestY = pos.y
         }
         this._graphDimensions = new Vector(biggestX,biggestY)
         return  this._graphDimensions
     }
-    private getRawPosForNode(ln: LNode): Vector {
-        return new Vector(ln.layer*this.spacingXAxis,ln.order * this.spacingYAxis)
-    }
-    private getRealPosForNode(ln: LNode): Vector {
-        //centering
-        const wh = new Vector(this.width, this.height)
-        return this.getRawPosForNode(ln).plus(wh.half()).minus(this._graphDimensions!.half())
+    private getPosForLayerAndOrder(layer:number, order:number): Vector {
+        const x = layer*this.spacingXAxis
+        const y = order * this.spacingYAxis
+        return new Vector(x,y)
     }
 
      sugiResult: LayeredGraph| undefined
