@@ -1,5 +1,5 @@
 import { BGraph } from '../B/BGraph';
-import { BpmnEdge } from './BpmnEdge';
+import { BpmnEdge } from './BpmnEdge/BpmnEdge';
 import { BpmnEventEnd } from './events/BpmnEventEnd';
 import { BpmnEventIntermediate } from './events/BpmnEventIntermediate';
 import { BpmnEventStart } from './events/BpmnEventStart';
@@ -15,6 +15,7 @@ export class BpmnGraph
     extends BGraph<BpmnEdge, BpmnNode>
     implements SvgInterface
 {
+    
     constructor(){
         super()
         //this._svg = this.updateSvg()
@@ -32,7 +33,6 @@ export class BpmnGraph
     }
     createSvg() {
         const c = Svg.container()
-        c.appendChild(Svg.background())
         for (const n of this.nodes) {
             c.appendChild(n.updateSvg())
         }
@@ -76,8 +76,19 @@ export class BpmnGraph
         let elementE3 = new BpmnEventEnd("E3");
         elementE3.setPosXY(1600,190)
         elementE3.label = "BpmnEventEnd"
-
         g.addNode(elementE3);
+
+
+        let elementEe3 = new BpmnEventEnd("Ee3");
+        elementEe3.setPosXY(1600,190)
+        elementEe3.label = "ende gelaende"
+        g.addNode(elementEe3);
+
+        let copou = new BpmnEdge("1vvv",elementEe3, elementE3);
+        g.addEdge(copou);
+
+
+
 
         let elementT1 = new BpmnTaskService("t1");
         elementT1.setPosXY(442,60) 

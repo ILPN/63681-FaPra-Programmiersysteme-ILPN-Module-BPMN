@@ -16,4 +16,8 @@ export class BGraph<E extends BEdge, N extends BNode>{
     public set nodes(value: N[]) {
         this._nodes = value;
     }
+
+    isEmpty() {
+        return this._nodes.length ==0
+    }
 }

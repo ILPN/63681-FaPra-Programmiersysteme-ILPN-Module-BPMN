@@ -4,9 +4,15 @@
     <!--  Header  -->
     <a href="https://www.fernuni-hagen.de/ilovepetrinets/"><h1>I <span class="red">❤</span> Petri Nets</h1></a>
     <h2>Subtitle</h2>
-   <app-mode-switch></app-mode-switch>
+    <app-mode-switch></app-mode-switch>
     <!--    Main content    -->
-    <app-display class="padding full-size"></app-display>
+    <div [ngSwitch]="mode">
+        <app-display-draggable-graph *ngSwitchCase="'Drag Free'"
+        class="padding full-size"></app-display-draggable-graph>
+        <app-display *ngSwitchCase="'Sugiyama Mode'"
+        class="padding full-size"></app-display>
+    </div>
+    
 
 
     <div fxLayout="row" fxLayoutAlign="space-evenly start">

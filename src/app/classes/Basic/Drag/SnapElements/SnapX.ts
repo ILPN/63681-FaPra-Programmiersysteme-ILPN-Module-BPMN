@@ -17,7 +17,7 @@ export class SnapX extends SnapElement{
     createSVG(): SVGElement {
         let pathSvg = Utility.createSvgElement('path');
         pathSvg.classList.add("snapLine")
-        pathSvg.setAttribute('d', `M ${this._x},${0} ${this._x},${10000}`);
+        pathSvg.setAttribute('d', `M ${this._x},${-10000} ${this._x},${10000}`);
 
         return pathSvg
     }

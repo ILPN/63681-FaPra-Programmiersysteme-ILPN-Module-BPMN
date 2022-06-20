@@ -1,4 +1,6 @@
+import { Utility } from "src/app/classes/Utils/Utility";
 import { Vector } from "src/app/classes/Utils/Vector";
+import { Svg } from "../../Svg/Svg";
 import { SnapElement } from "./SnapElement";
 
 export class SnapPoint extends SnapElement{
@@ -15,12 +17,7 @@ export class SnapPoint extends SnapElement{
         return this.position
     }
     createSVG(): SVGElement {
-        const svg = Utility.createSvgElement("circle")
-        svg.setAttribute("cx",`${this.position.x}`)
-        svg.setAttribute("cy",`${this.position.y}`)
-        svg.setAttribute("r", ""+this.radius)
-        svg.classList.add("snapPoint")
-        return svg
+        return Svg.circleNoStyle(this.position,"snapPoint")
     }
     
 }

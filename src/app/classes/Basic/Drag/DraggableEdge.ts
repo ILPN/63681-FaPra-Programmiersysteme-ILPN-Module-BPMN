@@ -2,12 +2,13 @@ import { SnapX } from "./SnapElements/SnapX";
 import { SnapY } from "./SnapElements/SnapY";
 import { Utility } from "../../Utils/Utility";
 import { Vector } from "../../Utils/Vector";
-import { BpmnEdge, BpmnEdgeCorner } from "../Bpmn/BpmnEdge";
-import { Position } from "../Interfaces/Position";
+import { BpmnEdge } from "../Bpmn/BpmnEdge/BpmnEdge";
 import { SvgInterface } from "../Interfaces/SvgInterface";
 import { Svg } from "../Svg/Svg";
 import { DragHandle } from "./DragHandle";
 import { DraggableGraph } from "./DraggableGraph";
+import { BpmnEdgeCorner } from "../Bpmn/BpmnEdge/BpmnEdgeCorner";
+import { BpmnDummyEdgeCorner } from "../Bpmn/BpmnEdge/BpmnDummyEdgeCorner";
 
 export class DraggableEdge implements SvgInterface{
     private _edge: BpmnEdge;
@@ -23,6 +24,10 @@ export class DraggableEdge implements SvgInterface{
 }
     private newDragHandle(corner:BpmnEdgeCorner){
         const dragHandle = new DragHandle(corner)
+        this.addCallbacksToDragHandle(dragHandle)
+        return dragHandle
+    }
+    private addCallbacksToDragHandle(dragHandle:DragHandle){
         dragHandle.addCallbackAfterDrag(() => this.updateSvg())
         dragHandle.addCallbackbeforeStartDrag((dE,dH) =>{
             this.dragged = true
@@ -32,7 +37,6 @@ export class DraggableEdge implements SvgInterface{
             this.dragged = false
             this.updateSvg()
         } )
-        return dragHandle
     }
 
     getEndCornerDragHandle(){
@@ -71,12 +75,15 @@ export class DraggableEdge implements SvgInterface{
             if(i== this.edge.corners.length-1) cornerPos = this.edge.nodeIntersection2
 
 
-            const pos = Vector.center(cornerBeforePos,cornerPos)
+            if(cornerBeforePos.distanceTo(cornerPos)> 20 ){
+                const pos = Vector.center(cornerBeforePos,cornerPos)
             const plusCircle = Svg.circleNoStyle(pos,"plusCircle")
             Utility.addSimulatedClickListener(plusCircle,() =>{
                 this.addCorner(i,pos)
             })
             c.appendChild(plusCircle)
+            }
+            
         }    
         return c    
     }
@@ -102,14 +109,25 @@ export class DraggableEdge implements SvgInterface{
 
 
             }else{
-                const dragCir = Svg.circleNoStyle(corner.getPos(),"dragHandleInnerCorner")
-                dragCir.onmousedown = (e) => {
-                    const dragHandle = this.newDragHandle(corner)
-                    this.addSnapsToDragHandle(dragHandle)
-                    this.dwg.startDrag(e,dragHandle)
+                
+                if(corner instanceof BpmnDummyEdgeCorner){
+                    const dragCir = Svg.circleNoStyle(corner.getPos(),"dragHandleDummyCorner")
+                    dragCir.onmousedown = (e) => {
+                        this.addCallbacksToDragHandle(corner.dragHandle)
+                        this.dwg.startDrag(e,corner.dragHandle)
+                    }
+                    c.appendChild(dragCir)
+                }else{
+                    const dragCir = Svg.circleNoStyle(corner.getPos(),"dragHandleInnerCorner")
+                    dragCir.onmousedown = (e) => {
+                        const dragHandle = this.newDragHandle(corner)
+                        this.addSnapsToDragHandle(dragHandle)
+                        this.dwg.startDrag(e,dragHandle)
+                    }
+                    c.appendChild(dragCir)
+                    c.appendChild(this.deleteCircle(i,corner))  
                 }
-                c.appendChild(dragCir)
-                c.appendChild(this.deleteCircle(i,corner))
+                
             }
         }
         return c

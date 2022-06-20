@@ -37,6 +37,11 @@ export class DragHandle{
     public addSnapElement(snapElement: SnapElement){
         this.snapElements.push(snapElement)
     }
+    public addSnapElements(snapElements: SnapElement[]){
+        for (const snap of snapElements) {
+            this.addSnapElement(snap)
+        }
+    }
     private snapSvg:SVGElement | undefined
     /**
      * 
@@ -98,7 +103,6 @@ export class DragHandle{
     }
     stopDrag(){
         this.snapSvg?.remove()
-        this.snapElements =[]
         for (const dragHandle of this.dragedAlong) {
             dragHandle.stopDrag()
         }
