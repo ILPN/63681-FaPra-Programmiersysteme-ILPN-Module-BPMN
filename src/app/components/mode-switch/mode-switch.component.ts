@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { AppComponent } from 'src/app/app.component';
 
 
 @Component({
@@ -11,7 +12,7 @@ export class ModeSwitchComponent implements OnInit {
   toggleOptions: Array<String> = ["Drag Free", "Sugiyama Mode", "Switch Diagram"];
   isFreeMode: boolean = false;
 
-  constructor() {
+  constructor( private _appComponent: AppComponent) {
     this.selectedToggle = "Drag Free",
     this.setIsFreeMode();
   }
@@ -24,8 +25,8 @@ export class ModeSwitchComponent implements OnInit {
     console.log("Selected value: " + item.value);
 
     this.selectedToggle = item.value
+    this._appComponent.mode = item.value
 
-    this.setIsFreeMode();
   }
 
   setIsFreeMode(){

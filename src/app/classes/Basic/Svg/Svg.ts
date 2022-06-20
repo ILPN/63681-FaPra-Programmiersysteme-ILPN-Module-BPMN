@@ -12,7 +12,7 @@ export class Svg{
         return this.createSvgElement("svg")
     }
     static pointer(position: Vector, direction:Vector) {
-        const headLength = 20;
+        const headLength = 15;
         const headWidth = 10;
         const half = headWidth/2
 

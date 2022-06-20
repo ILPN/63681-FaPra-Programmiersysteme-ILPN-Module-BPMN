@@ -12,19 +12,9 @@ import { SvgService } from './services/svg.service';
     styleUrls: ['./app.component.scss'],
 })
 export class AppComponent implements OnDestroy {
+
+    mode = "Drag Free"
     public textareaFc: FormControl;
-
-    selectedToggle: string ="Drag Free";
-    toggleOptions: Array<String> = ["Drag Free", "Sugiyama Mode", "Switch Diagram"];
-  
-    selectionChanged(item : any) {
-        console.log("Selected value: " + item.value);
-    
-        this.selectedToggle = item.value
-    
-        //this.setIsFreeMode();
-      }
-
     private _sub: Subscription;
 
     constructor(

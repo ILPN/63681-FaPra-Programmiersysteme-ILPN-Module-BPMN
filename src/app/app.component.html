@@ -4,15 +4,9 @@
     <!--  Header  -->
     <a href="https://www.fernuni-hagen.de/ilovepetrinets/"><h1>I <span class="red">❤</span> Petri Nets</h1></a>
     <h2>Subtitle</h2>
-   <!--  <app-mode-switch></app-mode-switch>-->
+    <app-mode-switch></app-mode-switch>
     <!--    Main content    -->
-
-    <mat-button-toggle-group [(value)]="selectedToggle" #group="matButtonToggleGroup" multiple=false>
-        <mat-button-toggle *ngFor="let item of toggleOptions;" (change)="selectionChanged($event)" [value]="item">
-            {{item}}</mat-button-toggle>
-    </mat-button-toggle-group>
-
-    <div [ngSwitch]="selectedToggle">
+    <div [ngSwitch]="mode">
         <app-display-draggable-graph *ngSwitchCase="'Drag Free'"
         class="padding full-size"></app-display-draggable-graph>
         <app-display *ngSwitchCase="'Sugiyama Mode'"
