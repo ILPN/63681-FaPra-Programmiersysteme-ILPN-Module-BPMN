@@ -36,7 +36,9 @@ export class DisplayComponent implements OnDestroy, AfterViewInit {
     ngAfterViewInit(): void {
         this._sub = this._displayService.diagram$.subscribe((diagram) => {
             this._diagram = diagram;
-                this.draw(diagram.updateSvg());
+            if(this.drawingArea == undefined) return
+            this._layoutService.setViewBox(this.drawingArea.nativeElement)
+            this.draw(diagram.updateSvg());
         });
     }
 

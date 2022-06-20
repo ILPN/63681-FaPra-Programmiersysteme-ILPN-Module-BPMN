@@ -21,8 +21,9 @@ export class Sugiyama {
         this.addDummies();
         this.ordering();
         this.reverseReversedArcs();
-        this.calculateCoordinates1();
+        //this.calculateCoordinates1();
     }
+    /*
     private calculateCoordinates() {
         for (let l = 0; l < this.leveled.layers.length; l++) {
             const layer = this.leveled.layers[l];
@@ -79,6 +80,7 @@ export class Sugiyama {
             n.y = n.y + this.neededHeight/2 -graphHeight/2
         }
     }
+     */
     reverseReversedArcs() {
         const revArcs = this.leveled.arcs.filter((arc) => arc.reversed);
         revArcs.forEach((ra) => {
@@ -96,6 +98,7 @@ export class Sugiyama {
             }
         }
     }
+   
     private ordering() {
         /**
          * A i<= 1

@@ -3,8 +3,6 @@ import { FormControl } from '@angular/forms';
 import { ParserService } from './services/parser.service';
 import { DisplayService } from './services/display.service';
 import { debounceTime, Subscription } from 'rxjs';
-import { applySugiyama } from './classes/Sugiyama/SugiyamaForDiagram';
-import { SvgService } from './services/svg.service';
 
 @Component({
     selector: 'app-root',

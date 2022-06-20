@@ -3,15 +3,10 @@ import { SimpleGraph } from "./SimpleGraph";
 export class LayeredGraph {
   getSortedDummysForEdge(from: string, to: string) {
     const dummys = this.getAllDummys().filter(dn => dn.fromId == from && dn.toId == to)
-
    
     const edgeAscending = ()=> (this.getNode(from)!.layer< this.getNode(to)!.layer)
    
     return dummys.sort((a,b) => edgeAscending()? a.layer-b.layer: b.layer - a.layer)
-  }
-  getXOfLayer(layer: number) {
-    if(layer > this.layers.length) return 0
-    else return this.layers[layer][0].x
   }
   getArc(a: LArc) :LArc {
       const arc = this.arcs.find(ar=> ar == a)
@@ -95,6 +90,8 @@ export class LNode{
     public get id(): string {
         return this._id
     }
+
+    /*
   private _x: number = -1;
   public get x(): number {
     return this._x;
@@ -108,7 +105,7 @@ export class LNode{
   }
   public set y(value: number) {
     this._y = value;
-  }
+  }*/
   private _layer = -1;
   public get layer() {
     return this._layer;
