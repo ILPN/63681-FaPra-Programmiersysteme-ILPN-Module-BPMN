@@ -7,6 +7,6 @@ import { BpmnGraph } from '../classes/Basic/Bpmn/BpmnGraph';
 export class SvgService {
 
     public createSvgElements(diagram: BpmnGraph): Array<SVGElement> {
-        return [diagram.updateSvg()];
+        return [diagram.svgManager.getSvg()];
     }
 }

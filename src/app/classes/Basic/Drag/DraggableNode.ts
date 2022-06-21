@@ -1,10 +1,8 @@
 import { BpmnNode } from "../Bpmn/BpmnNode";
-import { SvgInterface } from "../Interfaces/SvgInterface";
-import { Svg } from "../Svg/Svg";
 import { DragHandle } from "./DragHandle";
 import { DraggableGraph } from "./DraggableGraph";
 
-export class DraggableNode implements SvgInterface{
+export class DraggableNode{
     public  node:BpmnNode
     private dwg:DraggableGraph
     private _dragHandle: DragHandle
@@ -13,27 +11,11 @@ export class DraggableNode implements SvgInterface{
     }
     constructor(node:BpmnNode, dwg:DraggableGraph){
         this.node = node
+        this.node.svgManager.getSvg().onmousedown = (e) => this.dwg.startDrag(e,this.dragHandle)
         this.dwg = dwg
         this._dragHandle = new DragHandle(node)
-        this.dragHandle.addCallbackAfterDrag(() =>{
-            this.updateSvg()
+        this.dragHandle.addCallbackAfterDragTo(() =>{
+            this.node.svgManager.redraw()
         })
-    }
-    private _svg: SVGElement | undefined;
-    updateSvg(): SVGElement {
-        const newSvg = this.createSvg();
-        
-        if(this._svg != undefined &&this._svg.isConnected){
-            this._svg.replaceWith(newSvg);
-        }
-        this._svg = newSvg;
-
-        return newSvg;
-    }
-    createSvg():SVGElement{
-        const c = Svg.container()
-        c.appendChild(this.node.createSvg())
-        c.onmousedown = (e)=> this.dwg.startDrag(e, this.dragHandle)
-        return c
     }
 }

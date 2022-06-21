@@ -51,7 +51,7 @@ export class DisplayDraggableGraphComponent implements OnDestroy,  AfterViewInit
                 
                 const dg = new DraggableGraph(diagram, this._layoutService, this.rootSvg!.nativeElement);
   
-                this.draw(dg.updateSvg());
+                this.draw(dg.svgManager.getSvg());
                 
                 //this.draw(this._diagram.createDiagramSVG());
                 //const g = BpmnGraph.sampleGraph()

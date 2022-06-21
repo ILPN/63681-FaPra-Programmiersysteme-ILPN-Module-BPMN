@@ -13,6 +13,8 @@ import { LayoutService } from '../../services/layout.service';
 import { SvgService } from '../../services/svg.service';
 import { BpmnGraph } from 'src/app/classes/Basic/Bpmn/BpmnGraph';
 import { DraggableGraph } from 'src/app/classes/Basic/Drag/DraggableGraph';
+import { MyTestNode } from 'src/app/classes/Basic/Bpmn/MyTestNode';
+import { Vector } from 'src/app/classes/Utils/Vector';
 
 @Component({
     selector: 'app-display',
@@ -37,8 +39,18 @@ export class DisplayComponent implements OnDestroy, AfterViewInit {
         this._sub = this._displayService.diagram$.subscribe((diagram) => {
             this._diagram = diagram;
             if(this.drawingArea == undefined) return
-            this._layoutService.setViewBox(this.drawingArea.nativeElement)
-            this.draw(diagram.updateSvg());
+            //this._layoutService.setViewBox(this.drawingArea.nativeElement)
+            //this.draw(diagram.updateSvg());
+
+
+            const testNOde = new MyTestNode("test")
+            testNOde.setPosXY(100,100)
+            testNOde.svgManager.getSvg().onclick = ()=>{
+                testNOde.setPos(testNOde.getPos().plus(new Vector(10,20)))
+                testNOde.svgManager.redraw()
+            }
+            this.draw(testNOde.svgManager.getSvg())
+
         });
     }
 

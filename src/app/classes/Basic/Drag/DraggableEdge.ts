@@ -3,14 +3,26 @@ import { SnapY } from "./SnapElements/SnapY";
 import { Utility } from "../../Utils/Utility";
 import { Vector } from "../../Utils/Vector";
 import { BpmnEdge } from "../Bpmn/BpmnEdge/BpmnEdge";
-import { SvgInterface } from "../Interfaces/SvgInterface";
 import { Svg } from "../Svg/Svg";
 import { DragHandle } from "./DragHandle";
 import { DraggableGraph } from "./DraggableGraph";
 import { BpmnEdgeCorner } from "../Bpmn/BpmnEdge/BpmnEdgeCorner";
 import { BpmnDummyEdgeCorner } from "../Bpmn/BpmnEdge/BpmnDummyEdgeCorner";
+import { GetSvgManager } from "../Interfaces/GetSvgManager";
+import { SvgManager } from "../Svg/SvgManager/SvgManager";
 
-export class DraggableEdge implements SvgInterface{
+export class DraggableEdge implements GetSvgManager{
+    private _svgManager: SvgManager | undefined;
+    public get svgManager(): SvgManager {
+        if(this._svgManager == undefined){
+            this._svgManager = new SvgManager("DraggableGraph",() => this.svgCreation())
+        }
+        return this._svgManager;
+    }
+    
+    
+    
+    
     private _edge: BpmnEdge;
     public get edge(): BpmnEdge {
         return this._edge;
@@ -28,14 +40,14 @@ export class DraggableEdge implements SvgInterface{
         return dragHandle
     }
     private addCallbacksToDragHandle(dragHandle:DragHandle){
-        dragHandle.addCallbackAfterDrag(() => this.updateSvg())
-        dragHandle.addCallbackbeforeStartDrag((dE,dH) =>{
+        dragHandle.addCallbackAfterDragTo(() => this.svgManager.redraw())
+        dragHandle.addCallbackBeforeStartDrag((dE,dH) =>{
             this.dragged = true
-            this.updateSvg()
+            this.svgManager.redraw()
         } )
         dragHandle.addCallbackAfterStopDrag((dE,dH) =>{
             this.dragged = false
-            this.updateSvg()
+            this.svgManager.redraw()
         } )
     }
 
@@ -49,19 +61,10 @@ export class DraggableEdge implements SvgInterface{
         this.addSnapsToDragHandle(dH)
         return dH
     }
-    private _svg: SVGElement | undefined;
-    updateSvg(): SVGElement {
-        const newSvg = this.createSvg();
-        
-        if(this._svg != undefined &&this._svg.isConnected){
-            this._svg.replaceWith(newSvg);
-        }
-        this._svg = newSvg;
-        return newSvg;
-    }
-    createSvg():SVGElement{
+
+    private svgCreation():SVGElement{
         const c = Svg.container()
-        c.appendChild(this.edge.createSvg())
+        c.appendChild(this.edge.svgManager.getSvg())
         c.appendChild(this.dragCircles())
         c.appendChild(this.addCircles())
         return c
@@ -88,9 +91,8 @@ export class DraggableEdge implements SvgInterface{
         return c    
     }
     addCorner(at: number, pos:Vector) {
-        const newCorner = this._edge.addCorner(pos,at)
-        this.newDragHandle(newCorner)     
-        this.updateSvg()
+        this._edge.addCorner(pos,at)
+        this.svgManager.redraw()
     }
     dragCircles(): SVGElement {
         const c = Svg.container()
@@ -113,8 +115,7 @@ export class DraggableEdge implements SvgInterface{
                 if(corner instanceof BpmnDummyEdgeCorner){
                     const dragCir = Svg.circleNoStyle(corner.getPos(),"dragHandleDummyCorner")
                     dragCir.onmousedown = (e) => {
-                        this.addCallbacksToDragHandle(corner.dragHandle)
-                        this.dwg.startDrag(e,corner.dragHandle)
+                        this.dwg.startDragWithObj(e,corner)
                     }
                     c.appendChild(dragCir)
                 }else{
@@ -180,7 +181,7 @@ export class DraggableEdge implements SvgInterface{
         //this.svgDelete.addEventListener("click", () => this.arrow.removeCorner(this));
         Utility.addSimulatedClickListener(deleteCircle, (e) =>{
             this.edge.removeCorner(i)
-            this.updateSvg()
+            this.svgManager.redraw()
         }            
         );
 
