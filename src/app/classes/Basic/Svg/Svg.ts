@@ -1,6 +1,9 @@
 import { Vector } from "../../Utils/Vector";
 
 export class Svg{
+    static dummyNode(pos: Vector): SVGElement {
+        return Svg.circle(pos,10)
+    }
     static event(pos: Vector, radius: number, label: string) {
         const c = Svg.relativeContainerWithClass(pos,"Event")
         c.append(Svg.circleNoStyle(new Vector(0,0),radius,"nodeBackground"))

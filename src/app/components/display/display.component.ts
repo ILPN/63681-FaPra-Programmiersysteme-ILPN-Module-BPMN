@@ -47,7 +47,7 @@ export class DisplayComponent implements OnDestroy, AfterViewInit {
             testNode.label = 'This is a Test';
             testNode.setPosXY(100, 100);
             let selected = true;
-            testNode.svgManager.getSvg().onclick = () => {
+            testNode.svgManager.getNewSvg().onclick = () => {
                 testNode.setPos(testNode.getPos().plus(new Vector(20, 20)));
                 testNode.svgManager.setCssClasses(selected ? 'selected' : '');
                 selected = !selected;
@@ -58,11 +58,10 @@ export class DisplayComponent implements OnDestroy, AfterViewInit {
             event.label = 'This is the dude';
             event.setPosXY(200, 100);
             let selectedevent = true;
-            event.svgManager.getSvg().onclick = () => {
+            event.svgManager.getNewSvg().onclick = () => {
                 event.setPos(event.getPos().plus(new Vector(10, 0)));
                 event.svgManager.setCssClasses(selectedevent ? 'selected' : '');
                 selectedevent = !selectedevent;
-
                 event.svgManager.redraw();
             };
 

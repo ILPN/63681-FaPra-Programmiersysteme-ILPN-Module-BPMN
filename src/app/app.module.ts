@@ -1,6 +1,7 @@
 import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {AppComponent} from './app.component';
+
 import {DisplayComponent} from './components/display/display.component';
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
@@ -17,6 +18,7 @@ import { ModeSwitchComponent } from './components/mode-switch/mode-switch.compon
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import { FormsModule } from '@angular/forms';
 import { DisplayDraggableGraphComponent } from './components/display-draggable-graph/display-draggable-graph.component';
+import { DisplayReorderGraphComponent } from './components/display-reorder-graph/display-reorder-graph.component';
 
 @NgModule({
     declarations: [
@@ -27,7 +29,8 @@ import { DisplayDraggableGraphComponent } from './components/display-draggable-g
         InputFieldComponent,
         InputDirective,
         ModeSwitchComponent,
-        DisplayDraggableGraphComponent
+        DisplayDraggableGraphComponent,
+        DisplayReorderGraphComponent
     ],
     imports: [
         BrowserModule,

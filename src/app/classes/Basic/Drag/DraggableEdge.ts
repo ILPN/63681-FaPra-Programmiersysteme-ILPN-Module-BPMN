@@ -10,6 +10,7 @@ import { BpmnEdgeCorner } from "../Bpmn/BpmnEdge/BpmnEdgeCorner";
 import { BpmnDummyEdgeCorner } from "../Bpmn/BpmnEdge/BpmnDummyEdgeCorner";
 import { GetSvgManager } from "../Interfaces/GetSvgManager";
 import { SvgManager } from "../Svg/SvgManager/SvgManager";
+import { DragManager } from "./DragManager";
 
 export class DraggableEdge implements GetSvgManager{
     private _svgManager: SvgManager | undefined;
@@ -29,8 +30,8 @@ export class DraggableEdge implements GetSvgManager{
     }
     private dragged = false
 
-    private dwg:DraggableGraph
-    constructor(edge:BpmnEdge, dwg:DraggableGraph){
+    private dwg:DragManager
+    constructor(edge:BpmnEdge, dwg:DragManager){
         this._edge = edge
         this.dwg = dwg
 }
@@ -64,7 +65,7 @@ export class DraggableEdge implements GetSvgManager{
 
     private svgCreation():SVGElement{
         const c = Svg.container()
-        c.appendChild(this.edge.svgManager.getSvg())
+        c.appendChild(this.edge.svgManager.getNewSvg())
         c.appendChild(this.dragCircles())
         c.appendChild(this.addCircles())
         return c

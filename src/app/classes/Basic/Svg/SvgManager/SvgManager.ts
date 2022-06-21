@@ -22,6 +22,10 @@ export class SvgManager{
         this._svg?.replaceWith(newSvg);
         this._svg = newSvg;
     }
+    getNewSvg():SVGElement{
+        this.initSvg()
+        return this.root
+    }
     getSvg():SVGElement{
         this.redraw()
         return this.root

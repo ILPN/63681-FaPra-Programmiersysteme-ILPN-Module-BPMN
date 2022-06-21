@@ -8,6 +8,7 @@ import { SvgManager } from '../Svg/SvgManager/SvgManager';
 import { DraggableEdge } from './DraggableEdge';
 import { DraggableNode } from './DraggableNode';
 import { DragHandle } from './DragHandle';
+import { DragManager } from './DragManager';
 import { SnapElement } from './SnapElements/SnapElement';
 
 export class DraggableGraph implements GetSvgManager {
@@ -20,14 +21,14 @@ export class DraggableGraph implements GetSvgManager {
     }
     
     private bpmnGraph: BpmnGraph;
-    constructor(bpmnGraph: BpmnGraph, layoutService:LayoutService, rootSvg:SVGElement) {
+    private dragManager: DragManager
+    constructor(bpmnGraph: BpmnGraph, layoutService:LayoutService, rootSvg:SVGElement,drawingArea:SVGElement) {
         this.bpmnGraph = bpmnGraph;
+        this.dragManager = new DragManager(rootSvg,drawingArea)
         this.convertToDraggableNodesAndEdges()
-        this.attachListenersForDragging(rootSvg)
         this.attachSnapings(layoutService)
 
     }
-    private dragHandles: Map<any,DragHandle> = new Map() // homeless dragHandles
     attachSnapings(layoutService:LayoutService) {
 
         //for nodes
@@ -43,26 +44,18 @@ export class DraggableGraph implements GetSvgManager {
                     const newDragHandle = new DragHandle(corner)
                     newDragHandle.addCallbackAfterDragTo(()=>de.svgManager.redraw())
                     newDragHandle.addSnapElements(layoutService.getSnapsFor(corner.id))
-                    this.dragHandles.set(corner, newDragHandle)
+                    this.dragManager.registerDragHandle(corner, newDragHandle)
                 }                
             }
         }
     }
-    attachListenersForDragging(rootSvg: SVGElement) {
-        rootSvg.onmouseup = (event) => {
-            this.stopDrag(event);
-        };
-        rootSvg.onmousemove = (event) => {
-            this.drag(event);
-        };
-    }
     convertToDraggableNodesAndEdges() {
         this.dEdges = this.bpmnGraph.edges.map((e,i)=>{
-            const dragableEdge = new DraggableEdge(e,this)
+            const dragableEdge = new DraggableEdge(e,this.dragManager)
             return dragableEdge
         })
         this.dNodes = this.bpmnGraph.nodes.map((n,i)=>{
-            const dragableNode: DraggableNode = new DraggableNode(n,this)
+            const dragableNode: DraggableNode = new DraggableNode(n,this.dragManager)
             const outDEdges = this.dEdges.filter((dE)=> dE.edge.from == n)
             for (const dragableEdge of outDEdges) {
                 dragableNode.dragHandle.addDraggedAlong(dragableEdge.getStartCornerDragHandle())
@@ -76,7 +69,6 @@ export class DraggableGraph implements GetSvgManager {
     }
     private dEdges: DraggableEdge[] = []
     private dNodes: DraggableNode[] = []
-    private snapSvgs: SVGElement | undefined;
     svgCreation(): SVGElement {
         const c = Svg.container();
         const cNodes = Svg.container('nodes');
@@ -87,38 +79,12 @@ export class DraggableGraph implements GetSvgManager {
             cNodes.appendChild(n.node.svgManager.getSvg());
         }
 
-        
         for (const e of this.dEdges) {
             cEdges.appendChild(e.svgManager.getSvg());
         }
 
-        this.snapSvgs = Svg.container('snapSvgs');
         c.appendChild(cNodes);
-        c.appendChild(this.snapSvgs);
         c.appendChild(cEdges);
         return c;
-    }
-
-    private dragedDragHandle: DragHandle | undefined;
-
-    startDragWithObj(event:MouseEvent,obj:any){
-        const dragHandle = this.dragHandles.get(obj)
-        if(dragHandle == undefined){
-            console.log("sorry couldn t find a dragHandle for that obj")
-            return
-        }
-        this.startDrag(event,dragHandle)
-    }
-    startDrag(event: MouseEvent, dh: DragHandle ) {
-        this.dragedDragHandle = dh;
-        this.dragedDragHandle.startDrag(event);
-        this.snapSvgs?.appendChild(dh.getSnapSvg());
-    }
-    drag(event: MouseEvent) {
-        this.dragedDragHandle?.draging(event);
-    }
-    stopDrag(event: MouseEvent) {
-        this.dragedDragHandle?.stopDrag();
-        this.dragedDragHandle = undefined;
     }
 }
