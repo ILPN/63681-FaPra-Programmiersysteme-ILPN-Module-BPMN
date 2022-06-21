@@ -49,7 +49,7 @@ export class DisplayDraggableGraphComponent implements OnDestroy,  AfterViewInit
 
                 this._layoutService.setViewBox(this.drawingArea.nativeElement)
                 
-                const dg = new DraggableGraph(diagram, this._layoutService, this.rootSvg!.nativeElement);
+                const dg = new DraggableGraph(diagram, this._layoutService, this.rootSvg!.nativeElement,this.drawingArea.nativeElement);
   
                 this.draw(dg.svgManager.getSvg());
                 

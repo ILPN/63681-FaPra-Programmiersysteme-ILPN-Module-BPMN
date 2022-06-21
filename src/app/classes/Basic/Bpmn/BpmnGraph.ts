@@ -19,7 +19,7 @@ export class BpmnGraph
     private _svgManager: SvgManager | undefined;
     public get svgManager(): SvgManager {
         if(this._svgManager == undefined){
-            this._svgManager = new SvgManager("DraggableGraph",() => this.svgCreation())
+            this._svgManager = new SvgManager("BpmnGraph",() => this.svgCreation())
         }
         return this._svgManager;
     }
@@ -28,13 +28,13 @@ export class BpmnGraph
         super()
         //this._svg = this.updateSvg()
     }
-    svgCreation() {
+    private svgCreation() {
         const c = Svg.container()
         for (const n of this.nodes) {
-            c.appendChild(n.svgManager.getSvg())
+            c.appendChild(n.svgManager.getNewSvg())
         }
         for (const e of this.edges) {
-            c.appendChild(e.svgManager.getSvg())
+            c.appendChild(e.svgManager.getNewSvg())
         }
         return c
     }

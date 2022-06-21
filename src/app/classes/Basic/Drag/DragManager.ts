@@ -1,0 +1,37 @@
+import { DragHandle } from "./DragHandle";
+
+export class DragManager{
+    private dragHandles: Map<any,DragHandle> = new Map() // homeless dragHandles
+    private dragedDragHandle: DragHandle | undefined;
+    private snapingView:SVGElement 
+
+    constructor(dragingSurface:SVGElement, snapingView:SVGElement){
+        dragingSurface.onmouseup = (event) => this.stopDrag(event);
+        dragingSurface.onmousemove = (event) => this.drag(event);
+        this.snapingView = snapingView
+    }
+
+    registerDragHandle(obj:any,dragHandle:DragHandle){
+        this.dragHandles.set(obj,dragHandle)
+    }
+    startDragWithObj(event:MouseEvent,obj:any){
+        const dragHandle = this.dragHandles.get(obj)
+        if(dragHandle == undefined){
+            console.log("sorry couldn t find a dragHandle for that obj")
+            return
+        }
+        this.startDrag(event,dragHandle)
+    }
+    startDrag(event: MouseEvent, dh: DragHandle ) {
+        this.dragedDragHandle = dh;
+        this.dragedDragHandle.startDrag(event);
+        this.snapingView.appendChild(dh.getSnapSvg());
+    }
+    drag(event: MouseEvent) {
+        this.dragedDragHandle?.draging(event);
+    }
+    stopDrag(event: MouseEvent) {
+        this.dragedDragHandle?.stopDrag();
+        this.dragedDragHandle = undefined;
+    }
+}

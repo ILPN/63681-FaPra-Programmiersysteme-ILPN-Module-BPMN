@@ -32,7 +32,7 @@ export class LayoutService {
 
     private spacingXAxis = 150
     private spacingYAxis= 100
-    private padding = new Vector(100,100)
+    private padding = new Vector(50,50)
     public setViewBox(drawingArea:SVGElement){
         const centerOfView = (new Vector(this.width,this.height)).half()
         const centerOfGraph = this._graphDimensions!.half()
