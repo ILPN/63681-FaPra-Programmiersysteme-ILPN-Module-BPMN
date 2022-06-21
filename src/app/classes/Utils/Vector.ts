@@ -1,4 +1,7 @@
 export class Vector {
+    invers(): Vector {
+        return new Vector(0,0).minus(this)
+    }
     radians():number {
         return Math.atan2(this.y, this.x) + Math.PI / 2;
     }

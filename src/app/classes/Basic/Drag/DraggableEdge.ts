@@ -80,7 +80,7 @@ export class DraggableEdge implements GetSvgManager{
 
             if(cornerBeforePos.distanceTo(cornerPos)> 20 ){
                 const pos = Vector.center(cornerBeforePos,cornerPos)
-            const plusCircle = Svg.circleNoStyle(pos,"plusCircle")
+            const plusCircle = Svg.circleNoStyleNoRadius(pos,"plusCircle")
             Utility.addSimulatedClickListener(plusCircle,() =>{
                 this.addCorner(i,pos)
             })
@@ -100,12 +100,12 @@ export class DraggableEdge implements GetSvgManager{
         for (const [i,corner] of this.edge.corners.entries()) {
             if(i==0 || i == lastIndex){
                 const intersection = i==0? this.edge.nodeIntersection1: this.edge.nodeIntersection2
-                const dragStartCir = Svg.circleNoStyle(intersection,"dragHandleInnerCorner")
+                const dragStartCir = Svg.circleNoStyleNoRadius(intersection,"dragHandleInnerCorner")
                 dragStartCir.onmousedown = (e) => this.dwg.startDrag(e,i==0? this.getStartCornerDragHandle(): this.getEndCornerDragHandle())
                 const line = Svg.pathNoStyle([intersection, corner.getPos()],"edgeLineInNode")
                 if(this.dragged){
                     c.appendChild(line)
-                    c.appendChild(Svg.circleNoStyle(corner.getPos(),"endCircle"))
+                    c.appendChild(Svg.circleNoStyleNoRadius(corner.getPos(),"endCircle"))
                 }
                 c.appendChild(dragStartCir)
 
@@ -113,13 +113,13 @@ export class DraggableEdge implements GetSvgManager{
             }else{
                 
                 if(corner instanceof BpmnDummyEdgeCorner){
-                    const dragCir = Svg.circleNoStyle(corner.getPos(),"dragHandleDummyCorner")
+                    const dragCir = Svg.circleNoStyleNoRadius(corner.getPos(),"dragHandleDummyCorner")
                     dragCir.onmousedown = (e) => {
                         this.dwg.startDragWithObj(e,corner)
                     }
                     c.appendChild(dragCir)
                 }else{
-                    const dragCir = Svg.circleNoStyle(corner.getPos(),"dragHandleInnerCorner")
+                    const dragCir = Svg.circleNoStyleNoRadius(corner.getPos(),"dragHandleInnerCorner")
                     dragCir.onmousedown = (e) => {
                         const dragHandle = this.newDragHandle(corner)
                         this.addSnapsToDragHandle(dragHandle)
@@ -173,7 +173,7 @@ export class DraggableEdge implements GetSvgManager{
         const pos = corner.getPos().plus(dir.muliplied(distance));
 
 
-        const deleteCircle = Svg.circleNoStyle(pos,"deleteCircle")
+        const deleteCircle = Svg.circleNoStyleNoRadius(pos,"deleteCircle")
 
 
         //somehow onclick doesnt work after having draged the corner

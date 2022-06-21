@@ -16,7 +16,7 @@ import { DraggableGraph } from 'src/app/classes/Basic/Drag/DraggableGraph';
 @Component({
   selector: 'app-display-draggable-graph',
   templateUrl: './display-draggable-graph.component.html',
-  styleUrls: ['./display-draggable-graph.component.scss'],
+  styleUrls: ['./display-draggable-graph.component.scss', '../bpmn.scss'],
   encapsulation: ViewEncapsulation.None,
 })
 export class DisplayDraggableGraphComponent implements OnDestroy,  AfterViewInit {

@@ -1,18 +1,21 @@
 import { BpmnNode } from "../BpmnNode";
 import { Svg } from "../../Svg/Svg";
+import { Version } from "@angular/compiler";
+import { Vector } from "src/app/classes/Utils/Vector";
 
 export class BpmnTask extends BpmnNode{
 
+    readonly dimensions = new Vector(150,90)
     readonly width:number = 150//170 
     readonly heigth:number = 90// 100 
     protected readonly logoX = -this.width/2 + 10
     protected readonly logoY =  -this.heigth/2 + 10
 
     override svgCreation(){
-        const c = Svg.relativeContainer(this.x,this.y)
-        c.append(Svg.rectRounded(0,0,this.width,this.heigth,10,2))
-        c.appendChild(Svg.text(this.label, 0, 0,))
-        return c
+        return Svg.task(this.getPos(),this.dimensions,this.label,this.getIconUrl())
+    }
+    protected getIconUrl(){
+        return ""
     }
 
 }

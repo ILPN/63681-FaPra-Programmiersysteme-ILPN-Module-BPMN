@@ -17,7 +17,7 @@ export class SnapPoint extends SnapElement{
         return this.position
     }
     createSVG(): SVGElement {
-        return Svg.circleNoStyle(this.position,"snapPoint")
+        return Svg.circleNoStyleNoRadius(this.position,"snapPoint")
     }
     
 }

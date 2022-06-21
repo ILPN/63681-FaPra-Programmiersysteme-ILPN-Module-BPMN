@@ -4,13 +4,14 @@ import { Svg } from "../../Svg/Svg";
 export class BpmnGateway extends BpmnNode{
 
     readonly width:number = 70
-    readonly textY =  this.width/2+15
 
     override svgCreation(){
+        /*
         const c = Svg.relativeContainer(this.x,this.y)
         c.append(Svg.rotatetSquare(0,0,this.width))
         c.appendChild(Svg.text(this.label, 0, this.textY))
-        return c
+        */
+        return Svg.gateway(this.getPos(),this.width,this.label)
     }
 
 }

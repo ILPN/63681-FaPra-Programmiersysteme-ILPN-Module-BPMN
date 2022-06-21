@@ -15,42 +15,58 @@ import { BpmnGraph } from 'src/app/classes/Basic/Bpmn/BpmnGraph';
 import { DraggableGraph } from 'src/app/classes/Basic/Drag/DraggableGraph';
 import { MyTestNode } from 'src/app/classes/Basic/Bpmn/MyTestNode';
 import { Vector } from 'src/app/classes/Utils/Vector';
+import { BpmnTaskBusinessRule } from 'src/app/classes/Basic/Bpmn/tasks/BpmnTaskBusinessRule';
+import { BpmnEventEnd } from 'src/app/classes/Basic/Bpmn/events/BpmnEventEnd';
 
 @Component({
     selector: 'app-display',
     templateUrl: './display.component.html',
-    styleUrls: ['./display.component.scss'],
+    styleUrls: ['./display.component.scss', '../bpmn.scss'],
     encapsulation: ViewEncapsulation.None,
 })
 export class DisplayComponent implements OnDestroy, AfterViewInit {
     @ViewChild('drawingArea') drawingArea: ElementRef<SVGElement> | undefined;
 
-    private _sub: Subscription | undefined
+    private _sub: Subscription | undefined;
     private _diagram: BpmnGraph | undefined;
 
     constructor(
         private _layoutService: LayoutService,
         private _svgService: SvgService,
         private _displayService: DisplayService
-    ) {
-    }
+    ) {}
 
     ngAfterViewInit(): void {
         this._sub = this._displayService.diagram$.subscribe((diagram) => {
             this._diagram = diagram;
-            if(this.drawingArea == undefined) return
+            if (this.drawingArea == undefined) return;
             //this._layoutService.setViewBox(this.drawingArea.nativeElement)
             //this.draw(diagram.updateSvg());
 
+            const testNode = new BpmnTaskBusinessRule('test');
+            testNode.label = 'This is a Test';
+            testNode.setPosXY(100, 100);
+            let selected = true;
+            testNode.svgManager.getSvg().onclick = () => {
+                testNode.setPos(testNode.getPos().plus(new Vector(20, 20)));
+                testNode.svgManager.setCssClasses(selected ? 'selected' : '');
+                selected = !selected;
 
-            const testNOde = new MyTestNode("test")
-            testNOde.setPosXY(100,100)
-            testNOde.svgManager.getSvg().onclick = ()=>{
-                testNOde.setPos(testNOde.getPos().plus(new Vector(10,20)))
-                testNOde.svgManager.redraw()
-            }
-            this.draw(testNOde.svgManager.getSvg())
+                testNode.svgManager.redraw();
+            };
+            const event = new BpmnEventEnd('test');
+            event.label = 'This is the dude';
+            event.setPosXY(200, 100);
+            let selectedevent = true;
+            event.svgManager.getSvg().onclick = () => {
+                event.setPos(event.getPos().plus(new Vector(10, 0)));
+                event.svgManager.setCssClasses(selectedevent ? 'selected' : '');
+                selectedevent = !selectedevent;
 
+                event.svgManager.redraw();
+            };
+
+            this.draw(testNode.svgManager.getSvg(), event.svgManager.getSvg());
         });
     }
 
@@ -58,7 +74,7 @@ export class DisplayComponent implements OnDestroy, AfterViewInit {
         this._sub?.unsubscribe();
     }
 
-    private draw(svg: SVGElement) {
+    private draw(...svgs: SVGElement[]) {
         if (this.drawingArea === undefined) {
             console.debug('drawing area not ready yet');
             return;
@@ -67,7 +83,9 @@ export class DisplayComponent implements OnDestroy, AfterViewInit {
 
         this.clearDrawingArea();
 
-        this.drawingArea.nativeElement.appendChild(svg);
+        for (const svg of svgs) {
+            this.drawingArea.nativeElement.appendChild(svg);
+        }
 
         /*
         const elements = this._svgService.createSvgElements(this._displayService.diagram);

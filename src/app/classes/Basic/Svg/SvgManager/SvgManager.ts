@@ -1,6 +1,7 @@
 import { Svg } from "../Svg";
 
 export class SvgManager{
+    
     private root!: SVGElement;
     private _svg: SVGElement | undefined;
     private id:string
@@ -11,7 +12,7 @@ export class SvgManager{
         this.initSvg()
     }
     
-    initSvg(){
+    private initSvg(){
         this.root = Svg.container(this.id)
         this._svg = this.createSvg()
         this.root.appendChild(this._svg)
@@ -24,5 +25,16 @@ export class SvgManager{
     getSvg():SVGElement{
         this.redraw()
         return this.root
+    }
+    remove(){
+        this.root.remove
+    }
+
+    setCssClasses(...cssClasses: string[]) {
+        this.root.setAttribute("class", "")
+        for (const cssClass of cssClasses) {
+            if(cssClass.trim()!="")
+            this.root.classList.add(cssClass)
+        }
     }
 }
