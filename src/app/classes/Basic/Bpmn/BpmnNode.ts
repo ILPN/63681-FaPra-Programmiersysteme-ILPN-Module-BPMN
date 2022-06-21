@@ -1,8 +1,10 @@
+import { Utility } from '../../Utils/Utility';
 import { Vector } from '../../Utils/Vector';
 import { BNode } from '../B/BNode';
 import { Position } from '../Interfaces/Position';
 import { Svg } from '../Svg/Svg';
 import { SvgManager } from '../Svg/SvgManager/SvgManager';
+import { BpmnEdge } from './BpmnEdge/BpmnEdge';
 
 export  class BpmnNode extends BNode implements Position {
     readonly radius:number = 35
@@ -43,6 +45,21 @@ export  class BpmnNode extends BNode implements Position {
     constructor(id: string) {
         super(id);
         //dont call subclass methods in cunstructor
+    }
+    private _inEdges: BpmnEdge[] = [];
+    public get inEdges(): BpmnEdge[] {
+        return this._inEdges;
+    }
+    addInEdge(inEdge:BpmnEdge){
+        Utility.pushIfNotInArray(inEdge,this._inEdges)
+    }
+
+    private _outEdges: BpmnEdge[] = [];
+    public get outEdges(): BpmnEdge[] {
+        return this._outEdges;
+    }
+    addOutEdge(outEdge:BpmnEdge){
+        Utility.pushIfNotInArray(outEdge,this._outEdges)
     }
 
     private _svgManager: SvgManager | undefined;

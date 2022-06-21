@@ -16,6 +16,10 @@ import { BpmnTaskBusinessRule } from 'src/app/classes/Basic/Bpmn/tasks/BpmnTaskB
 import { Vector } from 'src/app/classes/Utils/Vector';
 import { BpmnEventEnd } from 'src/app/classes/Basic/Bpmn/events/BpmnEventEnd';
 import { DragManager } from 'src/app/classes/Basic/Drag/DragManager';
+import { DragHandle } from 'src/app/classes/Basic/Drag/DragHandle';
+import { BpmnDummyEdgeCorner } from 'src/app/classes/Basic/Bpmn/BpmnEdge/BpmnDummyEdgeCorner';
+import { Svg } from 'src/app/classes/Basic/Svg/Svg';
+import { VisualDragHandle } from 'src/app/classes/Basic/Drag/VisualDragHandle';
 @Component({
   selector: 'app-display-reorder-graph',
   templateUrl: './display-reorder-graph.component.html',
@@ -39,9 +43,42 @@ export class DisplayReorderGraphComponent implements OnDestroy, AfterViewInit {
           this.bpmnGraph = graph;
           if (this.drawingArea == undefined || this.rootSvg == undefined) return;
           this._layoutService.setViewBox(this.drawingArea.nativeElement)
+
           const dragManager = new DragManager(this.rootSvg.nativeElement,this.drawingArea.nativeElement)
-//         
-          this.draw([this.bpmnGraph.svgManager.getNewSvg()]);
+          const bpmnGraphSvg = this.bpmnGraph.svgManager.getNewSvg()
+          for (const node of this.bpmnGraph.nodes) {
+            const dragHandle = new DragHandle(node)
+            console.log(node.outEdges)
+            for (const edge of node.outEdges) {
+                const endOfEdgeHandle = new DragHandle(edge.corners[0])
+                endOfEdgeHandle.addCallbackAfterDragTo(()=>edge.svgManager.redraw())
+                dragHandle.addDraggedAlong(endOfEdgeHandle)
+            }
+            for (const edge of node.inEdges) {
+                const endOfEdgeHandle = new DragHandle(edge.corners[edge.corners.length-1])
+                endOfEdgeHandle.addCallbackAfterDragTo(()=>edge.svgManager.redraw())
+                dragHandle.addDraggedAlong(endOfEdgeHandle)
+            }
+            dragHandle.addCallbackAfterDragTo(()=> node.svgManager.redraw())
+            node.svgManager.getSvg().onmousedown = (e) => dragManager.startDrag(e,dragHandle)
+            
+           
+        }
+        const dragHandleSvgs = Svg.container()
+        for (const edge of this.bpmnGraph.edges) {
+            for (const corner of edge.corners) {
+                if(corner instanceof BpmnDummyEdgeCorner){
+                    const newDragHandle = new VisualDragHandle(corner,dragManager)
+                    newDragHandle.addCallbackAfterDragTo(()=> edge.svgManager.redraw())
+                    dragHandleSvgs.appendChild(newDragHandle.svgManager.getSvg())
+                }
+            }
+            
+        }
+
+
+        
+        this.draw([bpmnGraphSvg, dragHandleSvgs]);
       });
   }
 

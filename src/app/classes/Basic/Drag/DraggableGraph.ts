@@ -69,7 +69,6 @@ export class DraggableGraph implements GetSvgManager {
     }
     private dEdges: DraggableEdge[] = []
     private dNodes: DraggableNode[] = []
-    private snapSvgs: SVGElement | undefined;
     svgCreation(): SVGElement {
         const c = Svg.container();
         const cNodes = Svg.container('nodes');
@@ -80,14 +79,11 @@ export class DraggableGraph implements GetSvgManager {
             cNodes.appendChild(n.node.svgManager.getSvg());
         }
 
-        
         for (const e of this.dEdges) {
             cEdges.appendChild(e.svgManager.getSvg());
         }
 
-        this.snapSvgs = Svg.container('snapSvgs');
         c.appendChild(cNodes);
-        c.appendChild(this.snapSvgs);
         c.appendChild(cEdges);
         return c;
     }

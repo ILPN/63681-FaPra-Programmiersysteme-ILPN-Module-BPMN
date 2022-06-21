@@ -11,6 +11,7 @@ import { BpmnTaskManual } from './tasks/BpmnTaskManual';
 import { BpmnTaskUserTask } from './tasks/BpmnTaskUserTask';
 import { GetSvgManager } from '../Interfaces/GetSvgManager';
 import { SvgManager } from '../Svg/SvgManager/SvgManager';
+import { Utility } from '../../Utils/Utility';
 
 export class BpmnGraph
     extends BGraph<BpmnEdge, BpmnNode>
@@ -48,8 +49,15 @@ export class BpmnGraph
     }
 
     addEdge(edge:BpmnEdge){
-        if(this.edges.findIndex(e => e.id == edge.id) == -1)
+        const fromNode = this.nodes.find(n => n==edge.from)
+        const toNode = this.nodes.find(n => n== edge.to)
+        if(fromNode ==undefined || toNode == undefined) throw new Error("couldn find nodes of edge")
+        
+        if(this.edges.findIndex(e => e.id == edge.id) == -1){
+            fromNode.addOutEdge(edge)
+            toNode.addInEdge(edge)
             this.edges.push(edge)
+        }
         else
         console.log("couldn't add edge "+ edge.id)
     }
