@@ -17,6 +17,7 @@ import { MyTestNode } from 'src/app/classes/Basic/Bpmn/MyTestNode';
 import { Vector } from 'src/app/classes/Utils/Vector';
 import { BpmnTaskBusinessRule } from 'src/app/classes/Basic/Bpmn/tasks/BpmnTaskBusinessRule';
 import { BpmnEventEnd } from 'src/app/classes/Basic/Bpmn/events/BpmnEventEnd';
+import { BpmnGatewaySplitOr } from 'src/app/classes/Basic/Bpmn/gateways/BpmnGatewaySplitOr';
 
 @Component({
     selector: 'app-display',
@@ -43,7 +44,7 @@ export class DisplayComponent implements OnDestroy, AfterViewInit {
             //this._layoutService.setViewBox(this.drawingArea.nativeElement)
             //this.draw(diagram.updateSvg());
 
-            const testNode = new BpmnTaskBusinessRule('test');
+            const testNode = new BpmnGatewaySplitOr('test');
             testNode.label = 'This is a Test';
             testNode.setPosXY(100, 100);
             let selected = true;
