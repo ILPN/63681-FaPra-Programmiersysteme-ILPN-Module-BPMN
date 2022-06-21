@@ -3,14 +3,26 @@ import { SnapY } from "./SnapElements/SnapY";
 import { Utility } from "../../Utils/Utility";
 import { Vector } from "../../Utils/Vector";
 import { BpmnEdge } from "../Bpmn/BpmnEdge/BpmnEdge";
-import { SvgInterface } from "../Interfaces/SvgInterface";
 import { Svg } from "../Svg/Svg";
 import { DragHandle } from "./DragHandle";
 import { DraggableGraph } from "./DraggableGraph";
 import { BpmnEdgeCorner } from "../Bpmn/BpmnEdge/BpmnEdgeCorner";
 import { BpmnDummyEdgeCorner } from "../Bpmn/BpmnEdge/BpmnDummyEdgeCorner";
+import { GetSvgManager } from "../Interfaces/GetSvgManager";
+import { SvgManager } from "../Svg/SvgManager/SvgManager";
 
-export class DraggableEdge implements SvgInterface{
+export class DraggableEdge implements GetSvgManager{
+    private _svgManager: SvgManager | undefined;
+    public get svgManager(): SvgManager {
+        if(this._svgManager == undefined){
+            this._svgManager = new SvgManager("DraggableGraph",() => this.svgCreation())
+        }
+        return this._svgManager;
+    }
+    
+    
+    
+    
     private _edge: BpmnEdge;
     public get edge(): BpmnEdge {
         return this._edge;
@@ -28,14 +40,14 @@ export class DraggableEdge implements SvgInterface{
         return dragHandle
     }
     private addCallbacksToDragHandle(dragHandle:DragHandle){
-        dragHandle.addCallbackAfterDrag(() => this.updateSvg())
-        dragHandle.addCallbackbeforeStartDrag((dE,dH) =>{
+        dragHandle.addCallbackAfterDragTo(() => this.svgManager.redraw())
+        dragHandle.addCallbackBeforeStartDrag((dE,dH) =>{
             this.dragged = true
-            this.updateSvg()
+            this.svgManager.redraw()
         } )
         dragHandle.addCallbackAfterStopDrag((dE,dH) =>{
             this.dragged = false
-            this.updateSvg()
+            this.svgManager.redraw()
         } )
     }
 
@@ -49,19 +61,10 @@ export class DraggableEdge implements SvgInterface{
         this.addSnapsToDragHandle(dH)
         return dH
     }
-    private _svg: SVGElement | undefined;
-    updateSvg(): SVGElement {
-        const newSvg = this.createSvg();
-        
-        if(this._svg != undefined &&this._svg.isConnected){
-            this._svg.replaceWith(newSvg);
-        }
-        this._svg = newSvg;
-        return newSvg;
-    }
-    createSvg():SVGElement{
+
+    private svgCreation():SVGElement{
         const c = Svg.container()
-        c.appendChild(this.edge.createSvg())
+        c.appendChild(this.edge.svgManager.getSvg())
         c.appendChild(this.dragCircles())
         c.appendChild(this.addCircles())
         return c
@@ -77,7 +80,7 @@ export class DraggableEdge implements SvgInterface{
 
             if(cornerBeforePos.distanceTo(cornerPos)> 20 ){
                 const pos = Vector.center(cornerBeforePos,cornerPos)
-            const plusCircle = Svg.circleNoStyle(pos,"plusCircle")
+            const plusCircle = Svg.circleNoStyleNoRadius(pos,"plusCircle")
             Utility.addSimulatedClickListener(plusCircle,() =>{
                 this.addCorner(i,pos)
             })
@@ -88,9 +91,8 @@ export class DraggableEdge implements SvgInterface{
         return c    
     }
     addCorner(at: number, pos:Vector) {
-        const newCorner = this._edge.addCorner(pos,at)
-        this.newDragHandle(newCorner)     
-        this.updateSvg()
+        this._edge.addCorner(pos,at)
+        this.svgManager.redraw()
     }
     dragCircles(): SVGElement {
         const c = Svg.container()
@@ -98,12 +100,12 @@ export class DraggableEdge implements SvgInterface{
         for (const [i,corner] of this.edge.corners.entries()) {
             if(i==0 || i == lastIndex){
                 const intersection = i==0? this.edge.nodeIntersection1: this.edge.nodeIntersection2
-                const dragStartCir = Svg.circleNoStyle(intersection,"dragHandleInnerCorner")
+                const dragStartCir = Svg.circleNoStyleNoRadius(intersection,"dragHandleInnerCorner")
                 dragStartCir.onmousedown = (e) => this.dwg.startDrag(e,i==0? this.getStartCornerDragHandle(): this.getEndCornerDragHandle())
                 const line = Svg.pathNoStyle([intersection, corner.getPos()],"edgeLineInNode")
                 if(this.dragged){
                     c.appendChild(line)
-                    c.appendChild(Svg.circleNoStyle(corner.getPos(),"endCircle"))
+                    c.appendChild(Svg.circleNoStyleNoRadius(corner.getPos(),"endCircle"))
                 }
                 c.appendChild(dragStartCir)
 
@@ -111,14 +113,13 @@ export class DraggableEdge implements SvgInterface{
             }else{
                 
                 if(corner instanceof BpmnDummyEdgeCorner){
-                    const dragCir = Svg.circleNoStyle(corner.getPos(),"dragHandleDummyCorner")
+                    const dragCir = Svg.circleNoStyleNoRadius(corner.getPos(),"dragHandleDummyCorner")
                     dragCir.onmousedown = (e) => {
-                        this.addCallbacksToDragHandle(corner.dragHandle)
-                        this.dwg.startDrag(e,corner.dragHandle)
+                        this.dwg.startDragWithObj(e,corner)
                     }
                     c.appendChild(dragCir)
                 }else{
-                    const dragCir = Svg.circleNoStyle(corner.getPos(),"dragHandleInnerCorner")
+                    const dragCir = Svg.circleNoStyleNoRadius(corner.getPos(),"dragHandleInnerCorner")
                     dragCir.onmousedown = (e) => {
                         const dragHandle = this.newDragHandle(corner)
                         this.addSnapsToDragHandle(dragHandle)
@@ -172,7 +173,7 @@ export class DraggableEdge implements SvgInterface{
         const pos = corner.getPos().plus(dir.muliplied(distance));
 
 
-        const deleteCircle = Svg.circleNoStyle(pos,"deleteCircle")
+        const deleteCircle = Svg.circleNoStyleNoRadius(pos,"deleteCircle")
 
 
         //somehow onclick doesnt work after having draged the corner
@@ -180,7 +181,7 @@ export class DraggableEdge implements SvgInterface{
         //this.svgDelete.addEventListener("click", () => this.arrow.removeCorner(this));
         Utility.addSimulatedClickListener(deleteCircle, (e) =>{
             this.edge.removeCorner(i)
-            this.updateSvg()
+            this.svgManager.redraw()
         }            
         );
 

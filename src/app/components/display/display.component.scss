@@ -11,3 +11,28 @@
     user-select: none;
 }
 
+
+.selected{
+    .Task{ 
+        .nodeBackground{
+            fill: rgb(255, 42, 177);
+        }
+    }
+}
+.selected{
+    .Gateway{ 
+        .nodeBackground{
+            fill: rgb(11, 58, 226);
+        }
+    }
+}
+.selected{
+    .Event{ 
+        .stroke{
+            stroke: rgb(226, 11, 11);
+        }
+    }
+}
+
+
+

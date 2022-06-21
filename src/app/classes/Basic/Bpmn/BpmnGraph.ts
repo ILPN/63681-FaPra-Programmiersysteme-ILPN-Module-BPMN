@@ -5,39 +5,36 @@ import { BpmnEventIntermediate } from './events/BpmnEventIntermediate';
 import { BpmnEventStart } from './events/BpmnEventStart';
 import { BpmnNode } from './BpmnNode';
 import { Svg } from '../Svg/Svg';
-import { SvgInterface } from '../Interfaces/SvgInterface';
 import { BpmnGateway } from './gateways/BpmnGateway';
 import { BpmnTaskService } from './tasks/BpmnTaskService';
 import { BpmnTaskManual } from './tasks/BpmnTaskManual';
 import { BpmnTaskUserTask } from './tasks/BpmnTaskUserTask';
+import { GetSvgManager } from '../Interfaces/GetSvgManager';
+import { SvgManager } from '../Svg/SvgManager/SvgManager';
 
 export class BpmnGraph
     extends BGraph<BpmnEdge, BpmnNode>
-    implements SvgInterface
+    implements GetSvgManager
 {
+    private _svgManager: SvgManager | undefined;
+    public get svgManager(): SvgManager {
+        if(this._svgManager == undefined){
+            this._svgManager = new SvgManager("DraggableGraph",() => this.svgCreation())
+        }
+        return this._svgManager;
+    }
     
     constructor(){
         super()
         //this._svg = this.updateSvg()
     }
-    private _svg: SVGElement | undefined;
-    updateSvg(): SVGElement {
-        const newSvg = this.createSvg();
-        
-        if(this._svg != undefined &&this._svg.isConnected){
-            this._svg.replaceWith(newSvg);
-        }
-        this._svg = newSvg;
-
-        return newSvg;
-    }
-    createSvg() {
+    svgCreation() {
         const c = Svg.container()
         for (const n of this.nodes) {
-            c.appendChild(n.updateSvg())
+            c.appendChild(n.svgManager.getSvg())
         }
         for (const e of this.edges) {
-            c.appendChild(e.updateSvg())
+            c.appendChild(e.svgManager.getSvg())
         }
         return c
     }

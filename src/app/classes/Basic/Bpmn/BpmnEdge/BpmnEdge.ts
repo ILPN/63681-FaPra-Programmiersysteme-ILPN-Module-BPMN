@@ -1,17 +1,24 @@
 import { Line } from "../../../Utils/Line";
 import { Vector } from "../../../Utils/Vector";
 import { BEdge } from "../../B/BEdge";
-import { Position } from "../../Interfaces/Position";
 import { Svg } from "../../Svg/Svg";
-import { SvgInterface } from "../../Interfaces/SvgInterface";
 import { BpmnNode } from "../BpmnNode";
 import { BpmnEvent } from "../events/BpmnEvent";
 import { BpmnGateway } from "../gateways/BpmnGateway";
 import { BpmnTask } from "../tasks/BpmnTask";
 import { BpmnEdgeCorner } from "./BpmnEdgeCorner";
 import { BpmnDummyEdgeCorner } from "./BpmnDummyEdgeCorner";
+import { GetSvgManager } from "../../Interfaces/GetSvgManager";
+import { SvgManager } from "../../Svg/SvgManager/SvgManager";
 
-export class BpmnEdge extends BEdge implements SvgInterface{
+export class BpmnEdge extends BEdge implements GetSvgManager {
+    private _svgManager: SvgManager | undefined;
+    public get svgManager(): SvgManager {
+        if(this._svgManager == undefined){
+            this._svgManager = new SvgManager(this.id,() => this.svgCreation())
+        }
+        return this._svgManager;
+    }
     setStartPos(x: number, y: number) {
         this._corners[0].setPosXY(x,y)
     }
@@ -24,7 +31,7 @@ export class BpmnEdge extends BEdge implements SvgInterface{
         this._corners.splice(at, 1);
         console.log(this._corners)
 
-        this.updateSvg()
+        this.svgManager.redraw()
     }
     private readonly _id: string
     public get id(): string {
@@ -51,20 +58,7 @@ export class BpmnEdge extends BEdge implements SvgInterface{
         [new BpmnEdgeCorner(from.getPos().x,from.getPos().y),
              new BpmnEdgeCorner(to.getPos().x,to.getPos().y)];
     }
-    private _svg: SVGElement | undefined;
-    updateSvg(): SVGElement {
-        const newSvg = this.createSvg();
-        
-        if(this._svg != undefined &&this._svg.isConnected){
-            this._svg.replaceWith(newSvg);
-        }
-        this._svg = newSvg;
 
-        return newSvg;
-    }
-    /**
-     * removes all corners from the arrow if deletable
-     */
     clearCorners() {
         this._corners = [this._corners[0], this._corners[this._corners.length-1]]
     }
@@ -96,7 +90,7 @@ export class BpmnEdge extends BEdge implements SvgInterface{
 
 
 
-     createSvg(): SVGElement {
+    svgCreation(): SVGElement {
         const svg = Svg.container();
         const lineSvgResult = this.lineSvg();
 

@@ -2,9 +2,9 @@ import { Vector } from '../../Utils/Vector';
 import { BNode } from '../B/BNode';
 import { Position } from '../Interfaces/Position';
 import { Svg } from '../Svg/Svg';
-import { SvgInterface } from '../Interfaces/SvgInterface';
+import { SvgManager } from '../Svg/SvgManager/SvgManager';
 
-export  class BpmnNode extends BNode implements Position, SvgInterface {
+export  class BpmnNode extends BNode implements Position {
     readonly radius:number = 35
     getPos(): Vector {
         return new Vector(this.x, this.y);
@@ -45,18 +45,15 @@ export  class BpmnNode extends BNode implements Position, SvgInterface {
         //dont call subclass methods in cunstructor
     }
 
-    private _svg: SVGElement | undefined;
-    updateSvg(): SVGElement {
-        const newSvg = this.createSvg();
-        
-        if(this._svg != undefined &&this._svg.isConnected){
-            this._svg.replaceWith(newSvg);
+    private _svgManager: SvgManager | undefined;
+    public get svgManager(): SvgManager {
+        if(this._svgManager == undefined){
+            this._svgManager = new SvgManager(this.id,() => this.svgCreation())
         }
-        this._svg = newSvg;
-
-        return newSvg;
+        return this._svgManager;
     }
-    createSvg():SVGElement{
-        return Svg.circleStroke(this.x,this.y, this.radius, 3)
+
+    protected svgCreation(){
+        return Svg.circleStroke(this.x,this.y, 10, 2)
     }
 }
