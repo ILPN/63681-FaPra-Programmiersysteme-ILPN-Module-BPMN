@@ -1,8 +1,8 @@
-import { DragHandle } from "./DragHandle";
+import { DragHandle } from "../DragHandle";
 
 export class DragManager{
-    private dragHandles: Map<any,DragHandle> = new Map() // homeless dragHandles
-    private dragedDragHandle: DragHandle | undefined;
+    protected dragHandles: Map<any,DragHandle> = new Map() // homeless dragHandles
+    protected dragedDragHandle: DragHandle | undefined;
     private snapingView:SVGElement 
 
     constructor(dragingSurface:SVGElement, snapingView:SVGElement){

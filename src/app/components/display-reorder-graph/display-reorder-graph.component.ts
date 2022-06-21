@@ -15,15 +15,18 @@ import { DraggableGraph } from 'src/app/classes/Basic/Drag/DraggableGraph';
 import { BpmnTaskBusinessRule } from 'src/app/classes/Basic/Bpmn/tasks/BpmnTaskBusinessRule';
 import { Vector } from 'src/app/classes/Utils/Vector';
 import { BpmnEventEnd } from 'src/app/classes/Basic/Bpmn/events/BpmnEventEnd';
-import { DragManager } from 'src/app/classes/Basic/Drag/DragManager';
+import { DragManager } from 'src/app/classes/Basic/Drag/DragManager/DragManager';
 import { DragHandle } from 'src/app/classes/Basic/Drag/DragHandle';
 import { BpmnDummyEdgeCorner } from 'src/app/classes/Basic/Bpmn/BpmnEdge/BpmnDummyEdgeCorner';
 import { Svg } from 'src/app/classes/Basic/Svg/Svg';
 import { VisualDragHandle } from 'src/app/classes/Basic/Drag/VisualDragHandle';
+import { DragManagerReorder } from 'src/app/classes/Basic/Drag/DragManager/DragManagerReorder';
+import { LayeredGraph } from 'src/app/classes/Sugiyama/LayeredGraph';
 @Component({
   selector: 'app-display-reorder-graph',
   templateUrl: './display-reorder-graph.component.html',
-  styleUrls: ['./display-reorder-graph.component.scss']
+  styleUrls: ['./display-reorder-graph.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class DisplayReorderGraphComponent implements OnDestroy, AfterViewInit {
   @ViewChild('drawingArea') drawingArea: ElementRef<SVGElement> | undefined;
@@ -44,11 +47,11 @@ export class DisplayReorderGraphComponent implements OnDestroy, AfterViewInit {
           if (this.drawingArea == undefined || this.rootSvg == undefined) return;
           this._layoutService.setViewBox(this.drawingArea.nativeElement)
 
-          const dragManager = new DragManager(this.rootSvg.nativeElement,this.drawingArea.nativeElement)
+          const dragManager = new DragManagerReorder(this.rootSvg.nativeElement,this.drawingArea.nativeElement,this._layoutService.sugiResult!)
           const bpmnGraphSvg = this.bpmnGraph.svgManager.getNewSvg()
           for (const node of this.bpmnGraph.nodes) {
             const dragHandle = new DragHandle(node)
-            console.log(node.outEdges)
+            dragManager.registerDragHandle(node,dragHandle)
             for (const edge of node.outEdges) {
                 const endOfEdgeHandle = new DragHandle(edge.corners[0])
                 endOfEdgeHandle.addCallbackAfterDragTo(()=>edge.svgManager.redraw())
@@ -69,6 +72,7 @@ export class DisplayReorderGraphComponent implements OnDestroy, AfterViewInit {
             for (const corner of edge.corners) {
                 if(corner instanceof BpmnDummyEdgeCorner){
                     const newDragHandle = new VisualDragHandle(corner,dragManager)
+                    dragManager.registerDragHandle(corner,newDragHandle)
                     newDragHandle.addCallbackAfterDragTo(()=> edge.svgManager.redraw())
                     dragHandleSvgs.appendChild(newDragHandle.svgManager.getSvg())
                 }
@@ -92,26 +96,11 @@ export class DisplayReorderGraphComponent implements OnDestroy, AfterViewInit {
           return;
       }
       console.log('draw is called');
-
       this.clearDrawingArea();
-
       for (const svg of svgs) {
           this.drawingArea.nativeElement.appendChild(svg);
       }
 
-      /*
-      const elements = this._svgService.createSvgElements(this._displayService.diagram);
-      for (const element of elements) {
-          this.drawingArea.nativeElement.appendChild(element);
-      }
-      */
-
-      /*const el1 = new Gateway("1", GatewayType.AND_JOIN)
-     const el2 = new MyElement("2")
-
-     this.drawingArea.nativeElement.appendChild(el1.getSVGThatWillBeAttachedToDom())
-     this.drawingArea.nativeElement.appendChild(el2.getSvgWithListeners())
-      */
   }
 
   private clearDrawingArea() {

@@ -6,7 +6,7 @@ import { Svg } from "../Svg/Svg";
 import { GetSvgManager } from "../Interfaces/GetSvgManager";
 import { SvgManager } from "../Svg/SvgManager/SvgManager";
 import { DragHandle } from "./DragHandle";
-import { DragManager } from "./DragManager";
+import { DragManager } from "./DragManager/DragManager";
 
 export class VisualDragHandle  extends DragHandle implements GetSvgManager{
     private _svgManager: SvgManager | undefined;

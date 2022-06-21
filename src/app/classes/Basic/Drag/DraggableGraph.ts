@@ -8,7 +8,7 @@ import { SvgManager } from '../Svg/SvgManager/SvgManager';
 import { DraggableEdge } from './DraggableEdge';
 import { DraggableNode } from './DraggableNode';
 import { DragHandle } from './DragHandle';
-import { DragManager } from './DragManager';
+import { DragManager } from './DragManager/DragManager';
 import { SnapElement } from './SnapElements/SnapElement';
 
 export class DraggableGraph implements GetSvgManager {
