@@ -49,7 +49,7 @@ export class SwitchController {
         } else {
             console.log("The state of this element can not be switched: " + clickedNode.id);
             if (clickedNode.enabled() && clickedNode instanceof BpmnEventEnd) {
-                this.newGame();
+                this.newSwitchFlow();
             }
         }
     }
@@ -63,20 +63,24 @@ export class SwitchController {
         let nodesToSwitch: SwitchableNode[] = [];
 
         //add the clicked node
-        SwitchUtils.addNodeToArray(clickedNode, nodesToSwitch);
+        SwitchUtils.addItem(clickedNode, nodesToSwitch);
 
         // if there is enabled gateway before the clicked node 
         clickedNode.predecessors().forEach(before => {
-            if (before.enabled() && before.isGateway()) {
+            if (before.enabled() && this.isGateway(before)) {
                 let gatewayConnections = (before as SwitchableGateway).switchSplit(clickedNode);
-                SwitchUtils.addNodesToArray(gatewayConnections, nodesToSwitch)
+                SwitchUtils.addItems(gatewayConnections, nodesToSwitch)
             }
         });
 
         // other nodes connected to the clicked node
-        SwitchUtils.addNodesToArray(clickedNode.switchRegular(), nodesToSwitch);
+        SwitchUtils.addItems(clickedNode.switchRegular(), nodesToSwitch);
 
         return nodesToSwitch
+    }
+
+    isGateway(node: SwitchableNode): boolean {
+        return this instanceof SwitchableGateway
     }
 
 
@@ -85,7 +89,7 @@ export class SwitchController {
      * @return Gibt an ob das Element geschaltet werden kann  
      */
     private possibleToSwitchNode(node: SwitchableNode): boolean {
-        if (node.isGateway() && (node.disabled() || node.enableable())) {
+        if (this.isGateway(node) && (node.disabled() || node.enableable())) {
 
             let gateway: SwitchableGateway = node as SwitchableGateway;
             return gateway.canBeSwitched()
@@ -118,7 +122,7 @@ export class SwitchController {
                 node.disable();
 
             node.predecessors().forEach(nodeBefore => {
-                if (nodeBefore.isGateway()) {
+                if (this.isGateway(nodeBefore)) {
                     let gateway: SwitchableGateway = nodeBefore as SwitchableGateway
                     if (gateway.OR_SPLIT() && !this.recursivelySearchForResponsibleJoinGateway(node, []))
                         node.disable();
@@ -203,13 +207,15 @@ export class SwitchController {
         return true;
     }
 
-    /** Hiermit das BPMN in den Startzustand versetzt werden. */
-    private newGame() {
-        let elements: Element[] = [];
+    /**
+     * reset switch flow into initial state
+     */ 
+    private newSwitchFlow() {
         this.nodes.forEach(node => node.disable());
         this._startEvents.forEach(event => {
+            let oldState: SwitchState = event.switchState
             event.switchState = SwitchState.enableable;
-            event.setColorToDefault();
+            event.changeColor(oldState, event.switchState);
         });
     }
 

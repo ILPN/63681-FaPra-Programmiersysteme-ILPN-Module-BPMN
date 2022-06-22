@@ -1,7 +1,5 @@
-import { BpmnGateway } from "../Bpmn/gateways/BpmnGateway";
 import { BpmnGatewayJoinAnd } from "../Bpmn/gateways/BpmnGatewayJoinAnd";
 import { BpmnGatewayJoinOr } from "../Bpmn/gateways/BpmnGatewayJoinOr";
-import { BpmnGatewayJoinXor } from "../Bpmn/gateways/BpmnGatewayJoinXor";
 import { BpmnGatewaySplitAnd } from "../Bpmn/gateways/BpmnGatewaySplitAnd";
 import { BpmnGatewaySplitOr } from "../Bpmn/gateways/BpmnGatewaySplitOr";
 import { BpmnGatewaySplitXor } from "../Bpmn/gateways/BpmnGatewaySplitXor";
@@ -50,12 +48,12 @@ export class SwitchableGateway extends SwitchableNode {
         let nodesToSwitch: SwitchableNode[] = [this];
 
         //successors of AND_SPLIT gateway
-        this.successors().forEach((after: SwitchableNode) => SwitchUtils.addNodeToArray(after, nodesToSwitch));
+        this.successors().forEach((after: SwitchableNode) => SwitchUtils.addItem(after, nodesToSwitch));
 
 
         // successors of the successors of the AND_SPLIT gateway
         this.successors().forEach(after => {
-            after.successors().forEach(afterAfter => SwitchUtils.addNodeToArray(afterAfter, nodesToSwitch));
+            after.successors().forEach(afterAfter => SwitchUtils.addItem(afterAfter, nodesToSwitch));
         });
 
         return nodesToSwitch;
@@ -80,7 +78,7 @@ export class SwitchableGateway extends SwitchableNode {
         //add XOR_SPLIT gateway to switchState array
         let nodesToSwitch: SwitchableNode[] = [this];
 
-        clicked.successors().forEach(after => SwitchUtils.addNodeToArray(after, nodesToSwitch));
+        clicked.successors().forEach(after => SwitchUtils.addItem(after, nodesToSwitch));
 
         return nodesToSwitch
     }
@@ -95,7 +93,7 @@ export class SwitchableGateway extends SwitchableNode {
      * @returns array of nodes whose state should be changed 
      */
     private switchORSplit(clicked: SwitchableNode): SwitchableNode[] {
-        return SwitchUtils.addNodeToArray(this, clicked.successors());
+        return SwitchUtils.addItem(this, clicked.successors());
     }
 
     private AND_SPLIT(): boolean {
@@ -130,7 +128,7 @@ export class SwitchableGateway extends SwitchableNode {
         if (this.OR_JOIN()) {
             let matchingOrSplit = this.findMatchingOrSplit();
             if (matchingOrSplit === null) {
-                console.warn("Failed to find matching OR-Split gateway for OR-Join gateway with id " + this.id())
+                console.warn("Failed to find matching OR-Split gateway for OR-Join gateway with id " + this.id)
                 return false;
             }
             if (!matchingOrSplit.switched())
@@ -153,7 +151,7 @@ export class SwitchableGateway extends SwitchableNode {
         let nodeBefore = this.predecessors()[0];
 
         while (nodeBefore != null) {
-            if (nodeBefore.isGateway()) {
+            if (nodeBefore instanceof SwitchableGateway) {
                 if ((nodeBefore as SwitchableGateway).OR_SPLIT())
                     return nodeBefore;
 

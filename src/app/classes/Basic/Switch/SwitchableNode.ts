@@ -1,16 +1,10 @@
-
 import { BpmnNode } from "../Bpmn/BpmnNode";
 import { BpmnEventStart } from "../Bpmn/events/BpmnEventStart";
-import { BpmnGateway } from "../Bpmn/gateways/BpmnGateway";
-import { SvgInterface } from "../Interfaces/SvgInterface";
-import { Svg } from "../Svg/Svg";
 import { SwitchController } from "./switch-controller";
-import { SwitchableGateway } from "./SwitchableGateway";
-import { SwitchableGraph } from "./SwitchableGraph";
 import { SwitchState } from "./switchstatetype";
 import { SwitchUtils } from "./SwitchUtils";
 
-export class SwitchableNode implements SvgInterface {
+export class SwitchableNode {
     protected _bpmnNode: BpmnNode
     private _switchState: SwitchState = SwitchState.disabled;
     private _switchController: SwitchController | undefined;
@@ -28,6 +22,8 @@ export class SwitchableNode implements SvgInterface {
         this._predecessors = new Array<SwitchableNode>();
         this._successors = new Array<SwitchableNode>();
 
+        //switch on mouse down
+        this._bpmnNode.svgManager.getNewSvg().onmousedown = (e) => controller.press(this)
     }
 
 
@@ -39,53 +35,33 @@ export class SwitchableNode implements SvgInterface {
         return this._successors
     }
     addSuccessor(node: SwitchableNode) {
-        if (this._successors.includes(node))
-            return
-        this._successors.push(node)
+        SwitchUtils.addItem(node, this._successors)
     }
 
     addPredecessor(node: SwitchableNode) {
-        if (this._predecessors.includes(node))
-            return
-        this._predecessors.push(node)
+        SwitchUtils.addItem(node, this._predecessors)
     }
 
-    id(): string {
+    get id(): string {
         return this._id
     }
 
-
-    private _svg: SVGElement | undefined;
-    updateSvg(): SVGElement {
-        const newSvg = this.createSvg();
-
-        if (this._svg != undefined && this._svg.isConnected) {
-            this._svg.replaceWith(newSvg);
-        }
-        this._svg = newSvg;
-
-        return newSvg;
-    }
-    createSvg(): SVGElement {
-        const svgContainer = Svg.container()
-        svgContainer.appendChild(this._bpmnNode.createSvg())
-
-        svgContainer.onmousedown = (event) => {
-            this._switchController?.press(this);
-        };
-
-        return svgContainer
+    get bpmnNode(): BpmnNode {
+        return this._bpmnNode
     }
 
-    /** Diese Methode kann verwendet werden wenn ein Element, alle Elemente von dennen ein Verweis auf das übergebene Element kommt und alle Elemente auf die unser Element zeigt, dem übergebenen Array zum Schalten hinzugefügt werden soll. 
-        * @param elementsToSwitch das Array in das das Element aufgenommen werden soll.
-        * @param element das Element das hinzugefügt werden soll.
-       */
+
+    /**
+     * collects nodes whose needs to be switched when this node is clicked:
+     * 1. nodes after the clicked node
+     * 2. nodes before the clicked node
+     * @returns 
+     */
     switchRegular(): SwitchableNode[] {
         let nodesToSwitch: SwitchableNode[] = [];
 
-        this._predecessors.forEach(before => { if (before.switchState === SwitchState.enabled) SwitchUtils.addNodeToArray(before, nodesToSwitch) });
-        this._successors.forEach(after => { if (after.switchState === SwitchState.disabled) SwitchUtils.addNodeToArray(after, nodesToSwitch) });
+        this._predecessors.forEach(before => { if (before.switchState === SwitchState.enabled) SwitchUtils.addItem(before, nodesToSwitch) });
+        this._successors.forEach(after => { if (after.switchState === SwitchState.disabled) SwitchUtils.addItem(after, nodesToSwitch) });
 
         return nodesToSwitch;
     }
@@ -97,13 +73,8 @@ export class SwitchableNode implements SvgInterface {
         return this.switchState === SwitchState.enableable
     }
 
-    enabled(): boolean{
+    enabled(): boolean {
         return this.switchState === SwitchState.enabled
-    }
-    /** disables the node and changes its color */
-    disable(): void {
-        this.switchState = SwitchState.disabled;
-        this.setColorToDefault();
     }
 
     protected completedPathFromNodeExists(startNode: SwitchableNode): boolean {
@@ -111,11 +82,11 @@ export class SwitchableNode implements SvgInterface {
         //     //the immediate predecessor must have state enabled
         //     if(!nodeBefore.enabled())
         //       return false;
-            
+
         //     //every node on the path to the predecessor must be disabled
         //     nodeBefore = nodeBefore.predecessors()[0];
         //     while(nodeBefore != null && nodeBefore != startNode){
-                
+
         //     }
         // }
 
@@ -135,11 +106,15 @@ export class SwitchableNode implements SvgInterface {
         return false;
     }
 
-    isGateway(): boolean {
-        return this instanceof SwitchableGateway
+    
+
+
+    /** disables the node and changes its color */
+    disable(): void {
+        let oldState: SwitchState = this.switchState
+        this.switchState = SwitchState.disabled;
+        this.changeColor(oldState, this.switchState);
     }
-
-
 
     get switchState(): SwitchState {
         return this._switchState;
@@ -153,38 +128,20 @@ export class SwitchableNode implements SvgInterface {
         this._switchController = value;
     }
 
-
-    /** set the node color to default  */
-    setColorToDefault(): void {
-        this._bpmnNode.changeColor(this.getColor())
-    }
-
-    private getColor(): string {
-        switch (this._switchState) {
-            case SwitchState.disabled: {
-                return "white";
-                break;
-            }
-            case SwitchState.enableable: {
-                return "yellow";
-                break;
-            }
-            case SwitchState.enabled: {
-                return "lightgreen";
-                break;
-            }
-            case SwitchState.switched: {
-                return "lightgray";
-                break;
-            }
-            default: {
-                return "red";
-                break;
-            }
-        }
-    }
-
     switch(): void {
+        let oldState: SwitchState = this.switchState
+        this.setNewState();
+
+        this.changeColor(oldState, this.switchState);
+
+    }
+
+    changeColor(oldState: SwitchState, newState: SwitchState): void {
+        this.bpmnNode.svgManager.removeCssClasses(SwitchState[oldState])
+        this.bpmnNode.svgManager.setCssClasses(SwitchState[this._switchState]);
+    }
+
+    setNewState(): void {
         switch (this._switchState) {
             case SwitchState.disabled: {
                 this._switchState = SwitchState.enableable
@@ -207,6 +164,6 @@ export class SwitchableNode implements SvgInterface {
                 break;
             }
         }
-        this.setColorToDefault();
     }
+
 }

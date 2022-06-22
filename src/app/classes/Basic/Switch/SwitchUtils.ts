@@ -1,23 +1,30 @@
 import { SwitchableNode } from "./SwitchableNode";
 
-export class SwitchUtils{
+export class SwitchUtils {
 
 
-      /** Diese Methode fügt die übergebenen Elemente dem Arry hinzu, dies jedoch nur wenn das Element noch nicht im Array enthalten ist. 
-     * @param array das Array in das das Element aufgenommen werden soll.
-     * @param element das Element das hinzugefügt werden soll.
-    */
-       public static addNodesToArray(newNodes: SwitchableNode[], existingNodes: SwitchableNode[]): SwitchableNode[] {
-        for (let node of newNodes)
-            this.addNodeToArray(node, existingNodes);
-        return existingNodes;
+    /**
+     * adds items from source array to target array, only if the items don't exist in the target
+     * @param newItems items to be added
+     * @param existingItems target array
+     * @returns 
+     */
+    public static addItems<T>(newItems: T[], existingItems: T[]): T[] {
+        for (let node of newItems)
+            this.addItem(node, existingItems);
+        return existingItems;
     }
 
+    /**
+     * adds an item to the array if it does not exist in this array
+     * @param newItem 
+     * @param existingItems 
+     * @returns 
+     */
+    public static addItem<T>(newItem: T, existingItems: T[]): T[] {
 
-    public static addNodeToArray(newNode: SwitchableNode, existingNodes: SwitchableNode[]): SwitchableNode[] {
-        
-            if (!existingNodes.includes(newNode)) existingNodes.push(newNode);
+        if (!existingItems.includes(newItem)) existingItems.push(newItem);
 
-            return existingNodes
+        return existingItems
     }
 }

@@ -1,75 +1,81 @@
-import { exists } from 'fs';
-import { BpmnEdge } from '../Bpmn/BpmnEdge';
+import { BpmnEdge } from '../Bpmn/BpmnEdge/BpmnEdge';
 import { BpmnGraph } from '../Bpmn/BpmnGraph';
 import { BpmnNode } from '../Bpmn/BpmnNode';
-import { SvgInterface } from '../Interfaces/SvgInterface';
+import { GetSvgManager } from '../Interfaces/GetSvgManager';
 import { Svg } from '../Svg/Svg';
+import { SvgManager } from '../Svg/SvgManager/SvgManager';
 import { SwitchController } from './switch-controller';
 import { SwitchableEdge } from './SwitchableEdge';
 import { SwitchableNode } from './SwitchableNode';
+import { SwitchUtils } from './SwitchUtils';
 
 
-export class SwitchableGraph implements SvgInterface {
-    private bpmnGraph: BpmnGraph;
-    private switchEdges: SwitchableEdge[] = []
+export class SwitchableGraph implements GetSvgManager {
+   
+    private _switchEdges: SwitchableEdge[] = []
     private _switchNodes: SwitchableNode[] = []
     constructor(bpmnGraph: BpmnGraph) {
-        this.bpmnGraph = bpmnGraph;
-        //logic to switch nodes
+        console.log("New Switch graph")
+        //controls how nodes are switched
         const controller = new SwitchController(this);
 
-        this.switchEdges = bpmnGraph.edges.map((bpmnEdge: BpmnEdge) => {
-            const switchableEdge = new SwitchableEdge(bpmnEdge, this, controller)
-            addNodeFrom(bpmnEdge.from, bpmnEdge, controller);
-            addNodeTo(bpmnEdge.to, bpmnEdge, controller)
+        bpmnGraph.edges.forEach((bpmnEdge: BpmnEdge) => {
+            let switchEdge: SwitchableEdge = new SwitchableEdge(bpmnEdge);
+            SwitchUtils.addItem(switchEdge, this._switchEdges);
+            this.addNodesConnectedByEdge(bpmnEdge, controller);
 
-
-            return switchableEdge
         })
-
-        // this._switchNodes = bpmnGraph.nodes.map((n: BpmnNode,i: any)=>{
-        //     const switchableNode = new SwitchableNode(n,this, controller)
-        //     const outDEdges = this.switchEdges.filter((sEdge)=> sEdge.edge.from == n)
-        //     // for (const switchableEdge of outDEdges) {
-        //     //     switchableNode.dragHandle.addDraggedAlong(switchableEdge.getStartCornerDragHandle())
-        //     // }
-
-        //     // const inDEdges = this.switchEdges.filter((dE)=> dE.edge.to == n)
-        //     // for (const switchableEdge of inDEdges) {
-        //     //     switchableNode.dragHandle.addDraggedAlong(switchableEdge.getEndCornerDragHandle())
-        //     // }
-
-        //     return switchableNode
-        // })
     }
 
-    addNodeFrom(nodeFrom: BpmnNode, edge: BpmnEdge, controller: SwitchController): void {
-        let switchNode: SwitchableNode = this.getSwitchNode(nodeFrom);
-        if (switchNode == null)
-            switchNode = this.addNewSwitchNode(nodeFrom, controller);
-        
-        switchNode.addSuccessor(edge.to); 
+
+    svgCreation(): SVGElement {
+        const svgContainer = Svg.container();
+        const svgNodes = Svg.container('nodes');
+        const svgEdges = Svg.container('edges');
+
+
+        for (let switchNode of this._switchNodes) {
+            svgNodes.appendChild(switchNode.bpmnNode.svgManager.getSvg());
+        }
+
+        for (let switchEdge of this._switchEdges) {
+            svgEdges.appendChild(switchEdge.bpmnEdge.svgManager.getSvg());
+        }
+
+        svgContainer.appendChild(svgNodes);
+        svgContainer.appendChild(svgEdges);
+        return svgContainer;
     }
 
-    addNewSwitchNode(bpmnNode: BpmnNode, controller: SwitchController): SwitchableNode{
-        let switchNode = new SwitchableNode(bpmnNode, controller);
-        this._switchNodes.push(switchNode);
 
-        return switchNode;
+    addNewSwitchNode(bpmnNode: BpmnNode, controller: SwitchController): SwitchableNode {
+        let node: SwitchableNode = new SwitchableNode(bpmnNode, controller)
+        SwitchUtils.addItem(node, this._switchNodes);
+
+
+        return node;
     }
 
-    addNodeTo(nodeTo: BpmnNode, edge: BpmnEdge, controller: SwitchController): void {
-        let switchNode: SwitchableNode = this.getSwitchNode(nodeTo);
-        if (switchNode == null)
-            switchNode = this.addNewSwitchNode(nodeTo, controller);
-        
-        switchNode.addPredecessor(edge.to); 
+    addNodesConnectedByEdge(edge: BpmnEdge, controller: SwitchController): void {
+        //create node that is source of the edge
+        let switchNodeFrom: SwitchableNode = this.getSwitchNode(edge.from);
+        if (switchNodeFrom == null)
+            switchNodeFrom = this.addNewSwitchNode(edge.from, controller);
+
+        //create node that is target of the edge
+        let switchNodeTo: SwitchableNode = this.getSwitchNode(edge.to);
+        if (switchNodeTo == null)
+            switchNodeTo = this.addNewSwitchNode(edge.to, controller);
+
+        //register predecessor and successor nodes   
+        switchNodeTo.addPredecessor(switchNodeFrom);
+        switchNodeFrom.addSuccessor(switchNodeTo);
     }
 
-    private getSwitchNode(nodeToCheck: BpmnNode): any {
+    private getSwitchNode(nodeToFind: BpmnNode): any {
 
         for (let node of this._switchNodes)
-            if (node.id() === nodeToCheck.id)
+            if (node.id === nodeToFind.id)
                 return node
         return null
     }
@@ -78,36 +84,16 @@ export class SwitchableGraph implements SvgInterface {
         return this._switchNodes
     }
 
-    private snapSvgs: SVGElement | undefined;
-    updateSvg(): SVGElement {
-        const c = Svg.container();
-        const cNodes = Svg.container('nodes');
-        const cEdges = Svg.container('edges');
+    
 
-        c.appendChild(Svg.background());
-
-        // c.onmouseup = (event) => {
-        //     this.stopDrag(event);
-        // };
-        // c.onmousemove = (event) => {
-        //     this.drag(event);
-        // };
-
-        for (const n of this._switchNodes) {
-            cNodes.appendChild(n.updateSvg());
+    private _svgManager: SvgManager | undefined;
+    public get svgManager(): SvgManager {
+        if (this._svgManager == undefined) {
+            this._svgManager = new SvgManager("SwitchableGraph", () => this.svgCreation())
         }
-
-
-        for (const e of this.switchEdges) {
-            cEdges.appendChild(e.updateSvg());
-        }
-
-        this.snapSvgs = Svg.container('snapSvgs');
-        c.appendChild(cNodes);
-        c.appendChild(this.snapSvgs);
-        c.appendChild(cEdges);
-        return c;
+        return this._svgManager;
     }
 
 
+    
 }
