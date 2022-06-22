@@ -15,7 +15,7 @@ export class SwitchableGraph implements GetSvgManager {
     private _switchEdges: SwitchableEdge[] = []
     private _switchNodes: SwitchableNode[] = []
     constructor(bpmnGraph: BpmnGraph) {
-        console.log("New Switch graph")
+        
         //controls how nodes are switched
         const controller = new SwitchController(this);
 

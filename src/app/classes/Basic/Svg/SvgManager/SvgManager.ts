@@ -43,6 +43,7 @@ export class SvgManager {
     }
 
     removeCssClasses(...cssClasses: string[]) {
+        
         for (const cssClass of cssClasses) {
             if (cssClass.trim() != "")
                 this.root.classList.remove(cssClass)

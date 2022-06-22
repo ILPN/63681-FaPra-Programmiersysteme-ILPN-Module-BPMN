@@ -1,4 +1,5 @@
 import { BpmnNode } from "../Bpmn/BpmnNode";
+import { BpmnEventEnd } from "../Bpmn/events/BpmnEventEnd";
 import { BpmnEventStart } from "../Bpmn/events/BpmnEventStart";
 import { SwitchController } from "./switch-controller";
 import { SwitchState } from "./switchstatetype";
@@ -14,24 +15,29 @@ export class SwitchableNode {
 
     constructor(node: BpmnNode, controller: SwitchController) {
         this._bpmnNode = node
+        this._id = node.id
         this._switchController = controller;
+
+        //initial state for any node except StartEvent is disabled
+        //StartEvents are enableable
+        this.switchTo(SwitchState.disabled)
         if (this.isStartEvent())
             this._switchController.addToStartEvents(this)
-        this._id = node.id
 
+        //connected nodes
         this._predecessors = new Array<SwitchableNode>();
         this._successors = new Array<SwitchableNode>();
 
-        //switch on mouse down
+        //switch state on mouse down
         this._bpmnNode.svgManager.getNewSvg().onmousedown = (e) => controller.press(this)
     }
 
 
-    predecessors(): Array<SwitchableNode> {
+    get predecessors(): Array<SwitchableNode> {
         return this._predecessors
     }
 
-    successors(): Array<SwitchableNode> {
+    get successors(): Array<SwitchableNode> {
         return this._successors
     }
     addSuccessor(node: SwitchableNode) {
@@ -53,13 +59,13 @@ export class SwitchableNode {
 
     /**
      * collects nodes whose needs to be switched when this node is clicked:
-     * 1. nodes after the clicked node
-     * 2. nodes before the clicked node
-     * @returns 
+     * 1. disabled nodes after the clicked node
+     * 2. enabled nodes before the clicked node
+     * @returns nodes to switch
      */
     switchRegular(): SwitchableNode[] {
         let nodesToSwitch: SwitchableNode[] = [];
-
+        SwitchUtils.addItem(this, nodesToSwitch)
         this._predecessors.forEach(before => { if (before.switchState === SwitchState.enabled) SwitchUtils.addItem(before, nodesToSwitch) });
         this._successors.forEach(after => { if (after.switchState === SwitchState.disabled) SwitchUtils.addItem(after, nodesToSwitch) });
 
@@ -77,43 +83,42 @@ export class SwitchableNode {
         return this.switchState === SwitchState.enabled
     }
 
-    protected completedPathFromNodeExists(startNode: SwitchableNode): boolean {
-        // for (let nodeBefore of this.predecessors()) {
-        //     //the immediate predecessor must have state enabled
-        //     if(!nodeBefore.enabled())
-        //       return false;
-
-        //     //every node on the path to the predecessor must be disabled
-        //     nodeBefore = nodeBefore.predecessors()[0];
-        //     while(nodeBefore != null && nodeBefore != startNode){
-
-        //     }
-        // }
-
-
-        // return false;
-        return true;
+    /**
+     * checks if this node is a gateway
+     * @returns 
+     */
+    isGateway(): boolean{
+        //we have to move the implementation to another class
+        //because importing SwitchableGateway in this class
+        // creates circular dependency because of which webpack refuses to build the project 
+        return SwitchUtils.isGateway(this);
     }
 
+    /**
+     * checks if this node is in state switched
+     * @returns 
+     */
+    switched(): boolean{
+        return this.switchState === SwitchState.switched
+    }
 
     /** checks if the graph node is a Start Event 
     * @returns true if if the graph node is a Start Event 
     */
     isStartEvent(): boolean {
-        if (this._bpmnNode instanceof BpmnEventStart) {
-            return true;
-        };
-        return false;
+        return this._bpmnNode instanceof BpmnEventStart;
     }
 
-    
-
+      /** checks if the graph node is an End Event 
+    * @returns true if if the graph node is an End Event 
+    */
+       isEndEvent(): boolean {
+        return this._bpmnNode instanceof BpmnEventEnd;
+    }
 
     /** disables the node and changes its color */
     disable(): void {
-        let oldState: SwitchState = this.switchState
-        this.switchState = SwitchState.disabled;
-        this.changeColor(oldState, this.switchState);
+        this.switchTo(SwitchState.disabled)
     }
 
     get switchState(): SwitchState {
@@ -128,42 +133,54 @@ export class SwitchableNode {
         this._switchController = value;
     }
 
+    /**
+     * switches state to the next one according to transition rules
+     */
     switch(): void {
-        let oldState: SwitchState = this.switchState
-        this.setNewState();
-
-        this.changeColor(oldState, this.switchState);
-
+        this.switchTo(this.getNextState())
     }
 
+    /**
+     * switches node to specified new state 
+     * @param newState 
+     */
+    switchTo(newState: SwitchState): void {
+        this.changeColor(this.switchState, newState)
+        this.switchState = newState;
+    }
+    /**
+     * sets new color according to the new state
+     */
     changeColor(oldState: SwitchState, newState: SwitchState): void {
+        //console.log("Switching " + this.id + " from " + SwitchState[oldState].toLocaleUpperCase() + " to " + SwitchState[newState].toLocaleUpperCase())
         this.bpmnNode.svgManager.removeCssClasses(SwitchState[oldState])
-        this.bpmnNode.svgManager.setCssClasses(SwitchState[this._switchState]);
+        this.bpmnNode.svgManager.setCssClasses(SwitchState[newState]);
+        this.bpmnNode.svgManager.redraw();
+       
     }
-
-    setNewState(): void {
+    /**
+     * defines the transition to the next state from the current state
+     * @returns the next state to switch to
+     */
+    getNextState(): SwitchState {
         switch (this._switchState) {
-            case SwitchState.disabled: {
-                this._switchState = SwitchState.enableable
-                break;
-            }
-            case SwitchState.enableable: {
-                this._switchState = SwitchState.enabled;
-                break;
-            }
-            case SwitchState.enabled: {
-                this._switchState = SwitchState.switched;
-                break;
-            }
-            case SwitchState.switched: {
-                this._switchState = SwitchState.switched;
-                break;
-            }
-            default: {
-                this._switchState = SwitchState.disabled
-                break;
-            }
+            case SwitchState.disabled:
+                return SwitchState.enableable
+
+            case SwitchState.enableable:
+                return SwitchState.enabled;
+
+            case SwitchState.enabled:
+                return SwitchState.switched;
+
+
+            case SwitchState.switched:
+                return SwitchState.switched;
+
+            default: return SwitchState.disabled
+
         }
+        
     }
 
 }

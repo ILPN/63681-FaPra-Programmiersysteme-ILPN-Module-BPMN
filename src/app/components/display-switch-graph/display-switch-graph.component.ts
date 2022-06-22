@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { BpmnGraph } from 'src/app/classes/Basic/Bpmn/BpmnGraph';
 import { SwitchableGraph } from 'src/app/classes/Basic/Switch/SwitchableGraph';
@@ -9,7 +9,8 @@ import { SvgService } from 'src/app/services/svg.service';
 @Component({
   selector: 'app-display-switch-graph',
   templateUrl: './display-switch-graph.component.html',
-  styleUrls: ['./display-switch-graph.component.scss']
+  styleUrls: ['./display-switch-graph.component.scss'],
+  encapsulation: ViewEncapsulation.None
 })
 export class DisplaySwitchGraphComponent implements OnDestroy, AfterViewInit {
   @ViewChild('drawingArea') drawingArea: ElementRef<SVGElement> | undefined;

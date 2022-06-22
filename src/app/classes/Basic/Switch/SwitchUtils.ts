@@ -1,3 +1,4 @@
+import { SwitchableGateway } from "./SwitchableGateway";
 import { SwitchableNode } from "./SwitchableNode";
 
 export class SwitchUtils {
@@ -26,5 +27,14 @@ export class SwitchUtils {
         if (!existingItems.includes(newItem)) existingItems.push(newItem);
 
         return existingItems
+    }
+
+    /**
+     * checks if the node is a gateway
+     * @param node 
+     * @returns 
+     */
+    public static isGateway(node: SwitchableNode): boolean{
+        return node instanceof SwitchableGateway
     }
 }
