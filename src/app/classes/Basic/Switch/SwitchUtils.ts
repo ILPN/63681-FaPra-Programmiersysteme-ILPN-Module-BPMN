@@ -1,3 +1,5 @@
+import { BpmnGateway } from "../Bpmn/gateways/BpmnGateway";
+import { BpmnGatewaySplitAnd } from "../Bpmn/gateways/BpmnGatewaySplitAnd";
 import { SwitchableGateway } from "./SwitchableGateway";
 import { SwitchableNode } from "./SwitchableNode";
 

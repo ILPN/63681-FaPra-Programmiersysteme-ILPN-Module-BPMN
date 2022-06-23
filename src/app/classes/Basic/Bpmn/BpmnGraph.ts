@@ -12,6 +12,8 @@ import { BpmnTaskUserTask } from './tasks/BpmnTaskUserTask';
 import { GetSvgManager } from '../Interfaces/GetSvgManager';
 import { SvgManager } from '../Svg/SvgManager/SvgManager';
 import { Utility } from '../../Utils/Utility';
+import { BpmnGatewayJoinAnd } from './gateways/BpmnGatewayJoinAnd';
+import { BpmnGatewaySplitAnd } from './gateways/BpmnGatewaySplitAnd';
 
 export class BpmnGraph
     extends BGraph<BpmnEdge, BpmnNode>
@@ -116,13 +118,13 @@ export class BpmnGraph
         elementT3.setPosXY(1225,190)
         g.addNode(elementT3);
 
-        let elementG1 = new BpmnGateway("G1");
+        let elementG1 = new BpmnGatewaySplitAnd("G1");
         elementG1.label = "BpmnGateway"
 
         elementG1.setPosXY(210,190);
         g.addNode(elementG1);
 
-        let elementG2 = new BpmnGateway("G2");
+        let elementG2 = new BpmnGatewayJoinAnd("G2");
         elementG2.label = "BpmnGateway"
 
         elementG2.setPosXY(675,190);
