@@ -44,7 +44,7 @@ export class SwitchableGateway extends SwitchableNode {
    */
     private switchAndSplit(): SwitchableNode[] {
 
-        console.log("switchAndSplit");
+        
         //add AND_SPLIT gateway
         let nodesToSwitch: SwitchableNode[] = [this];
 
@@ -136,7 +136,7 @@ export class SwitchableGateway extends SwitchableNode {
                     b = this.switchController.recursivelySearchForResponsibleSplitGateway(before, []);
                 }
             });
-            return b;
+            return b && i>0;
         }
 
         //XOR_JOIN, any _SPLIT gateway

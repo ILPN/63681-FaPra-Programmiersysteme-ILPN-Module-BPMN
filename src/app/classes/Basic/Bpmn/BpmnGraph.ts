@@ -14,6 +14,10 @@ import { SvgManager } from '../Svg/SvgManager/SvgManager';
 import { Utility } from '../../Utils/Utility';
 import { BpmnGatewayJoinAnd } from './gateways/BpmnGatewayJoinAnd';
 import { BpmnGatewaySplitAnd } from './gateways/BpmnGatewaySplitAnd';
+import { BpmnGatewaySplitOr } from './gateways/BpmnGatewaySplitOr';
+import { BpmnGatewayJoinOr } from './gateways/BpmnGatewayJoinOr';
+import { BpmnGatewaySplitXor } from './gateways/BpmnGatewaySplitXor';
+import { BpmnGatewayJoinXor } from './gateways/BpmnGatewayJoinXor';
 
 export class BpmnGraph
     extends BGraph<BpmnEdge, BpmnNode>
@@ -117,16 +121,42 @@ export class BpmnGraph
 
         elementT3.setPosXY(1225,190)
         g.addNode(elementT3);
+        
+        // ---------------------------------------------------
 
-        let elementG1 = new BpmnGatewaySplitAnd("G1");
+        // let elementG1 = new BpmnGatewaySplitAnd("G1");
+        // elementG1.label = "BpmnGateway"
+
+        // elementG1.setPosXY(210,190);
+        // g.addNode(elementG1);
+
+        // let elementG2 = new BpmnGatewayJoinAnd("G2");
+        // elementG2.label = "BpmnGateway"
+        
+        // ---------------------------------------------------
+
+        let elementG1 = new BpmnGatewaySplitOr("G1");
         elementG1.label = "BpmnGateway"
 
         elementG1.setPosXY(210,190);
         g.addNode(elementG1);
 
-        let elementG2 = new BpmnGatewayJoinAnd("G2");
+        let elementG2 = new BpmnGatewayJoinOr("G2");
         elementG2.label = "BpmnGateway"
 
+        
+        // ---------------------------------------------------
+
+        // let elementG1 = new BpmnGatewaySplitXor("G1");
+        // elementG1.label = "BpmnGateway"
+
+        // elementG1.setPosXY(210,190);
+        // g.addNode(elementG1);
+
+        // let elementG2 = new BpmnGatewayJoinXor("G2");
+        // elementG2.label = "BpmnGateway"
+
+        // ---------------------------------------------------
         elementG2.setPosXY(675,190);
         g.addNode(elementG2);
 

@@ -1,21 +1,23 @@
 import { BpmnEdge } from '../Bpmn/BpmnEdge/BpmnEdge';
 import { BpmnGraph } from '../Bpmn/BpmnGraph';
 import { BpmnNode } from '../Bpmn/BpmnNode';
+import { BpmnGateway } from '../Bpmn/gateways/BpmnGateway';
 import { GetSvgManager } from '../Interfaces/GetSvgManager';
 import { Svg } from '../Svg/Svg';
 import { SvgManager } from '../Svg/SvgManager/SvgManager';
 import { SwitchController } from './switch-controller';
 import { SwitchableEdge } from './SwitchableEdge';
+import { SwitchableGateway } from './SwitchableGateway';
 import { SwitchableNode } from './SwitchableNode';
 import { SwitchUtils } from './SwitchUtils';
 
 
 export class SwitchableGraph implements GetSvgManager {
-   
+
     private _switchEdges: SwitchableEdge[] = []
     private _switchNodes: SwitchableNode[] = []
     constructor(bpmnGraph: BpmnGraph) {
-        
+
         //controls how nodes are switched
         const controller = new SwitchController(this);
 
@@ -49,10 +51,8 @@ export class SwitchableGraph implements GetSvgManager {
 
 
     addNewSwitchNode(bpmnNode: BpmnNode, controller: SwitchController): SwitchableNode {
-        let node: SwitchableNode = new SwitchableNode(bpmnNode, controller)
+        let node = (bpmnNode instanceof BpmnGateway) ? new SwitchableGateway(bpmnNode, controller) : new SwitchableNode(bpmnNode, controller);
         SwitchUtils.addItem(node, this._switchNodes);
-
-
         return node;
     }
 
@@ -84,7 +84,7 @@ export class SwitchableGraph implements GetSvgManager {
         return this._switchNodes
     }
 
-    
+
 
     private _svgManager: SvgManager | undefined;
     public get svgManager(): SvgManager {
@@ -95,5 +95,5 @@ export class SwitchableGraph implements GetSvgManager {
     }
 
 
-    
+
 }

@@ -8,7 +8,7 @@ import { SwitchUtils } from "./SwitchUtils";
 export class SwitchableNode {
     protected _bpmnNode: BpmnNode
     private _switchState: SwitchState = SwitchState.disabled;
-    private _switchController: SwitchController | undefined;
+    private _switchController: SwitchController;
     private _id;
     private _predecessors: Array<SwitchableNode>;
     private _successors: Array<SwitchableNode>;
@@ -131,6 +131,10 @@ export class SwitchableNode {
 
     set switchController(value: SwitchController) {
         this._switchController = value;
+    }
+
+    get switchController() : SwitchController {
+        return this._switchController;
     }
 
     /**
