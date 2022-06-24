@@ -95,8 +95,9 @@ export class SwitchableGateway extends SwitchableNode {
      * @param clicked 
      * @returns nodes to switch
      */
-    private switchOrSplit(clicked: SwitchableNode): SwitchableNode[] {
-        return SwitchUtils.addItem(this, clicked.successors);
+     private switchOrSplit(clicked: SwitchableNode): SwitchableNode[] {
+        let nodesToSwitch: SwitchableNode[] = [this];
+        return SwitchUtils.addItem(this, nodesToSwitch);
     }
 
     private AND_SPLIT(): boolean {

@@ -214,9 +214,7 @@ export class SwitchController {
     private newGame() {
         this.nodes.forEach(node => node.disable());
         this._startEvents.forEach(event => {
-            let oldState: SwitchState = event.switchState
-            event.switchState = SwitchState.enableable;
-            event.changeColor(oldState, event.switchState);
+            event.switchTo(SwitchState.enableable)
         });
     }
 
