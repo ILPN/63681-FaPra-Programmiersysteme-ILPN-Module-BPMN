@@ -1,5 +1,7 @@
 module.exports = {
+  "testEnvironment": "jsdom",
     "roots": [
+      "<rootDir>",
       "<rootDir>/src"
     ],
     "testMatch": [
@@ -9,4 +11,5 @@ module.exports = {
     "transform": {
       "^.+\\.(ts|tsx)$": "ts-jest"
     },
+    "modulePaths": ["node_modules","<rootDir>"],
   }
