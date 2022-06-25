@@ -47,6 +47,7 @@ describe('Simple graph with OR gateway', () => {
         expect(startEvent.switchState).toEqual(SwitchState.enabled)
         expect(task1.switchState).toEqual(SwitchState.enableable)
         expect(gatewayJoinOr1.switchState).toEqual(SwitchState.disabled)
+        expect(task2.switchState).toEqual(SwitchState.disabled)
     });
 
     test('Recursive search for preceding SPLIT gateway', () => {
