@@ -1,5 +1,6 @@
 import { BpmnGatewayJoinAnd } from "../Bpmn/gateways/BpmnGatewayJoinAnd";
 import { BpmnGatewayJoinOr } from "../Bpmn/gateways/BpmnGatewayJoinOr";
+import { BpmnGatewayJoinXor } from "../Bpmn/gateways/BpmnGatewayJoinXor";
 import { BpmnGatewaySplitAnd } from "../Bpmn/gateways/BpmnGatewaySplitAnd";
 import { BpmnGatewaySplitOr } from "../Bpmn/gateways/BpmnGatewaySplitOr";
 import { BpmnGatewaySplitXor } from "../Bpmn/gateways/BpmnGatewaySplitXor";
@@ -26,6 +27,8 @@ export class SwitchableGateway extends SwitchableNode {
         if (this.XOR_SPLIT())
             return this.switchXorSplit(clicked);
 
+        if (this.OR_JOIN() || this.OR_JOIN() || this.AND_JOIN())
+            return [];
 
         console.warn("Failed to find Gateway type: " + typeof this + ". Check if the graph sequence is valid!")
         return [];
