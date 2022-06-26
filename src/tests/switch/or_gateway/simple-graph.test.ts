@@ -35,7 +35,9 @@ describe('Simple graph with OR gateway', () => {
     test('Initial status of nodes when the diagram was initialized', () => {
 
         expect(startEvent.switchState).toEqual(SwitchState.enableable)
-        expect(task1.switchState).toEqual(SwitchState.disabled)
+        for (let node of diagram.switchNodes)
+            if (node !== startEvent)
+                expect(node.switchState).toEqual(SwitchState.disabled)
 
     });
 
@@ -45,8 +47,53 @@ describe('Simple graph with OR gateway', () => {
 
         expect(startEvent.switchState).toEqual(SwitchState.enabled)
         expect(task1.switchState).toEqual(SwitchState.enableable)
-        expect(gatewayJoinOr1.switchState).toEqual(SwitchState.disabled)
+
+         //rest disabled
+         expect(gatewayJoinOr1.switchState).toEqual(SwitchState.disabled)
+         expect(task2.switchState).toEqual(SwitchState.disabled)
+         expect(task3.switchState).toEqual(SwitchState.disabled)
+         expect(gatewayJoinOr1.switchState).toEqual(SwitchState.disabled)
+         expect(endEvent.switchState).toEqual(SwitchState.disabled)
+        
+    });
+
+    test('Status of nodes when Task between StartEvent and Gateway is clicked', () => {
+
+        controller.press(startEvent)
+        controller.press(task1)
+
+
+        expect(startEvent.switchState).toEqual(SwitchState.switched)
+        expect(task1.switchState).toEqual(SwitchState.enabled)
+        expect(gatewaySplitOr1.switchState).toEqual(SwitchState.enableable)
+
+        //rest disabled
         expect(task2.switchState).toEqual(SwitchState.disabled)
+        expect(task3.switchState).toEqual(SwitchState.disabled)
+        expect(gatewayJoinOr1.switchState).toEqual(SwitchState.disabled)
+        expect(endEvent.switchState).toEqual(SwitchState.disabled)
+        
+    });
+
+    test('Status of nodes when SPLIT OR is clicked', () => {
+
+        controller.press(startEvent)
+        controller.press(task1)
+        controller.press(gatewaySplitOr1)
+
+
+        expect(startEvent.switchState).toEqual(SwitchState.switched)
+        expect(task1.switchState).toEqual(SwitchState.switched)
+        expect(gatewaySplitOr1.switchState).toEqual(SwitchState.enabled)
+
+        //tasks after SPLIT gateway
+        expect(task2.switchState).toEqual(SwitchState.enableable)
+        expect(task3.switchState).toEqual(SwitchState.enableable)
+
+        //rest disabled
+        expect(gatewayJoinOr1.switchState).toEqual(SwitchState.disabled)
+        expect(endEvent.switchState).toEqual(SwitchState.disabled)
+        
     });
 
     test('Recursive search for preceding SPLIT gateway', () => {
@@ -58,7 +105,7 @@ describe('Simple graph with OR gateway', () => {
         let found: boolean = controller.recursivelySearchForResponsibleSplitGateway(task2, [])
 
         expect(found).toEqual(false)
-       
+
     });
-    
+
 })

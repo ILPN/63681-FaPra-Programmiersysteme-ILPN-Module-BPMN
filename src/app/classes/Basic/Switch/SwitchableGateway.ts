@@ -27,11 +27,7 @@ export class SwitchableGateway extends SwitchableNode {
         if (this.XOR_SPLIT())
             return this.switchXorSplit(clicked);
 
-        if (this.OR_JOIN() || this.OR_JOIN() || this.AND_JOIN())
-            return [];
-
-        console.warn("Failed to find Gateway type: " + typeof this + ". Check if the graph sequence is valid!")
-        return [];
+        return clicked.switchRegular()
     }
 
 
