@@ -9,6 +9,7 @@ import { SwitchController } from './switch-controller';
 import { SwitchableEdge } from './SwitchableEdge';
 import { SwitchableGateway } from './SwitchableGateway';
 import { SwitchableNode } from './SwitchableNode';
+import { SwitchState } from './switchstatetype';
 import { SwitchUtils } from './SwitchUtils';
 
 
@@ -49,6 +50,10 @@ export class SwitchableGraph implements GetSvgManager {
 
 
         for (let switchNode of this._switchNodes) {
+            if (switchNode.isStartEvent())
+                switchNode.switchTo(SwitchState.enableable)
+            else
+                switchNode.switchTo(SwitchState.disabled)
             svgNodes.appendChild(switchNode.bpmnNode.svgManager.getSvg());
         }
 
