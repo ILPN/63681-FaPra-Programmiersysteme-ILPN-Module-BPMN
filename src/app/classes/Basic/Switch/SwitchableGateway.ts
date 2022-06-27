@@ -1,5 +1,6 @@
 import { BpmnGatewayJoinAnd } from "../Bpmn/gateways/BpmnGatewayJoinAnd";
 import { BpmnGatewayJoinOr } from "../Bpmn/gateways/BpmnGatewayJoinOr";
+import { BpmnGatewayJoinXor } from "../Bpmn/gateways/BpmnGatewayJoinXor";
 import { BpmnGatewaySplitAnd } from "../Bpmn/gateways/BpmnGatewaySplitAnd";
 import { BpmnGatewaySplitOr } from "../Bpmn/gateways/BpmnGatewaySplitOr";
 import { BpmnGatewaySplitXor } from "../Bpmn/gateways/BpmnGatewaySplitXor";
@@ -26,9 +27,7 @@ export class SwitchableGateway extends SwitchableNode {
         if (this.XOR_SPLIT())
             return this.switchXorSplit(clicked);
 
-
-        console.warn("Failed to find Gateway type: " + typeof this + ". Check if the graph sequence is valid!")
-        return [];
+        return clicked.switchRegular()
     }
 
 
@@ -95,8 +94,15 @@ export class SwitchableGateway extends SwitchableNode {
      * @param clicked 
      * @returns nodes to switch
      */
-    private switchOrSplit(clicked: SwitchableNode): SwitchableNode[] {
-        return SwitchUtils.addItem(this, clicked.successors);
+     private switchOrSplit(clicked: SwitchableNode): SwitchableNode[] {
+        let nodesToSwitch: SwitchableNode[] = [this];
+        //gateway
+        SwitchUtils.addItem(this, nodesToSwitch);
+
+        //nodes after the clicked one
+        SwitchUtils.addItems(clicked.successors, nodesToSwitch);
+
+        return nodesToSwitch
     }
 
     private AND_SPLIT(): boolean {

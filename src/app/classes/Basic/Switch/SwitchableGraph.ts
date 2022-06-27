@@ -9,6 +9,7 @@ import { SwitchController } from './switch-controller';
 import { SwitchableEdge } from './SwitchableEdge';
 import { SwitchableGateway } from './SwitchableGateway';
 import { SwitchableNode } from './SwitchableNode';
+import { SwitchState } from './switchstatetype';
 import { SwitchUtils } from './SwitchUtils';
 
 
@@ -16,19 +17,31 @@ export class SwitchableGraph implements GetSvgManager {
 
     private _switchEdges: SwitchableEdge[] = []
     private _switchNodes: SwitchableNode[] = []
+    private _controller: SwitchController;
+
     constructor(bpmnGraph: BpmnGraph) {
 
         //controls how nodes are switched
-        const controller = new SwitchController(this);
+        this._controller = new SwitchController(this);
 
         bpmnGraph.edges.forEach((bpmnEdge: BpmnEdge) => {
             let switchEdge: SwitchableEdge = new SwitchableEdge(bpmnEdge);
             SwitchUtils.addItem(switchEdge, this._switchEdges);
-            this.addNodesConnectedByEdge(bpmnEdge, controller);
+            this.addNodesConnectedByEdge(bpmnEdge, this._controller);
 
         })
     }
 
+    get controller(): SwitchController {
+        return this._controller
+    }
+
+    getNode(id: string): any {
+        for (let node of this._switchNodes)
+            if (node.id === id)
+                return node
+        return null
+    }
 
     svgCreation(): SVGElement {
         const svgContainer = Svg.container();
@@ -37,6 +50,10 @@ export class SwitchableGraph implements GetSvgManager {
 
 
         for (let switchNode of this._switchNodes) {
+            if (switchNode.isStartEvent())
+                switchNode.switchTo(SwitchState.enableable)
+            else
+                switchNode.switchTo(SwitchState.disabled)
             svgNodes.appendChild(switchNode.bpmnNode.svgManager.getSvg());
         }
 

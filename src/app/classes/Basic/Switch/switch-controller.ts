@@ -62,16 +62,18 @@ export class SwitchController {
         //add the clicked node
         SwitchUtils.addItem(clickedNode, nodesToSwitch);
 
+        // if no nodes before the clicked one
+        if(clickedNode.predecessors.length === 0)
+          return SwitchUtils.addItems(clickedNode.switchRegular(), nodesToSwitch);
+
         // if there is enabled gateway before the clicked node 
         clickedNode.predecessors.forEach(before => {
             if (before.enabled() && before.isGateway()) {
                 let gatewayConnections = (before as SwitchableGateway).switchSplit(clickedNode);
                 SwitchUtils.addItems(gatewayConnections, nodesToSwitch)
-            }
+            }else
+                SwitchUtils.addItems(clickedNode.switchRegular(), nodesToSwitch);
         });
-
-        // other nodes connected to the clicked node
-        SwitchUtils.addItems(clickedNode.switchRegular(), nodesToSwitch);
 
         return nodesToSwitch
     }
@@ -214,9 +216,7 @@ export class SwitchController {
     private newGame() {
         this.nodes.forEach(node => node.disable());
         this._startEvents.forEach(event => {
-            let oldState: SwitchState = event.switchState
-            event.switchState = SwitchState.enableable;
-            event.changeColor(oldState, event.switchState);
+            event.switchTo(SwitchState.enableable)
         });
     }
 
