@@ -5,9 +5,24 @@ import { BpmnGatewaySplitAnd } from "../Bpmn/gateways/BpmnGatewaySplitAnd";
 import { BpmnGatewaySplitOr } from "../Bpmn/gateways/BpmnGatewaySplitOr";
 import { BpmnGatewaySplitXor } from "../Bpmn/gateways/BpmnGatewaySplitXor";
 import { SwitchableNode } from "./SwitchableNode";
+import { SwitchState } from "./switchstatetype";
 import { SwitchUtils } from "./SwitchUtils";
 
 export class SwitchableGateway extends SwitchableNode {
+
+
+/**  Disables all alternative paths not taken in case of an or gateway*/
+    disablePathsNotTakenAfterOrJoin(): void {
+        if (this.OR_JOIN()) {
+            let split = this.searchResponsibleSplitGateway();
+            if (split !== undefined)
+                split.successors.forEach(successor => {
+                    if (successor.switchState === SwitchState.enableable) successor.disable();
+                });
+
+        }
+
+    }
 
 
     /**
@@ -43,7 +58,7 @@ export class SwitchableGateway extends SwitchableNode {
    */
     private switchAndSplit(): SwitchableNode[] {
 
-        
+
         //add AND_SPLIT gateway
         let nodesToSwitch: SwitchableNode[] = [this];
 
@@ -94,7 +109,7 @@ export class SwitchableGateway extends SwitchableNode {
      * @param clicked 
      * @returns nodes to switch
      */
-     private switchOrSplit(clicked: SwitchableNode): SwitchableNode[] {
+    private switchOrSplit(clicked: SwitchableNode): SwitchableNode[] {
         let nodesToSwitch: SwitchableNode[] = [this];
         //gateway
         SwitchUtils.addItem(this, nodesToSwitch);
@@ -121,36 +136,56 @@ export class SwitchableGateway extends SwitchableNode {
         return this._bpmnNode instanceof BpmnGatewayJoinAnd
     }
 
-    private OR_JOIN(): boolean {
+    OR_JOIN(): boolean {
         return this._bpmnNode instanceof BpmnGatewayJoinOr
     }
+
+    private XOR_JOIN(): boolean {
+        return this._bpmnNode instanceof BpmnGatewayJoinXor
+    }
+
+
 
     /**
     * checks if it is possible to switch the state of this gateway 
     * @returns true if the state can be switched
     */
     canBeSwitched(): boolean {
-
         if (this.AND_JOIN())
             return this.allNodesBeforeEnabled();
-
         let b: boolean = true;
         if (this.OR_JOIN()) {
-            let i: number = 0;
-            this.predecessors.forEach(before => {
-                if (before.enabled()) { i++; } else {
-                    b = this.switchController.recursivelySearchForResponsibleSplitGateway(before, []);
-                }
-            });
-            return b && i>0;
+            return this.checkIfOrJoinGatewayCanBeSwitched();
         }
-
         //XOR_JOIN, any _SPLIT gateway
         return true;
     }
 
+    /**
+     * checks if all nodes before this gateway are enabled
+     * @returns 
+     */
+    private checkIfOrJoinGatewayCanBeSwitched(): boolean {
+        let answer: boolean = true;
+        for (let nodeBefore of this.predecessors)
+            if (!nodeBefore.enabled()) {
+                let gateway: SwitchableGateway | undefined = this.searchResponsibleSplitGateway();
+                if (gateway !== undefined && answer) answer = SwitchUtils.isNoNodeEnabledOrSwitched(SwitchUtils.getAllElementsBetweenNodeToNodeBackward(nodeBefore, gateway,[]));    
+                // {   
+                // var uhu: SwitchableNode[] = SwitchUtils.getAllElementsBetweenNodeToNodeBackward(nodeBefore, gateway, []);
+                // SwitchUtils.printAllElements(nodeBefore, gateway, uhu);
+                // answer = SwitchUtils.isNoNodeEnabledOrSwitched(uhu);
+                // }
+            }
+        return answer;
+    }
+
     isSplitGateway(): boolean {
         return this.AND_SPLIT() || this.OR_SPLIT() || this.XOR_SPLIT();
+    }
+
+    isJoinGateway(): boolean {
+        return this.AND_JOIN() || this.OR_JOIN() || this.XOR_JOIN();
     }
 
     /**
@@ -158,13 +193,148 @@ export class SwitchableGateway extends SwitchableNode {
      * @returns 
      */
     private allNodesBeforeEnabled(): boolean {
-
         for (let nodeBefore of this.predecessors)
             if (!nodeBefore.enabled())
                 return false;
-
         return true;
-
     }
+
+    /**
+  * Returns true if split and join gateway have the same type (AND, OR, XOR)
+  * @param split Splitgateway
+  * @param join Joingateway
+  * @returns Returns true if split and join gateway have the same type
+  */
+    public static splitJoinSameType(split: SwitchableGateway, join: SwitchableGateway): boolean {
+        return ((split.OR_SPLIT() && join.OR_JOIN()) || (split.AND_SPLIT() && join.AND_JOIN()) || (split.XOR_SPLIT() && join.XOR_JOIN()))
+    }
+
+
+
+
+
+
+    /** Search For Responsible */
+    searchResponsibleJoinGateway(): SwitchableGateway | undefined { // private
+        let joingateway: SwitchableGateway | undefined = undefined;
+        let searchBranchNode: SwitchableGateway | undefined = undefined;
+        let fail: boolean = false;
+        this.successors.forEach(successor => {
+            if (!fail) {
+                searchBranchNode = this.helpSearchRecursiveResponsibleJoinGateway(successor, []);
+                if (searchBranchNode !== joingateway && searchBranchNode !== undefined && joingateway !== undefined) {
+                    fail = true;
+                    console.warn("The search for the responsible gateway has yielded several different hits. The Ids of the elements involved are: " + searchBranchNode.id + " and " + joingateway.id);
+                } else {
+                    if (searchBranchNode !== undefined && joingateway === undefined) {
+                        joingateway = searchBranchNode;
+                    }
+                }
+            };
+        });
+        if (!fail && joingateway !== undefined) {
+            let joinGatewayNotUndefined: SwitchableGateway = joingateway;
+            if (!SwitchableGateway.splitJoinSameType(this, joinGatewayNotUndefined)) {
+                fail = true;
+                console.warn("The search for the responsible gateway has resulted a gateway of a different type. The Ids of the elements involved are: " + this.id + " and " + joinGatewayNotUndefined.id);
+            }
+        }
+        return (!fail) ? joingateway : undefined;
+    }
+
+
+    /** Search For Responsible */
+    private helpSearchRecursiveResponsibleJoinGateway(searchNode: SwitchableNode, innerGatewayArray: SwitchableGateway[]): SwitchableGateway | undefined {
+        let joingateway: SwitchableGateway | undefined = undefined;
+        if (searchNode !== undefined)
+            if (searchNode.isGateway()) {
+                let searchNodeAsGateway: SwitchableGateway = searchNode as SwitchableGateway;
+                if (searchNodeAsGateway.isSplitGateway()) {
+                    console.warn("push Gateway to Stack with ID" + searchNodeAsGateway.id);
+                    innerGatewayArray.push(searchNodeAsGateway);
+                } else {
+                    if (innerGatewayArray.length === 0) {
+                        return searchNodeAsGateway;
+                    } else {
+                        var g: SwitchableGateway = innerGatewayArray.pop() as SwitchableGateway;
+                        console.warn("Pop Gateway from Stack with ID" + g.id);
+                    }
+                }
+                searchNodeAsGateway.successors.forEach(successor => {
+                    console.log("start helpSearchRecursiveResponsibleJoinGateway by " + searchNodeAsGateway.id + " with id:" + successor.id + "   Array length => " + innerGatewayArray.length);
+                    if (joingateway === undefined) joingateway = this.helpSearchRecursiveResponsibleJoinGateway(successor, innerGatewayArray);
+                });
+            } else {
+                searchNode.successors.forEach(successor => {
+                    console.log("start helpSearchRecursiveResponsibleJoinGateway by " + searchNode.id + " with id:" + successor.id + "   Array length => " + innerGatewayArray.length);
+                    if (joingateway === undefined) joingateway = this.helpSearchRecursiveResponsibleJoinGateway(successor, innerGatewayArray);
+                });
+            }
+        if (joingateway !== undefined) console.log("Search get " + (joingateway as SwitchableGateway).id + " ");
+        return joingateway;
+    }
+
+    /** Search For Responsible */
+    searchResponsibleSplitGateway(): SwitchableGateway | undefined {
+        let splitGateway: SwitchableGateway | undefined = undefined;
+        let searchBranchNode: SwitchableGateway | undefined = undefined;
+        let fail: boolean = false;
+        this.predecessors.forEach(predecessor => {
+            if (!fail) {
+                searchBranchNode = this.helpSearchRecursiveResponsibleSplitGateway(predecessor, []);
+                if (searchBranchNode !== splitGateway && searchBranchNode !== undefined && splitGateway !== undefined) {
+                    fail = true;
+                    console.warn("The search for the responsible gateway has yielded several different hits. The Ids of the elements involved are: " + searchBranchNode.id + " and " + splitGateway.id);
+                } else {
+                    if (searchBranchNode !== undefined && splitGateway === undefined) {
+                        splitGateway = searchBranchNode;
+                    }
+                }
+            };
+        });
+        if (!fail && splitGateway !== undefined) {
+            let joinGatewayNotUndefined: SwitchableGateway = splitGateway;
+            if (!SwitchableGateway.splitJoinSameType(joinGatewayNotUndefined, this)) {
+                fail = true;
+                console.warn("The search for the responsible gateway has resulted a gateway of a different type. The Ids of the elements involved are: " + joinGatewayNotUndefined.id + " and " + this.id);
+            }
+        }
+        return (!fail) ? splitGateway : undefined;
+    }
+
+
+    /** Search For Responsible */
+    private helpSearchRecursiveResponsibleSplitGateway(searchNode: SwitchableNode, innerGatewayArray: SwitchableGateway[]): SwitchableGateway | undefined {
+        let splitGateway: SwitchableGateway | undefined = undefined;
+        if (searchNode !== undefined)
+            if (searchNode.isGateway()) {
+                let searchNodeAsGateway: SwitchableGateway = searchNode as SwitchableGateway;
+                if (searchNodeAsGateway.isJoinGateway()) {
+                    console.warn("push Gateway to Stack with ID " + searchNodeAsGateway.id);
+                    innerGatewayArray.push(searchNodeAsGateway);
+                } else {
+                    if (innerGatewayArray.length === 0) {
+                        return searchNodeAsGateway;
+                    } else {
+                        let gateway: SwitchableGateway = innerGatewayArray.pop() as SwitchableGateway;
+                        console.warn("Pop Gateway from Stack with ID " + gateway.id);
+                    }
+                }
+                searchNodeAsGateway.predecessors.forEach(predecessor => {
+                    console.log("start helpSearchRecursiveResponsibleSplitGateway by " + searchNodeAsGateway.id + " with id:" + predecessor.id + "   Array length => " + innerGatewayArray.length);
+                    if (splitGateway === undefined) splitGateway = this.helpSearchRecursiveResponsibleSplitGateway(predecessor, innerGatewayArray);
+                });
+            } else {
+                searchNode.predecessors.forEach(predecessor => {
+                    console.log("start helpSearchRecursiveResponsibleSplitGateway by " + searchNode.id + " with id:" + predecessor.id + "   Array length => " + innerGatewayArray.length);
+                    if (splitGateway === undefined) splitGateway = this.helpSearchRecursiveResponsibleSplitGateway(predecessor, innerGatewayArray);
+                });
+            }
+        if (splitGateway !== undefined) console.log("Search get " + (splitGateway as SwitchableGateway).id + " ");
+        return splitGateway;
+    }
+
+
+
 
 }

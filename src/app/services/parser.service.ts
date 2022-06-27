@@ -19,7 +19,7 @@ export class ParserService {
         //         result.addElement(this.parseElement(line));
         //     }
         // });
-        const result = BpmnGraph.sampleGraph();
+        const result = BpmnGraph.anotherMonsterGraph();
 
         return result;
     }
