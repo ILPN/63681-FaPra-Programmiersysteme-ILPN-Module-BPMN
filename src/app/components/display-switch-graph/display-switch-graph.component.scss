@@ -1,0 +1,79 @@
+$enableable: 	#FFFF00;
+.enableable{
+    .Task{ 
+        .nodeBackground{
+            fill: $enableable;
+        }
+    }
+    .Gateway{ 
+        .nodeBackground{
+            fill: $enableable;
+        }
+    }
+    .Event{ 
+        .stroke{
+            fill: $enableable;
+        }
+    }
+}
+
+
+$disabled: 	#FFFFFF;
+.disabled{
+    .Task{ 
+        .nodeBackground{
+            fill: $disabled;
+        }
+    }
+    .Gateway{ 
+        .nodeBackground{
+            fill: $disabled;
+        }
+    }
+    .Event{ 
+        .stroke{
+            fill: $disabled;
+        }
+    }
+}
+
+$enabled: #00ff7b92;
+.enabled{
+    .Task{ 
+        .nodeBackground{
+            fill: $enabled;
+        }
+    }
+    .Gateway{ 
+        .nodeBackground{
+            fill: $enabled;
+        }
+    }
+    .Event{ 
+        .stroke{
+            fill: $enabled;
+        }
+    }
+}
+
+$switched: #C0C0C0;
+.switched{
+    .Task{ 
+        .nodeBackground{
+            fill: $switched;
+        }
+    }
+    .Gateway{ 
+        .nodeBackground{
+            fill: $switched;
+        }
+    }
+    .Event{ 
+        .stroke{
+            stroke: $switched;
+        }
+    }
+}
+.backgroundSwitchableGraph {
+    fill: white
+}

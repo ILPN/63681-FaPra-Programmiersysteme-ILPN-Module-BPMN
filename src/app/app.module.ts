@@ -19,6 +19,7 @@ import {MatButtonToggleModule} from '@angular/material/button-toggle';
 import { FormsModule } from '@angular/forms';
 import { DisplayDraggableGraphComponent } from './components/display-draggable-graph/display-draggable-graph.component';
 import { DisplayReorderGraphComponent } from './components/display-reorder-graph/display-reorder-graph.component';
+import { DisplaySwitchGraphComponent } from './components/display-switch-graph/display-switch-graph.component';
 
 @NgModule({
     declarations: [
@@ -30,7 +31,8 @@ import { DisplayReorderGraphComponent } from './components/display-reorder-graph
         InputDirective,
         ModeSwitchComponent,
         DisplayDraggableGraphComponent,
-        DisplayReorderGraphComponent
+        DisplayReorderGraphComponent,
+        DisplaySwitchGraphComponent
     ],
     imports: [
         BrowserModule,
