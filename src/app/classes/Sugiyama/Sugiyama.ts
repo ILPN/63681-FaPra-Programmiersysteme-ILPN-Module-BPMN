@@ -22,11 +22,11 @@ export class Sugiyama {
         this.leveling();
         this.addDummies();
         this.minimizeCrossings();
-        this.alignNodesOfArc()
+        this.alignNodesAndDummyNodes()
         this.reverseReversedArcs();
 
     }
-    alignNodesOfArc() {
+    alignNodesAndDummyNodes() {
         //@Marcel: here all arcs still point in one direction, the graph is still acyclical, every arc spans only over one level
         // placeisFree(level,order) might be usefull
         const leveledGraph = this.leveled
