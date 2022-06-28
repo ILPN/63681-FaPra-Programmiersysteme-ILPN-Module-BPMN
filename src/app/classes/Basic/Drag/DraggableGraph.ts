@@ -86,16 +86,14 @@ export class DraggableGraph implements GetSvgManager {
         c.appendChild(cEdges);
         return c;
     }
-
     deleteAllCorners(){
         for (const dEdge of this.dEdges) {
-            for (const [i,corner] of dEdge.edge.corners.entries()) {
-                if(i == 0) continue
-                if(i == dEdge.edge.corners.length-1) continue
+            for (let i = dEdge.edge.corners.length-2; i > 0; i--) {
+                const corner = dEdge.edge.corners[i];
                 if(corner instanceof BpmnDummyEdgeCorner) continue
                 dEdge.edge.removeCorner(i)
-                dEdge.svgManager.redraw()
             }
+            dEdge.svgManager.redraw()
         }
     }
 }

@@ -4,10 +4,6 @@ export class SimpleGraph{
   addArc(fromId: string, toId: string) {
     this.arcs.push(new SimpleArc(fromId, toId))
   }
-    addAndInvertArcs(arcs: SimpleArc[]) {
-        this.addArcs( arcs.map(a =>
-            new SimpleArc(a.to, a.from, true)))
-    }
     private _nodes: SimpleNode[] = []
     public get nodes(): SimpleNode[] {
         return this._nodes
@@ -28,6 +24,10 @@ export class SimpleGraph{
         clone._arcs = [...this._arcs]
         return clone
     }
+    /**
+     * 
+     * @returns sinks (sinks are nodes that have only incoming arcs, no outgoing arcs)
+     */
     getSinks() {
         return this.nodes.filter(n => 
             this.getOutArcs(n.id).length == 0
@@ -35,6 +35,10 @@ export class SimpleGraph{
             this.getInArcs(n.id).length > 0
             );
     }
+    /**
+     * 
+     * @returns sources (sources are nodes that have only outgoing arcs, no incoming arcs)
+     */
     getSources() {
         return this.nodes.filter(n => 
             this.getInArcs(n.id).length == 0

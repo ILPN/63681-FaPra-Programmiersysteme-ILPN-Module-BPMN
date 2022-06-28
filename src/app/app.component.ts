@@ -11,7 +11,7 @@ import { debounceTime, Subscription } from 'rxjs';
 })
 export class AppComponent implements OnDestroy {
 
-    mode = "Drag Free"
+    mode = "free dragging"
     public textareaFc: FormControl;
     private _sub: Subscription;
 
