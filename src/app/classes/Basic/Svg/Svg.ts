@@ -2,7 +2,7 @@ import { Vector } from "../../Utils/Vector";
 
 export class Svg{
     static dummyNode(pos: Vector): SVGElement {
-        return Svg.circle(pos,10)
+        return Svg.circleNoStyle(pos,10,"dummyNode")
     }
     static event(pos: Vector, radius: number, label: string) {
         const c = Svg.relativeContainerWithClass(pos,"Event")

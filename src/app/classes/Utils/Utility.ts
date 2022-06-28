@@ -22,4 +22,13 @@ export class Utility{
         return true
 
    }
+
+   static removeAllChildren(svg:SVGElement){
+      if (svg?.childElementCount === undefined) {
+          return;
+      }
+      while (svg.childElementCount > 0) {
+          svg.removeChild(svg.lastChild as ChildNode);
+      }
+   }
 }

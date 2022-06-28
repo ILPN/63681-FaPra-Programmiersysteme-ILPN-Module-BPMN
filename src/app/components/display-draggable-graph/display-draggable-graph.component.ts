@@ -12,6 +12,7 @@ import { LayoutService } from '../../services/layout.service';
 import { SvgService } from '../../services/svg.service';
 import { BpmnGraph } from 'src/app/classes/Basic/Bpmn/BpmnGraph';
 import { DraggableGraph } from 'src/app/classes/Basic/Drag/DraggableGraph';
+import { Utility } from 'src/app/classes/Utils/Utility';
 
 @Component({
   selector: 'app-display-draggable-graph',
@@ -24,7 +25,8 @@ export class DisplayDraggableGraphComponent implements OnDestroy,  AfterViewInit
   @ViewChild('rootSvg') rootSvg: ElementRef<SVGElement> | undefined;
 
   private _sub: Subscription |  undefined;
-  private _diagram: BpmnGraph | undefined;
+  private _bpmnGraph: BpmnGraph | undefined;
+  private _draggableGraph: DraggableGraph|undefined
 
   constructor(
       private _layoutService: LayoutService,
@@ -33,15 +35,23 @@ export class DisplayDraggableGraphComponent implements OnDestroy,  AfterViewInit
   ) {
      
   }
+  
+  onDeleteAllCorners(){
+    this._draggableGraph?.deleteAllCorners()
+  }
+
+  onMakeSquare(){
+    console.log("MakeSquare clicked");
+  }
     ngAfterViewInit(): void {
-        this._sub = this._displayService.diagram$.subscribe((diagram) => {
-            if(diagram == undefined)return
-            if(diagram.isEmpty())return
+        this._sub = this._displayService.diagram$.subscribe((bpmnGraph) => {
+            if(bpmnGraph == undefined)return
+            if(bpmnGraph.isEmpty())return
             if (this.rootSvg == undefined || this.drawingArea == undefined) return 
-            this._diagram = diagram;
+            this._bpmnGraph = bpmnGraph;
                 if(!this._layoutService.initalLayoutHasBeenDone){
                     this._layoutService.layout(
-                        this._diagram,
+                        this._bpmnGraph,
                         this.rootSvg!.nativeElement.clientWidth,
                         this.rootSvg!.nativeElement.clientHeight
                     );
@@ -49,39 +59,15 @@ export class DisplayDraggableGraphComponent implements OnDestroy,  AfterViewInit
 
                 this._layoutService.setViewBox(this.drawingArea.nativeElement)
                 
-                const dg = new DraggableGraph(diagram, this._layoutService, this.rootSvg!.nativeElement,this.drawingArea.nativeElement);
-  
-                this.draw(dg.svgManager.getSvg());
-                
-                //this.draw(this._diagram.createDiagramSVG());
-                //const g = BpmnGraph.sampleGraph()
-                
-                //this.draw(diagram.updateSvg());
-            
+                this._draggableGraph= new DraggableGraph(bpmnGraph, this._layoutService, this.rootSvg!.nativeElement,this.drawingArea.nativeElement);
+
+
+                Utility.removeAllChildren(this.drawingArea.nativeElement)
+                this.drawingArea.nativeElement.appendChild(this._draggableGraph.svgManager.getSvg());
         });
     }
 
   ngOnDestroy(): void {
       this._sub?.unsubscribe();
-  }
-
-  private draw(svg: SVGElement) {
-      if (this.drawingArea === undefined) {
-          console.debug('drawing area not ready yet');
-          return;
-      }
-      this.clearDrawingArea();
-      this.drawingArea.nativeElement.appendChild(svg);
-  }
-
-  private clearDrawingArea() {
-      const drawingArea = this.drawingArea?.nativeElement;
-      if (drawingArea?.childElementCount === undefined) {
-          return;
-      }
-
-      while (drawingArea.childElementCount > 0) {
-          drawingArea.removeChild(drawingArea.lastChild as ChildNode);
-      }
   }
 }
