@@ -33,11 +33,4 @@ export class ModeSwitchComponent implements OnInit {
     this.isFreeMode = this.selectedToggle === "Drag Free";
   }
 
-  onDeleteAllCorners(){
-    console.log("DeleteAllCorners clicked");
-  }
-
-  onMakeSquare(){
-    console.log("MakeSquare clicked");
-  }
 }

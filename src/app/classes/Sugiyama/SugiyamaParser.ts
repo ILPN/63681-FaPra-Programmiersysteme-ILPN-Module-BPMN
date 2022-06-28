@@ -1,7 +1,5 @@
-import { Diagram } from "../diagram/diagram";
 import { LayeredGraph } from "./LayeredGraph";
 import { SimpleArc, SimpleGraph } from "./SimpleGraph";
-import { Sugiyama } from "./Sugiyama";
 
 export class SugiyamaParser { 
 
