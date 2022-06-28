@@ -420,6 +420,37 @@ export class BpmnGraph
         return answer;
     }
 
+    private allOrGatewayForAnotherMonsterGraph() {
+        this.addMyGateway("G1J", "join", "or");
+        this.addMyGateway("G2S", "split", "or");
+        this.addMyGateway("G2J", "join", "or");
+        this.addMyGateway("G3S", "split", "or");
+        this.addMyGateway("G3J", "join", "or");
+        this.addMyGateway("G4S", "split", "or");
+        this.addMyGateway("G4J", "join", "or");
+        this.addMyGateway("G5S", "split", "or");
+        this.addMyGateway("G5J", "join", "or");
+        this.addMyGateway("G6S", "split", "or");
+        this.addMyGateway("G6J", "join", "or");
+        this.addMyGateway("G7S", "split", "or");
+        this.addMyGateway("G7J", "join", "or");
+    } 
+
+    private mixedGatewayForAnotherMonsterGraph() {
+        this.addMyGateway("G1J", "join", "or");
+        this.addMyGateway("G2S", "split", "or");
+        this.addMyGateway("G2J", "join", "or");
+        this.addMyGateway("G3S", "split", "and");
+        this.addMyGateway("G3J", "join", "and");
+        this.addMyGateway("G4S", "split", "or");
+        this.addMyGateway("G4J", "join", "or");
+        this.addMyGateway("G5S", "split", "and");
+        this.addMyGateway("G5J", "join", "and");
+        this.addMyGateway("G6S", "split", "xor");
+        this.addMyGateway("G6J", "join", "xor");
+        this.addMyGateway("G7S", "split", "or");
+        this.addMyGateway("G7J", "join", "or");
+    } 
 
     static anotherMonsterGraph(): BpmnGraph {
         const g = new BpmnGraph();
@@ -428,7 +459,7 @@ export class BpmnGraph
         g.addMyEvent("E2", "BpmnEventStart");
         g.addMyEvent("E3", "BpmnEventEnd");
 
-         g.addMyTask("T1");
+        g.addMyTask("T1");
         g.addMyTask("T2");
         g.addMyTask("T3");
         g.addMyTask("T4");
@@ -445,20 +476,9 @@ export class BpmnGraph
         g.addMyTask("T15");
         g.addMyTask("T16");
 
-        g.addMyGateway("G1J", "join", "or");
-        g.addMyGateway("G2S", "split", "or");
-        g.addMyGateway("G2J", "join", "or");
-        g.addMyGateway("G3S", "split", "or");
-        g.addMyGateway("G3J", "join", "or");
-        g.addMyGateway("G4S", "split", "or");
-        g.addMyGateway("G4J", "join", "or");
-        g.addMyGateway("G5S", "split", "or");
-        g.addMyGateway("G5J", "join", "or");
-        g.addMyGateway("G6S", "split", "or");
-        g.addMyGateway("G6J", "join", "or");
-        g.addMyGateway("G7S", "split", "or");
-        g.addMyGateway("G7J", "join", "or");
-
+        g.allOrGatewayForAnotherMonsterGraph();
+        //g.mixedGatewayForAnotherMonsterGraph();
+        
        
         g.addMyConnector("E1", "T1");
         g.addMyConnector("T1", "G1J");
