@@ -6,13 +6,13 @@ import { Svg } from "../Svg/Svg";
 import { GetSvgManager } from "../Interfaces/GetSvgManager";
 import { SvgManager } from "../Svg/SvgManager/SvgManager";
 import { DragHandle } from "./DragHandle";
-import { DragManager } from "./DragManager";
+import { DragManager } from "./DragManager/DragManager";
 
-export class VisualDragHandle  extends DragHandle implements GetSvgManager{
+export class VisibleDragHandle  extends DragHandle implements GetSvgManager{
     private _svgManager: SvgManager | undefined;
     public get svgManager(): SvgManager {
         if(this._svgManager == undefined){
-            this._svgManager = new SvgManager("VisualDragHandle",() => Svg.dummyNode(this.dragedElement.getPos()))
+            this._svgManager = new SvgManager("VisibleDragHandle",() => Svg.dummyNode(this.dragedElement.getPos()))
         }
         return this._svgManager;
     }

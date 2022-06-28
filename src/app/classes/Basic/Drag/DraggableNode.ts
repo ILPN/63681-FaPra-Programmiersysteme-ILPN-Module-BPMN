@@ -1,6 +1,6 @@
 import { BpmnNode } from "../Bpmn/BpmnNode";
 import { DragHandle } from "./DragHandle";
-import { DragManager } from "./DragManager";
+import { DragManager } from "./DragManager/DragManager";
 
 export class DraggableNode{
     public  node:BpmnNode

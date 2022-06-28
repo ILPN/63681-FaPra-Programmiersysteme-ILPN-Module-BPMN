@@ -1,3 +1,8 @@
+<div class="buttonWrap">
+    <button (click)="onDeleteAllCorners()"  mat-raised-button>Delete all corners</button>
+    <button (click)="onMakeSquare()"  style="margin-left:15px" mat-raised-button>Make square</button>
+</div>
+
 <svg #rootSvg id="rootsvg" class="canvas">
     <rect width="100%" height="100%" class="backgroundDraggableGraph"></rect>
     <svg #drawingArea id="rootsvg" >        

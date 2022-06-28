@@ -10,7 +10,7 @@ import { BpmnEdgeCorner } from "../Bpmn/BpmnEdge/BpmnEdgeCorner";
 import { BpmnDummyEdgeCorner } from "../Bpmn/BpmnEdge/BpmnDummyEdgeCorner";
 import { GetSvgManager } from "../Interfaces/GetSvgManager";
 import { SvgManager } from "../Svg/SvgManager/SvgManager";
-import { DragManager } from "./DragManager";
+import { DragManager } from "./DragManager/DragManager";
 
 export class DraggableEdge implements GetSvgManager{
     private _svgManager: SvgManager | undefined;

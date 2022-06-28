@@ -1,12 +1,12 @@
 import { SimpleGraph } from "./SimpleGraph";
 
-export class LayeredGraph {
+export class LeveledGraph {
   getSortedDummysForEdge(from: string, to: string) {
-    const dummys = this.getAllDummys().filter(dn => dn.fromId == from && dn.toId == to)
+    const dummys = this.getAllDummyNodes().filter(dn => dn.fromId == from && dn.toId == to)
    
-    const edgeAscending = ()=> (this.getNode(from)!.layer< this.getNode(to)!.layer)
+    const edgeAscending = ()=> (this.getNode(from)!.level< this.getNode(to)!.level)
    
-    return dummys.sort((a,b) => edgeAscending()? a.layer-b.layer: b.layer - a.layer)
+    return dummys.sort((a,b) => edgeAscending()? a.level-b.level: b.level - a.level)
   }
   getArc(a: LArc) :LArc {
       const arc = this.arcs.find(ar=> ar == a)
@@ -14,12 +14,12 @@ export class LayeredGraph {
       return arc
   }
   setLevelOfNode(n: LNode, l: number) {
-    n.layer = l
-    for (let i = 0; i < this.layers.length; i++) {
-      this.layers[i] = this.layers[i].filter(nn => n.id != nn.id);      
+    n.level = l
+    for (let i = 0; i < this.levels.length; i++) {
+      this.levels[i] = this.levels[i].filter(nn => n.id != nn.id);      
     }
-    if(l>= this.layers.length) this.layers[l] = []
-    this.layers[l].push(n)
+    if(l>= this.levels.length) this.levels[l] = []
+    this.levels[l].push(n)
   }
   getSources() {
     return this.getAllNodes().filter(n => n.parents.length == 0 && n.children.length >=1)
@@ -28,9 +28,9 @@ export class LayeredGraph {
     return this.getAllNodes().filter(n => n.children.length == 0 && n.parents.length >=1)
   }
   import(acyc: SimpleGraph) {
-    this.layers[0]=[]
+    this.levels[0]=[]
       acyc.nodes.forEach(sn => {
-        this.layers[0].push(new LNode(sn.id))
+        this.levels[0].push(new LNode(sn.id))
       });
       acyc.arcs.forEach(sa => {
         this.addArc(sa.from,sa.to, sa.inversed)        
@@ -65,7 +65,7 @@ export class LayeredGraph {
   }
   getAllNodes() {
     let allNodes:LNode[] = []
-    this.layers.forEach(arr => {
+    this.levels.forEach(arr => {
       allNodes = allNodes.concat(arr)      
     });
     return allNodes
@@ -73,7 +73,7 @@ export class LayeredGraph {
   getAllNoneDummyNodes():LNode[]{
     return this.getAllNodes().filter(n => !(n instanceof DummyNode))
   }
-  getAllDummys():DummyNode[]{
+  getAllDummyNodes():DummyNode[]{
     const dummys: DummyNode[] = []
     for(let n of this.getAllNodes()){
       if (n instanceof DummyNode){
@@ -82,7 +82,7 @@ export class LayeredGraph {
     }
     return dummys
   }
-  public layers: LNode[][] = [];
+  public levels: LNode[][] = [];
   public arcs: LArc[] = [];
 }
 export class LNode{
@@ -106,12 +106,12 @@ export class LNode{
   public set y(value: number) {
     this._y = value;
   }*/
-  private _layer = -1;
-  public get layer() {
-    return this._layer;
+  private _level = -1;
+  public get level() {
+    return this._level;
   }
-  public set layer(value) {
-    this._layer = value;
+  public set level(value) {
+    this._level = value;
   }
   private _order = 0;
   public get order() {
@@ -120,9 +120,9 @@ export class LNode{
   public set order(value) {
     this._order = value;
   }
-  constructor(id: string, layer?: number) {
+  constructor(id: string, level?: number) {
     this._id = id;
-    if(layer != undefined) this._layer = layer
+    if(level != undefined) this._level = level
 
   }
 
@@ -195,8 +195,8 @@ export class DummyNode extends LNode{
   public set arcIsInversed(value: boolean) {
     this._arcIsInversed = value;
   }
-  constructor(id: string, from:string, to:string,arcIsInversed:boolean, layer?: number, ){
-    super(id,layer)
+  constructor(id: string, from:string, to:string,arcIsInversed:boolean, level?: number, ){
+    super(id,level)
     this._fromId = from
     this._toId = to
     this._arcIsInversed = arcIsInversed
