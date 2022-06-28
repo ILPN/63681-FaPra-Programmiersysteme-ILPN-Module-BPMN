@@ -9,16 +9,13 @@ import { AppComponent } from 'src/app/app.component';
 })
 export class ModeSwitchComponent implements OnInit {
   selectedToggle: string;
-  toggleOptions: Array<String> = ["Drag Free", "Sugiyama Mode", "Switch Diagram"];
-  isFreeMode: boolean = false;
-
+  toggleOptions: Array<String> = ["free dragging", "change order", "switch diagram"];
   constructor( private _appComponent: AppComponent) {
-    this.selectedToggle = "Drag Free",
-    this.setIsFreeMode();
+    this.selectedToggle = "free dragging"
   }
 
   ngOnInit(): void {
-    
+  
   }
 
   selectionChanged(item : any) {
@@ -29,8 +26,5 @@ export class ModeSwitchComponent implements OnInit {
 
   }
 
-  setIsFreeMode(){
-    this.isFreeMode = this.selectedToggle === "Drag Free";
-  }
 
 }

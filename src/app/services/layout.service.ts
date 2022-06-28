@@ -3,7 +3,7 @@ import { BpmnGraph } from '../classes/Basic/Bpmn/BpmnGraph';
 import { SnapElement } from '../classes/Basic/Drag/SnapElements/SnapElement';
 import { SnapPoint } from '../classes/Basic/Drag/SnapElements/SnapPoint';
 import { SnapX } from '../classes/Basic/Drag/SnapElements/SnapX';
-import { LayeredGraph, LNode } from '../classes/Sugiyama/LayeredGraph';
+import { LeveledGraph, LNode } from '../classes/Sugiyama/LeveledGraph';
 import { SimpleGraph } from '../classes/Sugiyama/SimpleGraph';
 import { Sugiyama } from '../classes/Sugiyama/Sugiyama';
 import { Vector } from '../classes/Utils/Vector';
@@ -16,11 +16,11 @@ export class LayoutService {
         const ln = this.sugiResult?.getNode(id)
         if(ln == undefined) return[]
         const snaps = []
-        snaps.push(new SnapX(this.getPosForLayerAndOrder(ln.layer,ln.order).x))
+        snaps.push(new SnapX(this.getPosForLevelAndOrder(ln.level,ln.order).x))
 
-        const biggestOrderIndex = [...this.sugiResult!.layers].sort((l1,l2) =>l2.length -l1.length)[0].length-1
+        const biggestOrderIndex = [...this.sugiResult!.levels].sort((l1,l2) =>l2.length -l1.length)[0].length-1
         for (let i = 0; i <= biggestOrderIndex; i++) {
-            snaps.push(new SnapPoint(this.getPosForLayerAndOrder(ln.layer,i)))
+            snaps.push(new SnapPoint(this.getPosForLevelAndOrder(ln.level,i)))
             
         }
         return snaps
@@ -67,7 +67,7 @@ export class LayoutService {
     setCoordinates(bpmnGraph: BpmnGraph) {
         for (const bpmnNode of bpmnGraph.nodes) {
             const ln = this.sugiResult!.getNode(bpmnNode.id)
-            bpmnNode.setPos(this.getPosForLayerAndOrder(ln!.layer,ln!.order))
+            bpmnNode.setPos(this.getPosForLevelAndOrder(ln!.level,ln!.order))
 
             const inEdges = bpmnGraph.edges.filter(e => e.to == bpmnNode)
             for (const inEdge of inEdges) {
@@ -82,11 +82,11 @@ export class LayoutService {
         }
         //add Dumynodes as edgecorners
         
-        console.log(this.sugiResult!.getAllDummys())
+        console.log(this.sugiResult!.getAllDummyNodes())
         for (const edge of bpmnGraph.edges) {
             const dNodes = this.sugiResult!.getSortedDummysForEdge(edge.fromId,edge.toId)
             for (const d of dNodes) {
-                edge.addDummyCorner(d.id,this.getPosForLayerAndOrder(d.layer,d.order))
+                edge.addDummyCorner(d.id,this.getPosForLevelAndOrder(d.level,d.order))
             }
         }
     }
@@ -99,23 +99,23 @@ export class LayoutService {
         let biggestX = 0
         let biggestY = 0
         for (const n of this.sugiResult!.getAllNodes()) {
-            const pos = this.getPosForLayerAndOrder(n.layer,n.order)
+            const pos = this.getPosForLevelAndOrder(n.level,n.order)
             if(pos.x> biggestX) biggestX = pos.x
             if(pos.y> biggestY) biggestY = pos.y
         }
         this._graphDimensions = new Vector(biggestX,biggestY)
         return  this._graphDimensions
     }
-    private getPosForLayerAndOrder(layer:number, order:number): Vector {
-        const x = layer*this.spacingXAxis
+    private getPosForLevelAndOrder(level:number, order:number): Vector {
+        const x = level*this.spacingXAxis
         const y = order * this.spacingYAxis
         return new Vector(x,y)
     }
 
-     sugiResult: LayeredGraph| undefined
+     sugiResult: LeveledGraph| undefined
     getSugiyamaResult(bpmnGraph:BpmnGraph):Sugiyama{
         const sugi = new Sugiyama(SimpleGraph.convert(bpmnGraph))
-        const result :LayeredGraph = sugi.getResult()
+        const result :LeveledGraph = sugi.getResult()
         this.sugiResult = result
         return sugi
       }

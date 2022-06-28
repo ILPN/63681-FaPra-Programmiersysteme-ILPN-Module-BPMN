@@ -1,4 +1,4 @@
-import { LayeredGraph } from "src/app/classes/Sugiyama/LayeredGraph";
+import { LeveledGraph } from "src/app/classes/Sugiyama/LeveledGraph";
 import { Utility } from "src/app/classes/Utils/Utility";
 import { Vector } from "src/app/classes/Utils/Vector";
 import { BpmnDummyEdgeCorner } from "../../Bpmn/BpmnEdge/BpmnDummyEdgeCorner";
@@ -10,8 +10,8 @@ import { DragManager } from "./DragManager";
 
 
 export class DragManagerReorder extends DragManager{
-    private sugiResult:LayeredGraph
-    constructor(dragingSurface:SVGElement,snapingView:SVGElement,sugiResult:LayeredGraph){
+    private sugiResult:LeveledGraph
+    constructor(dragingSurface:SVGElement,snapingView:SVGElement,sugiResult:LeveledGraph){
         super(dragingSurface,snapingView)
         this.sugiResult = sugiResult
     }
@@ -19,14 +19,14 @@ export class DragManagerReorder extends DragManager{
     private setDragHandlesToReorder(dragHandle:DragHandle){
         if(!(dragHandle.dragedElement instanceof BpmnNode || dragHandle.dragedElement instanceof BpmnDummyEdgeCorner)) return
         const idOfDraggedEl = dragHandle.dragedElement.id
-        const layer = this.sugiResult.getNode(idOfDraggedEl)!.layer
+        const level = this.sugiResult.getNode(idOfDraggedEl)!.level
 
-        const idsOfLayer = this.sugiResult.layers[layer].map(ln => ln.id)
-        console.log(idsOfLayer)
+        const idsInLevel = this.sugiResult.levels[level].map(ln => ln.id)
+        console.log(idsInLevel)
         console.log(this.dragHandles)
         for (const [a,dh] of this.dragHandles.entries()){
             if(!(a instanceof BpmnNode || a instanceof BpmnDummyEdgeCorner)) continue
-            if(idsOfLayer.findIndex(id => id== a.id) != -1){
+            if(idsInLevel.findIndex(id => id== a.id) != -1){
                 this.dragHandlesToReorder.push(dh)
             }
 
