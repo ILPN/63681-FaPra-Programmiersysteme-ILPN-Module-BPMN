@@ -105,29 +105,26 @@ export class InputFieldComponent {
                 return false;
         }
         console.log("validating category:" + category);
+        const lines = input.split('\n');
         let substring = input.substring(input.indexOf("." + category));
-        let nextLine = substring.search(/\n/) + 1;
-        substring = substring.substring(nextLine);
-        nextLine = 0;
-        while (substring.charAt(nextLine) !== "." && substring.charAt(nextLine) !== " " && substring.search(/\n/) !== 1) {
-            const match = substring.match(regexp);
-            if (match === null) {
-                console.log("format error at " + category);
-                this.displayErrorService.displayError("format error at " + category);
-                return false;
+        let pos;
+        let cat = lines.find(el => el.startsWith("." + category));
+        if(!cat) {
+            console.log("error: no" + category);
+        } else {
+            pos = lines.indexOf(cat)+1;
+            while(pos < lines.length && lines[pos].match(/^\w/) !== null) {
+                let match = lines[pos].match(regexp); 
+                if (match === null) {
+                    console.log("format error at " + category);
+                    this.displayErrorService.displayError("format error at " + category);
+                    return false;
+                }
+                console.log("regexp matched:" + match);
             }
-            console.log("regexp matched:" + match);
-            nextLine = substring.search(/\n/) + 1;
-            substring = substring.substring(nextLine);
-            if (nextLine === 0) {
-                substring = " ";
-                //wenn das Ende der Datei erreicht ist, wird aus der while-Schleife ausgetreten
-            }
-            nextLine = 0;
-            console.log(substring.charAt(nextLine));
         }
         console.log(category + " validated");
         return true;
+        }
+    
     }
-
-}
