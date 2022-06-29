@@ -17,7 +17,7 @@ export class SwitchableGateway extends SwitchableNode {
             let split = this.searchResponsibleSplitGateway();
             if (split !== undefined)
                 split.successors.forEach(successor => {
-                    if (successor.switchState === SwitchState.enableable) successor.disable();
+                    if (successor.enableable()) successor.disable();
                 });
 
         }
@@ -214,7 +214,10 @@ export class SwitchableGateway extends SwitchableNode {
 
 
 
-    /** Search For Responsible */
+    /**
+     * searches for the JOIN gateway corresponding to this SPLIT gateway
+     * @returns matching JOIN gateway
+     */
     searchResponsibleJoinGateway(): SwitchableGateway | undefined { // private
         let joingateway: SwitchableGateway | undefined = undefined;
         let searchBranchNode: SwitchableGateway | undefined = undefined;
@@ -236,7 +239,7 @@ export class SwitchableGateway extends SwitchableNode {
             let joinGatewayNotUndefined: SwitchableGateway = joingateway;
             if (!SwitchableGateway.splitJoinSameType(this, joinGatewayNotUndefined)) {
                 fail = true;
-                console.warn("The search for the responsible gateway has resulted a gateway of a different type. The Ids of the elements involved are: " + this.id + " and " + joinGatewayNotUndefined.id);
+                console.warn("The search for the responsible gateway has resulted in a gateway of a different type. The Ids of the elements involved are: " + this.id + " and " + joinGatewayNotUndefined.id);
             }
         }
         return (!fail) ? joingateway : undefined;
@@ -274,7 +277,10 @@ export class SwitchableGateway extends SwitchableNode {
         return joingateway;
     }
 
-    /** Search For Responsible */
+    /**
+     * searches for the SPLIT gateway corresponding to this JOIN gateway
+     * @returns matching SPLIT gateway 
+     */
     searchResponsibleSplitGateway(): SwitchableGateway | undefined {
         let splitGateway: SwitchableGateway | undefined = undefined;
         let searchBranchNode: SwitchableGateway | undefined = undefined;
