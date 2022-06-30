@@ -165,7 +165,6 @@ export class SwitchableNode {
      * sets new color according to the new state
      */
     changeColor(oldState: SwitchState, newState: SwitchState): void {
-        //console.log("Switching " + this.id + " from " + SwitchState[oldState].toLocaleUpperCase() + " to " + SwitchState[newState].toLocaleUpperCase())
         this.bpmnNode.svgManager.removeCssClasses(SwitchState[oldState])
         this.bpmnNode.svgManager.setCssClasses(SwitchState[newState]);
         this.bpmnNode.svgManager.redraw();
@@ -187,10 +186,10 @@ export class SwitchableNode {
                 return SwitchState.switched;
 
             case SwitchState.switched:
-                return SwitchState.switchedButEnableForLoopRun; // For loops turn from switched to switchedButEnableForLoopRun
+                return SwitchState.switchedButEnableForLoopRun; // For loops 
 
             case SwitchState.switchedButEnableForLoopRun:
-                return SwitchState.enabled; // For loops turn from switched to switchedButEnableForLoopRun
+                return SwitchState.enabled; // For loops 
 
             default: return SwitchState.disabled
 

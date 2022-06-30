@@ -23,7 +23,6 @@ export class SwitchableGateway extends SwitchableNode {
 
     }
 
-
     /**
      * collects nodes whose state should be switched in the case when 
      * the clicked node is preceded by this gateway
@@ -56,30 +55,7 @@ export class SwitchableGateway extends SwitchableNode {
    * @returns array of nodes whose state should be changed 
    */
     private switchAndSplit(clicked: SwitchableNode): SwitchableNode[] {
-
-
-        // //add AND_SPLIT gateway
-        // let nodesToSwitch: SwitchableNode[] = [this];
-
-        // //successors of AND_SPLIT gateway
-        // this.successors.forEach((after: SwitchableNode) => SwitchUtils.addItem(after, nodesToSwitch));
-
-
-        // // successors of the successors of the AND_SPLIT gateway
-        // this.successors.forEach(after => {
-        //     after.successors.forEach(
-        //         //  if (after.switchState === SwitchState.disabled || after.switchState === SwitchState.switched)
-        //         afterAfter => SwitchUtils.addItem(afterAfter, nodesToSwitch)
-        //         );
-        // });
-
-        // let nodesToSwitch: SwitchableNode[] = [this];
-        //  this.successors.forEach(after => {
-        //      if (after.switchState === SwitchState.disabled || after.switchState === SwitchState.switched) SwitchUtils.addItem(after, nodesToSwitch)
-        //  });
-
         let nodesToSwitch: SwitchableNode[] = [this];
-        //gateway         SwitchUtils.addItem(this, nodesToSwitch);
 
         // nodes after the clicked one
         clicked.successors.forEach(after => {
@@ -99,15 +75,11 @@ export class SwitchableGateway extends SwitchableNode {
      */
      private switchOrSplit(clicked: SwitchableNode): SwitchableNode[] {
         let nodesToSwitch: SwitchableNode[] = [this];
-        //gateway         SwitchUtils.addItem(this, nodesToSwitch);
 
         // nodes after the clicked one
         clicked.successors.forEach(after => {
              if (after.switchState === SwitchState.disabled || after.switchState === SwitchState.switched) SwitchUtils.addItem(after, nodesToSwitch)
          });
-
-        // SwitchUtils.addItems(clicked.successors, nodesToSwitch); //double switch for loop
-
         return nodesToSwitch
     }
 
@@ -120,7 +92,6 @@ export class SwitchableGateway extends SwitchableNode {
      * @returns nodes to switch 
      */
     private switchXorSplit(clicked: SwitchableNode): SwitchableNode[] {
-
         //disable all alternative successors of this XOR gateway
         this.successors.forEach(after => {
             if (!(after === clicked)) {
@@ -193,11 +164,6 @@ export class SwitchableGateway extends SwitchableNode {
             if (!nodeBefore.enabled()) {
                 let gateway: SwitchableGateway | undefined = this.searchResponsibleSplitGateway();
                 if (gateway !== undefined && answer) answer = SwitchUtils.isNoNodeEnabledOrSwitched(SwitchUtils.getAllElementsBetweenNodeToNodeBackward(nodeBefore, gateway, []));
-                // {   
-                // var uhu: SwitchableNode[] = SwitchUtils.getAllElementsBetweenNodeToNodeBackward(nodeBefore, gateway, []);
-                // SwitchUtils.printAllElements(nodeBefore, gateway, uhu);
-                // answer = SwitchUtils.isNoNodeEnabledOrSwitched(uhu);
-                // }
             }
         return answer;
     }
