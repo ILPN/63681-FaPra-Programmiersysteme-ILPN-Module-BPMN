@@ -89,21 +89,13 @@ export class InputFieldComponent {
             //die für die Eingabe gültig sind, dann kann ich sie hier mit überprüfen
             //aktuell sind nur die Typen für Gateways eindeutig definiert
 
-            case "activities":
-                regexp = /^[\w]+ [\w]+ "[\w]+"(?: \([0-9]*,[0-9]*\))?/;
-                break;
-            case "sequences":
-                regexp = /^[\w]+ [\w]+ "[\w]+"(?: \([0-9]*,[0-9]*\))?/;
-                break;
-            case "events":
-                regexp = /^[\w]+ [\w]+ "[\w]+"(?: \([0-9]*,[0-9]*\))?/;
-                break;
-            case "gateways":
-                regexp = /^[\w]+ (and|or|xor)+(?: \([0-9]*,[0-9]*\))?/;
-                break;
-            default:
-                return false;
+            case "activities": regexp = /^[\w]+ (Sending|Manual|Service|BusinessRule|Receiving|UserTask) "[\w ]*"(?: \([0-9]*,[0-9]*\))?/i; break;
+            case "sequences": regexp = /^[\w]+ (SequenceFlow|Association|InformationFlow) "[\w ]*" [\w]+ [\w]+(?: \([0-9]*,[0-9]*\))?/i; break;
+            case "events": regexp = /^[\w]+ (Start|End|Intermediate) "[\w ]*"(?: \([0-9]*,[0-9]*\))?/i; break;
+            case "gateways": regexp = /^[\w]+ (XOR_SPLIT|XOR_JOIN|AND_SPLIT|AND_JOIN|OR_SPLIT|OR_JOIN)(?: \([0-9]*,[0-9]*\))?/i; break;
+            default: return false;
         }
+
         console.log("validating category:" + category);
         const lines = input.split('\n');
         let substring = input.substring(input.indexOf("." + category));
@@ -121,6 +113,7 @@ export class InputFieldComponent {
                     return false;
                 }
                 console.log("regexp matched:" + match);
+                pos++;
             }
         }
         console.log(category + " validated");
