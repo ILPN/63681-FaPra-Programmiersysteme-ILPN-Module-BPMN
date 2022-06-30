@@ -540,22 +540,6 @@ export class BpmnGraph
     }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     static loopingLouieGraph(): BpmnGraph { 
         const g = new BpmnGraph();
 
@@ -569,8 +553,8 @@ export class BpmnGraph
 
         g.addMyGateway("G1J", "join", "xor");
         g.addMyGateway("G1S", "split", "xor");
-        g.addMyGateway("G2S", "split", "and");
-        g.addMyGateway("G2J", "join", "and");
+        g.addMyGateway("G2S", "split", "or");
+        g.addMyGateway("G2J", "join", "or");
        
         
        
