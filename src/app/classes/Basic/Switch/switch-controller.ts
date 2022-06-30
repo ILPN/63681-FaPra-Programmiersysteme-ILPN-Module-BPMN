@@ -35,39 +35,18 @@ export class SwitchController {
      * @param clickedNode the clicked node 
      */
     public press(clickedNode: SwitchableNode) {
-        if (clickedNode.switchState === SwitchState.enableable) {
+        if (clickedNode.switchState === SwitchState.enableable || clickedNode.switchState === SwitchState.switchedButEnableForLoopRun) {
             console.log("Clicked element " + clickedNode.id);
             if (clickedNode.isStartEvent()) this.disableAllOtherStartEvents(clickedNode);
 
 
-            // // ACHTUNG TEST
-            // if (clickedNode.isGateway()) {
-            //     let gatewayStart: SwitchableGateway = (clickedNode as SwitchableGateway);
-            //     let gatewayEnd: SwitchableGateway = (clickedNode as SwitchableGateway);
-            //     if (gatewayStart.isSplitGateway() && gatewayStart.searchResponsibleJoinGateway() !== undefined) {
-            //         gatewayEnd = gatewayStart.searchResponsibleJoinGateway() as SwitchableGateway;
-            //         console.warn("You have pressed a Splitgateway. Just for fun, we search the responsible join Gateway... is it " + gatewayEnd.id + "?");
-            //         var array: SwitchableNode[] = SwitchUtils.getAllElementsBetweenNodeToNodeForward(clickedNode, gatewayEnd, []);
-            //         SwitchUtils.printAllElements(gatewayStart, gatewayEnd, array);
-            //     }
-
-
-            //     if (gatewayStart.isJoinGateway()  && gatewayStart.searchResponsibleSplitGateway() !== undefined) {
-            //         gatewayEnd = gatewayStart.searchResponsibleSplitGateway() as SwitchableGateway;
-            //         console.warn("You have pressed a Joingateway. Just for fun, we search the responsible split Gateway... is it " + gatewayEnd.id + "?");
-            //         var array: SwitchableNode[] = SwitchUtils.getAllElementsBetweenNodeToNodeBackward(clickedNode, gatewayEnd, []);
-            //         SwitchUtils.printAllElements(gatewayStart, gatewayEnd, array);
-            //     }
-
-            // }
-
-            // // ACHTUNG TEST ENDE
             let nodesToSwitch: SwitchableNode[] = this.getNodesToSwitch(clickedNode)
-
-
             nodesToSwitch.forEach(node => { if (this.possibleToSwitchNode(node)) node.switch() });
             if(clickedNode.isGateway() && (clickedNode as SwitchableGateway).OR_JOIN()) (clickedNode as SwitchableGateway).disablePathsNotTakenAfterOrJoin();
             this.checkAllEnableableNodesStillEnableable();
+
+
+
         } else {
             console.log("The state of this element can not be switched: " + clickedNode.id);
             if (clickedNode.enabled() && clickedNode.isEndEvent()) {
@@ -93,7 +72,7 @@ export class SwitchController {
 
         // if there is enabled gateway before the clicked node 
         clickedNode.predecessors.forEach(before => {
-            if (before.enabled() && before.isGateway()) {
+            if (before.enabled() && before.isGateway()) { // before.enabled() &&  for loop
                 let gatewayConnections = (before as SwitchableGateway).switchSplit(clickedNode);
                 SwitchUtils.addItems(gatewayConnections, nodesToSwitch)
             } else
@@ -110,12 +89,12 @@ export class SwitchController {
      * @returns true if the node state can be switched
      */
     private possibleToSwitchNode(node: SwitchableNode): boolean {
-        if (node.isGateway() && (node.disabled() || node.enableable())) {
+         if (node.isGateway() && (node.disabled() || node.enableable() || node.switchedButEnableForLoopRun())) { 
 
-            let gateway: SwitchableGateway = node as SwitchableGateway;
-            return gateway.canBeSwitched()
+             let gateway: SwitchableGateway = node as SwitchableGateway;
+             return gateway.canBeSwitched()
 
-        }
+         }
         return true;
     }
 
