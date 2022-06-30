@@ -26,11 +26,10 @@ export class BpmnEdge extends BEdge implements GetSvgManager {
         this._corners[this._corners.length-1].setPosXY(x,y)
     }
     removeCorner(at:number) {
-        console.log(this.corners)
+        console.log(" trying to remove "+at)
         if(at == 0  || at >= this._corners.length-1) return
         this._corners.splice(at, 1);
-        console.log(this._corners)
-
+        console.log(" removed "+at)
         this.svgManager.redraw()
     }
     private readonly _id: string

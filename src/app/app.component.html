@@ -7,11 +7,11 @@
     <app-mode-switch></app-mode-switch>
     <!--    Main content    -->
     <div [ngSwitch]="mode">
-        <app-display-draggable-graph *ngSwitchCase="'Drag Free'"
+        <app-display-draggable-graph *ngSwitchCase="'free dragging'"
         class="padding full-size"></app-display-draggable-graph>
-        <app-display-reorder-graph *ngSwitchCase="'Sugiyama Mode'"
+        <app-display-reorder-graph *ngSwitchCase="'change order'"
         class="padding full-size"></app-display-reorder-graph>
-        <app-display-switch-graph *ngSwitchCase="'Switch Diagram'"
+        <app-display-switch-graph *ngSwitchCase="'switch diagram'"
         class="padding full-size"></app-display-switch-graph>
         <!--app-display *ngSwitchCase="'Switch Diagram'"
         class="padding full-size"></app-display>-->

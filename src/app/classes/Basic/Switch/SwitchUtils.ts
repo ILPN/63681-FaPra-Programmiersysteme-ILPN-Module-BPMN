@@ -54,7 +54,7 @@ export class SwitchUtils {
         return answer
     }
 
-    // /**       This method is not used, but has been programmed. Stupid run?
+    // /**       This method is not used, but has been programmed.
     //  * This recursive method create a Array of SwitchableNode where inside all SwitchableNode the are between startNode and endNode. At the beginning the array must be empty. This method searches forward.
     //  * @param startNode Start Node
     //  * @param endNode End Node

@@ -476,8 +476,8 @@ export class BpmnGraph
         g.addMyTask("T15");
         g.addMyTask("T16");
 
-        g.allOrGatewayForAnotherMonsterGraph();
-        //g.mixedGatewayForAnotherMonsterGraph();
+       // g.allOrGatewayForAnotherMonsterGraph();
+        g.mixedGatewayForAnotherMonsterGraph();
         
        
         g.addMyConnector("E1", "T1");
@@ -536,11 +536,46 @@ export class BpmnGraph
         g.addMyConnector("G3J", "G2J");
         g.addMyConnector("G4J", "G2J");
         g.addMyConnector("G2J", "E3");
-      
-
-
         return g
     }
 
+
+    static loopingLouieGraph(): BpmnGraph { 
+        const g = new BpmnGraph();
+
+        g.addMyEvent("E1", "BpmnEventStart");
+        g.addMyEvent("E2", "BpmnEventEnd");
+
+        g.addMyTask("T1");
+        g.addMyTask("T2");
+        g.addMyTask("T3");
+        g.addMyTask("T4");
+
+        g.addMyGateway("G1J", "join", "xor");
+        g.addMyGateway("G1S", "split", "xor");
+        g.addMyGateway("G2S", "split", "or");
+        g.addMyGateway("G2J", "join", "or");
+       
+        
+       
+        g.addMyConnector("E1", "T1");
+        g.addMyConnector("T1", "G1J");
+        g.addMyConnector("G1J", "T2");
+        g.addMyConnector("T2", "G2S");
+        g.addMyConnector("G2S", "T3");
+        g.addMyConnector("G2S", "T4");
+        g.addMyConnector("T3", "G2J");
+        g.addMyConnector("T4", "G2J");
+
+
+
+        g.addMyConnector("G2J", "G1S");
+        g.addMyConnector("G1S", "G1J");
+        g.addMyConnector("G1S", "E2");
+        
+        g.addMyConnector("G2S", "G2J");
+ 
+        return g
+    }
 
 }

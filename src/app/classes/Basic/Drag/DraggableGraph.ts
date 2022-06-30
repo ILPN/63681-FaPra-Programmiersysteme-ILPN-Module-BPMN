@@ -8,7 +8,7 @@ import { SvgManager } from '../Svg/SvgManager/SvgManager';
 import { DraggableEdge } from './DraggableEdge';
 import { DraggableNode } from './DraggableNode';
 import { DragHandle } from './DragHandle';
-import { DragManager } from './DragManager';
+import { DragManager } from './DragManager/DragManager';
 import { SnapElement } from './SnapElements/SnapElement';
 
 export class DraggableGraph implements GetSvgManager {
@@ -19,7 +19,6 @@ export class DraggableGraph implements GetSvgManager {
         }
         return this._svgManager;
     }
-    
     private bpmnGraph: BpmnGraph;
     private dragManager: DragManager
     constructor(bpmnGraph: BpmnGraph, layoutService:LayoutService, rootSvg:SVGElement,drawingArea:SVGElement) {
@@ -86,5 +85,15 @@ export class DraggableGraph implements GetSvgManager {
         c.appendChild(cNodes);
         c.appendChild(cEdges);
         return c;
+    }
+    deleteAllCorners(){
+        for (const dEdge of this.dEdges) {
+            for (let i = dEdge.edge.corners.length-2; i > 0; i--) {
+                const corner = dEdge.edge.corners[i];
+                if(corner instanceof BpmnDummyEdgeCorner) continue
+                dEdge.edge.removeCorner(i)
+            }
+            dEdge.svgManager.redraw()
+        }
     }
 }
