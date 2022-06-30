@@ -98,8 +98,6 @@ export class ParserService {
         //         result.addElement(this.parseElement(line));
         //     }
         // });
-
-        //const result = BpmnGraph.sampleGraph();
         return this.result; 
     }
 
@@ -109,7 +107,6 @@ export class ParserService {
         let re = /"[\w ]*"/;
         line = line.replace(re,"");
         const lineSplit = line.split(" ");
-        let el:Element;
 
         const name = lineSplit[0];
         let activity = new BpmnTask(name);
@@ -149,11 +146,14 @@ export class ParserService {
 
         const name = lineSplit[0];
         let event = new BpmnEvent(name);
+        
         switch(lineSplit[1].toLowerCase()){
             case("start"): event = new BpmnEventStart(name); break;
             case("intermediate"): event = new BpmnEventIntermediate(name); break;
             case("end"): event = new BpmnEventEnd(name); break;
         }
+        event.label = description; 
+        
         console.log("name:" + name + "description:" + description);
         if(lineSplit[3]) {
             let coordinates = lineSplit[3];
@@ -219,11 +219,11 @@ export class ParserService {
                         console.log("sequence:" + var1.id + var2.id);
                         let sequence = new BpmnEdge(name,var1,var2);
 
-                         if(lineSplit[5]) {
+                         if(lineSplit[5] && !lineSplit[5].startsWith("\r")) {
                             let coordinates = lineSplit[5];
                             let coord = coordinates.split(',');
-                            coord[0] = coord[0].replace("(","");
-                            coord[1] = coord[1].replace(")","");
+                            coord[0] = coord[0].replace("(","").replace("\r","");
+                            coord[1] = coord[1].replace(")","").replace("\r","");;
                             let x = parseInt(coord[0]);
                             let y = parseInt(coord[1]);
                             sequence.addCornerXY(x,y);
