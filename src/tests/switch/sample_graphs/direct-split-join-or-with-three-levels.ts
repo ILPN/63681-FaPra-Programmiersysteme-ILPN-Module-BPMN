@@ -62,7 +62,7 @@ export class DirectSplitJoinOr extends TestGraph {
         let task5 = this.createNode(new BpmnTaskService("Task5"), "Reiseunterlagen speichern");
         this.graph.addEdge(new BpmnEdge("11", gatewayJoinOr, task5));
 
-        //task5 --> EndEvent
+        //task5 --> EndEvent 
         let endEvent =  this.createNode(new BpmnEventEnd("EndEvent1"), "Reise gebucht");
         this.graph.addEdge(new BpmnEdge("12", task5, endEvent));
 
