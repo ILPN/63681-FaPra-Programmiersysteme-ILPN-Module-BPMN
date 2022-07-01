@@ -3,6 +3,7 @@ import { FormControl } from '@angular/forms';
 import { ParserService } from './services/parser.service';
 import { DisplayService } from './services/display.service';
 import { debounceTime, Subscription } from 'rxjs';
+import { BpmnGraph } from './classes/Basic/Bpmn/BpmnGraph';
 
 @Component({
     selector: 'app-root',
@@ -33,7 +34,7 @@ export class AppComponent implements OnDestroy {
     private processSourceChange(newSource: string) {
         const result = this._parserService.parse(newSource);
         if (result !== undefined) {
-            this._displayService.display(result);
+            this._displayService.display(BpmnGraph.sampleGraph());
         }
     }
 }

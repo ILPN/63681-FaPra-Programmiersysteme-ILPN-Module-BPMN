@@ -89,7 +89,7 @@ export class BpmnGraph
         g.addNode(elementE3);
 
 
-        /*
+        
         let elementEe3 = new BpmnEventEnd("Ee3");
         elementEe3.setPosXY(1600, 190)
         elementEe3.label = "ende gelaende"
@@ -195,9 +195,8 @@ export class BpmnGraph
 
         let connector7 = new BpmnEdge("A8", elementT3, elementE3);
         g.addEdge(connector7)
-        connector7.labelStart = "Start"
-        connector7.labelMid = "Mid"
-        connector7.labelEnd = "End"
+        connector7.labelStart = "One"
+        connector7.labelEnd = "Three"
 
         let connector8 = new BpmnEdge("A9", elementE3, elementE2);
         connector8.addCornerXY(1600, 60);

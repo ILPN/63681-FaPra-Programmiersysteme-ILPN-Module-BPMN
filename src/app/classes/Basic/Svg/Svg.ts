@@ -1,6 +1,22 @@
 import { Vector } from "../../Utils/Vector";
 
 export class Svg {
+    static textFrom(text:string, pos:Vector,rotation:number =0, baseline:string= "middle", anchor:string = "left",dx:number =5, dy:number=-5, fontSize:number =12){
+        const txt = this.createSvgElement('text');
+        txt.setAttribute('x', 0+"");
+        txt.setAttribute('y', 0+"");
+        txt.setAttribute('dx', dx+"");
+        txt.setAttribute('dy', dy+"");
+        txt.setAttribute("transform",`translate(${pos.x} ${pos.y}) rotate(${rotation}) `)
+        txt.setAttribute('font-size', `${fontSize}px`);
+        txt.setAttribute('text-align', 'justified');
+        txt.setAttribute('line-height', '110%');
+        txt.setAttribute('dominant-baseline', baseline);
+        txt.setAttribute('text-anchor', anchor);
+        let textNode = document.createTextNode(text);
+        txt.appendChild(textNode);
+        return txt;
+    }
     static dummyNode(pos: Vector): SVGElement {
         return Svg.circleNoStyle(pos, 10, "dummyNode")
     }
