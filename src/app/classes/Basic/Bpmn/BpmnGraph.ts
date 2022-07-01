@@ -48,9 +48,8 @@ export class BpmnGraph
     addNode(node: BpmnNode) {
         if (this.nodes.findIndex(n => n.id == node.id) == -1)
             this.nodes.push(node)
-        else
-            console.log("couldn't add node " + node.id)
-
+            else 
+            console.log("couldn't add node "+ node.id)
     }
 
     addEdge(edge: BpmnEdge) {
@@ -67,9 +66,8 @@ export class BpmnGraph
             console.log("couldn't add edge " + edge.id)
     }
 
-
-
-    static sampleGraph(): BpmnGraph {
+ 
+    static sampleGraph():BpmnGraph{
         const g = new BpmnGraph();
         let e1 = new BpmnEventStart("E1");
         e1.label = "Am Start!"
