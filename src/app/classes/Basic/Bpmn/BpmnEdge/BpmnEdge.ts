@@ -123,8 +123,8 @@ export class BpmnEdge extends BEdge implements GetSvgManager {
         return svg;
     }
     labels(): SVGElement[] {
-        const paddingX = 2;
-        const paddingY = -2;
+        const paddingX = 3;
+        const paddingY = -3;
         const fontSize = 8;
 
         let dir;
