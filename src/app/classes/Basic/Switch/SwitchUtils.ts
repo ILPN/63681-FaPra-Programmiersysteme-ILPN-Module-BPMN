@@ -2,6 +2,7 @@ import { BpmnGateway } from "../Bpmn/gateways/BpmnGateway";
 import { BpmnGatewaySplitAnd } from "../Bpmn/gateways/BpmnGatewaySplitAnd";
 import { SwitchableGateway } from "./SwitchableGateway";
 import { SwitchableNode } from "./SwitchableNode";
+import { SwitchState } from "./switchstatetype";
 
 export class SwitchUtils {
 
@@ -39,4 +40,61 @@ export class SwitchUtils {
     public static isGateway(node: SwitchableNode): boolean{
         return node instanceof SwitchableGateway
     }
+
+    /**
+     * checks if the node is a gateway
+     * @param node 
+     * @returns 
+     */
+     public static isNoNodeEnabledOrSwitched(nodeArray: SwitchableNode[]): boolean {
+        let answer = true;
+        nodeArray.forEach(element => {
+            if(element.switchState === SwitchState.enabled || element.switchState === SwitchState.switched) answer = false;  
+        });
+        return answer
+    }
+
+    // /**       This method is not used, but has been programmed.
+    //  * This recursive method create a Array of SwitchableNode where inside all SwitchableNode the are between startNode and endNode. At the beginning the array must be empty. This method searches forward.
+    //  * @param startNode Start Node
+    //  * @param endNode End Node
+    //  * @param array Array must be [] when called, it is needed for recursion
+    //  * @return returns a array with nodes which are located between startNode and endNode
+    //  */
+    //  public static getAllElementsBetweenNodeToNodeForward(startNode: SwitchableNode, endNode: SwitchableNode, array: SwitchableNode[]): SwitchableNode[] {
+    //     if (startNode !== endNode) {
+    //         SwitchUtils.addItem(startNode, array);
+    //         startNode.successors.forEach(successor => {
+    //             this.getAllElementsBetweenNodeToNodeForward(successor, endNode, array);
+    //         });
+    //     }
+    //     return array
+    // }
+
+
+    /**
+         * This recursive method create a Array of SwitchableNode where inside all SwitchableNode the are between startNode and endNode. At the beginning the array must be empty. This method searches backward.
+         * @param startNode Start Node
+         * @param endNode End Node
+         * @param array Array must be [] when called, it is needed for recursion
+         * @return returns a array with nodes which are located between startNode and endNode
+         */
+     public static getAllElementsBetweenNodeToNodeBackward(startNode: SwitchableNode, endNode: SwitchableNode, array: SwitchableNode[]): SwitchableNode[] {
+        if (startNode !== endNode) {
+            SwitchUtils.addItem(startNode, array);
+            startNode.predecessors.forEach(predecessor => {
+                this.getAllElementsBetweenNodeToNodeBackward(predecessor, endNode, array);
+            });
+        }
+        return array;
+    }
+
+    // Only for debugging
+    // public static printAllElements(startNode: SwitchableNode, endNode: SwitchableNode, array: SwitchableNode[]): void {
+    //     let s: String = "";
+    //     array.forEach(element => {
+    //         s += element.id + "=> "
+    //     });
+    //     console.log("Nodes List: " + s+ " ende bei " +endNode.id);
+    // }
 }
