@@ -89,45 +89,35 @@ export class InputFieldComponent {
             //die für die Eingabe gültig sind, dann kann ich sie hier mit überprüfen
             //aktuell sind nur die Typen für Gateways eindeutig definiert
 
-            case "activities":
-                regexp = /^[\w]+ [\w]+ "[\w]+"(?: \([0-9]*,[0-9]*\))?/;
-                break;
-            case "sequences":
-                regexp = /^[\w]+ [\w]+ "[\w]+"(?: \([0-9]*,[0-9]*\))?/;
-                break;
-            case "events":
-                regexp = /^[\w]+ [\w]+ "[\w]+"(?: \([0-9]*,[0-9]*\))?/;
-                break;
-            case "gateways":
-                regexp = /^[\w]+ (and|or|xor)+(?: \([0-9]*,[0-9]*\))?/;
-                break;
-            default:
-                return false;
+            case "activities": regexp = /^[\w]+ (Sending|Manual|Service|BusinessRule|Receiving|UserTask) "[\w ]*"(?: \([0-9]*,[0-9]*\))?/i; break;
+            case "sequences": regexp = /^[\w]+ (SequenceFlow|Association|InformationFlow) "[\w ]*" [\w]+ [\w]+(?: \([0-9]*,[0-9]*\))?/i; break;
+            case "events": regexp = /^[\w]+ (Start|End|Intermediate) "[\w ]*"(?: \([0-9]*,[0-9]*\))?/i; break;
+            case "gateways": regexp = /^[\w]+ (XOR_SPLIT|XOR_JOIN|AND_SPLIT|AND_JOIN|OR_SPLIT|OR_JOIN)(?: \([0-9]*,[0-9]*\))?/i; break;
+            default: return false;
         }
+
         console.log("validating category:" + category);
+        const lines = input.split('\n');
         let substring = input.substring(input.indexOf("." + category));
-        let nextLine = substring.search(/\n/) + 1;
-        substring = substring.substring(nextLine);
-        nextLine = 0;
-        while (substring.charAt(nextLine) !== "." && substring.charAt(nextLine) !== " " && substring.search(/\n/) !== 1) {
-            const match = substring.match(regexp);
-            if (match === null) {
-                console.log("format error at " + category);
-                this.displayErrorService.displayError("format error at " + category);
-                return false;
+        let pos;
+        let cat = lines.find(el => el.startsWith("." + category));
+        if(!cat) {
+            console.log("error: no" + category);
+        } else {
+            pos = lines.indexOf(cat)+1;
+            while(pos < lines.length && lines[pos].match(/^\w/) !== null) {
+                let match = lines[pos].match(regexp); 
+                if (match === null) {
+                    console.log("format error at " + category);
+                    this.displayErrorService.displayError("format error at " + category);
+                    return false;
+                }
+                console.log("regexp matched:" + match);
+                pos++;
             }
-            console.log("regexp matched:" + match);
-            nextLine = substring.search(/\n/) + 1;
-            substring = substring.substring(nextLine);
-            if (nextLine === 0) {
-                substring = " ";
-                //wenn das Ende der Datei erreicht ist, wird aus der while-Schleife ausgetreten
-            }
-            nextLine = 0;
-            console.log(substring.charAt(nextLine));
         }
         console.log(category + " validated");
         return true;
+        }
+    
     }
-
-}
