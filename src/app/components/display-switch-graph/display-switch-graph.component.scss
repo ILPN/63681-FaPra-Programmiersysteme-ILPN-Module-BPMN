@@ -70,7 +70,25 @@ $switched: #C0C0C0;
     }
     .Event{ 
         .stroke{
-            stroke: $switched;
+            fill: $switched;
+        }
+    }
+}
+$switchedButEnableForLoopRun: #FFFF00;
+.switchedButEnableForLoopRun{
+    .Task{ 
+        .nodeBackground{
+            fill: $switchedButEnableForLoopRun;
+        }
+    }
+    .Gateway{ 
+        .nodeBackground{
+            fill: $switchedButEnableForLoopRun;
+        }
+    }
+    .Event{ 
+        .stroke{
+            fill: $switchedButEnableForLoopRun;
         }
     }
 }
