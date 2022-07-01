@@ -18,6 +18,8 @@ import { BpmnGatewaySplitOr } from './gateways/BpmnGatewaySplitOr';
 import { BpmnGatewayJoinOr } from './gateways/BpmnGatewayJoinOr';
 import { BpmnGatewaySplitXor } from './gateways/BpmnGatewaySplitXor';
 import { BpmnGatewayJoinXor } from './gateways/BpmnGatewayJoinXor';
+import { BpmnTaskBusinessRule } from './tasks/BpmnTaskBusinessRule';
+import { BpmnEdgeDefault } from './BpmnEdge/BpmnEdgeDefault';
 
 export class BpmnGraph
     extends BGraph<BpmnEdge, BpmnNode>
@@ -90,13 +92,14 @@ export class BpmnGraph
         g.addNode(elementE3);
 
 
+        /*
         let elementEe3 = new BpmnEventEnd("Ee3");
         elementEe3.setPosXY(1600,190)
         elementEe3.label = "ende gelaende"
         g.addNode(elementEe3);
 
         let copou = new BpmnEdge("1vvv",elementEe3, elementE3);
-        g.addEdge(copou);
+        g.addEdge(copou);*/
 
 
 
@@ -108,10 +111,17 @@ export class BpmnGraph
         g.addNode(elementT1);
 
         let elementT2 = new BpmnTaskManual("t2");
-        elementT2.label = "BpmnTaskService"
-
+        elementT2.label = "BpmnTaskManual"
         elementT2.setPosXY(442,320);
         g.addNode(elementT2);
+
+        let tb2 = new BpmnTaskBusinessRule("tb2");
+        tb2.label = "BpmnTaskBusinessRule"
+        g.addNode(tb2);
+
+        
+
+        
 
 
      
@@ -166,6 +176,12 @@ export class BpmnGraph
         let pfeil = new BpmnEdge("p2", elementG1, elementT1);
         g.addEdge(pfeil);
 
+        let edge = new BpmnEdge("edge",elementG1, tb2);
+        g.addEdge(edge);
+
+        let edge2 = new BpmnEdge("edge111",tb2, elementG2);
+        g.addEdge(edge2);
+
         let connector2: BpmnEdge = new BpmnEdge("p3",  elementG1, elementT2);
         connector2.addCornerXY(210, 320);
 
@@ -179,7 +195,7 @@ export class BpmnGraph
         connector4.addCornerXY(675, 320);
         g.addEdge(connector4);
 
-        let connector5 = new BpmnEdge("A6", elementG2, elementE2);
+        let connector5 = new BpmnEdgeDefault("A6", elementG2, elementE2);
         g.addEdge(connector5)
 
         let connector6 = new BpmnEdge("A7", elementE2, elementT3);
@@ -187,10 +203,16 @@ export class BpmnGraph
 
         let connector7 = new BpmnEdge("A8",  elementT3, elementE3);
         g.addEdge(connector7)
+        connector7.labelStart = "Start"
+        connector7.labelMid = "Mid"
+        connector7.labelEnd = "End"
 
         let connector8 = new BpmnEdge("A9",  elementE3, elementE2);
         connector8.addCornerXY(1600, 60);
         connector8.addCornerXY(850, 60);
+        connector8.labelStart = "Start"
+        connector8.labelMid = "Mid"
+        connector8.labelEnd = "End"
         g.addEdge(connector8);
 
         return g

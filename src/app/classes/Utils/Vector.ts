@@ -8,6 +8,9 @@ export class Vector {
     degree():number {
         return this.radians()/(Math.PI *2) *360;
     }
+    static DegToRad(angle:number){
+        return angle/360 * 2* Math.PI
+    }
     static center(...args: Vector[]) {
         let sum = Vector.zero()
         for (const v of args) {
@@ -78,10 +81,10 @@ export class Vector {
         return Math.sqrt(this.x * this.x + this.y * this.y);
     }
 
-    rotate(angle: number): Vector {
+    rotate(rad: number): Vector {
         return new Vector(
-            Math.cos(angle) * this.x - Math.sin(angle) * this.y,
-            Math.sin(angle) * this.x + Math.cos(angle) * this.y
+            Math.cos(rad) * this.x - Math.sin(rad) * this.y,
+            Math.sin(rad) * this.x + Math.cos(rad) * this.y
         );
     }
 }
