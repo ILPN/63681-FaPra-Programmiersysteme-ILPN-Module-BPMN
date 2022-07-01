@@ -20,7 +20,7 @@ export class ParserService {
         //     }
         // });
         
-        const result = BpmnGraph.loopingLouieGraph();
+        const result = BpmnGraph.anotherGraph();
 
         // sampleGraph()  anotherGraph() anotherMonsterGraph()  loopingLouieGraph():
 

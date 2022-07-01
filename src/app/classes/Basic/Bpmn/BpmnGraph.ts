@@ -215,12 +215,12 @@ export class BpmnGraph
 
         let elementT1 = new BpmnTaskService("t1");
         elementT1.setPosXY(442, 60)
-        elementT1.label = "BpmnTaskService"
+        elementT1.label = "BpmnTaskService mit der ID T1 und damit der Name noch länger wird schreibe ich diesen Text hier"
 
         g.addNode(elementT1);
 
         let elementT2 = new BpmnTaskManual("t2");
-        elementT2.label = "BpmnTaskService"
+        elementT2.label = "BpmnTaskService  mit der ID T2 und extra langen Namen"
 
         elementT2.setPosXY(442, 320);
         g.addNode(elementT2);
@@ -248,11 +248,11 @@ export class BpmnGraph
         // ---------------------------------------------------
 
         let elementG1 = new BpmnGatewaySplitOr("G1");
-        elementG1.label = "G1"
+        elementG1.label = "G1 ist ein Oder Split Gateway"
         g.addNode(elementG1);
 
         let elementG2 = new BpmnGatewayJoinOr("G2");
-        elementG2.label = "G2"
+        elementG2.label = "G2 ist ein Oder Join Gateway mit zu langem Namen"
 
 
         // ---------------------------------------------------
