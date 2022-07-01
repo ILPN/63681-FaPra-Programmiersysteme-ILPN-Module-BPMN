@@ -3,6 +3,7 @@ import { BpmnGraph } from '../classes/Basic/Bpmn/BpmnGraph';
 import { SnapElement } from '../classes/Basic/Drag/SnapElements/SnapElement';
 import { SnapPoint } from '../classes/Basic/Drag/SnapElements/SnapPoint';
 import { SnapX } from '../classes/Basic/Drag/SnapElements/SnapX';
+import { SnapY } from '../classes/Basic/Drag/SnapElements/SnapY';
 import { LeveledGraph, LNode } from '../classes/Sugiyama/LeveledGraph';
 import { SimpleGraph } from '../classes/Sugiyama/SimpleGraph';
 import { Sugiyama } from '../classes/Sugiyama/Sugiyama';
@@ -12,7 +13,24 @@ import { Vector } from '../classes/Utils/Vector';
     providedIn: 'root'
 })
 export class LayoutService {
+    getSnapsForNode():SnapElement[]{
+        const snaps = []
+
+        //snaps.push(new SnapX(this.getPosForLevelAndOrder(ln.level,ln.order).x))
+        const biggestOrderIndex = [...this.sugiResult!.levels].sort((l1,l2) =>l2.length -l1.length)[0].length-1
+
+        for (let level = 0; level < this.sugiResult!.levels.length; level++) {
+            snaps.push(new SnapX(this.getPosForLevelAndOrder(level,0).x))
+        }
+        for (let i = 0; i <= biggestOrderIndex; i++) {
+            snaps.push(new SnapY(this.getPosForLevelAndOrder(0,i).y))
+        }
+        return snaps
+    }
     getSnapsFor(id: string):SnapElement[] {
+
+
+        /*
         const ln = this.sugiResult?.getNode(id)
         if(ln == undefined) return[]
         const snaps = []
@@ -23,14 +41,15 @@ export class LayoutService {
             snaps.push(new SnapPoint(this.getPosForLevelAndOrder(ln.level,i)))
             
         }
-        return snaps
+        */
+        return this.getSnapsForNode()
     }
 
     initalLayoutHasBeenDone = false;
     private width: number = 0
     private height:number = 0
 
-    private spacingXAxis = 150
+    private spacingXAxis = 200
     private spacingYAxis= 100
     private padding = new Vector(50,50)
     public setViewBox(drawingArea:SVGElement){

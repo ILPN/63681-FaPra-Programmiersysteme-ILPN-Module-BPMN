@@ -89,7 +89,6 @@ export class DisplayReorderGraphComponent implements OnDestroy, AfterViewInit {
           console.debug('drawing area not ready yet');
           return;
       }
-      console.log('draw is called');
       this.clearDrawingArea();
       for (const svg of svgs) {
           this.drawingArea.nativeElement.appendChild(svg);

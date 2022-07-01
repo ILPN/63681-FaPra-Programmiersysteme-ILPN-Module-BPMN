@@ -18,6 +18,8 @@ import { BpmnGatewaySplitOr } from './gateways/BpmnGatewaySplitOr';
 import { BpmnGatewayJoinOr } from './gateways/BpmnGatewayJoinOr';
 import { BpmnGatewaySplitXor } from './gateways/BpmnGatewaySplitXor';
 import { BpmnGatewayJoinXor } from './gateways/BpmnGatewayJoinXor';
+import { BpmnTaskBusinessRule } from './tasks/BpmnTaskBusinessRule';
+import { BpmnEdgeDefault } from './BpmnEdge/BpmnEdgeDefault';
 
 export class BpmnGraph
     extends BGraph<BpmnEdge, BpmnNode>
@@ -48,7 +50,7 @@ export class BpmnGraph
     addNode(node: BpmnNode) {
         if (this.nodes.findIndex(n => n.id == node.id) == -1)
             this.nodes.push(node)
-            else 
+            else
             console.log("couldn't add node "+ node.id)
     }
 
@@ -66,7 +68,7 @@ export class BpmnGraph
             console.log("couldn't add edge " + edge.id)
     }
 
- 
+
     static sampleGraph():BpmnGraph{
         const g = new BpmnGraph();
         let e1 = new BpmnEventStart("E1");
@@ -87,6 +89,7 @@ export class BpmnGraph
         g.addNode(elementE3);
 
 
+        
         let elementEe3 = new BpmnEventEnd("Ee3");
         elementEe3.setPosXY(1600, 190)
         elementEe3.label = "ende gelaende"
@@ -109,6 +112,14 @@ export class BpmnGraph
 
         elementT2.setPosXY(442, 320);
         g.addNode(elementT2);
+
+        let tb2 = new BpmnTaskBusinessRule("tb2");
+        tb2.label = "BpmnTaskBusinessRule"
+        g.addNode(tb2);
+
+
+
+
 
 
 
@@ -176,7 +187,7 @@ export class BpmnGraph
         connector4.addCornerXY(675, 320);
         g.addEdge(connector4);
 
-        let connector5 = new BpmnEdge("A6", elementG2, elementE2);
+        let connector5 = new BpmnEdgeDefault("A6", elementG2, elementE2);
         g.addEdge(connector5)
 
         let connector6 = new BpmnEdge("A7", elementE2, elementT3);
@@ -184,10 +195,15 @@ export class BpmnGraph
 
         let connector7 = new BpmnEdge("A8", elementT3, elementE3);
         g.addEdge(connector7)
+        connector7.labelStart = "One"
+        connector7.labelEnd = "Three"
 
         let connector8 = new BpmnEdge("A9", elementE3, elementE2);
         connector8.addCornerXY(1600, 60);
         connector8.addCornerXY(850, 60);
+        connector8.labelStart = "Start"
+        connector8.labelMid = "Mid"
+        connector8.labelEnd = "End"
         g.addEdge(connector8);
 
         return g
@@ -432,7 +448,7 @@ export class BpmnGraph
         this.addMyGateway("G6J", "join", "or");
         this.addMyGateway("G7S", "split", "or");
         this.addMyGateway("G7J", "join", "or");
-    } 
+    }
 
     private mixedGatewayForAnotherMonsterGraph() {
         this.addMyGateway("G1J", "join", "or");
@@ -448,7 +464,7 @@ export class BpmnGraph
         this.addMyGateway("G6J", "join", "xor");
         this.addMyGateway("G7S", "split", "or");
         this.addMyGateway("G7J", "join", "or");
-    } 
+    }
 
     static anotherMonsterGraph(): BpmnGraph {
         const g = new BpmnGraph();
@@ -476,8 +492,8 @@ export class BpmnGraph
 
        // g.allOrGatewayForAnotherMonsterGraph();
         g.mixedGatewayForAnotherMonsterGraph();
-        
-       
+
+
         g.addMyConnector("E1", "T1");
         g.addMyConnector("T1", "G1J");
         g.addMyConnector("E2", "G1J");
@@ -488,7 +504,7 @@ export class BpmnGraph
         g.addMyConnector("G2S", "T3");
         g.addMyConnector("T3", "G3S");
         g.addMyConnector("G3S", "T6");
-        
+
 
         // split G3S 1
         g.addMyConnector("T6", "G6S");
@@ -538,7 +554,7 @@ export class BpmnGraph
     }
 
 
-    static loopingLouieGraph(): BpmnGraph { 
+    static loopingLouieGraph(): BpmnGraph {
         const g = new BpmnGraph();
 
         g.addMyEvent("E1", "BpmnEventStart");
@@ -553,9 +569,9 @@ export class BpmnGraph
         g.addMyGateway("G1S", "split", "xor");
         g.addMyGateway("G2S", "split", "or");
         g.addMyGateway("G2J", "join", "or");
-       
-        
-       
+
+
+
         g.addMyConnector("E1", "T1");
         g.addMyConnector("T1", "G1J");
         g.addMyConnector("G1J", "T2");
@@ -570,9 +586,9 @@ export class BpmnGraph
         g.addMyConnector("G2J", "G1S");
         g.addMyConnector("G1S", "G1J");
         g.addMyConnector("G1S", "E2");
-        
+
         g.addMyConnector("G2S", "G2J");
- 
+
         return g
     }
 
