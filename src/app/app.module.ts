@@ -11,6 +11,7 @@ import {MatIconModule} from '@angular/material/icon';
 import {ReactiveFormsModule} from '@angular/forms';
 import {FooterComponent} from './components/footer/footer.component';
 import {InputFieldComponent} from './components/input-field/input-field.component';
+import {OutputFieldComponent} from './components/output-field/output-field.component';
 import {InputDirective} from './directives/input.directive';
 import {ErrorHintComponent} from './components/error-hint/error-hint.component';
 import { ModeSwitchComponent } from './components/mode-switch/mode-switch.component';
@@ -26,6 +27,7 @@ import { DisplaySwitchGraphComponent } from './components/display-switch-graph/d
         FooterComponent,
         ErrorHintComponent,
         InputFieldComponent,
+        OutputFieldComponent,
         InputDirective,
         ModeSwitchComponent,
         DisplayDraggableGraphComponent,
