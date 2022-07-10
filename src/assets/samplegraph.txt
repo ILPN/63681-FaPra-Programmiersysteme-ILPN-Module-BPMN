@@ -1,0 +1,28 @@
+.events
+e1 start "Am Start" (60,190)
+e2 intermediate "BpmnEventIntermediate" (850,190)
+e3 end "BpmnEventEnd" (1600,190)
+ee3 end "ende gelaende" (1600,190)
+
+.activities
+t1 service "BpmnTaskService" (442,60)
+t2 manual "BpmnTaskManual" (442,320)
+t3 usertask "BpmnTaskUser" (1225,190)
+
+.gateways 
+g1 or_split (210,190)
+g2 or_join (675,190)
+
+.sequences
+coupou sequenceflow "1vvv" ee3 e3
+connector sequenceflow "1" e1 g1 
+pfeil sequenceflow "p2" g1 t1
+connector2 sequenceflow "p3" g1 t2 (210,320)
+connector3 sequenceflow "a4" t1 g2 (675,60)
+connector4 sequenceflow "a5" t2 g2 (675,320)
+connector5 sequenceflow "a6" g2 e2 
+connector6 sequenceflow "a7" e2 t3
+connector7 sequenceflow "a8" t3 e3
+
+
+
