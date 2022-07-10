@@ -39,7 +39,8 @@ export class DisplayReorderGraphComponent implements OnDestroy, AfterViewInit {
       this._sub = this._displayService.diagram$.subscribe((graph) => {
           this.bpmnGraph = graph;
           if (this.drawingArea == undefined || this.rootSvg == undefined) return;
-          this._layoutService.setViewBox(this.drawingArea.nativeElement)
+          this._layoutService.layoutIfNeeded(this.bpmnGraph,this.rootSvg.nativeElement.clientWidth,this.rootSvg.nativeElement.clientHeight)
+        this._layoutService.setViewBox(this.drawingArea.nativeElement)
 
           const dragManager = new DragManagerReorder(this.rootSvg.nativeElement,this.drawingArea.nativeElement,this._layoutService.sugiResult!)
           const bpmnGraphSvg = this.bpmnGraph.svgManager.getNewSvg()

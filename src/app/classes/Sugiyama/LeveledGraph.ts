@@ -15,10 +15,11 @@ export class LeveledGraph {
   }
   setLevelOfNode(n: LNode, l: number) {
     n.level = l
-    for (let i = 0; i < this.levels.length; i++) {
+    this.unleveled = this.unleveled.filter(nn => n.id != nn.id);
+    for (const [i,level] of this.levels.entries()) {
       this.levels[i] = this.levels[i].filter(nn => n.id != nn.id);      
     }
-    if(l>= this.levels.length) this.levels[l] = []
+    if(this.levels[l]== undefined) this.levels[l] = []
     this.levels[l].push(n)
   }
   getSources() {
@@ -28,9 +29,9 @@ export class LeveledGraph {
     return this.getAllNodes().filter(n => n.children.length == 0 && n.parents.length >=1)
   }
   import(acyc: SimpleGraph) {
-    this.levels[0]=[]
+    this.unleveled = []
       acyc.nodes.forEach(sn => {
-        this.levels[0].push(new LNode(sn.id))
+        this.unleveled.push(new LNode(sn.id))
       });
       acyc.arcs.forEach(sa => {
         this.addArc(sa.from,sa.to, sa.inversed)        
@@ -64,7 +65,7 @@ export class LeveledGraph {
     return this.getAllNodes().find(n=> n.id == id)
   }
   getAllNodes() {
-    let allNodes:LNode[] = []
+    let allNodes:LNode[] = this.unleveled
     this.levels.forEach(arr => {
       allNodes = allNodes.concat(arr)      
     });
@@ -82,7 +83,8 @@ export class LeveledGraph {
     }
     return dummys
   }
-  public levels: LNode[][] = [];
+  public unleveled: LNode[]=[];
+  public levels: LNode[][] = [[]];
   public arcs: LArc[] = [];
 }
 export class LNode{

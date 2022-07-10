@@ -1,6 +1,7 @@
 import {Injectable, OnDestroy} from '@angular/core';
 import {BehaviorSubject, Observable} from 'rxjs';
 import { BpmnGraph } from '../classes/Basic/Bpmn/BpmnGraph';
+import { LayoutService } from './layout.service';
 
 @Injectable({
     providedIn: 'root'
@@ -9,7 +10,8 @@ export class DisplayService implements OnDestroy {
 
     private _diagram$: BehaviorSubject<BpmnGraph>;
 
-    constructor() {
+    constructor(private _layoutService: LayoutService,
+        ) {
         this._diagram$ = new BehaviorSubject<BpmnGraph>(new BpmnGraph());
     }
 
@@ -26,6 +28,9 @@ export class DisplayService implements OnDestroy {
     }
 
     public display(net: BpmnGraph) {
+        this._diagram$.getValue().svgManager.getSvg().remove()
+        this._layoutService.initalLayoutHasBeenDone = false
+        
         this._diagram$.next(net);
     }
 

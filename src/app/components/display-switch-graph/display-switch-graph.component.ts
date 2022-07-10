@@ -31,14 +31,7 @@ export class DisplaySwitchGraphComponent implements OnDestroy, AfterViewInit {
       if (graph.isEmpty()) return
       if (this.rootSvg == undefined || this.drawingArea == undefined) return
       this.bpmnGraph = graph;
-      if (!this._layoutService.initalLayoutHasBeenDone) {
-        this._layoutService.layout(
-          this.bpmnGraph,
-          this.rootSvg!.nativeElement.clientWidth,
-          this.rootSvg!.nativeElement.clientHeight
-        );
-      }
-
+      this._layoutService.layoutIfNeeded(this.bpmnGraph,this.rootSvg.nativeElement.clientWidth,this.rootSvg.nativeElement.clientHeight)
       this._layoutService.setViewBox(this.drawingArea.nativeElement)
 
       const switchGraph = new SwitchableGraph(graph);

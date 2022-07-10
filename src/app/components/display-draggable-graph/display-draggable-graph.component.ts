@@ -49,19 +49,11 @@ export class DisplayDraggableGraphComponent implements OnDestroy,  AfterViewInit
             if(bpmnGraph.isEmpty())return
             if (this.rootSvg == undefined || this.drawingArea == undefined) return 
             this._bpmnGraph = bpmnGraph;
-                if(!this._layoutService.initalLayoutHasBeenDone){
-                    this._layoutService.layout(
-                        this._bpmnGraph,
-                        this.rootSvg!.nativeElement.clientWidth,
-                        this.rootSvg!.nativeElement.clientHeight
-                    );
-                }
-
+                
+                this._layoutService.layoutIfNeeded(this._bpmnGraph,this.rootSvg!.nativeElement.clientWidth,this.rootSvg!.nativeElement.clientHeight)
                 this._layoutService.setViewBox(this.drawingArea.nativeElement)
                 
                 this._draggableGraph= new DraggableGraph(bpmnGraph, this._layoutService, this.rootSvg!.nativeElement,this.drawingArea.nativeElement);
-
-
                 Utility.removeAllChildren(this.drawingArea.nativeElement)
                 this.drawingArea.nativeElement.appendChild(this._draggableGraph.svgManager.getSvg());
         });
