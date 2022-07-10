@@ -14,8 +14,6 @@
         <app-display-switch-graph *ngSwitchCase="'switch diagram'"
         class="padding full-size"></app-display-switch-graph>
     </div>
-    
-
 
     <div fxLayout="row" fxLayoutAlign="space-evenly start">
         <input-field buttonText="File upload" buttonIcon="publish" (newInputEvent)="textareaFc.setValue($event)"></input-field>
@@ -28,7 +26,7 @@
                       cdkAutosizeMaxRows="20"
                       [formControl]="textareaFc"></textarea>
         </mat-form-field>
-        <input-field buttonText="Right button" buttonIcon="grade"></input-field>
+        <output-field buttonText="File download" buttonIcon="download" [text]="textareaFc.value"></output-field>
     </div>
 
     <!--  Footer  -->
