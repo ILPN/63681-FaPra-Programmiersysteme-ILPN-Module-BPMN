@@ -23,17 +23,18 @@ export class OutputFieldComponent {
 
     download(type:string) {
         let textToExport = this.text;
-        //ist der type pn oder bpmn-xml, wird textToExport zu dem jeweiligen Format geändert 
-        if(textToExport) {
+        if(type === 'bpmn' && textToExport) {
             if(!this.formValidationService.validateFormat(textToExport)){
                 this.displayErrorService.displayError("BPMN-Format ist verletzt; nicht exportierbar");
-            }else {
-            let a = document.getElementById(type);
-            if(a) {
+                return;
+            }
+        }
+        //ist der type pn oder bpmn-xml, wird textToExport zu dem jeweiligen Format geändert 
+
+        let a = document.getElementById(type);
+            if(a && textToExport) {
                 a.setAttribute('href','data:text/plain;charset=utf-8, ' + encodeURIComponent(textToExport));
                 a.setAttribute('download', type + ".txt");
             }
             }
-        }
     }
-}
