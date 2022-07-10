@@ -16,7 +16,7 @@ export class FormValidationService {
         console.log(input);
         if (!input.includes(".activities" && ".sequences")) {
             this.displayErrorService.displayError("wrong format");
-            console.log("wrong format");
+            //console.log("wrong format");
             return false;
         } else {
             if (!this.validateCategory("activities", input)) {
@@ -63,21 +63,22 @@ export class FormValidationService {
         let pos;
         let cat = lines.find(el => el.startsWith("." + category));
         if(!cat) {
-            console.log("error: no" + category);
+            this.displayErrorService.displayError("error: no" + category);
+            //console.log("error: no" + category);
         } else {
             pos = lines.indexOf(cat)+1;
             while(pos < lines.length && lines[pos].match(/^\w/) !== null) {
                 let match = lines[pos].match(regexp); 
                 if (match === null) {
-                    console.log("format error at " + category);
+                    //console.log("format error at " + category);
                     this.displayErrorService.displayError("format error at " + category);
                     return false;
                 }
-                console.log("regexp matched:" + match);
+                //console.log("regexp matched:" + match);
                 pos++;
             }
         }
-        console.log(category + " validated");
+        //console.log(category + " validated");
         return true;
         }
     
