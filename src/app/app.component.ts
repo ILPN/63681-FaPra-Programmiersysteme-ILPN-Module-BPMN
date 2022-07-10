@@ -3,6 +3,7 @@ import { FormControl } from '@angular/forms';
 import { ParserService } from './services/parser.service';
 import { DisplayService } from './services/display.service';
 import { debounceTime, Subscription } from 'rxjs';
+import { BpmnGraph } from './classes/Basic/Bpmn/BpmnGraph';
 
 @Component({
     selector: 'app-root',
@@ -23,7 +24,7 @@ export class AppComponent implements OnDestroy {
         this._sub = this.textareaFc.valueChanges
             .pipe(debounceTime(400))
             .subscribe((val) => this.processSourceChange(val));
-        this.textareaFc.setValue(`What s cookin, good lookin?`);
+        this.textareaFc.setValue(`Your advertising could be here`);
     }
 
     ngOnDestroy(): void {
@@ -33,7 +34,13 @@ export class AppComponent implements OnDestroy {
     private processSourceChange(newSource: string) {
         const result = this._parserService.parse(newSource);
         if (result !== undefined) {
-            this._displayService.display(result);
+            
+            if(result.nodes.length ==0){
+                this._displayService.display(BpmnGraph.sampleGraph());
+
+            }else{
+                this._displayService.display(result);
+            }
         }
     }
 }

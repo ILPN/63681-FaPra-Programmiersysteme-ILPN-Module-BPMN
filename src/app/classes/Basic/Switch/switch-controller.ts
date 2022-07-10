@@ -35,14 +35,18 @@ export class SwitchController {
      * @param clickedNode the clicked node 
      */
     public press(clickedNode: SwitchableNode) {
-        if (clickedNode.switchState === SwitchState.enableable) {
+        if (clickedNode.switchState === SwitchState.enableable || clickedNode.switchState === SwitchState.switchedButEnableForLoopRun) {
             console.log("Clicked element " + clickedNode.id);
             if (clickedNode.isStartEvent()) this.disableAllOtherStartEvents(clickedNode);
+
+
             let nodesToSwitch: SwitchableNode[] = this.getNodesToSwitch(clickedNode)
-
-
             nodesToSwitch.forEach(node => { if (this.possibleToSwitchNode(node)) node.switch() });
+            if(clickedNode.isGateway() && (clickedNode as SwitchableGateway).OR_JOIN()) (clickedNode as SwitchableGateway).disablePathsNotTakenAfterOrJoin();
             this.checkAllEnableableNodesStillEnableable();
+
+
+
         } else {
             console.log("The state of this element can not be switched: " + clickedNode.id);
             if (clickedNode.enabled() && clickedNode.isEndEvent()) {
@@ -63,15 +67,15 @@ export class SwitchController {
         SwitchUtils.addItem(clickedNode, nodesToSwitch);
 
         // if no nodes before the clicked one
-        if(clickedNode.predecessors.length === 0)
-          return SwitchUtils.addItems(clickedNode.switchRegular(), nodesToSwitch);
+        if (clickedNode.predecessors.length === 0)
+            return SwitchUtils.addItems(clickedNode.switchRegular(), nodesToSwitch);
 
         // if there is enabled gateway before the clicked node 
         clickedNode.predecessors.forEach(before => {
-            if (before.enabled() && before.isGateway()) {
+            if (before.enabled() && before.isGateway()) { // before.enabled() &&  for loop
                 let gatewayConnections = (before as SwitchableGateway).switchSplit(clickedNode);
                 SwitchUtils.addItems(gatewayConnections, nodesToSwitch)
-            }else
+            } else
                 SwitchUtils.addItems(clickedNode.switchRegular(), nodesToSwitch);
         });
 
@@ -85,12 +89,12 @@ export class SwitchController {
      * @returns true if the node state can be switched
      */
     private possibleToSwitchNode(node: SwitchableNode): boolean {
-        if (node.isGateway() && (node.disabled() || node.enableable())) {
+         if (node.isGateway() && (node.disabled() || node.enableable() || node.switchedButEnableForLoopRun())) { 
 
-            let gateway: SwitchableGateway = node as SwitchableGateway;
-            return gateway.canBeSwitched()
+             let gateway: SwitchableGateway = node as SwitchableGateway;
+             return gateway.canBeSwitched()
 
-        }
+         }
         return true;
     }
 
@@ -118,97 +122,8 @@ export class SwitchController {
         this.getAllEnableableNodes().forEach(node => {
             if (!this.possibleToSwitchNode(node))
                 node.disable();
-
-            node.predecessors.forEach(nodeBefore => {
-                if (nodeBefore.isGateway()) {
-                    let gateway: SwitchableGateway = nodeBefore as SwitchableGateway
-                    if (gateway.OR_SPLIT() && !this.recursivelySearchForResponsibleJoinGateway(node, []))
-                        node.disable();
-                }
-            });
-
         });
     }
-
-    /**
-* searches recursively for the split gateway before the element,
-* checks if there is at least one switched element on the path to the gateway and
-* if so - returns true
-* @param node the node from which the search for the split gateway starts
-* @param gatewayArray pass empty array when calling this method: '[]'. Recursively collects gateways
-* @return false  at least one  element on the path to the gateway is switched
-*/
-    recursivelySearchForResponsibleSplitGateway(node: SwitchableNode, gatewayArray: []): boolean {
-        let b: boolean = true;
-        if (node instanceof SwitchableGateway) {
-            if (gatewayArray.length === 0) return b;
-            let onlyOnce: boolean = true;
-            if (node.isSplitGateway()) {
-                gatewayArray.pop();
-            } else {
-                //any _JOIN gateway
-                gatewayArray.push();
-            }
-            node.predecessors.forEach(before => {
-                if (onlyOnce && !(before.disabled())) {
-                    onlyOnce = false;
-                    if (!this.recursivelySearchForResponsibleSplitGateway(before, gatewayArray)) b = false;
-                }
-            });
-        } else {
-            if (node.switchState === SwitchState.enabled) {
-                b = false;
-            } else {
-                node.predecessors.forEach(e => {
-                    if (b) {
-                        if (!this.recursivelySearchForResponsibleSplitGateway(e, gatewayArray)) b = false;
-                    }
-                });
-            }
-        }
-        return b;
-    }
-
-
-    /** 
-     * recursively searches for the following JOIN gateway and returns false if the gateway is switched  
-     * @param node the node from which the search for the join gateway starts
-     * @param gatewayArray pass empty array when calling this method: '[]'. Recursively collects gateways
-     * @return false if the found gateway is switched
-     */
-    recursivelySearchForResponsibleJoinGateway(node: SwitchableNode, gatewayArray: []): boolean {
-        let b: boolean = true;
-        if (node.isGateway()) {
-            if (gatewayArray.length === 0) {
-                if (node.enabled() || node.switched()) b = false;
-                return b;
-            }
-            let onlyOnce: boolean = true;
-            let gateway: SwitchableGateway = node as SwitchableGateway
-            if (gateway.isSplitGateway()) {
-                gatewayArray.pop();
-            } else {
-                gatewayArray.push();
-            }
-            node.successors.forEach(after => {
-                if (onlyOnce && !(after.disabled())) {
-                    onlyOnce = false;
-                    if (b) b = this.recursivelySearchForResponsibleSplitGateway(after, gatewayArray);
-                }
-                return b;
-            });
-        } else {
-            node.successors.forEach(after => {
-                if (b) {
-                    b = this.recursivelySearchForResponsibleJoinGateway(after, gatewayArray)
-                }
-            });
-
-            return b;
-        }
-        return true;
-    }
-
 
     /**
      * resets diagram into initial state to start switching from start event
@@ -219,5 +134,4 @@ export class SwitchController {
             event.switchTo(SwitchState.enableable)
         });
     }
-
 }

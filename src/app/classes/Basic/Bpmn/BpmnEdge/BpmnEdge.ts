@@ -1,40 +1,42 @@
-import { Line } from "../../../Utils/Line";
-import { Vector } from "../../../Utils/Vector";
-import { BEdge } from "../../B/BEdge";
-import { Svg } from "../../Svg/Svg";
-import { BpmnNode } from "../BpmnNode";
-import { BpmnEvent } from "../events/BpmnEvent";
-import { BpmnGateway } from "../gateways/BpmnGateway";
-import { BpmnTask } from "../tasks/BpmnTask";
-import { BpmnEdgeCorner } from "./BpmnEdgeCorner";
-import { BpmnDummyEdgeCorner } from "./BpmnDummyEdgeCorner";
-import { GetSvgManager } from "../../Interfaces/GetSvgManager";
-import { SvgManager } from "../../Svg/SvgManager/SvgManager";
+import { Line } from '../../../Utils/Line';
+import { Vector } from '../../../Utils/Vector';
+import { BEdge } from '../../B/BEdge';
+import { Svg } from '../../Svg/Svg';
+import { BpmnNode } from '../BpmnNode';
+import { BpmnEvent } from '../events/BpmnEvent';
+import { BpmnGateway } from '../gateways/BpmnGateway';
+import { BpmnTask } from '../tasks/BpmnTask';
+import { BpmnEdgeCorner } from './BpmnEdgeCorner';
+import { BpmnDummyEdgeCorner } from './BpmnDummyEdgeCorner';
+import { GetSvgManager } from '../../Interfaces/GetSvgManager';
+import { SvgManager } from '../../Svg/SvgManager/SvgManager';
 
 export class BpmnEdge extends BEdge implements GetSvgManager {
     private _svgManager: SvgManager | undefined;
     public get svgManager(): SvgManager {
-        if(this._svgManager == undefined){
-            this._svgManager = new SvgManager(this.id,() => this.svgCreation())
+        if (this._svgManager == undefined) {
+            this._svgManager = new SvgManager(this.id, () =>
+                this.svgCreation()
+            );
         }
         return this._svgManager;
     }
     setStartPos(x: number, y: number) {
-        this._corners[0].setPosXY(x,y)
+        this._corners[0].setPosXY(x, y);
     }
     setEndPos(x: number, y: number) {
-        this._corners[this._corners.length-1].setPosXY(x,y)
+        this._corners[this._corners.length - 1].setPosXY(x, y);
     }
-    removeCorner(at:number) {
-        console.log(" trying to remove "+at)
-        if(at == 0  || at >= this._corners.length-1) return
+    removeCorner(at: number) {
+        console.log(' trying to remove ' + at);
+        if (at == 0 || at >= this._corners.length - 1) return;
         this._corners.splice(at, 1);
-        console.log(" removed "+at)
-        this.svgManager.redraw()
+        console.log(' removed ' + at);
+        this.svgManager.redraw();
     }
-    private readonly _id: string
+    private readonly _id: string;
     public get id(): string {
-        return this._id
+        return this._id;
     }
 
     private _corners: BpmnEdgeCorner[];
@@ -44,73 +46,186 @@ export class BpmnEdge extends BEdge implements GetSvgManager {
     from: BpmnNode;
     to: BpmnNode;
 
-    constructor(
-        id: string,
-        from: BpmnNode,
-        to:BpmnNode
-    ) {
-        super(from.id,to.id);
-        this._id = id
+    constructor(id: string, from: BpmnNode, to: BpmnNode) {
+        super(from.id, to.id);
+        this._id = id;
         this.from = from;
         this.to = to;
-        this._corners = 
-        [new BpmnEdgeCorner(from.getPos().x,from.getPos().y),
-             new BpmnEdgeCorner(to.getPos().x,to.getPos().y)];
+        this._corners = [
+            new BpmnEdgeCorner(from.getPos().x, from.getPos().y),
+            new BpmnEdgeCorner(to.getPos().x, to.getPos().y),
+        ];
+    }
+    private _labelStart = '';
+    public get labelStart() {
+        return this._labelStart;
+    }
+    public set labelStart(value) {
+        this._labelStart = value;
+    }
+    private _labelEnd = '';
+    public get labelEnd() {
+        return this._labelEnd;
+    }
+    public set labelEnd(value) {
+        this._labelEnd = value;
+    }
+    private _labelMid = '';
+    public get labelMid() {
+        return this._labelMid;
+    }
+    public set labelMid(value) {
+        this._labelMid = value;
     }
 
     clearCorners() {
-        this._corners = [this._corners[0], this._corners[this._corners.length-1]]
+        this._corners = [
+            this._corners[0],
+            this._corners[this._corners.length - 1],
+        ];
     }
     addCornerXY(x: number, y: number) {
         this.addCorner(new Vector(x, y));
     }
-    private addCornerr(corner:BpmnEdgeCorner, atPosition: number = -1){
-        const lastIndex = this._corners.length -1
+    private addCornerr(corner: BpmnEdgeCorner, atPosition: number = -1) {
+        const lastIndex = this._corners.length - 1;
         if (atPosition == -1) {
             this._corners.splice(lastIndex, 0, corner);
         } else {
             this._corners.splice(atPosition, 0, corner);
         }
-        return corner
+        return corner;
     }
-    addCorner(pos: Vector, at: number = -1):BpmnEdgeCorner {
-        const corner = new BpmnEdgeCorner(pos.x,pos.y);
-        this.addCornerr(corner,at)
-        return corner
-    }
-
-    addDummyCorner(id:string, pos: Vector, at: number = -1):BpmnEdgeCorner {
-        const corner = new BpmnDummyEdgeCorner(id,pos);
-        corner._deletable = false
-        this.addCornerr(corner,at)
-        return corner
+    addCorner(pos: Vector, at: number = -1): BpmnEdgeCorner {
+        const corner = new BpmnEdgeCorner(pos.x, pos.y);
+        this.addCornerr(corner, at);
+        return corner;
     }
 
-
-
+    addDummyCorner(id: string, pos: Vector, at: number = -1): BpmnEdgeCorner {
+        const corner = new BpmnDummyEdgeCorner(id, pos);
+        corner._deletable = false;
+        this.addCornerr(corner, at);
+        return corner;
+    }
 
     svgCreation(): SVGElement {
         const svg = Svg.container();
         const lineSvgResult = this.lineSvg();
-
-        //this.pointsToBeConnected.push(lineSvgResult.startOfLine);
-        //this.pointsToBeConnected.push(lineSvgResult.endOfLine);
-
         svg.append(lineSvgResult.svg);
         svg.append(
-            Svg.pointer(
-                lineSvgResult.endOfLine,
-                lineSvgResult.directionOfEnd
-            )
+            Svg.pointer(lineSvgResult.endOfLine, lineSvgResult.directionOfEnd)
         );
+
+        for (const label of this.labels()) {
+            svg.appendChild(label);
+        }
         return svg;
     }
+    labels(): SVGElement[] {
+        const paddingX = 3;
+        const paddingY = -3;
+        const fontSize = 8;
 
+        let dir;
+        let pos;
 
-    public nodeIntersection1 = new Vector()
-    public nodeIntersection2 = new Vector()
+        const upsideDown = (deg:number) => !(0 <=deg && deg<=180)
+        const labels = [];
+        if (this.labelStart != '') {
+            dir = this.corners[1]
+                .getPos()
+                .minus(this.corners[0].getPos())
+                .toUnitVector();
+            pos = this.nodeIntersection1;
+
+            const uD = upsideDown(dir.degree())
+            labels.push(
+                Svg.textFrom(
+                this.labelStart,
+                pos,
+                uD? dir.degree() + 90: dir.degree() -90,
+                'auto',
+                uD? 'end': 'start',
+                uD? -paddingX: paddingX,
+                paddingY,
+                fontSize
+            ));
+        }
+
+        if (this.labelEnd != '') {
+            dir = this.corners[this.corners.length - 1]
+                .getPos()
+                .minus(this.corners[this.corners.length - 2].getPos())
+                .toUnitVector();
+            pos = this.nodeIntersection2;
+            const uD = upsideDown(dir.degree())
+            const endLabel = Svg.textFrom(
+                this.labelEnd,
+                pos,
+                uD? dir.degree() + 90: dir.degree() -90,
+                'auto',
+                uD ? "start":'end',
+                uD ? +paddingX + 15: -paddingX - 15,
+                paddingY,
+                fontSize
+            );
+            labels.push(endLabel);
+        }
+
+        if (this.labelMid != '') {
+            let lengthOfEdge = 0;
+            for (let i = 0; i < this.corners.length - 1; i++) {
+                const cornerPos = this.corners[i].getPos();
+                const nextCornerPos = this.corners[i + 1].getPos();
+                lengthOfEdge += nextCornerPos.minus(cornerPos).length();
+            }
+            const lengthFromStartToIntersection = this.nodeIntersection1
+                .minus(this.corners[0].getPos())
+                .length();
+            lengthOfEdge =
+                lengthOfEdge -
+                lengthFromStartToIntersection -
+                this.nodeIntersection2
+                    .minus(this.corners[this.corners.length - 1].getPos())
+                    .length();
+
+            //find center
+            let halfWay = lengthOfEdge / 2;
+            halfWay += lengthFromStartToIntersection;
+            for (let i = 0; i < this.corners.length - 1; i++) {
+                const cornerPos = this.corners[i].getPos();
+                const nextCornerPos = this.corners[i + 1].getPos();
+                halfWay -= nextCornerPos.minus(cornerPos).length();
+                if (halfWay <= 0) {
+                    dir = nextCornerPos.minus(cornerPos).toUnitVector();
+                    pos = nextCornerPos.plus(dir.muliplied(halfWay));
+                    break;
+                }
+            }
+            if (pos != undefined && dir != undefined) {
+                const uD = upsideDown(dir.degree())
+                const middleLabel = Svg.textFrom(
+                    this.labelMid,
+                    pos,
+                    uD? dir.degree()+90 :dir.degree() - 90,
+                    'bottom',
+                    'middle',
+                    0,
+                    paddingY,
+                    fontSize
+                );
+                labels.push(middleLabel);
+            }
+        }
+
+        return labels;
+    }
+
+    public nodeIntersection1 = new Vector();
+    public nodeIntersection2 = new Vector();
     /**
-     * 
+     *
      * @returns a svg path, representing the line of the arrow
      */
     private lineSvg(): {
@@ -125,25 +240,24 @@ export class BpmnEdge extends BEdge implements GetSvgManager {
             this._corners[0].getPos(),
             this.from
         );
-       this.nodeIntersection1 = intersectionWithStartElement
+        this.nodeIntersection1 = intersectionWithStartElement;
         pointsToBeConnected.push(intersectionWithStartElement);
-        
-        for (let i = 1; i < this._corners.length-1; i++) {
+
+        for (let i = 1; i < this._corners.length - 1; i++) {
             const corner = this._corners[i];
             pointsToBeConnected.push(corner.getPos());
-
         }
-        const lastIndex = this.corners.length -1 
+        const lastIndex = this.corners.length - 1;
         const intersectionWithEndElement = this.calculateIntersection(
-            this._corners[lastIndex -1].getPos(),
+            this._corners[lastIndex - 1].getPos(),
             this._corners[lastIndex].getPos(),
             this.to
         );
-        this.nodeIntersection2 = intersectionWithEndElement
+        this.nodeIntersection2 = intersectionWithEndElement;
         pointsToBeConnected.push(intersectionWithEndElement);
 
-        const pathSvg = Svg.path(pointsToBeConnected)
-        
+        const pathSvg = Svg.path(pointsToBeConnected);
+
         const endOfLine = pointsToBeConnected[pointsToBeConnected.length - 1];
         const directionOfEnd = endOfLine.minus(
             pointsToBeConnected[pointsToBeConnected.length - 2]
@@ -162,23 +276,11 @@ export class BpmnEdge extends BEdge implements GetSvgManager {
         node: BpmnNode
     ): Vector {
         if (node instanceof BpmnTask) {
-            return this.intersectionWithTask(
-                outerPoint,
-                innerPoint,
-                node
-            );
+            return this.intersectionWithTask(outerPoint, innerPoint, node);
         } else if (node instanceof BpmnGateway) {
-            return this.intersectionWithGateway(
-                outerPoint,
-                innerPoint,
-                node
-            );
+            return this.intersectionWithGateway(outerPoint, innerPoint, node);
         } else if (node instanceof BpmnEvent) {
-            return this.intersectionWithNode(
-                outerPoint,
-                innerPoint,
-                node 
-            );
+            return this.intersectionWithNode(outerPoint, innerPoint, node);
         }
         return this.intersectionWithNode(outerPoint, innerPoint, node);
     }
@@ -215,17 +317,17 @@ export class BpmnEdge extends BEdge implements GetSvgManager {
         el: BpmnTask
     ): Vector {
         const inside = () => {
-            if (innerPoint.x > el.getPos().x + el.width/2) return false;
-            if (innerPoint.x < el.getPos().x - el.width/2) return false;
-            if (innerPoint.y > el.getPos().y + el.heigth/2) return false;
-            if (innerPoint.y < el.getPos().y - el.heigth/2) return false;
+            if (innerPoint.x > el.getPos().x + el.width / 2) return false;
+            if (innerPoint.x < el.getPos().x - el.width / 2) return false;
+            if (innerPoint.y > el.getPos().y + el.heigth / 2) return false;
+            if (innerPoint.y < el.getPos().y - el.heigth / 2) return false;
             return true;
         };
         if (!inside()) return innerPoint;
         const center = el.getPos();
         //boundinglines: lineUp, lineRight, lineLeft, lineDown
-        const halfWidth = el.width/2
-        const halfHeight = el.heigth/2
+        const halfWidth = el.width / 2;
+        const halfHeight = el.heigth / 2;
         const lineU = new Line(
             center.plusXY(0, -halfHeight),
             new Vector(10, 0)
@@ -234,10 +336,7 @@ export class BpmnEdge extends BEdge implements GetSvgManager {
             el.getPos().plusXY(halfWidth, 0),
             new Vector(0, 10)
         );
-        const lineD = new Line(
-            center.plusXY(0, halfHeight),
-            new Vector(10, 0)
-        );
+        const lineD = new Line(center.plusXY(0, halfHeight), new Vector(10, 0));
         const lineL = new Line(
             el.getPos().plusXY(-halfWidth, 0),
             new Vector(0, 10)
@@ -283,8 +382,8 @@ export class BpmnEdge extends BEdge implements GetSvgManager {
         g: BpmnGateway
     ): Vector {
         // lineUpperLeft, lineUpperRight, lineLowerLeft, lineLowerRight
-        const halfWidth = g.width/2
-        const halfHeight = g.width/2
+        const halfWidth = g.width / 2;
+        const halfHeight = g.width / 2;
         const lineUL = new Line(
             new Vector(g.getPos().x, g.getPos().y - halfHeight),
             new Vector(halfWidth, -halfHeight)
@@ -343,6 +442,4 @@ export class BpmnEdge extends BEdge implements GetSvgManager {
 
         return intersections[0];
     }
-
-
 }

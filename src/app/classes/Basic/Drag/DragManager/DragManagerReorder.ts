@@ -22,8 +22,8 @@ export class DragManagerReorder extends DragManager{
         const level = this.sugiResult.getNode(idOfDraggedEl)!.level
 
         const idsInLevel = this.sugiResult.levels[level].map(ln => ln.id)
-        console.log(idsInLevel)
-        console.log(this.dragHandles)
+        //console.log(idsInLevel)
+        //console.log(this.dragHandles)
         for (const [a,dh] of this.dragHandles.entries()){
             if(!(a instanceof BpmnNode || a instanceof BpmnDummyEdgeCorner)) continue
             if(idsInLevel.findIndex(id => id== a.id) != -1){
@@ -44,6 +44,10 @@ export class DragManagerReorder extends DragManager{
             this.startPositions.push(dragHandle.dragedElement.getPos().copy())
         }
         this.startPositions.sort((a,b)=> a.y-b.y)
+
+        for (const dragHandle of this.dragHandlesToReorder) {
+            dragHandle.startDrag(event)
+        }
     }
 
     override drag(event: MouseEvent): void {
