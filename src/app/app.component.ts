@@ -34,7 +34,8 @@ export class AppComponent implements OnDestroy {
     private processSourceChange(newSource: string) {
         const result = this._parserService.parse(newSource);
         if (result !== undefined) {
-            this._displayService.display(BpmnGraph.sampleGraph());
+            this._displayService.display(result);
+            //BpmnGraph.sampleGraph()
         }
     }
 }

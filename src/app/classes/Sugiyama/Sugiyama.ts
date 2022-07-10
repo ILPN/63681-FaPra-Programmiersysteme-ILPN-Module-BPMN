@@ -25,6 +25,16 @@ export class Sugiyama {
         this.alignNodesAndDummyNodes()
         this.reverseReversedArcs();
 
+        this.assignLevelToUnleveledNodes()
+
+    }
+    assignLevelToUnleveledNodes() {
+        /*
+        for (const node of this.leveled.levels[0]) {
+            if (node.level != 0 )this.leveled.setLevelOfNode(node,0)
+            if(node.order == -1){this.leveled.
+            }
+        }*/
     }
     alignNodesAndDummyNodes() {
         //@Marcel: here all arcs still point in one direction, the graph is still acyclical, every arc spans only over one level
