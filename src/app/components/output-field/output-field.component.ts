@@ -18,7 +18,6 @@ export class OutputFieldComponent {
     }
 
     showMenu() {
-        console.log(document.getElementById("myDropdown"));
         document.getElementById("myDropdown")?.classList.toggle("show");
     }
 

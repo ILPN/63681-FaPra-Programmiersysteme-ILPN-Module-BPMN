@@ -219,15 +219,17 @@ export class ParserService {
                         console.log("sequence:" + var1.id + var2.id);
                         let sequence = new BpmnEdge(name,var1,var2);
 
-                         if(lineSplit[5] && !lineSplit[5].startsWith("\r")) {
-                            let coordinates = lineSplit[5];
+                        let i = 5; 
+                        while (lineSplit[i] != undefined && !lineSplit[i].startsWith("\r")) {
+                            let coordinates = lineSplit[i];
                             let coord = coordinates.split(',');
                             coord[0] = coord[0].replace("(","").replace("\r","");
                             coord[1] = coord[1].replace(")","").replace("\r","");;
                             let x = parseInt(coord[0]);
                             let y = parseInt(coord[1]);
                             sequence.addCornerXY(x,y);
-                          } 
+                            i++;
+                        } 
                           return sequence;
                         }
                     }
