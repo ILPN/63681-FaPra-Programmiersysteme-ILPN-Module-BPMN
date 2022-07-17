@@ -212,6 +212,9 @@ export class Svg {
     }
 
     static getText(text: string, x: number = 0, y: number = 0, fontSize: number = 12, maxZeilen: number = 4): SVGElement {
+        if(text == undefined) text = ""
+        text = text.trim()
+        
         let txt = this.createSvgElement('text');
         txt.setAttribute('x', `${x}`);
         txt.setAttribute('y', `${y}`);
