@@ -371,6 +371,39 @@ export class BpmnGraph
         return g
     }
 
+    static miniGraph(): BpmnGraph {
+        const g = new BpmnGraph()
+
+        const start = new BpmnEventStart("start")
+        start.label = "start"
+        g.addNode(start)
+
+        const start2 = new BpmnEventStart("start2")
+        start2.label = "start2"
+        g.addNode(start2)
+
+        const middle = new BpmnEventIntermediate("middle")
+        start.label = "middle"
+        g.addNode(middle)
+
+        const end = new BpmnEventEnd("end")
+        start.label = "end"
+        g.addNode(end)
+
+
+        const e1 = new BpmnEdge("startToMiddle",start,middle)
+        g.addEdge(e1)
+        const e2 = new BpmnEdge("middleToEnd",middle,end)
+        g.addEdge(e2)
+        const e3 = new BpmnEdge("EndToStart",end,start)
+        g.addEdge(e3)
+
+        const e4 = new BpmnEdge("Start2ToEnd",start2,end)
+        g.addEdge(e4)
+
+        return g
+    }
+
 
 
 

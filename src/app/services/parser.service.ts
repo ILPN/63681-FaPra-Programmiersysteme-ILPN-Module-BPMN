@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
+import { BpmnDummyEdgeCorner } from '../classes/Basic/Bpmn/BpmnEdge/BpmnDummyEdgeCorner';
 import { BpmnEdge } from '../classes/Basic/Bpmn/BpmnEdge/BpmnEdge';
+import { BpmnEdgeCorner } from '../classes/Basic/Bpmn/BpmnEdge/BpmnEdgeCorner';
 import { BpmnGraph } from '../classes/Basic/Bpmn/BpmnGraph';
 import { BpmnNode } from '../classes/Basic/Bpmn/BpmnNode';
 import { BpmnEvent } from '../classes/Basic/Bpmn/events/BpmnEvent';
@@ -25,12 +27,39 @@ import { BpmnTaskUserTask } from '../classes/Basic/Bpmn/tasks/BpmnTaskUserTask';
     providedIn: 'root'
 })
 export class ParserService {
-
+    
     constructor() {
        
     }
-    positionOfNodesChanged(nodes:BpmnNode[]){
+    /**
+     * is called after draging or reordering if positions have been changed
+     * @param nodes that have changed positions
+     * @param dummyNodes that have changed positions
+     * @param edgeStarts that have changed positions
+     * @param edgeEnds that have changed positions
+     */
+    positionOfNodesAndEdgesChanged(nodes:BpmnNode[], dummyNodes: BpmnDummyEdgeCorner[], edgeStarts:BpmnEdgeCorner[],  edgeEnds:BpmnEdgeCorner[]){
+        //@Vanessa
+        /*
         console.log(nodes)
+        console.log(dummyNodes)
+        console.log(edgeStarts)
+        console.log(edgeEnds)
+        */
+    }
+    /**
+     * this functions is called after the layout by the sugiyama algorithm has been done 
+     * and allows to override the positions set by the alogrithm
+     */
+    setHardcodedPositions(bpmnGraph:BpmnGraph) {
+        //@Vanessa
+        for (const node of bpmnGraph.nodes) {
+            const id = node.id 
+            //if (pos is defined in text)  => node.setPosXY(...,...)           
+        }
+        for (const edge of bpmnGraph.edges) {
+        }
+        //console.log("read existing positions from text and set them to the nodes and edges")
     }
 
     parse(text: string): BpmnGraph | undefined {

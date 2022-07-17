@@ -1,12 +1,13 @@
 import { Vector } from "../../../Utils/Vector";
 import { Position } from "../../Interfaces/Position";
+import { BpmnEdge } from "./BpmnEdge";
 
 export class BpmnEdgeCorner implements Position{
-    public _deletable: boolean;
-    constructor(x:number = 0, y:number = 0){
+    public edge: BpmnEdge
+    constructor(x:number = 0, y:number = 0, edge:BpmnEdge){
         this._x = x
         this._y = y
-        this._deletable = true
+        this.edge = edge
     }
     getPos(): Vector {
         return new Vector(this.x, this.y);
