@@ -8,10 +8,11 @@ ee3 end "ende gelaende" (1600,190)
 t1 service "BpmnTaskService" (442,60)
 t2 manual "BpmnTaskManual" (442,320)
 t3 usertask "BpmnTaskUser" (1225,190)
+tb2 businessrule "BpmnTaskBusinessRule"
 
 .gateways 
-g1 or_split (210,190)
-g2 or_join (675,190)
+g1 or_split "BpmnGateway" (210,190)
+g2 or_join "BpmnGateway" (675,190)
 
 .sequences
 coupou sequenceflow "1vvv" ee3 e3
@@ -24,5 +25,6 @@ connector5 sequenceflow "a6" g2 e2
 connector6 sequenceflow "a7" e2 t3
 connector7 sequenceflow "a8" t3 e3
 
+ 
 
 
