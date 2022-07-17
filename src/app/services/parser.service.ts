@@ -29,14 +29,15 @@ export class ParserService {
     constructor() {
        
     }
+    positionOfNodesChanged(nodes:BpmnNode[]){
+        console.log(nodes)
+    }
 
     parse(text: string): BpmnGraph | undefined {
-        let result = new BpmnGraph();
-        let elements = new Array<BpmnNode>();
+        const result = new BpmnGraph();
+        const nodes = new Array<BpmnNode>();
 
         console.log("parsing");
-
-        let def = BpmnGraph.sampleGraph();
 
         const lines = text.split('\n');
 
@@ -46,7 +47,7 @@ export class ParserService {
             pos = lines.indexOf(act) + 1;
             while (pos < lines.length && lines[pos].match(/^\w/) !== null) {
                 let el: BpmnNode = this.parseActivities(lines[pos]);
-                elements.push(el);
+                nodes.push(el);
                 result.addNode(el);
                 pos++;
             }
@@ -57,7 +58,7 @@ export class ParserService {
             pos = lines.indexOf(evt) + 1;
             while (pos < lines.length && lines[pos].match(/^\w/) !== null) {
                 let el: BpmnNode = this.parseEvents(lines[pos]);
-                elements.push(el);
+                nodes.push(el);
                 result.addNode(el);
                 pos++;
             }
@@ -68,7 +69,7 @@ export class ParserService {
             pos = lines.indexOf(gateway) + 1;
             while (pos < lines.length && lines[pos].match(/^\w/) !== null) {
                 let el: BpmnNode = this.parseGateways(lines[pos]);
-                elements.push(el);
+                nodes.push(el);
                 result.addNode(el);
                 pos++;
             }
@@ -78,7 +79,7 @@ export class ParserService {
         if (seq) {
             pos = lines.indexOf(seq) + 1;
             while (pos < lines.length && lines[pos].match(/^\w/) !== null) {
-                let el = this.parseSequences(lines[pos],elements);
+                let el = this.parseSequences(lines[pos],nodes);
                 if (typeof el === 'object') {
                     result.addEdge(el);
                 } else {
