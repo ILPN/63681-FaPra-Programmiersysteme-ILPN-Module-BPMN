@@ -1,21 +1,27 @@
-import { SwitchState } from "./switchstatetype";
-import { SwitchableNode } from "./SwitchableNode";
-import { SwitchableGraph } from "./SwitchableGraph";
-import { SwitchableGateway } from "./SwitchableGateway";
-import { SwitchUtils } from "./SwitchUtils";
+import {SwitchState} from "./switchstatetype";
+import {SwitchableNode} from "./SwitchableNode";
+import {SwitchableGraph} from "./SwitchableGraph";
+import {SwitchableGateway} from "./SwitchableGateway";
+import {SwitchUtils} from "./SwitchUtils";
+import {GraphValidationService} from "../../../services/graph-validation.service";
 
 export class SwitchController {
     private _startEvents: SwitchableNode[];
     private nodes: SwitchableNode[];
 
-    constructor(graph: SwitchableGraph) {
+    constructor(graph: SwitchableGraph, private graphValidationService: GraphValidationService) {
         this._startEvents = [];
         this.nodes = graph.switchNodes
+        this.validateGraph(graph);
+    }
+
+    private validateGraph(graph: SwitchableGraph) {
+        this.graphValidationService.validateGraph(graph);
     }
 
     /**
-     * adds StartEvent node to collection of startEvents 
-     * @param node 
+     * adds StartEvent node to collection of startEvents
+     * @param node
      */
     addToStartEvents(node: SwitchableNode): void {
         node.switchTo(SwitchState.enableable)
@@ -23,8 +29,8 @@ export class SwitchController {
     }
 
     /** when one of the StartEvents is enabled - this method disables all other StartEvents
-    * @param theOneAndOnlyStartEvent the enabled StartEvent node
-    */
+     * @param theOneAndOnlyStartEvent the enabled StartEvent node
+     */
     private disableAllOtherStartEvents(theOneAndOnlyStartEvent: SwitchableNode) {
         this._startEvents.forEach(startEvent => {
             if (!(theOneAndOnlyStartEvent === startEvent)) startEvent.disable();
@@ -32,7 +38,7 @@ export class SwitchController {
     }
 
     /** changes state of the clicked node and connected nodes
-     * @param clickedNode the clicked node 
+     * @param clickedNode the clicked node
      */
     public press(clickedNode: SwitchableNode) {
         if (clickedNode.switchState === SwitchState.enableable || clickedNode.switchState === SwitchState.switchedButEnableForLoopRun) {
@@ -41,10 +47,11 @@ export class SwitchController {
 
 
             let nodesToSwitch: SwitchableNode[] = this.getNodesToSwitch(clickedNode)
-            nodesToSwitch.forEach(node => { if (this.possibleToSwitchNode(node)) node.switch() });
-            if(clickedNode.isGateway() && (clickedNode as SwitchableGateway).OR_JOIN()) (clickedNode as SwitchableGateway).disablePathsNotTakenAfterOrJoin();
+            nodesToSwitch.forEach(node => {
+                if (this.possibleToSwitchNode(node)) node.switch()
+            });
+            if (clickedNode.isGateway() && (clickedNode as SwitchableGateway).OR_JOIN()) (clickedNode as SwitchableGateway).disablePathsNotTakenAfterOrJoin();
             this.checkAllEnableableNodesStillEnableable();
-
 
 
         } else {
@@ -57,7 +64,7 @@ export class SwitchController {
 
     /**
      * collects all the nodes whose state should be switched
-     * @param clickedNode 
+     * @param clickedNode
      * @returns nodes to switch
      */
     private getNodesToSwitch(clickedNode: SwitchableNode): SwitchableNode[] {
@@ -70,7 +77,7 @@ export class SwitchController {
         if (clickedNode.predecessors.length === 0)
             return SwitchUtils.addItems(clickedNode.switchRegular(), nodesToSwitch);
 
-        // if there is enabled gateway before the clicked node 
+        // if there is enabled gateway before the clicked node
         clickedNode.predecessors.forEach(before => {
             if (before.enabled() && before.isGateway()) { // before.enabled() &&  for loop
                 let gatewayConnections = (before as SwitchableGateway).switchSplit(clickedNode);
@@ -85,24 +92,23 @@ export class SwitchController {
 
     /**
      * checks if it is possible to switch the node state
-     * @param node node to switch 
+     * @param node node to switch
      * @returns true if the node state can be switched
      */
     private possibleToSwitchNode(node: SwitchableNode): boolean {
-         if (node.isGateway() && (node.disabled() || node.enableable() || node.switchedButEnableForLoopRun())) { 
+        if (node.isGateway() && (node.disabled() || node.enableable() || node.switchedButEnableForLoopRun())) {
 
-             let gateway: SwitchableGateway = node as SwitchableGateway;
-             return gateway.canBeSwitched()
+            let gateway: SwitchableGateway = node as SwitchableGateway;
+            return gateway.canBeSwitched()
 
-         }
+        }
         return true;
     }
 
 
-
-    /** collects alle nodes in state enableable 
+    /** collects alle nodes in state enableable
      * @return enableable nodes
-    */
+     */
     private getAllEnableableNodes(): SwitchableNode[] {
         let nodes: SwitchableNode[] = [];
 
@@ -116,7 +122,7 @@ export class SwitchController {
     /**
      * checks every enableable node and disables it if:
      * 1. its state cannot be switched
-     * 2. it goes after OR_SPLIT and the corresponding JOIN is switched 
+     * 2. it goes after OR_SPLIT and the corresponding JOIN is switched
      */
     private checkAllEnableableNodesStillEnableable() {
         this.getAllEnableableNodes().forEach(node => {

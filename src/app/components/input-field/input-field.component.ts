@@ -14,11 +14,15 @@ export class InputFieldComponent {
 
     @Output() newInputEvent = new EventEmitter<string>();
 
-    constructor(private displayErrorService: DisplayErrorService, 
+    constructor(private displayErrorService: DisplayErrorService,
         private formValidationService:FormValidationService) {
     }
 
     onFileDragged(e: DragEvent) {
+        console.log('e');
+        console.log(e);
+        console.log('e.dataTransfer');
+        console.log(e.dataTransfer);
         if (e.dataTransfer) {
             let list: FileList = e.dataTransfer.files;
             let file: File = list[0];
@@ -28,7 +32,7 @@ export class InputFieldComponent {
 
     onFileSelected(e: Event) {
         let list = (e.target as HTMLInputElement).files;
-        console.log('file selected');
+        // console.log('file selected');
 
         if (list) {
             const file: File = list[0];
@@ -37,7 +41,7 @@ export class InputFieldComponent {
     }
 
     fileUpload(file: File) {
-        console.log('uploading file');
+        // console.log('uploading file');
         const reader: FileReader = new FileReader();
         reader.readAsText(file);
         reader.addEventListener('load', () => {
@@ -45,7 +49,7 @@ export class InputFieldComponent {
                 const input = reader.result.toString();
                 const validated = this.formValidationService.validateFormat(input);
                 if (validated) {
-                    console.log("validation successful");
+                    // console.log("validation successful");
                     this.newInputEvent.emit(input);
                 }
 

@@ -3,6 +3,7 @@ import { SwitchableGateway } from "src/app/classes/Basic/Switch/SwitchableGatewa
 import { SwitchableGraph } from "src/app/classes/Basic/Switch/SwitchableGraph";
 import { SwitchableNode } from "src/app/classes/Basic/Switch/SwitchableNode";
 import { OrGraphWithNestedOr } from "../sample_graphs/or-graph-with-nested-or";
+import {GraphValidationService} from "../../../app/services/graph-validation.service";
 
 
 describe('OR graph with nested OR gateway', () => {
@@ -24,11 +25,12 @@ describe('OR graph with nested OR gateway', () => {
     let gatewayJoinOrParent: SwitchableGateway
     let task5: SwitchableNode
     let endEvent: SwitchableNode
+    let graphValidationService:GraphValidationService;
 
-  
+
 
     beforeEach(() => {
-        diagram = new SwitchableGraph(OrGraphWithNestedOr.create())
+        diagram = new SwitchableGraph(OrGraphWithNestedOr.create(), graphValidationService)
         controller = diagram.controller
 
         startEvent = diagram.getNode("StartEvent1")
@@ -39,13 +41,13 @@ describe('OR graph with nested OR gateway', () => {
         task3 = diagram.getNode("Task3")
         task4 = diagram.getNode("Task4")
         gatewayJoinOrNested = diagram.getNode("GatewayJoinOrNested")
-        
+
         gatewayJoinOrParent = diagram.getNode("GatewayJoinOrParent")
         task5 = diagram.getNode("Task5")
         endEvent = diagram.getNode("EndEvent1")
 
     });
-    
+
 
 
     test('Recursive search for preceding NESTED SPLIT gateway', () => {

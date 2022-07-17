@@ -1,25 +1,25 @@
-import { Injectable } from '@angular/core';
-import { BpmnEdge } from '../classes/Basic/Bpmn/BpmnEdge/BpmnEdge';
-import { BpmnGraph } from '../classes/Basic/Bpmn/BpmnGraph';
-import { BpmnNode } from '../classes/Basic/Bpmn/BpmnNode';
-import { BpmnEvent } from '../classes/Basic/Bpmn/events/BpmnEvent';
-import { BpmnEventEnd } from '../classes/Basic/Bpmn/events/BpmnEventEnd';
-import { BpmnEventIntermediate } from '../classes/Basic/Bpmn/events/BpmnEventIntermediate';
-import { BpmnEventStart } from '../classes/Basic/Bpmn/events/BpmnEventStart';
-import { BpmnGateway } from '../classes/Basic/Bpmn/gateways/BpmnGateway';
-import { BpmnGatewayJoinAnd } from '../classes/Basic/Bpmn/gateways/BpmnGatewayJoinAnd';
-import { BpmnGatewayJoinOr } from '../classes/Basic/Bpmn/gateways/BpmnGatewayJoinOr';
-import { BpmnGatewayJoinXor } from '../classes/Basic/Bpmn/gateways/BpmnGatewayJoinXor';
-import { BpmnGatewaySplitAnd } from '../classes/Basic/Bpmn/gateways/BpmnGatewaySplitAnd';
-import { BpmnGatewaySplitOr } from '../classes/Basic/Bpmn/gateways/BpmnGatewaySplitOr';
-import { BpmnGatewaySplitXor } from '../classes/Basic/Bpmn/gateways/BpmnGatewaySplitXor';
-import { BpmnTask } from '../classes/Basic/Bpmn/tasks/BpmnTask';
-import { BpmnTaskBusinessRule } from '../classes/Basic/Bpmn/tasks/BpmnTaskBusinessRule';
-import { BpmnTaskManual } from '../classes/Basic/Bpmn/tasks/BpmnTaskManual';
-import { BpmnTaskReceiving } from '../classes/Basic/Bpmn/tasks/BpmnTaskReceiving';
-import { BpmnTaskSending } from '../classes/Basic/Bpmn/tasks/BpmnTaskSending';
-import { BpmnTaskService } from '../classes/Basic/Bpmn/tasks/BpmnTaskService';
-import { BpmnTaskUserTask } from '../classes/Basic/Bpmn/tasks/BpmnTaskUserTask';
+import {Injectable} from '@angular/core';
+import {BpmnEdge} from '../classes/Basic/Bpmn/BpmnEdge/BpmnEdge';
+import {BpmnGraph} from '../classes/Basic/Bpmn/BpmnGraph';
+import {BpmnNode} from '../classes/Basic/Bpmn/BpmnNode';
+import {BpmnEvent} from '../classes/Basic/Bpmn/events/BpmnEvent';
+import {BpmnEventEnd} from '../classes/Basic/Bpmn/events/BpmnEventEnd';
+import {BpmnEventIntermediate} from '../classes/Basic/Bpmn/events/BpmnEventIntermediate';
+import {BpmnEventStart} from '../classes/Basic/Bpmn/events/BpmnEventStart';
+import {BpmnGateway} from '../classes/Basic/Bpmn/gateways/BpmnGateway';
+import {BpmnGatewayJoinAnd} from '../classes/Basic/Bpmn/gateways/BpmnGatewayJoinAnd';
+import {BpmnGatewayJoinOr} from '../classes/Basic/Bpmn/gateways/BpmnGatewayJoinOr';
+import {BpmnGatewayJoinXor} from '../classes/Basic/Bpmn/gateways/BpmnGatewayJoinXor';
+import {BpmnGatewaySplitAnd} from '../classes/Basic/Bpmn/gateways/BpmnGatewaySplitAnd';
+import {BpmnGatewaySplitOr} from '../classes/Basic/Bpmn/gateways/BpmnGatewaySplitOr';
+import {BpmnGatewaySplitXor} from '../classes/Basic/Bpmn/gateways/BpmnGatewaySplitXor';
+import {BpmnTask} from '../classes/Basic/Bpmn/tasks/BpmnTask';
+import {BpmnTaskBusinessRule} from '../classes/Basic/Bpmn/tasks/BpmnTaskBusinessRule';
+import {BpmnTaskManual} from '../classes/Basic/Bpmn/tasks/BpmnTaskManual';
+import {BpmnTaskReceiving} from '../classes/Basic/Bpmn/tasks/BpmnTaskReceiving';
+import {BpmnTaskSending} from '../classes/Basic/Bpmn/tasks/BpmnTaskSending';
+import {BpmnTaskService} from '../classes/Basic/Bpmn/tasks/BpmnTaskService';
+import {BpmnTaskUserTask} from '../classes/Basic/Bpmn/tasks/BpmnTaskUserTask';
 
 @Injectable({
     providedIn: 'root'
@@ -35,7 +35,7 @@ export class ParserService {
     }
 
     parse(text: string): BpmnGraph | undefined {
-        console.log("parsing");
+        // console.log("parsing");
 
         let def = BpmnGraph.sampleGraph();
 
@@ -83,8 +83,8 @@ export class ParserService {
                 if (typeof el === 'object') {
                     this.result.addEdge(el);
                 } else {
-                    console.log("nicht vorhandene Verbindungselemente bei" + el);
-                };
+                    // console.log("nicht vorhandene Verbindungselemente bei" + el);
+                }
                 pos++;
             }
         }
@@ -104,7 +104,7 @@ export class ParserService {
                 return BpmnGraph.loopingLouieGraph();
             default:
                 return this.result;
-                
+
         }
     }
 
@@ -119,17 +119,29 @@ export class ParserService {
         let activity = new BpmnTask(name);
 
         switch (lineSplit[1].toLowerCase()) {
-            case ("sending"): activity = new BpmnTaskSending(name); break;
-            case ("manual"): activity = new BpmnTaskManual(name); break;
-            case ("service"): activity = new BpmnTaskService(name); break;
-            case ("businessrule"): activity = new BpmnTaskBusinessRule(name); break;
-            case ("receiving"): activity = new BpmnTaskReceiving(name); break;
-            case ("usertask"): activity = new BpmnTaskUserTask(name); break;
+            case ("sending"):
+                activity = new BpmnTaskSending(name);
+                break;
+            case ("manual"):
+                activity = new BpmnTaskManual(name);
+                break;
+            case ("service"):
+                activity = new BpmnTaskService(name);
+                break;
+            case ("businessrule"):
+                activity = new BpmnTaskBusinessRule(name);
+                break;
+            case ("receiving"):
+                activity = new BpmnTaskReceiving(name);
+                break;
+            case ("usertask"):
+                activity = new BpmnTaskUserTask(name);
+                break;
         }
 
         activity.label = description;
 
-        console.log("name:" + name + "description:" + description);
+        // console.log("name:" + name + "description:" + description);
 
         if (lineSplit[3]) {
             let coordinates = lineSplit[3];
@@ -139,7 +151,7 @@ export class ParserService {
             let x = parseInt(coord[0]);
             let y = parseInt(coord[1]);
             activity.setPosXY(x, y);
-            console.log("x: " + x + "y: " + y);
+            // console.log("x: " + x + "y: " + y);
         }
         return activity;
     }
@@ -155,13 +167,19 @@ export class ParserService {
         let event = new BpmnEvent(name);
 
         switch (lineSplit[1].toLowerCase()) {
-            case ("start"): event = new BpmnEventStart(name); break;
-            case ("intermediate"): event = new BpmnEventIntermediate(name); break;
-            case ("end"): event = new BpmnEventEnd(name); break;
+            case ("start"):
+                event = new BpmnEventStart(name);
+                break;
+            case ("intermediate"):
+                event = new BpmnEventIntermediate(name);
+                break;
+            case ("end"):
+                event = new BpmnEventEnd(name);
+                break;
         }
         event.label = description;
 
-        console.log("name:" + name + "description:" + description);
+        // console.log("name:" + name + "description:" + description);
         if (lineSplit[3]) {
             let coordinates = lineSplit[3];
             let coord = coordinates.split(',');
@@ -179,12 +197,24 @@ export class ParserService {
         const name = lineSplit[0];
         let gateway = new BpmnGateway(name);
         switch (lineSplit[1].toLowerCase()) {
-            case ("and_join"): gateway = new BpmnGatewayJoinAnd(name); break;
-            case ("and_split"): gateway = new BpmnGatewaySplitAnd(name); break;
-            case ("or_join"): gateway = new BpmnGatewayJoinOr(name); break;
-            case ("or_split"): gateway = new BpmnGatewaySplitOr(name); break;
-            case ("xor_join"): gateway = new BpmnGatewayJoinXor(name); break;
-            case ("xor_split"): gateway = new BpmnGatewaySplitXor(name); break;
+            case ("and_join"):
+                gateway = new BpmnGatewayJoinAnd(name);
+                break;
+            case ("and_split"):
+                gateway = new BpmnGatewaySplitAnd(name);
+                break;
+            case ("or_join"):
+                gateway = new BpmnGatewayJoinOr(name);
+                break;
+            case ("or_split"):
+                gateway = new BpmnGatewaySplitOr(name);
+                break;
+            case ("xor_join"):
+                gateway = new BpmnGatewayJoinXor(name);
+                break;
+            case ("xor_split"):
+                gateway = new BpmnGatewaySplitXor(name);
+                break;
         }
         if (lineSplit[2]) {
             let coordinates = lineSplit[2];
@@ -208,7 +238,7 @@ export class ParserService {
 
         const name = lineSplit[0];
 
-        /* 
+        /*
         switch(lineSplit[1].toLowerCase()){
             case("sequenceflow"): type = Connectortype.SequenceFlow; break;
             case("association"): type = Connectortype.Association; break;
@@ -223,21 +253,22 @@ export class ParserService {
                 for (let j = 0; j < this.elements.length; j++) {
                     if (this.elements[j].id === lineSplit[4].trim()) {
                         var2 = this.elements[j];
-                        console.log("sequence:" + var1.id + var2.id);
+                        // console.log("sequence:" + var1.id + var2.id);
                         let sequence = new BpmnEdge(name, var1, var2);
 
-                        let i = 5; 
+                        let i = 5;
                         while (lineSplit[i] != undefined && !lineSplit[i].startsWith("\r")) {
                             let coordinates = lineSplit[i];
                             let coord = coordinates.split(',');
                             coord[0] = coord[0].replace("(", "").replace("\r", "");
-                            coord[1] = coord[1].replace(")", "").replace("\r", "");;
+                            coord[1] = coord[1].replace(")", "").replace("\r", "");
+                            ;
                             let x = parseInt(coord[0]);
                             let y = parseInt(coord[1]);
-                            sequence.addCornerXY(x,y);
+                            sequence.addCornerXY(x, y);
                             i++;
-                        } 
-                          return sequence;
+                        }
+                        return sequence;
                     }
                 }
             }

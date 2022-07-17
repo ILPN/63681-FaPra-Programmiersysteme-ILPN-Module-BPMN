@@ -11,6 +11,7 @@ import { SwitchableGateway } from './SwitchableGateway';
 import { SwitchableNode } from './SwitchableNode';
 import { SwitchState } from './switchstatetype';
 import { SwitchUtils } from './SwitchUtils';
+import {GraphValidationService} from "../../../services/graph-validation.service";
 
 
 export class SwitchableGraph implements GetSvgManager {
@@ -19,10 +20,10 @@ export class SwitchableGraph implements GetSvgManager {
     private _switchNodes: SwitchableNode[] = []
     private _controller: SwitchController;
 
-    constructor(bpmnGraph: BpmnGraph) {
+    constructor(bpmnGraph: BpmnGraph,private  graphValidationService:GraphValidationService) {
 
         //controls how nodes are switched
-        this._controller = new SwitchController(this);
+        this._controller = new SwitchController(this, graphValidationService);
 
         bpmnGraph.edges.forEach((bpmnEdge: BpmnEdge) => {
             let switchEdge: SwitchableEdge = new SwitchableEdge(bpmnEdge);
@@ -84,7 +85,7 @@ export class SwitchableGraph implements GetSvgManager {
         if (switchNodeTo == null)
             switchNodeTo = this.addNewSwitchNode(edge.to, controller);
 
-        //register predecessor and successor nodes   
+        //register predecessor and successor nodes
         switchNodeTo.addPredecessor(switchNodeFrom);
         switchNodeFrom.addSuccessor(switchNodeTo);
     }
