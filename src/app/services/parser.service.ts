@@ -174,6 +174,10 @@ export class ParserService {
     }
 
     private parseGateways(line: string): BpmnNode {
+        let description = line.split('"')[1];
+        let re = /"[\w ]*"/;
+        line = line.replace(re, "");
+
         const lineSplit = line.split(" ");
         const name = lineSplit[0];
         let gateway = new BpmnGateway(name);
@@ -185,8 +189,10 @@ export class ParserService {
             case ("xor_join"): gateway = new BpmnGatewayJoinXor(name); break;
             case ("xor_split"): gateway = new BpmnGatewaySplitXor(name); break;
         }
-        if (lineSplit[2]) {
-            let coordinates = lineSplit[2];
+        gateway.label = description; 
+
+        if (lineSplit[3]) {
+            let coordinates = lineSplit[3];
             let coord = coordinates.split(',');
             coord[0] = coord[0].replace("(", "");
             coord[1] = coord[1].replace(")", "");

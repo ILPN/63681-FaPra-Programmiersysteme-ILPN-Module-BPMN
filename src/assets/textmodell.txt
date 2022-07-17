@@ -1,0 +1,29 @@
+bpmn-Format
+
+.activities
+name type „label“ (coordinate1,coordinate2)
+
+.events
+name type „label“ (coordinate1,coordinate2)
+	
+.gateways
+name type "label" (coordinate1,coordinate2)
+
+.sequences
+name type "label" node1 node2 (coordinate1,coordinate2)
+	
+
+----------------
+Koordinaten sind optional 
+node1, node2 bei sequences sind immer names der Elemente die verbunden werden sollen
+bei sequences mehrere Koordinaten möglich 
+types: 
+    activities: service, manual, usertask, ...
+    events: start, intermediate, end
+    gateways: and-split, and-join, or-split, or-join, xor-split, xor-join
+    sequences: sequenceflow, informationflow, 
+    
+
+
+
+
