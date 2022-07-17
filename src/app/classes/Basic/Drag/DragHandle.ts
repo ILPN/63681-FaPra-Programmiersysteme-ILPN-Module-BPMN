@@ -88,16 +88,22 @@ export class DragHandle{
     this.afterDragTo()
    }
 
-    private dragedAlong:DragHandle[] =[]
+    private _dragedAlong: DragHandle[] = [];
+    public get dragedAlong(): DragHandle[] {
+        return this._dragedAlong;
+    }
 
-    protected startPos: Vector = new Vector();
+    private _startPos: Vector = new Vector();
+    public get startPos(): Vector {
+        return this._startPos;
+    }
 
     private mouseStartPos:Vector = new Vector()
 
     startDrag(event:MouseEvent){
         if(this.beforeStartDrag != undefined)
             this.beforeStartDrag(this.dragedElement,this)
-        this.startPos = this.dragedElement.getPos()
+        this._startPos = this.dragedElement.getPos()
         this.mouseStartPos.x = event.clientX
         this.mouseStartPos.y = event.clientY
         for (const dragHandle of this.dragedAlong) {

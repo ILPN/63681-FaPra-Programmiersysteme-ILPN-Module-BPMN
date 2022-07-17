@@ -8,11 +8,16 @@ import { LeveledGraph, LNode } from '../classes/Sugiyama/LeveledGraph';
 import { SimpleGraph } from '../classes/Sugiyama/SimpleGraph';
 import { Sugiyama } from '../classes/Sugiyama/Sugiyama';
 import { Vector } from '../classes/Utils/Vector';
+import { ParserService } from './parser.service';
 
 @Injectable({
     providedIn: 'root',
 })
 export class LayoutService {
+
+    constructor(
+        private _parserService: ParserService,
+    ){}
     layoutIfNeeded(bpmnGraph: BpmnGraph, w: number, h: number) {
         if (!this.initalLayoutHasBeenDone) {
             this.layout(bpmnGraph, w, h);
@@ -79,6 +84,8 @@ export class LayoutService {
 
         this.setCoordinates(bpmnGraph);
 
+        
+        this._parserService.setHardcodedPositions(bpmnGraph)
         this.initalLayoutHasBeenDone = true;
     }
     scaleWidthAndHeightIfGraphToBig() {

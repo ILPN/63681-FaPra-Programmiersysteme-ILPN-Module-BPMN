@@ -22,7 +22,7 @@ export class Sugiyama {
         this.leveling();
         this.addDummies();
         this.minimizeCrossings();
-        this.alignNodesAndDummyNodes()
+        //this.straightening()
         this.reverseReversedArcs();
 
         this.assignLevelAndOrderToUnleveledNodes()
@@ -36,15 +36,24 @@ export class Sugiyama {
             this.leveled.setLevelOfNode(node,0)
         }
     }
-    alignNodesAndDummyNodes() {
-        //@Marcel: here all arcs still point in one direction, the graph is still acyclical, every arc spans only over one level
-        // placeisFree(level,order) might be usefull
-        const leveledGraph = this.leveled
-
-        for (const dn of this.leveled.getAllDummyNodes()) {
-           // dn.order = dn.order+1 // @Marcel: just so you see what happens when you do that
+    straightening() {
+ 
+        const maxOrder = () =>{
+         let maxO = 0
+         for (const n of this.leveled.getAllNodes()) {
+             if(n.order> maxO)maxO = n.order
+         }
+         return maxO
         }
-    }
+ 
+        const ordersSpots = maxOrder() * 2
+         for (let i = 0; i < this.leveled.levels.length - 1; i++) {
+             this.medianHeuristic(
+                 this.leveled.levels[i],
+                 this.leveled.levels[i + 1]
+             );
+         }
+     }
     placeIsFree(level:number, order:number){
         for (const n of this.leveled.getAllNodes()) {
             if(n.level == level && n.order == order) return false

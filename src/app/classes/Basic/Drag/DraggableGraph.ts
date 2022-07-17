@@ -1,6 +1,10 @@
 import { LayoutService } from 'src/app/services/layout.service';
+import { ParserService } from 'src/app/services/parser.service';
+import { Utility } from '../../Utils/Utility';
 import { BpmnDummyEdgeCorner } from '../Bpmn/BpmnEdge/BpmnDummyEdgeCorner';
+import { BpmnEdgeCorner } from '../Bpmn/BpmnEdge/BpmnEdgeCorner';
 import { BpmnGraph } from '../Bpmn/BpmnGraph';
+import { BpmnNode } from '../Bpmn/BpmnNode';
 import { GetSvgManager } from '../Interfaces/GetSvgManager';
 import { Position } from '../Interfaces/Position';
 import { Svg } from '../Svg/Svg';
@@ -21,9 +25,42 @@ export class DraggableGraph implements GetSvgManager {
     }
     private bpmnGraph: BpmnGraph;
     private dragManager: DragManager
-    constructor(bpmnGraph: BpmnGraph, layoutService:LayoutService, rootSvg:SVGElement,drawingArea:SVGElement) {
+    constructor(bpmnGraph: BpmnGraph, layoutService:LayoutService, rootSvg:SVGElement,drawingArea:SVGElement, private _parserService:ParserService) {
         this.bpmnGraph = bpmnGraph;
         this.dragManager = new DragManager(rootSvg,drawingArea)
+        this.dragManager.onStopDrag = (dh)=>{
+            if(!Utility.positionsAreEqual(dh.dragedElement.getPos(),dh.startPos)){
+    
+                const nodes: BpmnNode[] = []
+            let dummyNodes: BpmnDummyEdgeCorner[] =[]
+            let edgeEnds: BpmnEdgeCorner[]=[]
+            let edgeStarts: BpmnEdgeCorner[]=[]
+
+            let dragedDhs = []
+            dragedDhs.push(dh)
+            dragedDhs = dragedDhs.concat(dh.dragedAlong)
+            for (const dh of dragedDhs) {
+                if(dh.dragedElement instanceof BpmnNode){
+                    const node = dh.dragedElement
+                    nodes.push(node)
+                }
+                else if(dh.dragedElement instanceof BpmnDummyEdgeCorner){
+                    dummyNodes.push(dh.dragedElement)
+                }else if(dh.dragedElement instanceof BpmnEdgeCorner){
+                    const corner = dh.dragedElement
+                    if(corner === corner.edge.corners[0]){
+                        edgeStarts.push(corner)
+                    }else if(corner === Utility.lastElement(corner.edge.corners)){
+                        edgeEnds.push(corner)
+                    }
+                }
+            }
+            if(!(nodes.length == 0 && dummyNodes.length ==0 && edgeStarts.length ==0 && edgeEnds.length ==0)){
+                this._parserService.positionOfNodesAndEdgesChanged(nodes,dummyNodes,edgeStarts,edgeEnds)
+            }
+            }
+            
+        }
         this.convertToDraggableNodesAndEdges()
         this.attachSnapings(layoutService)
 
