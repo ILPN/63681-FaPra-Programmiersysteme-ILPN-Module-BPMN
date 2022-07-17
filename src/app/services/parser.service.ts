@@ -159,6 +159,7 @@ export class ParserService {
             case ("intermediate"): event = new BpmnEventIntermediate(name); break;
             case ("end"): event = new BpmnEventEnd(name); break;
         }
+        
         event.label = description;
 
         console.log("name:" + name + "description:" + description);
