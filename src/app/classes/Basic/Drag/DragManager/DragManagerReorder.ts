@@ -60,7 +60,7 @@ export class DragManagerReorder extends DragManager{
     }
 
     private _onStopReorderDragHandles: (dragHandlesThatChanged: DragHandle[]) => void = () => { };
-    public set onStopDragCallback(value: (dragHandlesThatChanged: DragHandle[]) => void) {
+    public set onStopReorderDrag(value: (dragHandlesThatChanged: DragHandle[]) => void) {
         this._onStopReorderDragHandles = value;
     }
     override stopDrag(event: MouseEvent): void {

@@ -40,12 +40,12 @@ export class ParserService {
      */
     positionOfNodesAndEdgesChanged(nodes:BpmnNode[], dummyNodes: BpmnDummyEdgeCorner[], edgeStarts:BpmnEdgeCorner[],  edgeEnds:BpmnEdgeCorner[]){
         //@Vanessa
-        /*
+        
         console.log(nodes)
         console.log(dummyNodes)
         console.log(edgeStarts)
         console.log(edgeEnds)
-        */
+        
     }
     /**
      * this functions is called after the layout by the sugiyama algorithm has been done 

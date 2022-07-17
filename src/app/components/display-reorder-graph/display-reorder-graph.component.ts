@@ -49,7 +49,7 @@ export class DisplayReorderGraphComponent implements OnDestroy, AfterViewInit {
         this._layoutService.setViewBox(this.drawingArea.nativeElement)
 
           const dragManager = new DragManagerReorder(this.rootSvg.nativeElement,this.drawingArea.nativeElement,this._layoutService.sugiResult!)
-          dragManager.onStopDragCallback = (reorderdDragHandles) =>{
+          dragManager.onStopReorderDrag = (reorderdDragHandles) =>{
             const nodes: BpmnNode[] = []
             let dummyNodes: BpmnDummyEdgeCorner[] =[]
             let edgeEnds: BpmnEdgeCorner[]=[]
@@ -108,36 +108,14 @@ export class DisplayReorderGraphComponent implements OnDestroy, AfterViewInit {
         }
 
 
-        
-        this.draw([bpmnGraphSvg, dragHandleSvgs]);
+        Utility.removeAllChildren(this.drawingArea.nativeElement)
+        this.drawingArea.nativeElement.appendChild(bpmnGraphSvg);
+        this.drawingArea.nativeElement.appendChild(dragHandleSvgs);
       });
   }
 
   ngOnDestroy(): void {
       this._sub?.unsubscribe();
-  }
-
-  private draw(svgs: SVGElement[]) {
-      if (this.drawingArea === undefined) {
-          console.debug('drawing area not ready yet');
-          return;
-      }
-      this.clearDrawingArea();
-      for (const svg of svgs) {
-          this.drawingArea.nativeElement.appendChild(svg);
-      }
-
-  }
-
-  private clearDrawingArea() {
-      const drawingArea = this.drawingArea?.nativeElement;
-      if (drawingArea?.childElementCount === undefined) {
-          return;
-      }
-
-      while (drawingArea.childElementCount > 0) {
-          drawingArea.removeChild(drawingArea.lastChild as ChildNode);
-      }
   }
 }
 

@@ -13,6 +13,7 @@ import { SvgService } from '../../services/svg.service';
 import { BpmnGraph } from 'src/app/classes/Basic/Bpmn/BpmnGraph';
 import { DraggableGraph } from 'src/app/classes/Basic/Drag/DraggableGraph';
 import { Utility } from 'src/app/classes/Utils/Utility';
+import { ParserService } from 'src/app/services/parser.service';
 
 @Component({
   selector: 'app-display-draggable-graph',
@@ -30,7 +31,7 @@ export class DisplayDraggableGraphComponent implements OnDestroy,  AfterViewInit
 
   constructor(
       private _layoutService: LayoutService,
-      private _svgService: SvgService,
+      private _parserService: ParserService,
       private _displayService: DisplayService
   ) {
      
@@ -53,7 +54,7 @@ export class DisplayDraggableGraphComponent implements OnDestroy,  AfterViewInit
                 this._layoutService.layoutIfNeeded(this._bpmnGraph,this.rootSvg!.nativeElement.clientWidth,this.rootSvg!.nativeElement.clientHeight)
                 this._layoutService.setViewBox(this.drawingArea.nativeElement)
                 
-                this._draggableGraph= new DraggableGraph(bpmnGraph, this._layoutService, this.rootSvg!.nativeElement,this.drawingArea.nativeElement);
+                this._draggableGraph= new DraggableGraph(bpmnGraph, this._layoutService, this.rootSvg!.nativeElement,this.drawingArea.nativeElement, this._parserService);
                 Utility.removeAllChildren(this.drawingArea.nativeElement)
                 this.drawingArea.nativeElement.appendChild(this._draggableGraph.svgManager.getSvg());
         });

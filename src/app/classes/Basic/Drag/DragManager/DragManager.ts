@@ -30,8 +30,15 @@ export class DragManager{
     drag(event: MouseEvent) {
         this.dragedDragHandle?.draging(event);
     }
+    private _onStopDrag: (dh: DragHandle) => void = () => { };
+    public set onStopDrag(value: (dh: DragHandle) => void) {
+        this._onStopDrag = value;
+    }
     stopDrag(event: MouseEvent) {
-        this.dragedDragHandle?.stopDrag();
+        if(this.dragedDragHandle != undefined){
+            this.dragedDragHandle.stopDrag();
+            this._onStopDrag(this.dragedDragHandle)
+        }
         this.dragedDragHandle = undefined;
     }
 }
