@@ -36,7 +36,7 @@ export class AppComponent implements OnDestroy {
         if (result !== undefined) {
             
             if(result.nodes.length ==0){
-                this._displayService.display(BpmnGraph.miniGraph());
+                this._displayService.display(BpmnGraph.anotherMonsterGraph());
 
             }else{
                 this._displayService.display(result);
