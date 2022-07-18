@@ -1,3 +1,4 @@
+import { matchesPattern } from '@babel/types';
 import { DummyNode, LeveledGraph, LNode } from './LeveledGraph';
 import { SimpleArc, SimpleGraph } from './SimpleGraph';
 
@@ -37,7 +38,8 @@ export class Sugiyama {
         }
     }
     straightening() {
- 
+        /*
+        ansatz
         const maxOrder = () =>{
          let maxO = 0
          for (const n of this.leveled.getAllNodes()) {
@@ -47,12 +49,18 @@ export class Sugiyama {
         }
  
         const ordersSpots = maxOrder() * 2
-         for (let i = 0; i < this.leveled.levels.length - 1; i++) {
-             this.medianHeuristic(
-                 this.leveled.levels[i],
-                 this.leveled.levels[i + 1]
-             );
+        const distNode = (node:LNode, withOrder:number) =>{
+            let sum = 0
+            for (const adj of node.parents.concat(node.children)) {
+                sum += Math.pow(adj.order- withOrder,2)
+            }
          }
+        let consideredNodesStart = 0
+         for (let i = 0; i < this.leveled.levels.length - 1; i++) {
+             const level = this.leveled.levels[i]
+             
+         }
+         */
      }
     placeIsFree(level:number, order:number){
         for (const n of this.leveled.getAllNodes()) {
