@@ -35,7 +35,7 @@ export class LayoutService {
         for (let level = 0; level < this.sugiResult!.levels.length; level++) {
             snaps.push(new SnapX(this.getPosForLevelAndOrder(level, 0).x));
         }
-        for (let i = 0; i <= biggestOrderIndex; i++) {
+        for (let i = -1; i <= biggestOrderIndex+1; i++) {
             snaps.push(new SnapY(this.getPosForLevelAndOrder(0, i).y));
         }
         return snaps;
@@ -75,20 +75,15 @@ export class LayoutService {
 
     public layout(bpmnGraph: BpmnGraph, w: number, h: number): void {
         this.getSugiyamaResult(bpmnGraph);
-
         this.width = w;
         this.height = h;
-
         this.getGraphDimensions();
         this.scaleWidthAndHeightIfGraphToBig();
-
         this.setCoordinates(bpmnGraph);
-
-        
         this._parserService.setHardcodedPositions(bpmnGraph)
         this.initalLayoutHasBeenDone = true;
     }
-    scaleWidthAndHeightIfGraphToBig() {
+    private scaleWidthAndHeightIfGraphToBig() {
         const xRatio =
             (this._graphDimensions!.x + 2 * this.padding.x) / this.width;
         const yRatio =
@@ -99,7 +94,7 @@ export class LayoutService {
             this.height = this.height * scalingFactor;
         }
     }
-    setCoordinates(bpmnGraph: BpmnGraph) {
+    private setCoordinates(bpmnGraph: BpmnGraph) {
         for (const bpmnNode of bpmnGraph.nodes) {
             const ln = this.sugiResult!.getNode(bpmnNode.id);
             bpmnNode.setPos(this.getPosForLevelAndOrder(ln!.level, ln!.order));
@@ -131,9 +126,7 @@ export class LayoutService {
     }
 
     private _graphDimensions: Vector | undefined;
-    public getGraphDimensions(): Vector {
-        if (this._graphDimensions != undefined) return this._graphDimensions;
-
+    private getGraphDimensions(): Vector {
         let biggestX = 0;
         let biggestY = 0;
         for (const n of this.sugiResult!.getAllNodes()) {
@@ -150,11 +143,14 @@ export class LayoutService {
         return new Vector(x, y);
     }
 
-    sugiResult: LeveledGraph | undefined;
-    getSugiyamaResult(bpmnGraph: BpmnGraph): Sugiyama {
+    private _sugiResult: LeveledGraph | undefined;
+    public get sugiResult(): LeveledGraph | undefined {
+        return this._sugiResult;
+    }
+    private getSugiyamaResult(bpmnGraph: BpmnGraph): Sugiyama {
         const sugi = new Sugiyama(SimpleGraph.convert(bpmnGraph));
         const result: LeveledGraph = sugi.getResult();
-        this.sugiResult = result;
+        this._sugiResult = result;
         return sugi;
     }
 }
