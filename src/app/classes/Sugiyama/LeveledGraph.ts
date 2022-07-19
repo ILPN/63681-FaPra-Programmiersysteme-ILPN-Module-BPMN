@@ -1,6 +1,14 @@
 import { SimpleGraph } from "./SimpleGraph";
 
 export class LeveledGraph {
+  levelSize(level: number) {
+    const l = this.levels[level]
+    if(l == undefined) return 0
+    return l.length
+    }
+  public unleveled: LNode[]=[];
+  public levels: LNode[][] = [[]];
+  public arcs: LArc[] = [];
   getSortedDummysForEdge(from: string, to: string) {
     const dummys = this.getAllDummyNodes().filter(dn => dn.fromId == from && dn.toId == to)
    
@@ -83,9 +91,6 @@ export class LeveledGraph {
     }
     return dummys
   }
-  public unleveled: LNode[]=[];
-  public levels: LNode[][] = [[]];
-  public arcs: LArc[] = [];
 }
 export class LNode{
   private readonly _id: string
