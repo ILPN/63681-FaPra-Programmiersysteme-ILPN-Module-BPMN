@@ -1,3 +1,4 @@
+import { Utility } from "../Utils/Utility";
 import { LeveledGraph, LNode } from "./LeveledGraph";
 
 export class Block {
@@ -7,19 +8,41 @@ export class Block {
     makeAligned(lgraph:LeveledGraph){
         const lg = lgraph
         const nodeCount = lg.getAllNodes().length
-        this.setGravityTo(nodeCount,lg)
+        this.setGravityTo(10,lg)
         this.makeLines(lg)
     }
     makeLines(lg: LeveledGraph) {
-        const uppestNode = this.getNodeWithMinimalOrder(lg.getAllNodes())
+        let lineSet = new LineSet()
+        let shrinkingSet = [...lg.getAllNodes()]
+
+        let counter = 0
+        while(shrinkingSet.length > 0 && counter < 3){
+            counter++
+            console.log("going through ")
+            console.log(lineSet)
+            const uppestNode = this.getNodeWithMinimalOrder(shrinkingSet)
+            const line = new Line()
+            line.order = lineSet.getMaximalOrder() + 1
+            line.addNode(uppestNode)
+    
+            let next = uppestNode
+            while(next != undefined){
+                line.addNode(next)
+                next =Utility.cutSet(next.parents, shrinkingSet).sort((a,b)=> a.order - b.order)[0]
+            }
+    
+            next = Utility.cutSet(uppestNode.children, shrinkingSet).sort((a,b)=> a.order - b.order)[0]
+            while(next != undefined){
+                line.addNode(next)
+                next =Utility.cutSet(next.children, shrinkingSet).sort((a,b)=> a.order - b.order)[0]
+            }
+            line.straighten()
+            lineSet.addLine(line)
+            shrinkingSet = Utility.substractArray(shrinkingSet, line.nodes)
+            
+        }
+
     }
-    /**
-     * 
-     * @param order
-     * @param level 
-     * @param set considered LNodes
-     * @returns node with node.order closest to order. if there are multiple ones, the one with node.level closest to level is picked
-     */
     getNodeWithMinimalOrder(set: LNode[]) {
         const sortedByOrder = [...set].sort((a,b)=> (a.order  -b.order ))
         const minimalOrder = sortedByOrder[0].order
@@ -35,9 +58,27 @@ export class Block {
     }
 }
 class LineSet{
-    lines: Line[] =[]
+    private lines: Line[] =[]
+    addLine(line:Line){
+        this.lines.push(line)
+    }
+    getMaximalOrder(){
+        let max = -1
+        for (const line of this.lines) {
+            if(line.order> max) max = line.order
+        }
+        return max
+    }
 }
 class Line{
+        straighten() {
+            for (const n of this.nodes) {
+                n.order = this.order
+            }
+        }
+        addNode(node: LNode) {
+            this.nodes.push(node)
+        }
         nodes: LNode[] =[]
         order = -1
 
