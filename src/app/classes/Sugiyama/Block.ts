@@ -10,24 +10,29 @@ export class Block {
         const nodeCount = lg.getAllNodes().length
         this.setGravityTo(10,lg)
         const lineset = this.makeLines(lg)
-        this.moveLinesClosest(lineset)
+        this.moveLinesClosestTogether(lineset)
     }
-    moveLinesClosest(lineSet: LineSet) {
+    moveLinesClosestTogether(lineSet: LineSet) {
         const lines = lineSet.lines
         lines.sort((a,b) => a.order - b.order)
         for (let i = 1; i < lines.length; i++) {
             const line = lines[i];
             const allOtherLines = Utility.substractArray(lines, [line])
             const nodesOfOtherLines = LineSet.nodesOfLines(allOtherLines)
-            for (let j = line.order-1; j > 0; j--) {
+
+            for (let j = line.order-1; j >= 0; j--) {
                 let touchingOtherNodes = false
                 for (const n of line.nodes) {
-                    const newOrder = j
+                    const ordersOfLevel = nodesOfOtherLines.filter(nn => nn.level == n.level).map(nn => nn.order)
+                    if(ordersOfLevel.includes(j)) touchingOtherNodes = true
                 }
-                if(!touchingOtherNodes){
-                    //
+                if(touchingOtherNodes){
+                    line.order = j+1
+                    line.straighten()
+                    break
                 }
             }
+            
         }
     }
     private makeLines(lg: LeveledGraph) {
@@ -36,14 +41,10 @@ export class Block {
 
         let counter = 0
         let uppestNode = this.getNodeWithMinimalOrder(shrinkingSet)
-        while(shrinkingSet.length > 0 && counter < 9){
+        while(shrinkingSet.length > 0 && counter < 50){
             counter++
-            console.log("going through ")
-            console.log(lineSet)
             const line = new Line()
             line.order = lineSet.getMaximalOrder() + 1
-            line.addNode(uppestNode)
-    
             let next = uppestNode
             while(next != undefined){
                 line.addNode(next)
@@ -57,7 +58,6 @@ export class Block {
             }
 
             const nodesAbove: LNode[] = this.nodesAboveLine(line,shrinkingSet)
-            console.log(nodesAbove)
             if (nodesAbove.length == 0){
                 line.straighten()
                 lineSet.addLine(line)
