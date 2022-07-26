@@ -19,10 +19,6 @@ export class InputFieldComponent {
     }
 
     onFileDragged(e: DragEvent) {
-        console.log('e');
-        console.log(e);
-        console.log('e.dataTransfer');
-        console.log(e.dataTransfer);
         if (e.dataTransfer) {
             let list: FileList = e.dataTransfer.files;
             let file: File = list[0];

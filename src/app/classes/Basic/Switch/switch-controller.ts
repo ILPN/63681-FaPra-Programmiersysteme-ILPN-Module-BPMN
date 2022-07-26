@@ -3,21 +3,16 @@ import {SwitchableNode} from "./SwitchableNode";
 import {SwitchableGraph} from "./SwitchableGraph";
 import {SwitchableGateway} from "./SwitchableGateway";
 import {SwitchUtils} from "./SwitchUtils";
-import {GraphValidationService} from "../../../services/graph-validation.service";
 
 export class SwitchController {
     private _startEvents: SwitchableNode[];
     private nodes: SwitchableNode[];
 
-    constructor(graph: SwitchableGraph, private graphValidationService: GraphValidationService) {
+    constructor(graph: SwitchableGraph) {
         this._startEvents = [];
         this.nodes = graph.switchNodes
-        this.validateGraph(graph);
     }
 
-    private validateGraph(graph: SwitchableGraph) {
-        this.graphValidationService.validateGraph(graph);
-    }
 
     /**
      * adds StartEvent node to collection of startEvents
@@ -42,7 +37,7 @@ export class SwitchController {
      */
     public press(clickedNode: SwitchableNode) {
         if (clickedNode.switchState === SwitchState.enableable || clickedNode.switchState === SwitchState.switchedButEnableForLoopRun) {
-            console.log("Clicked element " + clickedNode.id);
+            //console.log("Clicked element " + clickedNode.id);
             if (clickedNode.isStartEvent()) this.disableAllOtherStartEvents(clickedNode);
 
 
@@ -55,7 +50,7 @@ export class SwitchController {
 
 
         } else {
-            console.log("The state of this element can not be switched: " + clickedNode.id);
+            //console.log("The state of this element can not be switched: " + clickedNode.id);
             if (clickedNode.enabled() && clickedNode.isEndEvent()) {
                 this.newGame();
             }

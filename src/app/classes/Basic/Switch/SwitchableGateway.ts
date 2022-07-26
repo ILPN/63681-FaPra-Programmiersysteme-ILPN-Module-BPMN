@@ -24,7 +24,7 @@ export class SwitchableGateway extends SwitchableNode {
     }
 
     /**
-     * collects nodes whose state should be switched in the case when 
+     * collects nodes whose state should be switched in the case when
      * the clicked node is preceded by this gateway
      * @param clicked clicked node
      * @returns nodes to switch
@@ -45,14 +45,14 @@ export class SwitchableGateway extends SwitchableNode {
 
 
 
-    /** 
-     * collects nodes whose state should be switched 
+    /**
+     * collects nodes whose state should be switched
      * in the case when the clicked node is preceded by AND_SPLIT gateway these should be:
-     * 1. AND_SPLIT gateway 
+     * 1. AND_SPLIT gateway
      * 2. all the successors of this AND_SPLIT gateway
      * 3. all the successors of the successors of the AND_SPLIT gateway
    * @param before AND_SPLIT gateway that is predecessor of the clicked node
-   * @returns array of nodes whose state should be changed 
+   * @returns array of nodes whose state should be changed
    */
     private switchAndSplit(clicked: SwitchableNode): SwitchableNode[] {
         let nodesToSwitch: SwitchableNode[] = [this];
@@ -67,10 +67,10 @@ export class SwitchableGateway extends SwitchableNode {
 
     /**
      * collects nodes  whose state should be switched:
-     * if the clicked node is after this OR_SPLIT gateway, 
-     * 1. the state of this OR_SPLIT gateway needs to be switched 
+     * if the clicked node is after this OR_SPLIT gateway,
+     * 1. the state of this OR_SPLIT gateway needs to be switched
      * 2. as well as the state of all the successors of the clicked node
-     * @param clicked 
+     * @param clicked
      * @returns nodes to switch
      */
      private switchOrSplit(clicked: SwitchableNode): SwitchableNode[] {
@@ -83,13 +83,13 @@ export class SwitchableGateway extends SwitchableNode {
         return nodesToSwitch
     }
 
-    /** 
+    /**
      * collects nodes  whose state should be switched:
      * in the case when the clicked node is after this XOR_SPLIT gateway,
      * 1. all the successors of this gateway, except the clicked one, should be disabled;
      * 2. the state of all the successors of the clicked node should be switched
      * @param clicked clicked node
-     * @returns nodes to switch 
+     * @returns nodes to switch
      */
     private switchXorSplit(clicked: SwitchableNode): SwitchableNode[] {
         //disable all alternative successors of this XOR gateway
@@ -111,7 +111,7 @@ export class SwitchableGateway extends SwitchableNode {
 
 
 
-    
+
 
     private AND_SPLIT(): boolean {
         return this._bpmnNode instanceof BpmnGatewaySplitAnd
@@ -140,7 +140,7 @@ export class SwitchableGateway extends SwitchableNode {
 
 
     /**
-    * checks if it is possible to switch the state of this gateway 
+    * checks if it is possible to switch the state of this gateway
     * @returns true if the state can be switched
     */
     canBeSwitched(): boolean {
@@ -156,7 +156,7 @@ export class SwitchableGateway extends SwitchableNode {
 
     /**
      * checks if all nodes before this gateway are enabled
-     * @returns 
+     * @returns
      */
     private checkIfOrJoinGatewayCanBeSwitched(): boolean {
         let answer: boolean = true;
@@ -178,7 +178,7 @@ export class SwitchableGateway extends SwitchableNode {
 
     /**
      * checks if all nodes before this gateway are enabled
-     * @returns 
+     * @returns
      */
     private allNodesBeforeEnabled(): boolean {
         for (let nodeBefore of this.predecessors)
@@ -267,7 +267,7 @@ export class SwitchableGateway extends SwitchableNode {
 
     /**
      * searches for the SPLIT gateway corresponding to this JOIN gateway
-     * @returns matching SPLIT gateway 
+     * @returns matching SPLIT gateway
      */
     searchResponsibleSplitGateway(): SwitchableGateway | undefined {
         let splitGateway: SwitchableGateway | undefined = undefined;

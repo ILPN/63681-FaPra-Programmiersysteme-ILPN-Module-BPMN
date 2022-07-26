@@ -47,7 +47,9 @@ export class AppComponent implements OnDestroy {
         }
     }
 
-    // validateGraph(): void {
-    //     this.graphValidationService.validateGraph(this.result);
-    // }
+    validateGraph(): void {
+        if (this.result.isValidateable()) {
+            this.graphValidationService.validateGraph(this.result);
+        }
+    }
 }

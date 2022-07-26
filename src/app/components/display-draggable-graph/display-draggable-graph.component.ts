@@ -33,26 +33,26 @@ export class DisplayDraggableGraphComponent implements OnDestroy,  AfterViewInit
       private _svgService: SvgService,
       private _displayService: DisplayService
   ) {
-     
+
   }
-  
+
   onDeleteAllCorners(){
     this._draggableGraph?.deleteAllCorners()
   }
 
   onMakeSquare(){
-    console.log("MakeSquare clicked");
+    //console.log("MakeSquare clicked");
   }
     ngAfterViewInit(): void {
         this._sub = this._displayService.diagram$.subscribe((bpmnGraph) => {
             if(bpmnGraph == undefined)return
             if(bpmnGraph.isEmpty())return
-            if (this.rootSvg == undefined || this.drawingArea == undefined) return 
+            if (this.rootSvg == undefined || this.drawingArea == undefined) return
             this._bpmnGraph = bpmnGraph;
-                
+
                 this._layoutService.layoutIfNeeded(this._bpmnGraph,this.rootSvg!.nativeElement.clientWidth,this.rootSvg!.nativeElement.clientHeight)
                 this._layoutService.setViewBox(this.drawingArea.nativeElement)
-                
+
                 this._draggableGraph= new DraggableGraph(bpmnGraph, this._layoutService, this.rootSvg!.nativeElement,this.drawingArea.nativeElement);
                 Utility.removeAllChildren(this.drawingArea.nativeElement)
                 this.drawingArea.nativeElement.appendChild(this._draggableGraph.svgManager.getSvg());

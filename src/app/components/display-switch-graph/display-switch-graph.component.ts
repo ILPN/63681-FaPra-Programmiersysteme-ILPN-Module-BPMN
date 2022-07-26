@@ -6,6 +6,7 @@ import { DisplayService } from 'src/app/services/display.service';
 import { LayoutService } from 'src/app/services/layout.service';
 import { SvgService } from 'src/app/services/svg.service';
 import {GraphValidationService} from "../../services/graph-validation.service";
+import {SwitchableNode} from "../../classes/Basic/Switch/SwitchableNode";
 
 @Component({
   selector: 'app-display-switch-graph',
@@ -36,14 +37,16 @@ export class DisplaySwitchGraphComponent implements OnDestroy, AfterViewInit {
       this._layoutService.layoutIfNeeded(this.bpmnGraph,this.rootSvg.nativeElement.clientWidth,this.rootSvg.nativeElement.clientHeight)
       this._layoutService.setViewBox(this.drawingArea.nativeElement)
 
-      const switchGraph = new SwitchableGraph(graph, this.graphValidationService);
+      const switchGraph = new SwitchableGraph(graph);
+      this.validateGraph(switchGraph)
 
       this.draw(switchGraph.svgManager.getSvg())
 
-
     });
   }
-
+    private validateGraph(graph:SwitchableGraph) {
+        this.graphValidationService.validateGraph(graph);
+    }
 
 
   ngOnInit(): void {

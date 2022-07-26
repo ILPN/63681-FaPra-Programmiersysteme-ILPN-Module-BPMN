@@ -1,29 +1,29 @@
-import { BGraph } from '../B/BGraph';
-import { BpmnEdge } from './BpmnEdge/BpmnEdge';
-import { BpmnEventEnd } from './events/BpmnEventEnd';
-import { BpmnEventIntermediate } from './events/BpmnEventIntermediate';
-import { BpmnEventStart } from './events/BpmnEventStart';
-import { BpmnNode } from './BpmnNode';
-import { Svg } from '../Svg/Svg';
-import { BpmnGateway } from './gateways/BpmnGateway';
-import { BpmnTaskService } from './tasks/BpmnTaskService';
-import { BpmnTaskManual } from './tasks/BpmnTaskManual';
-import { BpmnTaskUserTask } from './tasks/BpmnTaskUserTask';
-import { GetSvgManager } from '../Interfaces/GetSvgManager';
-import { SvgManager } from '../Svg/SvgManager/SvgManager';
-import { Utility } from '../../Utils/Utility';
-import { BpmnGatewayJoinAnd } from './gateways/BpmnGatewayJoinAnd';
-import { BpmnGatewaySplitAnd } from './gateways/BpmnGatewaySplitAnd';
-import { BpmnGatewaySplitOr } from './gateways/BpmnGatewaySplitOr';
-import { BpmnGatewayJoinOr } from './gateways/BpmnGatewayJoinOr';
-import { BpmnGatewaySplitXor } from './gateways/BpmnGatewaySplitXor';
-import { BpmnGatewayJoinXor } from './gateways/BpmnGatewayJoinXor';
-import { BpmnTaskBusinessRule } from './tasks/BpmnTaskBusinessRule';
-import { BpmnEdgeDefault } from './BpmnEdge/BpmnEdgeDefault';
+import {BGraph} from '../B/BGraph';
+import {BpmnEdge} from './BpmnEdge/BpmnEdge';
+import {BpmnEventEnd} from './events/BpmnEventEnd';
+import {BpmnEventIntermediate} from './events/BpmnEventIntermediate';
+import {BpmnEventStart} from './events/BpmnEventStart';
+import {BpmnNode} from './BpmnNode';
+import {Svg} from '../Svg/Svg';
+import {BpmnGateway} from './gateways/BpmnGateway';
+import {BpmnTaskService} from './tasks/BpmnTaskService';
+import {BpmnTaskManual} from './tasks/BpmnTaskManual';
+import {BpmnTaskUserTask} from './tasks/BpmnTaskUserTask';
+import {GetSvgManager} from '../Interfaces/GetSvgManager';
+import {SvgManager} from '../Svg/SvgManager/SvgManager';
+import {BpmnGatewayJoinAnd} from './gateways/BpmnGatewayJoinAnd';
+import {BpmnGatewaySplitAnd} from './gateways/BpmnGatewaySplitAnd';
+import {BpmnGatewaySplitOr} from './gateways/BpmnGatewaySplitOr';
+import {BpmnGatewayJoinOr} from './gateways/BpmnGatewayJoinOr';
+import {BpmnGatewaySplitXor} from './gateways/BpmnGatewaySplitXor';
+import {BpmnGatewayJoinXor} from './gateways/BpmnGatewayJoinXor';
+import {BpmnTaskBusinessRule} from './tasks/BpmnTaskBusinessRule';
+import {BpmnEdgeDefault} from './BpmnEdge/BpmnEdgeDefault';
+import {ValidateableGraph} from "../Interfaces/ValidateableGraph";
 
 export class BpmnGraph
     extends BGraph<BpmnEdge, BpmnNode>
-    implements GetSvgManager {
+    implements GetSvgManager, ValidateableGraph {
     private _svgManager: SvgManager | undefined;
     public get svgManager(): SvgManager {
         if (this._svgManager == undefined) {
@@ -36,6 +36,11 @@ export class BpmnGraph
         super()
         //this._svg = this.updateSvg()
     }
+
+    isValidateable(): boolean {
+        return true;
+    }
+
     private svgCreation() {
         const c = Svg.container()
         for (const n of this.nodes) {
@@ -50,8 +55,8 @@ export class BpmnGraph
     addNode(node: BpmnNode) {
         if (this.nodes.findIndex(n => n.id == node.id) == -1)
             this.nodes.push(node)
-            else
-            console.log("couldn't add node "+ node.id)
+       // else
+           // console.log("couldn't add node " + node.id)
     }
 
     addEdge(edge: BpmnEdge) {
@@ -63,13 +68,12 @@ export class BpmnGraph
             fromNode.addOutEdge(edge)
             toNode.addInEdge(edge)
             this.edges.push(edge)
-        }
-        else
-            console.log("couldn't add edge " + edge.id)
+        } //else
+            //console.log("couldn't add edge " + edge.id)
     }
 
 
-    static sampleGraph():BpmnGraph{
+    static sampleGraph(): BpmnGraph {
         const g = new BpmnGraph();
         let e1 = new BpmnEventStart("E1");
         e1.label = "Am Start!"
@@ -82,14 +86,12 @@ export class BpmnGraph
         g.addNode(elementE2);
 
 
-
         let elementE3 = new BpmnEventEnd("E3");
         elementE3.setPosXY(1600, 190)
         elementE3.label = "BpmnEventEnd"
         g.addNode(elementE3);
 
 
-        
         let elementEe3 = new BpmnEventEnd("Ee3");
         elementEe3.setPosXY(1600, 190)
         elementEe3.label = "ende gelaende"
@@ -97,8 +99,6 @@ export class BpmnGraph
 
         let copou = new BpmnEdge("1vvv", elementEe3, elementE3);
         g.addEdge(copou);
-
-
 
 
         let elementT1 = new BpmnTaskService("t1");
@@ -116,12 +116,6 @@ export class BpmnGraph
         let tb2 = new BpmnTaskBusinessRule("tb2");
         tb2.label = "BpmnTaskBusinessRule"
         g.addNode(tb2);
-
-
-
-
-
-
 
 
         let elementT3 = new BpmnTaskUserTask("t3");
@@ -226,7 +220,6 @@ export class BpmnGraph
         g.addNode(elementE3);
 
 
-
         let elementT1 = new BpmnTaskService("t1");
         elementT1.setPosXY(442, 60)
         elementT1.label = "BpmnTaskService mit der ID T1 und damit der Name noch länger wird schreibe ich diesen Text hier"
@@ -238,8 +231,6 @@ export class BpmnGraph
 
         elementT2.setPosXY(442, 320);
         g.addNode(elementT2);
-
-
 
 
         let elementT3 = new BpmnTaskUserTask("t3");
@@ -285,10 +276,8 @@ export class BpmnGraph
         g.addNode(elementG2);
 
 
-
         let connector = new BpmnEdge("1", e1, elementG1);
         g.addEdge(connector);
-
 
 
         let connector2: BpmnEdge = new BpmnEdge("p3", elementG1, elementT2);
@@ -310,7 +299,6 @@ export class BpmnGraph
 
         let connector10: BpmnEdge = new BpmnEdge("A10", elementT1, elementG3);
         g.addEdge(connector10);
-
 
 
         let elementT10 = new BpmnTaskService("t10");
@@ -337,23 +325,6 @@ export class BpmnGraph
         g.addEdge(connector15);
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
         let connector4 = new BpmnEdge("A5", elementT2, elementG2);
         connector4.addCornerXY(675, 320);
         g.addEdge(connector4);
@@ -370,8 +341,6 @@ export class BpmnGraph
 
         return g
     }
-
-
 
 
     private addMyEvent(id: string, typ: string): void {
@@ -412,25 +381,22 @@ export class BpmnGraph
     }
 
 
-
-
-
-
     private addMyConnector(fromID: string, toID: string) {
         let fromNode: BpmnNode | undefined = this.getNodeFromID(fromID);
         let toNode: BpmnNode | undefined = this.getNodeFromID(toID);
         if (fromNode !== undefined && toNode !== undefined) {
-            let connector: BpmnEdge = new BpmnEdge("A-"+fromNode.id+"-"+toNode.id, fromNode, toNode);
+            let connector: BpmnEdge = new BpmnEdge("A-" + fromNode.id + "-" + toNode.id, fromNode, toNode);
             this.addEdge(connector);
         }
     }
+
     getNodeFromID(toID: string): BpmnNode | undefined {
-        let answer : BpmnNode | undefined = undefined;
+        let answer: BpmnNode | undefined = undefined;
         this.nodes.forEach(node => {
             if (node.id === toID) answer = node;
         });
-      //  throw new Error('ID unknown');
-        if(answer === undefined) console.error("ID unknown: " + toID);
+        //  throw new Error('ID unknown');
+        if (answer === undefined) console.error("ID unknown: " + toID);
         return answer;
     }
 
@@ -490,7 +456,7 @@ export class BpmnGraph
         g.addMyTask("T15");
         g.addMyTask("T16");
 
-       // g.allOrGatewayForAnotherMonsterGraph();
+        // g.allOrGatewayForAnotherMonsterGraph();
         g.mixedGatewayForAnotherMonsterGraph();
 
 
@@ -525,10 +491,6 @@ export class BpmnGraph
         g.addMyConnector("G7J", "G3J");
 
 
-
-
-
-
 // split G2S 2
 
         g.addMyConnector("G2S", "G4S");
@@ -543,8 +505,6 @@ export class BpmnGraph
         g.addMyConnector("T13", "G5J");
         g.addMyConnector("T14", "G5J");
         g.addMyConnector("G5J", "G4J");
-
-
 
 
         g.addMyConnector("G3J", "G2J");
@@ -571,7 +531,6 @@ export class BpmnGraph
         g.addMyGateway("G2J", "join", "or");
 
 
-
         g.addMyConnector("E1", "T1");
         g.addMyConnector("T1", "G1J");
         g.addMyConnector("G1J", "T2");
@@ -580,7 +539,6 @@ export class BpmnGraph
         g.addMyConnector("G2S", "T4");
         g.addMyConnector("T3", "G2J");
         g.addMyConnector("T4", "G2J");
-
 
 
         g.addMyConnector("G2J", "G1S");
