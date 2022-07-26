@@ -1,16 +1,24 @@
 import { Utility } from "../Utils/Utility";
-import { LeveledGraph, LNode } from "./LeveledGraph";
+import { LNode, TableGraph } from "./TableGraph";
 
 export class Block {
-    constructor() {
+    private og:TableGraph
+    private g: TableGraph
+    constructor(tGraph:TableGraph) {
+        this.og = tGraph.clone()
+        this.g = tGraph
     }
-
-    makeAligned(lgraph:LeveledGraph){
-        const lg = lgraph
-        const nodeCount = lg.getAllNodes().length
-        this.setGravityTo(10,lg)
-        const lineset = this.makeLines(lg)
-        this.moveLinesClosestTogether(lineset)
+    alignNodes(){
+        const nodeCount = this.g.getAllNodes().length
+        this.setGravityTo(nodeCount)
+        const makeLinesResult = this.makeLines()
+        if(makeLinesResult.loopTerminates){
+            this.moveLinesClosestTogether(makeLinesResult.lineSet)
+            return this.g
+        }else{
+            this.g = this.og
+            return this.og
+        }
     }
     moveLinesClosestTogether(lineSet: LineSet) {
         const lines = lineSet.lines
@@ -23,8 +31,8 @@ export class Block {
             for (let j = line.order-1; j >= 0; j--) {
                 let touchingOtherNodes = false
                 for (const n of line.nodes) {
-                    const ordersOfLevel = nodesOfOtherLines.filter(nn => nn.level == n.level).map(nn => nn.order)
-                    if(ordersOfLevel.includes(j)) touchingOtherNodes = true
+                    const rowsInColumn = nodesOfOtherLines.filter(nn => nn.column == n.column).map(nn => nn.row)
+                    if(rowsInColumn.includes(j)) touchingOtherNodes = true
                 }
                 if(touchingOtherNodes){
                     line.order = j+1
@@ -35,26 +43,33 @@ export class Block {
             
         }
     }
-    private makeLines(lg: LeveledGraph) {
+    private makeLines() {
         let lineSet = new LineSet()
-        let shrinkingSet = [...lg.getAllNodes()]
+        let shrinkingSet = [...this.g.getAllNodes()]
 
-        let counter = 0
+        let iterationCount = 0
         let uppestNode = this.getNodeWithMinimalOrder(shrinkingSet)
-        while(shrinkingSet.length > 0 && counter < 50){
-            counter++
+        let loopTerminates = true
+        const maxIterations = this.g.getAllNodes().length +1
+        while(shrinkingSet.length > 0 && iterationCount <= maxIterations){
+            iterationCount++
+            if(iterationCount >= maxIterations){
+                loopTerminates = false
+                break
+            } 
+
             const line = new Line()
             line.order = lineSet.getMaximalOrder() + 1
             let next = uppestNode
             while(next != undefined){
                 line.addNode(next)
-                next =Utility.cutSet(next.parents, shrinkingSet).sort((a,b)=> a.order - b.order)[0]
+                next =Utility.cutSet(next.parents, shrinkingSet).sort((a,b)=> a.row - b.row)[0]
             }
     
-            next = Utility.cutSet(uppestNode.children, shrinkingSet).sort((a,b)=> a.order - b.order)[0]
+            next = Utility.cutSet(uppestNode.children, shrinkingSet).sort((a,b)=> a.row - b.row)[0]
             while(next != undefined){
                 line.addNode(next)
-                next =Utility.cutSet(next.children, shrinkingSet).sort((a,b)=> a.order - b.order)[0]
+                next =Utility.cutSet(next.children, shrinkingSet).sort((a,b)=> a.row - b.row)[0]
             }
 
             const nodesAbove: LNode[] = this.nodesAboveLine(line,shrinkingSet)
@@ -71,29 +86,29 @@ export class Block {
             
         }
 
-        return lineSet
+        return {lineSet:lineSet, loopTerminates:loopTerminates}
     }
     private nodesAboveLine(line: Line, shrinkingSet: LNode[]): LNode[] {
         const nodesAbove = []
         for (const n of line.nodes) {
-            const nodesOfLevel = shrinkingSet.filter(nn => nn.level == n.level)
-            for (const nn of nodesOfLevel) {
-                if(nn.order< n.order) nodesAbove.push(nn)
+            const nodesOfColumn = shrinkingSet.filter(nn => nn.column == n.column)
+            for (const nn of nodesOfColumn) {
+                if(nn.row< n.row) nodesAbove.push(nn)
             }
         }
         return nodesAbove
     }
     private getNodeWithMinimalOrder(set: LNode[]) {
-        const sortedByOrder = set.sort((a,b)=> (a.order  -b.order ))
-        const minimalOrder = sortedByOrder[0].order
-        const allNodesWithThatOrder = set.filter((n)=> n.order == minimalOrder)
-        const sortedByLevel = allNodesWithThatOrder.sort((a,b)=> ((a.level) -(b.level)))
-        const minimalOrderThenMinimalLevel = sortedByLevel[0]
-        return minimalOrderThenMinimalLevel
+        const sortedByOrder = set.sort((a,b)=> (a.row  -b.row ))
+        const minimalOrder = sortedByOrder[0].row
+        const allNodesWithThatOrder = set.filter((n)=> n.row == minimalOrder)
+        const sortedByColumn = allNodesWithThatOrder.sort((a,b)=> ((a.column) -(b.column)))
+        const minimalRowThenMinimalColumn = sortedByColumn[0]
+        return minimalRowThenMinimalColumn
     }
-    private setGravityTo(order: number, lg: LeveledGraph) {
-        for (const node of lg.getAllNodes()) {
-            node.order = order- lg.levelSize(node.level)+ node.order
+    private setGravityTo(order: number) {
+        for (const node of this.g.getAllNodes()) {
+            node.row = order- this.g.columnSize(node.column)+ node.row
         }
     }
 }
@@ -124,7 +139,7 @@ class LineSet{
 class Line{
         straighten() {
             for (const n of this.nodes) {
-                n.order = this.order
+                n.row = this.order
             }
         }
         addNode(node: LNode) {

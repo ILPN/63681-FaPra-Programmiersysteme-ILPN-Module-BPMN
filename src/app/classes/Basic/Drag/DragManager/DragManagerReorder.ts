@@ -1,4 +1,4 @@
-import { LeveledGraph } from "src/app/classes/Sugiyama/LeveledGraph";
+import { TableGraph } from "src/app/classes/Sugiyama/TableGraph";
 import { Utility } from "src/app/classes/Utils/Utility";
 import { Vector } from "src/app/classes/Utils/Vector";
 import { BpmnDummyEdgeCorner } from "../../Bpmn/BpmnEdge/BpmnDummyEdgeCorner";
@@ -10,8 +10,8 @@ import { DragManager } from "./DragManager";
 
 
 export class DragManagerReorder extends DragManager{
-    private sugiResult:LeveledGraph
-    constructor(dragingSurface:SVGElement,snapingView:SVGElement,sugiResult:LeveledGraph){
+    private sugiResult:TableGraph
+    constructor(dragingSurface:SVGElement,snapingView:SVGElement,sugiResult:TableGraph){
         super(dragingSurface,snapingView)
         this.sugiResult = sugiResult
     }
@@ -19,14 +19,14 @@ export class DragManagerReorder extends DragManager{
     private setDragHandlesToReorder(dragHandle:DragHandle){
         if(!(dragHandle.dragedElement instanceof BpmnNode || dragHandle.dragedElement instanceof BpmnDummyEdgeCorner)) return
         const idOfDraggedEl = dragHandle.dragedElement.id
-        const level = this.sugiResult.getNode(idOfDraggedEl)!.level
+        const column = this.sugiResult.getNode(idOfDraggedEl)!.column
 
-        const idsInLevel = this.sugiResult.levels[level].map(ln => ln.id)
-        //console.log(idsInLevel)
+        const idsInColumn = this.sugiResult.columns[column].map(ln => ln.id)
+        //console.log(idsInColumn)
         //console.log(this.dragHandles)
         for (const [a,dh] of this.dragHandles.entries()){
             if(!(a instanceof BpmnNode || a instanceof BpmnDummyEdgeCorner)) continue
-            if(idsInLevel.findIndex(id => id== a.id) != -1){
+            if(idsInColumn.findIndex(id => id== a.id) != -1){
                 this.dragHandlesToReorder.push(dh)
             }
 

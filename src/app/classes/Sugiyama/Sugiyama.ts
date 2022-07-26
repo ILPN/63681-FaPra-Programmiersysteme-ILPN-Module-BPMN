@@ -1,18 +1,18 @@
 import { matchesPattern } from '@babel/types';
 import { Block } from './Block';
-import { DummyNode, LeveledGraph, LNode } from './LeveledGraph';
+import { DummyNode, TableGraph, LNode } from './TableGraph';
 import { SimpleEdge, SimpleGraph } from './SimpleGraph';
 
 export class Sugiyama {
-    getLeveledGraph(): LeveledGraph {
-        return this.leveled;
+    getTableGraph(): TableGraph {
+        return this.table;
     }
     getAcycGraph(): SimpleGraph {
         return this.acyc;
     }
     getResult() {
         this.sugiyamaFramework();
-        return this.getLeveledGraph();
+        return this.getTableGraph();
     }
     private sugiyamaFramework() {
         /**
@@ -24,40 +24,32 @@ export class Sugiyama {
         this.leveling();
         this.addDummies();
         this.minimizeCrossings();
-        this.straightening()
+
+        const block = new Block(this.table)
+        this.table = block.alignNodes()
+
         this.reverseReversedEdges();
 
-        this.assignLevelAndOrderToUnleveledNodes()
+        this.assignColumnAndRowToNodesNotInTable()
 
     }
-    assignLevelAndOrderToUnleveledNodes() {
-        const remainingNodes = [...this.leveled.unleveled]
-        const getFreeOrderOfLevel = (l:number)=>{
-            const level = this.leveled.levels[l]
-            
-        }
+    assignColumnAndRowToNodesNotInTable() {
+        const remainingNodes = [...this.table.notInTable]
         for (const node of remainingNodes) {
-            this.leveled.setLevelOfNode(node,0)
-            node.order = this.leveled.levels[0][this.leveled.levels[0].length-1].order+1
+            const lowestRow = this.table.columns[0].map(n => n.row).sort((a, b) => b - a)[0];
+            console.log(lowestRow)
+            node.row = lowestRow +1
+            this.table.setColumnOfNode(node,0)
+
         }
-    }
-    straightening() {
-        const block = new Block()
-        block.makeAligned(this.leveled)
-         }
-    placeIsFree(level:number, order:number){
-        for (const n of this.leveled.getAllNodes()) {
-            if(n.level == level && n.order == order) return false
-        }
-        return true
     }
     reverseReversedEdges() {
-        const revEdges = this.leveled.edges.filter((edge) => edge.reversed);
+        const revEdges = this.table.edges.filter((edge) => edge.reversed);
         for (const ra of revEdges) {
-            this.leveled.removeEdge(ra.from.id, ra.to.id); 
-            this.leveled.addEdge(ra.to.id, ra.from.id);
+            this.table.removeEdge(ra.from.id, ra.to.id); 
+            this.table.addEdge(ra.to.id, ra.from.id);
         }
-        for (const dummy of this.leveled.getAllDummyNodes()) {
+        for (const dummy of this.table.getAllDummyNodes()) {
             if(dummy.edgeIsInversed){
                 const from = dummy.fromId;
                 const to = dummy.toId;
@@ -69,7 +61,7 @@ export class Sugiyama {
     }
    
     /**
-     * changes order of nodes inside levels, inorder to minimize crossings of edges
+     * changes order of nodes inside columns, inorder to minimize crossings of edges
      */
     private minimizeCrossings() {
         /**
@@ -80,16 +72,16 @@ export class Sugiyama {
          * E. if i>1, then i<= i-1 and go to Step D. Otherwise, stop
          */
 
-        for (let i = 0; i < this.leveled.levels.length - 1; i++) {
+        for (let i = 0; i < this.table.columns.length - 1; i++) {
             this.medianHeuristic(
-                this.leveled.levels[i],
-                this.leveled.levels[i + 1]
+                this.table.columns[i],
+                this.table.columns[i + 1]
             );
         }
-        for (let i = this.leveled.levels.length - 1; i > 0; i--) {
+        for (let i = this.table.columns.length - 1; i > 0; i--) {
             this.medianHeuristic(
-                this.leveled.levels[i],
-                this.leveled.levels[i - 1],
+                this.table.columns[i],
+                this.table.columns[i - 1],
                 false
             );
         }
@@ -109,29 +101,29 @@ export class Sugiyama {
 
         for (let i = 0; i < fixed.length; i++) {
             const e = fixed[i];
-            e.order = i;
+            e.row = i;
         }
 
         for (const e of toBeOrderd) {
-            if (e.parents.length == 0) e.order = 0;
+            if (e.parents.length == 0) e.row = 0;
             else {
                 if (childrenUnordered)
-                    e.order = median(e.parents.map((n) => n.order));
-                else e.order = median(e.children.map((n) => n.order));
+                    e.row = median(e.parents.map((n) => n.row));
+                else e.row = median(e.children.map((n) => n.row));
             } 
         }
 
-        toBeOrderd.sort((a, b) => a.order - b.order);
+        toBeOrderd.sort((a, b) => a.row - b.row);
 
         // incase there are nodes with same order
         for (let i = 0; i < toBeOrderd.length; i++) {
             const e = toBeOrderd[i];
-            e.order = i;
+            e.row = i;
         }
     }
     private og: SimpleGraph;
     private acyc: SimpleGraph = new SimpleGraph();
-    private leveled: LeveledGraph = new LeveledGraph();
+    private table: TableGraph = new TableGraph();
     constructor(
         graph: SimpleGraph,
     ) {
@@ -182,27 +174,27 @@ export class Sugiyama {
     }
 
     /**
-     * arranges nodes in levels. The level of a node is defined by the length of the longest path from a source to that node
+     * arranges nodes in columns. The column of a node is defined by the length of the longest path from a source to that node
      */
     private leveling() {
-        this.leveled.import(this.acyc);
-        for (const source of this.leveled.getSources()) {
-            this.leveled.setLevelOfNode(source,0)
+        this.table.import(this.acyc);
+        for (const source of this.table.getSources()) {
+            this.table.setColumnOfNode(source,0)
         }
-        for (const sink of this.leveled.getSinks()) {
-            this.leveled.setLevelOfNode(sink, this.maxLevelOfParents(sink) + 1);
+        for (const sink of this.table.getSinks()) {
+            this.table.setColumnOfNode(sink, this.maxColumnOfParents(sink) + 1);
 
         }
     }
-    private maxLevelOfParents(n: LNode) {
+    private maxColumnOfParents(n: LNode) {
         let max = -1;
         const parents = n.parents;
         for (const pn of parents) {
-            if (pn.level == -1) {
-                this.leveled.setLevelOfNode(pn, this.maxLevelOfParents(pn) + 1);
+            if (pn.column == -1) {
+                this.table.setColumnOfNode(pn, this.maxColumnOfParents(pn) + 1);
             }
-            if (pn.level > max) {
-                max = pn.level;
+            if (pn.column > max) {
+                max = pn.column;
             }
             
         }
@@ -210,29 +202,29 @@ export class Sugiyama {
     }
 
     private addDummies() {
-        for (const edge of this.leveled.edges) {
-            let levelSpan = edge.to.level - edge.from.level;
-            if (levelSpan > 1) {
-                // split edge so that level span equals 1
+        for (const edge of this.table.edges) {
+            let columnSpan = edge.to.column - edge.from.column;
+            if (columnSpan > 1) {
+                // split edge so that columnSpan equals 1
                 const edgeIsInversed = edge.reversed;
-                this.leveled.removeEdge(edge.from.id, edge.to.id);
+                this.table.removeEdge(edge.from.id, edge.to.id);
                 let prev = edge.from.id;
-                for (let i = 1; i < levelSpan; i++) {
+                for (let i = 1; i < columnSpan; i++) {
                     const dummyId = edge.from.id + '-' + edge.to.id + 'd' + i;
-                    const level = edge.from.level + i;
-                    this.leveled.levels[level].push(
+                    const column = edge.from.column + i;
+                    this.table.columns[column].push(
                         new DummyNode(
                             dummyId,
                             edge.from.id,
                             edge.to.id,
                             edgeIsInversed,
-                            level
+                            column
                         )
                     );
-                    this.leveled.addEdge(prev, dummyId, edgeIsInversed);
+                    this.table.addEdge(prev, dummyId, edgeIsInversed);
                     prev = dummyId;
                 }
-                this.leveled.addEdge(prev, edge.to.id, edgeIsInversed);
+                this.table.addEdge(prev, edge.to.id, edgeIsInversed);
             }
             
         }
