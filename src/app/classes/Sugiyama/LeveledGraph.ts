@@ -11,9 +11,9 @@ export class LeveledGraph {
   public edges: LArc[] = [];
   getSortedDummysForEdge(from: string, to: string) {
     const dummys = this.getAllDummyNodes().filter(dn => dn.fromId == from && dn.toId == to)
-   
+
     const edgeAscending = ()=> (this.getNode(from)!.level< this.getNode(to)!.level)
-   
+
     return dummys.sort((a,b) => edgeAscending()? a.level-b.level: b.level - a.level)
   }
   getArc(a: LArc) :LArc {
@@ -25,7 +25,7 @@ export class LeveledGraph {
     n.level = l
     this.unleveled = this.unleveled.filter(nn => n.id != nn.id);
     for (const [i,level] of this.levels.entries()) {
-      this.levels[i] = this.levels[i].filter(nn => n.id != nn.id);      
+      this.levels[i] = this.levels[i].filter(nn => n.id != nn.id);
     }
     if(this.levels[l]== undefined) this.levels[l] = []
     this.levels[l].push(n)
@@ -42,7 +42,7 @@ export class LeveledGraph {
         this.unleveled.push(new LNode(sn.id))
       });
       acyc.edges.forEach(sa => {
-        this.addEdge(sa.from,sa.to, sa.inversed)        
+        this.addEdge(sa.from,sa.to, sa.inversed)
       });
   }
   addEdge(from: string, to: string, reversed = false) {
@@ -50,7 +50,7 @@ export class LeveledGraph {
     const nTo = this.getNode(to)
 
     if(nFrom === undefined || nTo=== undefined){
-      console.log("addArc: Error: Node not found")
+      //console.log("addArc: Error: Node not found")
       return
     }
     nFrom.children.push(nTo)
@@ -61,7 +61,7 @@ export class LeveledGraph {
     const nFrom = this.getNode(from)
     const nTo = this.getNode(to)
     if(nFrom === undefined || nTo=== undefined){
-      console.log("removeArc: Error: Node not found")
+      //console.log("removeArc: Error: Node not found")
       return
     }
    nFrom.children = nFrom.children.filter(child => child.id != nTo.id)
@@ -75,7 +75,7 @@ export class LeveledGraph {
   getAllNodes() {
     let allNodes:LNode[] = this.unleveled
     this.levels.forEach(arr => {
-      allNodes = allNodes.concat(arr)      
+      allNodes = allNodes.concat(arr)
     });
     return allNodes
   }
@@ -87,7 +87,7 @@ export class LeveledGraph {
     for(let n of this.getAllNodes()){
       if (n instanceof DummyNode){
         dummys.push(n)
-      } 
+      }
     }
     return dummys
   }
@@ -178,7 +178,7 @@ export class LArc {
   }
 }
 export class DummyNode extends LNode{
-  private _fromId: string; 
+  private _fromId: string;
   public get fromId(): string {
     return this._fromId;
   }
@@ -193,7 +193,7 @@ export class DummyNode extends LNode{
   public set toId(value: string) {
     this._toId = value;
   }
-  
+
 
   private _arcIsInversed: boolean;
   public get edgeIsInversed(): boolean {
