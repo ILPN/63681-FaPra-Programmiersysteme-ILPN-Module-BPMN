@@ -1,21 +1,46 @@
+.message{
+    font-family: serif;
+    font-size: 30px;
+    font-weight: bold;
+}
+
 .error-hint {
     -webkit-animation: fadeIn linear 1.2s;
 }
 
 .error-hint, .error-hint:hover {
-    position: absolute;
-    width: 300px;
-    height: 50px;
-    border: 3px solid black;
-    padding: 50px;
-    margin: 20px;
+    position: fixed;
+    //width: 300px;
+    //height: 50px;
+    align-items: center;
+    border: 3px solid red;
+    padding: 170px;
+    //margin: 20px;
     display: flex;
     justify-content: center;
     border-radius: 25px;
-    font-family: serif;
     box-shadow: rgba(149, 157, 165, 0.2) 0 8px 24px;
-    right: 25px;
-    top: 0;
+    //right: 25px;
+    //top: 0;
+    margin: auto;
+    left: 30%;
+    top: 35%;
+    animation-name: colorAnimation;
+    animation-duration: 1s;
+    animation-iteration-count: infinite;
+    background-color: white;
+}
+
+@keyframes colorAnimation {
+    from {
+        border: 5px solid red;
+    }
+    to {
+        border: 3px solid #FF3131;
+    }
+    to {
+        border: 3px solid #F58D93;
+    }
 }
 
 @keyframes fadeIn {
@@ -37,7 +62,7 @@
 }
 
 .error-hint:hover {
-    border: 4px solid black;
+    border: 4px solid red;
     box-shadow: rgba(100, 100, 111, 0.2) 0 7px 29px 0;
 }
 
@@ -47,8 +72,8 @@
     position: absolute;
     width: 20px;
     height: 20px;
-    left: 370px;
-    top: 10px;
+    right: 20px;
+    top: 15px;
     border-radius: 10px;
     box-shadow: rgba(0, 0, 0, 0.16) 0 1px 4px;
 }

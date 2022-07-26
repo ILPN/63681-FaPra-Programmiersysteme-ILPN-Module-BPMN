@@ -3,7 +3,7 @@ import { DragHandle } from "../DragHandle";
 export class DragManager{
     protected dragHandles: Map<any,DragHandle> = new Map() // homeless dragHandles
     protected dragedDragHandle: DragHandle | undefined;
-    private snapingView:SVGElement 
+    private snapingView:SVGElement
 
     constructor(dragingSurface:SVGElement, snapingView:SVGElement){
         dragingSurface.onmouseup = (event) => this.stopDrag(event);
@@ -17,7 +17,7 @@ export class DragManager{
     startDragWithObj(event:MouseEvent,obj:any){
         const dragHandle = this.dragHandles.get(obj)
         if(dragHandle == undefined){
-            console.log("sorry couldn t find a dragHandle for that obj")
+            //console.log("sorry couldn t find a dragHandle for that obj")
             return
         }
         this.startDrag(event,dragHandle)

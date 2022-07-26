@@ -1,4 +1,5 @@
 <app-error-hint></app-error-hint>
+<button (click)="validateGraph()">validate Graph</button>
 
 <div fxLayout="column" fxLayoutAlign="start stretch">
     <!--  Header  -->
@@ -16,7 +17,9 @@
     </div>
 
     <div fxLayout="row" fxLayoutAlign="space-evenly start">
-        <input-field buttonText="File upload" buttonIcon="publish" (newInputEvent)="textareaFc.setValue($event)"></input-field>
+        <input-field buttonText="File upload"
+                     buttonIcon="publish"
+                     (newInputEvent)="textareaFc.setValue($event)"></input-field>
         <mat-form-field appearance="outline"
                         class="textarea">
             <mat-label>Source file</mat-label>
@@ -26,7 +29,9 @@
                       cdkAutosizeMaxRows="20"
                       [formControl]="textareaFc"></textarea>
         </mat-form-field>
-        <output-field buttonText="File download" buttonIcon="download" [text]="textareaFc.value"></output-field>
+        <output-field buttonText="File download"
+                      buttonIcon="download"
+                      [text]="textareaFc.value"></output-field>
     </div>
 
     <!--  Footer  -->
