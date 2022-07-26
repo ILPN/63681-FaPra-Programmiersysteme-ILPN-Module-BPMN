@@ -1,7 +1,7 @@
 import { matchesPattern } from '@babel/types';
 import { Block } from './Block';
 import { DummyNode, LeveledGraph, LNode } from './LeveledGraph';
-import { SimpleArc, SimpleGraph } from './SimpleGraph';
+import { SimpleEdge, SimpleGraph } from './SimpleGraph';
 
 export class Sugiyama {
     getLeveledGraph(): LeveledGraph {
@@ -25,17 +25,20 @@ export class Sugiyama {
         this.addDummies();
         this.minimizeCrossings();
         this.straightening()
-        this.reverseReversedArcs();
+        this.reverseReversedEdges();
 
         this.assignLevelAndOrderToUnleveledNodes()
 
     }
     assignLevelAndOrderToUnleveledNodes() {
         const remainingNodes = [...this.leveled.unleveled]
+        const getFreeOrderOfLevel = (l:number)=>{
+            const level = this.leveled.levels[l]
+            
+        }
         for (const node of remainingNodes) {
-            const order = this.leveled.levels[0].length
-            node.order = order
             this.leveled.setLevelOfNode(node,0)
+            node.order = this.leveled.levels[0][this.leveled.levels[0].length-1].order+1
         }
     }
     straightening() {
@@ -48,25 +51,25 @@ export class Sugiyama {
         }
         return true
     }
-    reverseReversedArcs() {
-        const revArcs = this.leveled.arcs.filter((arc) => arc.reversed);
-        for (const ra of revArcs) {
-            this.leveled.removeArc(ra.from.id, ra.to.id); 
-            this.leveled.addArc(ra.to.id, ra.from.id);
+    reverseReversedEdges() {
+        const revEdges = this.leveled.edges.filter((edge) => edge.reversed);
+        for (const ra of revEdges) {
+            this.leveled.removeEdge(ra.from.id, ra.to.id); 
+            this.leveled.addEdge(ra.to.id, ra.from.id);
         }
         for (const dummy of this.leveled.getAllDummyNodes()) {
-            if(dummy.arcIsInversed){
+            if(dummy.edgeIsInversed){
                 const from = dummy.fromId;
                 const to = dummy.toId;
                 dummy.toId = from;
                 dummy.fromId = to;
-                dummy.arcIsInversed = false;
+                dummy.edgeIsInversed = false;
             }
         }
     }
    
     /**
-     * changes order of nodes inside levels, inorder to minimize crossings of arcs
+     * changes order of nodes inside levels, inorder to minimize crossings of edges
      */
     private minimizeCrossings() {
         /**
@@ -136,7 +139,7 @@ export class Sugiyama {
     }
 
     /**
-     * some arcs are inverted (and marked as so: arc.inversed = true) to make the graph acyclical
+     * some edges are inverted (and marked as so: edge.inversed = true) to make the graph acyclical
      */
     private makeAcyclic() {
         const cyc = this.og.clone();
@@ -144,38 +147,38 @@ export class Sugiyama {
         while (cyc.nodes.length > 0) {
             while (cyc.getSinks().length > 0) {
                 const sink = cyc.getSinks()[0];
-                this.acyc.addArcs(cyc.getInArcs(sink.id));
+                this.acyc.addEdges(cyc.getInEdges(sink.id));
                 cyc.removeNode(sink.id);
-                cyc.removeArcs(cyc.getInArcs(sink.id));
+                cyc.removeEdges(cyc.getInEdges(sink.id));
             }
 
             cyc.removeIsolatedNodes();
 
             while (cyc.getSources().length > 0) {
                 const src = cyc.getSources()[0];
-                this.acyc.addArcs(cyc.getOutArcs(src.id));
+                this.acyc.addEdges(cyc.getOutEdges(src.id));
                 cyc.removeNode(src.id);
-                cyc.removeArcs(cyc.getOutArcs(src.id));
+                cyc.removeEdges(cyc.getOutEdges(src.id));
             }
 
             if (cyc.nodes.length > 0) {
-                const n = cyc.getNodeWithMaxDiffInOutArcs();
-                this.acyc.addArcs(cyc.getOutArcs(n.id));
+                const n = cyc.getNodeWithMaxDiffInOutEdges();
+                this.acyc.addEdges(cyc.getOutEdges(n.id));
                 cyc.removeNode(n.id);
-                cyc.removeArcs(cyc.getInOutArcs(n.id));
+                cyc.removeEdges(cyc.getInAndOutEdges(n.id));
             }
         }
 
-        const remainingArcs = SimpleGraph.substractArcs(
-            this.og.arcs,
-            this.acyc.arcs
+        const remainingEdges = SimpleGraph.substractEdges(
+            this.og.edges,
+            this.acyc.edges
         );
 
-        const remainingArcsInverted =[]
-        for (const a of remainingArcs) {
-            remainingArcsInverted.push(new SimpleArc(a.to, a.from, true))
+        const remainingEdgesInverted =[]
+        for (const a of remainingEdges) {
+            remainingEdgesInverted.push(new SimpleEdge(a.to, a.from, true))
         }
-        this.acyc.addArcs(remainingArcsInverted);
+        this.acyc.addEdges(remainingEdgesInverted);
     }
 
     /**
@@ -207,29 +210,29 @@ export class Sugiyama {
     }
 
     private addDummies() {
-        for (const a of this.leveled.arcs) {
-            let levelSpan = a.to.level - a.from.level;
+        for (const edge of this.leveled.edges) {
+            let levelSpan = edge.to.level - edge.from.level;
             if (levelSpan > 1) {
-                // split arc so that level span equals 1
-                const arcIsInversed = a.reversed;
-                this.leveled.removeArc(a.from.id, a.to.id);
-                let prev = a.from.id;
+                // split edge so that level span equals 1
+                const edgeIsInversed = edge.reversed;
+                this.leveled.removeEdge(edge.from.id, edge.to.id);
+                let prev = edge.from.id;
                 for (let i = 1; i < levelSpan; i++) {
-                    const dummyId = a.from.id + '-' + a.to.id + 'd' + i;
-                    const level = a.from.level + i;
+                    const dummyId = edge.from.id + '-' + edge.to.id + 'd' + i;
+                    const level = edge.from.level + i;
                     this.leveled.levels[level].push(
                         new DummyNode(
                             dummyId,
-                            a.from.id,
-                            a.to.id,
-                            arcIsInversed,
+                            edge.from.id,
+                            edge.to.id,
+                            edgeIsInversed,
                             level
                         )
                     );
-                    this.leveled.addArc(prev, dummyId, arcIsInversed);
+                    this.leveled.addEdge(prev, dummyId, edgeIsInversed);
                     prev = dummyId;
                 }
-                this.leveled.addArc(prev, a.to.id, arcIsInversed);
+                this.leveled.addEdge(prev, edge.to.id, edgeIsInversed);
             }
             
         }

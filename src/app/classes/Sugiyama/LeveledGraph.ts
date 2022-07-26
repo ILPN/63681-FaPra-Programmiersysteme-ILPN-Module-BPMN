@@ -8,7 +8,7 @@ export class LeveledGraph {
     }
   public unleveled: LNode[]=[];
   public levels: LNode[][] = [[]];
-  public arcs: LArc[] = [];
+  public edges: LArc[] = [];
   getSortedDummysForEdge(from: string, to: string) {
     const dummys = this.getAllDummyNodes().filter(dn => dn.fromId == from && dn.toId == to)
    
@@ -17,7 +17,7 @@ export class LeveledGraph {
     return dummys.sort((a,b) => edgeAscending()? a.level-b.level: b.level - a.level)
   }
   getArc(a: LArc) :LArc {
-      const arc = this.arcs.find(ar=> ar == a)
+      const arc = this.edges.find(ar=> ar == a)
       if (arc == undefined) throw Error("Arc not found")
       return arc
   }
@@ -41,11 +41,11 @@ export class LeveledGraph {
       acyc.nodes.forEach(sn => {
         this.unleveled.push(new LNode(sn.id))
       });
-      acyc.arcs.forEach(sa => {
-        this.addArc(sa.from,sa.to, sa.inversed)        
+      acyc.edges.forEach(sa => {
+        this.addEdge(sa.from,sa.to, sa.inversed)        
       });
   }
-  addArc(from: string, to: string, reversed = false) {
+  addEdge(from: string, to: string, reversed = false) {
     const nFrom = this.getNode(from)
     const nTo = this.getNode(to)
 
@@ -55,9 +55,9 @@ export class LeveledGraph {
     }
     nFrom.children.push(nTo)
     nTo.parents.push(nFrom)
-    this.arcs.push(new LArc(nFrom,nTo, reversed))
+    this.edges.push(new LArc(nFrom,nTo, reversed))
   }
-  removeArc(from: string, to: string) {
+  removeEdge(from: string, to: string) {
     const nFrom = this.getNode(from)
     const nTo = this.getNode(to)
     if(nFrom === undefined || nTo=== undefined){
@@ -66,7 +66,7 @@ export class LeveledGraph {
     }
    nFrom.children = nFrom.children.filter(child => child.id != nTo.id)
     nTo.parents = nTo.parents.filter(parent => parent.id != nFrom.id)
-    this.arcs = this.arcs.filter(arc => !(arc.from.id == from && arc.to.id == to))
+    this.edges = this.edges.filter(arc => !(arc.from.id == from && arc.to.id == to))
   }
 
   getNode(id: string) {
@@ -196,10 +196,10 @@ export class DummyNode extends LNode{
   
 
   private _arcIsInversed: boolean;
-  public get arcIsInversed(): boolean {
+  public get edgeIsInversed(): boolean {
     return this._arcIsInversed;
   }
-  public set arcIsInversed(value: boolean) {
+  public set edgeIsInversed(value: boolean) {
     this._arcIsInversed = value;
   }
   constructor(id: string, from:string, to:string,arcIsInversed:boolean, level?: number, ){
