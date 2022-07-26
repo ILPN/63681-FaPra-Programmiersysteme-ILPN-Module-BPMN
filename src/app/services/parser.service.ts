@@ -1,5 +1,7 @@
 import {Injectable} from '@angular/core';
+import {BpmnDummyEdgeCorner} from '../classes/Basic/Bpmn/BpmnEdge/BpmnDummyEdgeCorner';
 import {BpmnEdge} from '../classes/Basic/Bpmn/BpmnEdge/BpmnEdge';
+import {BpmnEdgeCorner} from '../classes/Basic/Bpmn/BpmnEdge/BpmnEdgeCorner';
 import {BpmnGraph} from '../classes/Basic/Bpmn/BpmnGraph';
 import {BpmnNode} from '../classes/Basic/Bpmn/BpmnNode';
 import {BpmnEvent} from '../classes/Basic/Bpmn/events/BpmnEvent';
@@ -27,17 +29,47 @@ import {BpmnTaskUserTask} from '../classes/Basic/Bpmn/tasks/BpmnTaskUserTask';
 export class ParserService {
 
     result: BpmnGraph;
-    elements: Array<BpmnNode>;
+    nodes: Array<BpmnNode>;
 
     constructor() {
         this.result = new BpmnGraph();
-        this.elements = new Array<BpmnNode>();
+        this.nodes = new Array<BpmnNode>();
+    }
+
+    /**
+     * is called after draging or reordering if positions have been changed
+     * @param nodes that have changed positions
+     * @param dummyNodes that have changed positions
+     * @param edgeStarts that have changed positions
+     * @param edgeEnds that have changed positions
+     */
+    positionOfNodesAndEdgesChanged(nodes: BpmnNode[], dummyNodes: BpmnDummyEdgeCorner[], edgeStarts: BpmnEdgeCorner[], edgeEnds: BpmnEdgeCorner[]) {
+        //@Vanessa
+
+        console.log(nodes)
+        console.log(dummyNodes)
+        console.log(edgeStarts)
+        console.log(edgeEnds)
+
+    }
+
+    /**
+     * this functions is called after the layout by the sugiyama algorithm has been done
+     * and allows to override the positions set by the alogrithm
+     */
+    setHardcodedPositions(bpmnGraph: BpmnGraph) {
+        //@Vanessa
+        for (const node of bpmnGraph.nodes) {
+            const id = node.id
+            //if (pos is defined in text)  => node.setPosXY(...,...)
+        }
+        for (const edge of bpmnGraph.edges) {
+        }
+        //console.log("read existing positions from text and set them to the nodes and edges")
     }
 
     parse(text: string): BpmnGraph | undefined {
-        // console.log("parsing");
-
-        let def = BpmnGraph.sampleGraph();
+        console.log("parsing");
 
         const lines = text.split('\n');
 
@@ -47,7 +79,7 @@ export class ParserService {
             pos = lines.indexOf(act) + 1;
             while (pos < lines.length && lines[pos].match(/^\w/) !== null) {
                 let el: BpmnNode = this.parseActivities(lines[pos]);
-                this.elements.push(el);
+                this.nodes.push(el);
                 this.result.addNode(el);
                 pos++;
             }
@@ -58,7 +90,7 @@ export class ParserService {
             pos = lines.indexOf(evt) + 1;
             while (pos < lines.length && lines[pos].match(/^\w/) !== null) {
                 let el: BpmnNode = this.parseEvents(lines[pos]);
-                this.elements.push(el);
+                this.nodes.push(el);
                 this.result.addNode(el);
                 pos++;
             }
@@ -69,7 +101,7 @@ export class ParserService {
             pos = lines.indexOf(gateway) + 1;
             while (pos < lines.length && lines[pos].match(/^\w/) !== null) {
                 let el: BpmnNode = this.parseGateways(lines[pos]);
-                this.elements.push(el);
+                this.nodes.push(el);
                 this.result.addNode(el);
                 pos++;
             }
@@ -79,12 +111,13 @@ export class ParserService {
         if (seq) {
             pos = lines.indexOf(seq) + 1;
             while (pos < lines.length && lines[pos].match(/^\w/) !== null) {
-                let el = this.parseSequences(lines[pos]);
+                let el = this.parseSequences(lines[pos], this.nodes);
                 if (typeof el === 'object') {
                     this.result.addEdge(el);
                 } else {
-                    // console.log("nicht vorhandene Verbindungselemente bei" + el);
+                    console.log("nicht vorhandene Verbindungselemente bei" + el);
                 }
+                ;
                 pos++;
             }
         }
@@ -141,7 +174,7 @@ export class ParserService {
 
         activity.label = description;
 
-        // console.log("name:" + name + "description:" + description);
+        console.log("name:" + name + "description:" + description);
 
         if (lineSplit[3]) {
             let coordinates = lineSplit[3];
@@ -151,7 +184,7 @@ export class ParserService {
             let x = parseInt(coord[0]);
             let y = parseInt(coord[1]);
             activity.setPosXY(x, y);
-            // console.log("x: " + x + "y: " + y);
+            console.log("x: " + x + "y: " + y);
         }
         return activity;
     }
@@ -177,9 +210,10 @@ export class ParserService {
                 event = new BpmnEventEnd(name);
                 break;
         }
+
         event.label = description;
 
-        // console.log("name:" + name + "description:" + description);
+        console.log("name:" + name + "description:" + description);
         if (lineSplit[3]) {
             let coordinates = lineSplit[3];
             let coord = coordinates.split(',');
@@ -193,6 +227,10 @@ export class ParserService {
     }
 
     private parseGateways(line: string): BpmnNode {
+        let description = line.split('"')[1];
+        let re = /"[\w ]*"/;
+        line = line.replace(re, "");
+
         const lineSplit = line.split(" ");
         const name = lineSplit[0];
         let gateway = new BpmnGateway(name);
@@ -216,8 +254,10 @@ export class ParserService {
                 gateway = new BpmnGatewaySplitXor(name);
                 break;
         }
-        if (lineSplit[2]) {
-            let coordinates = lineSplit[2];
+        gateway.label = description;
+
+        if (lineSplit[3]) {
+            let coordinates = lineSplit[3];
             let coord = coordinates.split(',');
             coord[0] = coord[0].replace("(", "");
             coord[1] = coord[1].replace(")", "");
@@ -229,7 +269,7 @@ export class ParserService {
 
     }
 
-    private parseSequences(line: string): BpmnEdge | void {
+    private parseSequences(line: string, elements: Array<BpmnNode>): BpmnEdge | void {
 
         let description = line.split('"')[1];
         let re = /"[\w ]*"/;
@@ -247,22 +287,23 @@ export class ParserService {
         let var1: BpmnNode;
         let var2: BpmnNode;
 
-        for (let i = 0; i < this.elements.length; i++) {
-            if (this.elements[i].id === lineSplit[3].trim()) {
-                var1 = this.elements[i];
-                for (let j = 0; j < this.elements.length; j++) {
-                    if (this.elements[j].id === lineSplit[4].trim()) {
-                        var2 = this.elements[j];
-                        // console.log("sequence:" + var1.id + var2.id);
+        for (let i = 0; i < elements.length; i++) {
+            if (elements[i].id === lineSplit[3].trim()) {
+                var1 = elements[i];
+                for (let j = 0; j < elements.length; j++) {
+                    if (elements[j].id === lineSplit[4].trim()) {
+                        var2 = elements[j];
+                        console.log("sequence:" + var1.id + var2.id);
                         let sequence = new BpmnEdge(name, var1, var2);
 
                         let i = 5;
-                        while (lineSplit[i] != undefined && !lineSplit[i].startsWith("\r")) {
+                        while (lineSplit[i] && lineSplit[i] != undefined && !lineSplit[i].startsWith("\r")) {
+                            console.log(lineSplit[i]);
                             let coordinates = lineSplit[i];
                             let coord = coordinates.split(',');
+                            console.log("0:" + coord[0] + "1:" + coord[1]);
                             coord[0] = coord[0].replace("(", "").replace("\r", "");
                             coord[1] = coord[1].replace(")", "").replace("\r", "");
-                            ;
                             let x = parseInt(coord[0]);
                             let y = parseInt(coord[1]);
                             sequence.addCornerXY(x, y);

@@ -30,7 +30,6 @@ export class DisplayService implements OnDestroy {
     public display(net: BpmnGraph) {
         this._diagram$.getValue().svgManager.getSvg().remove()
         this._layoutService.initalLayoutHasBeenDone = false
-        
         this._diagram$.next(net);
     }
 

@@ -24,18 +24,27 @@ export class OutputFieldComponent {
     download(type:string) {
         let textToExport = this.text;
         let filetype = '.txt';
-        if(type === 'bpmn' && textToExport) {
-            if(!this.formValidationService.validateFormat(textToExport)){
-                this.displayErrorService.displayError("BPMN-Format ist verletzt; nicht exportierbar");
+        switch(type) {
+            case'bpmn': if(textToExport) {
+                if(!this.formValidationService.validateFormat(textToExport)){
+                    this.displayErrorService.displayError("BPMN-Format ist verletzt; nicht exportierbar");
+                    return;
+                }
+            }; break;
+            case 'bpmn-xml':
+                filetype = ".xml";
+                this.displayErrorService.displayError("XML-Format wird noch implementiert");
+                //todo: textToExport zu XML-Format konvertieren; return entfernen
                 return;
-            }
+                break;
+            case 'pn':  
+                this.displayErrorService.displayError("PN-Format wird noch implementiert");
+                //todo: textToExport zu PN-Format konvertieren; return entfernen
+                return;
+                break;
         }
-        if(type === "bpmn-xml") {
-            filetype = ".xml";
-        }
-        
-        //ist der type pn oder bpmn-xml, wird textToExport zu dem jeweiligen Format geändert 
 
+        
         let a = document.getElementById(type);
             if(a && textToExport) {
                 a.setAttribute('href','data:text/plain;charset=utf-8, ' + encodeURIComponent(textToExport));

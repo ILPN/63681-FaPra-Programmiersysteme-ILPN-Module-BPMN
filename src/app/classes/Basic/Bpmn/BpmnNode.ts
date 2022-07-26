@@ -47,6 +47,10 @@ export class BpmnNode extends BNode implements Position {
     }
 
     public set label(value: string) {
+        if(value == undefined){
+            this._label = ""
+            return
+        }
         this._label = value;
     }
 

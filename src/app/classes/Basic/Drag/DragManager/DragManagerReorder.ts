@@ -59,10 +59,26 @@ export class DragManagerReorder extends DragManager{
         }
     }
 
+    private _onStopReorderDragHandles: (dragHandlesThatChanged: DragHandle[]) => void = () => { };
+    public set onStopReorderDrag(value: (dragHandlesThatChanged: DragHandle[]) => void) {
+        this._onStopReorderDragHandles = value;
+    }
     override stopDrag(event: MouseEvent): void {
         super.stopDrag(event)
         for (const [i,dragHandle] of this.dragHandlesToReorder.entries()) {
             dragHandle.dragTo(this.startPositions[i])
         }
+
+        const dragHandlesThatChanged = []
+        for (const dh of this.dragHandlesToReorder) {
+            if(!Utility.positionsAreEqual(dh.dragedElement.getPos(), dh.startPos)){
+                dragHandlesThatChanged.push(dh)
+                for (const dha of dh.dragedAlong) {
+                    dragHandlesThatChanged.push(dha)
+                }
+            }
+        }
+
+        this._onStopReorderDragHandles(dragHandlesThatChanged)
     }
 }

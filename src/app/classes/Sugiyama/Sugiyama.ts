@@ -1,3 +1,4 @@
+import { matchesPattern } from '@babel/types';
 import { DummyNode, LeveledGraph, LNode } from './LeveledGraph';
 import { SimpleArc, SimpleGraph } from './SimpleGraph';
 
@@ -22,7 +23,7 @@ export class Sugiyama {
         this.leveling();
         this.addDummies();
         this.minimizeCrossings();
-        this.alignNodesAndDummyNodes()
+        //this.straightening()
         this.reverseReversedArcs();
 
         this.assignLevelAndOrderToUnleveledNodes()
@@ -36,15 +37,31 @@ export class Sugiyama {
             this.leveled.setLevelOfNode(node,0)
         }
     }
-    alignNodesAndDummyNodes() {
-        //@Marcel: here all arcs still point in one direction, the graph is still acyclical, every arc spans only over one level
-        // placeisFree(level,order) might be usefull
-        const leveledGraph = this.leveled
-
-        for (const dn of this.leveled.getAllDummyNodes()) {
-           // dn.order = dn.order+1 // @Marcel: just so you see what happens when you do that
+    straightening() {
+        /*
+        ansatz
+        const maxOrder = () =>{
+         let maxO = 0
+         for (const n of this.leveled.getAllNodes()) {
+             if(n.order> maxO)maxO = n.order
+         }
+         return maxO
         }
-    }
+ 
+        const ordersSpots = maxOrder() * 2
+        const distNode = (node:LNode, withOrder:number) =>{
+            let sum = 0
+            for (const adj of node.parents.concat(node.children)) {
+                sum += Math.pow(adj.order- withOrder,2)
+            }
+         }
+        let consideredNodesStart = 0
+         for (let i = 0; i < this.leveled.levels.length - 1; i++) {
+             const level = this.leveled.levels[i]
+             
+         }
+         */
+     }
     placeIsFree(level:number, order:number){
         for (const n of this.leveled.getAllNodes()) {
             if(n.level == level && n.order == order) return false

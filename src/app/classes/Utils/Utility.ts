@@ -1,4 +1,12 @@
+import { Vector } from "./Vector";
+
 export class Utility{
+    static lastElement(arr:any[]) {
+        return arr[arr.length-1]
+        }
+    static positionsAreEqual(pos1: Vector, pos2: Vector) {
+        return(pos1.x == pos2.x && pos1.y == pos2.y)
+    }
     static between(n: number, lowLimit: number, highLimit: number) {
         return (lowLimit <= n)&& (n <= highLimit);
     }
