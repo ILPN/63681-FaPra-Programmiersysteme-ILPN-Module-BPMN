@@ -1,8 +1,8 @@
 import { BpmnGraph } from "../Basic/Bpmn/BpmnGraph"
 
 export class SimpleGraph{
-  addArc(fromId: string, toId: string) {
-    this.arcs.push(new SimpleArc(fromId, toId))
+  addEdge(fromId: string, toId: string) {
+    this.edges.push(new SimpleEdge(fromId, toId))
   }
     private _nodes: SimpleNode[] = []
     public get nodes(): SimpleNode[] {
@@ -11,46 +11,46 @@ export class SimpleGraph{
     public set nodes(value: SimpleNode[]) {
         this._nodes = value
     }
-    private _arcs: SimpleArc[] = []
-    public get arcs(): SimpleArc[] {
-        return this._arcs
+    private _edges: SimpleEdge[] = []
+    public get edges(): SimpleEdge[] {
+        return this._edges
     }
-    public set arcs(value: SimpleArc[]) {
-        this._arcs = value
+    public set edges(value: SimpleEdge[]) {
+        this._edges = value
     }
     clone(): SimpleGraph {
         const clone = new SimpleGraph()
         clone._nodes = [...this.nodes]
-        clone._arcs = [...this._arcs]
+        clone._edges = [...this._edges]
         return clone
     }
     /**
      * 
-     * @returns sinks (sinks are nodes that have only incoming arcs, no outgoing arcs)
+     * @returns sinks (sinks are nodes that have only incoming edges, no outgoing edges)
      */
     getSinks() {
         return this.nodes.filter(n => 
-            this.getOutArcs(n.id).length == 0
+            this.getOutEdges(n.id).length == 0
             &&
-            this.getInArcs(n.id).length > 0
+            this.getInEdges(n.id).length > 0
             );
     }
     /**
      * 
-     * @returns sources (sources are nodes that have only outgoing arcs, no incoming arcs)
+     * @returns sources (sources are nodes that have only outgoing edges, no incoming edges)
      */
     getSources() {
         return this.nodes.filter(n => 
-            this.getInArcs(n.id).length == 0
+            this.getInEdges(n.id).length == 0
             &&
-            this.getOutArcs(n.id).length > 0
+            this.getOutEdges(n.id).length > 0
             );
     }
-    getNodeWithMaxDiffInOutArcs():SimpleNode{
+    getNodeWithMaxDiffInOutEdges():SimpleNode{
         let maxNode = this.nodes[0];
         let maxDif = -10000;
         this.nodes.forEach(n => {
-            const d = this.getOutArcs(n.id).length - this.getInArcs(n.id).length;
+            const d = this.getOutEdges(n.id).length - this.getInEdges(n.id).length;
             if (d> maxDif){
                 maxDif = d;
                 maxNode = n;
@@ -63,25 +63,25 @@ export class SimpleGraph{
      * @param a2 
      * @returns a1 without a2
      */
-     static substractArcs( a1:SimpleArc[], a2: SimpleArc[]):SimpleArc[]{
+     static substractEdges( a1:SimpleEdge[], a2: SimpleEdge[]):SimpleEdge[]{
         return a1.filter(a => !a2.find(
             ra => a.to==ra.to && a.from == ra.from
         ));
     }
     removeIsolatedNodes() {
-        this._nodes = this.nodes.filter(n=> this.getInOutArcs(n.id).length!=0 );
+        this._nodes = this.nodes.filter(n=> this.getInAndOutEdges(n.id).length!=0 );
     }
-    removeArcs(removedArcs: SimpleArc[]) {
-        this._arcs = this._arcs.filter(a => !removedArcs.find(
+    removeEdges(removedEdges: SimpleEdge[]) {
+        this._edges = this._edges.filter(a => !removedEdges.find(
             ra => a.to==ra.to && a.from == ra.from
         ));
     }
-    removeArc(ra: SimpleArc) {
-        const before = this._arcs.length
-        this._arcs = this._arcs.filter(a => ra != a)
+    removeEdge(re: SimpleEdge) {
+        const before = this._edges.length
+        this._edges = this._edges.filter(a => re != a)
      }
-    addArcs(newArcs:SimpleArc[]) {
-        this._arcs = this._arcs.concat(newArcs);
+    addEdges(newEdge:SimpleEdge[]) {
+        this._edges = this._edges.concat(newEdge);
     }
 
     addNode(id:string){
@@ -94,14 +94,14 @@ export class SimpleGraph{
     removeNode(id:string){
         this._nodes = this.nodes.filter(n =>  n.id != id);
     }
-    getInArcs(id: string){
-        return this.arcs.filter( a => a.to == id)
+    getInEdges(id: string){
+        return this.edges.filter( a => a.to == id)
     }
-    getOutArcs(id: string){
-        return this.arcs.filter( a => a.from == id)
+    getOutEdges(id: string){
+        return this.edges.filter( a => a.from == id)
     }
-    getInOutArcs(id: string){
-        return this.arcs.filter( a => a.from == id || a.to == id)
+    getInAndOutEdges(id: string){
+        return this.edges.filter( a => a.from == id || a.to == id)
     }
    
     
@@ -113,7 +113,7 @@ export class SimpleGraph{
             sGraph.addNode(node.id)
         }
         for (const edge of bpmnGraph.edges) {
-            sGraph.addArc(edge.fromId,edge.toId)
+            sGraph.addEdge(edge.fromId,edge.toId)
         }
         return sGraph
     }
@@ -127,7 +127,7 @@ export class SimpleNode{
         this._id = id
     }
 }
-export class SimpleArc{
+export class SimpleEdge{
     constructor(public from:string, public to:string, public inversed:boolean = false){
     }
 }
