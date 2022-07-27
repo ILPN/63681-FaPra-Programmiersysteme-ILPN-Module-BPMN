@@ -1,9 +1,7 @@
 import {Injectable} from '@angular/core';
 import {SwitchableNode} from "../classes/Basic/Switch/SwitchableNode";
 import {DisplayErrorService} from "./display-error.service";
-import {ValidateableGraph} from "../classes/Basic/Interfaces/ValidateableGraph";
 import {BpmnNode} from "../classes/Basic/Bpmn/BpmnNode";
-import {SwitchableGraph} from "../classes/Basic/Switch/SwitchableGraph";
 import {BpmnGraph} from "../classes/Basic/Bpmn/BpmnGraph";
 import {BpmnEventEnd} from "../classes/Basic/Bpmn/events/BpmnEventEnd";
 import {BpmnEventStart} from "../classes/Basic/Bpmn/events/BpmnEventStart";
@@ -18,47 +16,18 @@ export class GraphValidationService {
     constructor(private displayErrorService: DisplayErrorService) {
     }
 
-    // gucken ob man die Fehlermeldungen alle untereinander ausgibt. Evtl errorMessages: string[] und dann ausgeben lassen
+    // todo: gucken ob man die Fehlermeldungen alle untereinander ausgibt. Evtl errorMessages: string[] und dann ausgeben lassen
     private errorMessage: string = '';
 
-    validateGraph(validateableGraph: ValidateableGraph) {
-        if (validateableGraph instanceof SwitchableGraph) {
-            this.validateSwitchableGraph(validateableGraph.switchNodes);
-        }
-        if (validateableGraph instanceof BpmnGraph) {
-            this.validateBpmnGraph(validateableGraph.nodes);
-        }
+    validateGraph(validateableGraph: BpmnGraph) {
+        this.validateBpmnGraph(validateableGraph.nodes);
 
         if (this.errorMessage !== '') {
             this.displayErrorService.displayError(this.errorMessage);
         }
     }
-
-    private validateSwitchableGraph(nodes: SwitchableNode[]): void {
-        let startEventNodes: SwitchableNode[] = [];
-        let endEventNodes: SwitchableNode[] = [];
-        let gatewayNodes: SwitchableNode[] = [];
-        nodes.forEach(node => {
-            if (node.isEndEvent()) {
-                endEventNodes.push(node);
-            }
-            if (node.isStartEvent()) {
-                startEventNodes.push(node);
-            }
-            if (node.isGateway()) {
-                gatewayNodes.push(node);
-            }
-        });
-        this.validateEndEventNodes(endEventNodes);
-        this.validateStartEventNodes(startEventNodes);
-        // this.validateGatewayNodes(gatewayNodes);
-
-    }
-
-    private validateEndEventNodes(endEvents: SwitchableNode[]): void {
-        if (this.containsOutEdges(endEvents)) {
-            this.errorMessage += 'EndEvent enthaelt einen Ausgang!';
-        }
+    resetErrorMessage():void {
+        this.errorMessage = '';
     }
 
     private validateBpmnEndEventNodes(endEvents: BpmnNode[]): void {
@@ -80,22 +49,6 @@ export class GraphValidationService {
         return outEdges > 0;
     }
 
-    private containsOutEdges(endEventNodes: SwitchableNode[]): boolean {
-        let outEdges: number = 0;
-        endEventNodes.forEach(endEventNode => {
-            if (endEventNode.containsOutEdges()) {
-                outEdges++;
-            }
-        });
-        return outEdges > 0;
-    }
-
-    private validateStartEventNodes(startEventNodes: SwitchableNode[]): void {
-        if (this.containsInEdges(startEventNodes)) {
-            this.errorMessage += 'Fehler, Startevent hat inEdges!';
-        }
-    }
-
     private validateBpmnStartEventNodes(startEventNodes: BpmnNode[]): void {
         if (this.containsInEdgesBpmn(startEventNodes)) {
             this.errorMessage += 'Fehler, Startevent hat inEdges!';
@@ -104,16 +57,6 @@ export class GraphValidationService {
             this.errorMessage += 'enthaelt kein StartEvent!';
         }
 
-    }
-
-    private containsInEdges(startEventNodes: SwitchableNode[]): boolean {
-        let inEdges: number = 0;
-        startEventNodes.forEach(startEventNode => {
-            if (startEventNode.containsInEdges()) {
-                inEdges++;
-            }
-        });
-        return inEdges > 0;
     }
 
     private containsInEdgesBpmn(startEventNodes: BpmnNode[]): boolean {
@@ -158,12 +101,12 @@ export class GraphValidationService {
                 gatewayNodes.push(node);
             }
         });
-        console.log(startEventNodes.length);
-        console.log(endEventNodes.length);
-        console.log('BpmnTask:');
-        console.log(bpmnTasks.length);
-        console.log(intermediateEventNodes.length);
-        console.log(gatewayNodes.length);
+        // console.log(startEventNodes.length);
+        // console.log(endEventNodes.length);
+        // console.log('BpmnTask:');
+        // console.log(bpmnTasks.length);
+        // console.log(intermediateEventNodes.length);
+        // console.log(gatewayNodes.length);
         this.validateBpmnEndEventNodes(endEventNodes);
         // this.validateBpmnIntermediateEventNodes(intermediateEventNodes); // muessen erst die passenden Faelle kommen
         this.validateBpmnStartEventNodes(startEventNodes);

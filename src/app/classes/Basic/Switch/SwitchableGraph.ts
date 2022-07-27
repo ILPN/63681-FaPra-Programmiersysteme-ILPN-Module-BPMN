@@ -11,10 +11,9 @@ import {SwitchableGateway} from './SwitchableGateway';
 import {SwitchableNode} from './SwitchableNode';
 import {SwitchState} from './switchstatetype';
 import {SwitchUtils} from './SwitchUtils';
-import {ValidateableGraph} from "../Interfaces/ValidateableGraph";
 
 
-export class SwitchableGraph implements GetSvgManager, ValidateableGraph {
+export class SwitchableGraph implements GetSvgManager {
 
     private _switchEdges: SwitchableEdge[] = []
     private _switchNodes: SwitchableNode[] = []
@@ -39,11 +38,6 @@ export class SwitchableGraph implements GetSvgManager, ValidateableGraph {
         return bpmnNodes;
     }
 
-
-    // workaround, wenn ValidateableGraph implementiert wurde
-    isValidateable(): boolean {
-        return true;
-    }
 
     get controller(): SwitchController {
         return this._controller

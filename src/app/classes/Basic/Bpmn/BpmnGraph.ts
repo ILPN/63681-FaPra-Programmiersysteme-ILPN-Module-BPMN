@@ -19,11 +19,10 @@ import {BpmnGatewaySplitXor} from './gateways/BpmnGatewaySplitXor';
 import {BpmnGatewayJoinXor} from './gateways/BpmnGatewayJoinXor';
 import {BpmnTaskBusinessRule} from './tasks/BpmnTaskBusinessRule';
 import {BpmnEdgeDefault} from './BpmnEdge/BpmnEdgeDefault';
-import {ValidateableGraph} from "../Interfaces/ValidateableGraph";
 
 export class BpmnGraph
     extends BGraph<BpmnEdge, BpmnNode>
-    implements GetSvgManager, ValidateableGraph {
+    implements GetSvgManager {
     private _svgManager: SvgManager | undefined;
     public get svgManager(): SvgManager {
         if (this._svgManager == undefined) {
@@ -35,10 +34,6 @@ export class BpmnGraph
     constructor() {
         super()
         //this._svg = this.updateSvg()
-    }
-
-    isValidateable(): boolean {
-        return true;
     }
 
     private svgCreation() {
@@ -55,8 +50,8 @@ export class BpmnGraph
     addNode(node: BpmnNode) {
         if (this.nodes.findIndex(n => n.id == node.id) == -1)
             this.nodes.push(node)
-       // else
-           // console.log("couldn't add node " + node.id)
+        // else
+        // console.log("couldn't add node " + node.id)
     }
 
     addEdge(edge: BpmnEdge) {
@@ -69,7 +64,7 @@ export class BpmnGraph
             toNode.addInEdge(edge)
             this.edges.push(edge)
         } //else
-            //console.log("couldn't add edge " + edge.id)
+        //console.log("couldn't add edge " + edge.id)
     }
 
 
@@ -362,14 +357,14 @@ export class BpmnGraph
         g.addNode(end)
 
 
-        const e1 = new BpmnEdge("startToMiddle",start,middle)
+        const e1 = new BpmnEdge("startToMiddle", start, middle)
         g.addEdge(e1)
-        const e2 = new BpmnEdge("middleToEnd",middle,end)
+        const e2 = new BpmnEdge("middleToEnd", middle, end)
         g.addEdge(e2)
-        const e3 = new BpmnEdge("EndToStart",end,start)
+        const e3 = new BpmnEdge("EndToStart", end, start)
         g.addEdge(e3)
 
-        const e4 = new BpmnEdge("Start2ToEnd",start2,end)
+        const e4 = new BpmnEdge("Start2ToEnd", start2, end)
         g.addEdge(e4)
 
         return g
