@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, Output, EventEmitter} from '@angular/core';
 import { BpmnDummyEdgeCorner } from '../classes/Basic/Bpmn/BpmnEdge/BpmnDummyEdgeCorner';
 import { BpmnEdge } from '../classes/Basic/Bpmn/BpmnEdge/BpmnEdge';
 import { BpmnEdgeCorner } from '../classes/Basic/Bpmn/BpmnEdge/BpmnEdgeCorner';
@@ -27,9 +27,17 @@ import { BpmnTaskUserTask } from '../classes/Basic/Bpmn/tasks/BpmnTaskUserTask';
     providedIn: 'root'
 })
 export class ParserService {
+
+    @Output() positionChange = new EventEmitter<string>();
+    
+    text:string[];
     
     constructor() {
-       
+       this.text = [];
+    }
+
+    getText() {
+        return this.text;
     }
     /**
      * is called after draging or reordering if positions have been changed
@@ -41,12 +49,65 @@ export class ParserService {
     positionOfNodesAndEdgesChanged(nodes:BpmnNode[], dummyNodes: BpmnDummyEdgeCorner[], edgeStarts:BpmnEdgeCorner[],  edgeEnds:BpmnEdgeCorner[]){
         //@Vanessa
         
-        console.log(nodes)
-        console.log(dummyNodes)
-        console.log(edgeStarts)
-        console.log(edgeEnds)
-        
+        for (const node of nodes) {
+            if (this.text != []) {
+                let newCoordString = "(" + node.getPos().x + "," + node.getPos().y + ")";
+                let matchLine = this.text.find(line => line.startsWith(node.id));
+                if(matchLine != undefined) {
+                    let index = this.text.indexOf(matchLine);
+                    console.log(matchLine);
+                    let matchLineNew = matchLine.replace(/\(-?[0-9]*,-?[0-9]*\)/,newCoordString);
+                  
+                    if(matchLine.match(/\(-?[0-9]*,-?[0-9]*\)/) === null) {
+                        matchLineNew = matchLine.concat(" "+newCoordString);
+                    }
+                   
+                    this.text[index] = matchLineNew;
+                    console.log(matchLineNew);
+                }
+                
+            }
+            for (const edge of node.inEdges){
+                let newCoordString = "(" + edgeEnds[0].x + "," + edgeEnds[0].y + ")";
+                console.log(newCoordString);
+                let matchLine = this.text.find(line => line.startsWith(edge.id));
+
+                if(matchLine != undefined) {
+                    let index = this.text.indexOf(matchLine);
+                    console.log(matchLine);
+                    let matchLineNew = matchLine.replace(/\(-?[0-9]*,-?[0-9]*\)/,newCoordString);
+                    if(matchLine.match(/\(-?[0-9]*,-?[0-9]*\)/) === null) {
+                        matchLineNew = matchLine.concat(" "+newCoordString);
+                    }
+                    this.text[index] = matchLineNew;
+                    console.log(matchLineNew);
+            }
+
+        }
+
+        for (const edge of node.outEdges){
+            let newCoordString = "(" + edgeStarts[0].x + "," + edgeStarts[0].y + ")";
+            console.log(newCoordString);
+            let matchLine = this.text.find(line => line.startsWith(edge.id));
+
+            if(matchLine != undefined) {
+                let index = this.text.indexOf(matchLine);
+                console.log(matchLine);
+                let matchLineNew = matchLine.replace(/\(-?[0-9]*,-?[0-9]*\)/,newCoordString);
+              
+                if(matchLine.match(/\(-?[0-9]*,-?[0-9]*\)/) === null) {
+                    matchLineNew = matchLine.concat(" "+newCoordString);
+                }
+                this.text[index] = matchLineNew;
+                console.log(matchLineNew);
+        }
+
     }
+
+        let emitText = this.text.join("\n");
+        this.positionChange.emit(emitText);
+        
+    }}
     /**
      * this functions is called after the layout by the sugiyama algorithm has been done 
      * and allows to override the positions set by the alogrithm
@@ -54,21 +115,53 @@ export class ParserService {
     setHardcodedPositions(bpmnGraph:BpmnGraph) {
         //@Vanessa
         for (const node of bpmnGraph.nodes) {
-            const id = node.id 
-            //if (pos is defined in text)  => node.setPosXY(...,...)           
+            const id = node.id;
+            let matchLine = this.text.find(line => line.startsWith(node.id));
+                if(matchLine != undefined && matchLine.includes("(")) {
+                    let re = /"[\w ]*"/;
+                    matchLine = matchLine.replace(re, "");
+                    let lineSplit = matchLine.split(" ");
+                    if (lineSplit[3]) {
+                        let coordinates = lineSplit[3];
+                        let coord = coordinates.split(',');
+                        coord[0] = coord[0].replace("(", "");
+                        coord[1] = coord[1].replace(")", "");
+                        let x = parseInt(coord[0]);
+                        let y = parseInt(coord[1]);
+                        node.setPosXY(x,y);   
+                }}  
+                   
         }
         for (const edge of bpmnGraph.edges) {
-        }
+            const id = edge.id;
+            let matchLine = this.text.find(line => line.startsWith(edge.id));
+            if(matchLine != undefined && matchLine.includes("(")) {
+                let sub = matchLine.substring(matchLine.indexOf("("));
+                while (sub != "") {
+                    sub = sub.substring(sub.indexOf("(")+1,sub.indexOf(")"));
+                    let coord = sub.split(',');
+                    coord[0] = coord[0].replace("\r", "");
+                    coord[1] = coord[1].replace("\r", "");;
+                    let x = parseInt(coord[0]);
+                    let y = parseInt(coord[1]);
+                    edge.addCornerXY(x,y);
+                    if(sub.includes("(")) {
+                        sub = sub.substring(sub.indexOf("("));
+                    }else sub = "";
+                }   
+            }}     
+
         //console.log("read existing positions from text and set them to the nodes and edges")
     }
 
     parse(text: string): BpmnGraph | undefined {
-        const result = new BpmnGraph();
-        const nodes = new Array<BpmnNode>();
 
         console.log("parsing");
 
         const lines = text.split('\n');
+        this.text = lines; 
+        const result = new BpmnGraph();
+        const nodes = new Array<BpmnNode>();
 
         let pos;
         let act = lines.find(el => el.startsWith(".activities"));
@@ -158,8 +251,6 @@ export class ParserService {
 
         activity.label = description;
 
-        console.log("name:" + name + "description:" + description);
-
         if (lineSplit[3]) {
             let coordinates = lineSplit[3];
             let coord = coordinates.split(',');
@@ -168,7 +259,6 @@ export class ParserService {
             let x = parseInt(coord[0]);
             let y = parseInt(coord[1]);
             activity.setPosXY(x, y);
-            console.log("x: " + x + "y: " + y);
         }
         return activity;
     }
@@ -191,7 +281,6 @@ export class ParserService {
         
         event.label = description;
 
-        console.log("name:" + name + "description:" + description);
         if (lineSplit[3]) {
             let coordinates = lineSplit[3];
             let coord = coordinates.split(',');
@@ -259,15 +348,12 @@ export class ParserService {
                 for (let j = 0; j < elements.length; j++) {
                     if (elements[j].id === lineSplit[4].trim()) {
                         var2 = elements[j];
-                        console.log("sequence:" + var1.id + var2.id);
                         let sequence = new BpmnEdge(name, var1, var2);
 
                         let i = 5; 
                         while (lineSplit[i] && lineSplit[i] != undefined && !lineSplit[i].startsWith("\r")) {
-                            console.log(lineSplit[i]);
                             let coordinates = lineSplit[i];
                             let coord = coordinates.split(',');
-                            console.log("0:" + coord[0] + "1:" + coord[1]);
                             coord[0] = coord[0].replace("(", "").replace("\r", "");
                             coord[1] = coord[1].replace(")", "").replace("\r", "");;
                             let x = parseInt(coord[0]);
