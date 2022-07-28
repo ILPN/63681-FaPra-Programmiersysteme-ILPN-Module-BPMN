@@ -48,7 +48,7 @@ export class AppComponent implements OnDestroy {
     }
 
     validateGraph(): void {
-        if (this.result !== undefined) {
+       if (this.result !== undefined) {
             this.graphValidationService.validateGraph(this.result);
         }
     }

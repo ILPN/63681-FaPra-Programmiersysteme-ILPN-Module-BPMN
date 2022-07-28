@@ -6,6 +6,7 @@ import {Svg} from '../Svg/Svg';
 import {SvgManager} from '../Svg/SvgManager/SvgManager';
 import {BpmnEdge} from './BpmnEdge/BpmnEdge';
 
+
 export class BpmnNode extends BNode implements Position {
     readonly radius: number = 35
 
@@ -88,4 +89,6 @@ export class BpmnNode extends BNode implements Position {
     protected svgCreation() {
         return Svg.circleStroke(this.x, this.y, 10, 2)
     }
+
+
 }

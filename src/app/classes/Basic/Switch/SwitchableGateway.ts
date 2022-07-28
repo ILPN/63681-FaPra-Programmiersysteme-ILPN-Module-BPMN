@@ -1,3 +1,4 @@
+import { BpmnCommonValidateServices } from "../Bpmn/bpmn-common-validate-services";
 import { BpmnGatewayJoinAnd } from "../Bpmn/gateways/BpmnGatewayJoinAnd";
 import { BpmnGatewayJoinOr } from "../Bpmn/gateways/BpmnGatewayJoinOr";
 import { BpmnGatewayJoinXor } from "../Bpmn/gateways/BpmnGatewayJoinXor";
@@ -114,27 +115,33 @@ export class SwitchableGateway extends SwitchableNode {
 
 
     private AND_SPLIT(): boolean {
-        return this._bpmnNode instanceof BpmnGatewaySplitAnd
+        return BpmnCommonValidateServices.isGatewaySplit(this._bpmnNode)&&BpmnCommonValidateServices.isGatewayAnd(this._bpmnNode);
+       // return this._bpmnNode instanceof BpmnGatewaySplitAnd
     }
 
     OR_SPLIT(): boolean {
-        return this._bpmnNode instanceof BpmnGatewaySplitOr
+        return BpmnCommonValidateServices.isGatewaySplit(this._bpmnNode)&&BpmnCommonValidateServices.isGatewayOR(this._bpmnNode);
+        //return this._bpmnNode instanceof BpmnGatewaySplitOr
     }
 
     private XOR_SPLIT(): boolean {
-        return this._bpmnNode instanceof BpmnGatewaySplitXor
+        return BpmnCommonValidateServices.isGatewaySplit(this._bpmnNode)&&BpmnCommonValidateServices.isGatewayXOR(this._bpmnNode);
+     //   return this._bpmnNode instanceof BpmnGatewaySplitXor
     }
 
     private AND_JOIN(): boolean {
-        return this._bpmnNode instanceof BpmnGatewayJoinAnd
+        return BpmnCommonValidateServices.isGatewayJoin(this._bpmnNode)&&BpmnCommonValidateServices.isGatewayAnd(this._bpmnNode);
+        //return this._bpmnNode instanceof BpmnGatewayJoinAnd
     }
 
     OR_JOIN(): boolean {
-        return this._bpmnNode instanceof BpmnGatewayJoinOr
+        return BpmnCommonValidateServices.isGatewayJoin(this._bpmnNode)&&BpmnCommonValidateServices.isGatewayOR(this._bpmnNode);
+        //return this._bpmnNode instanceof BpmnGatewayJoinOr
     }
 
     private XOR_JOIN(): boolean {
-        return this._bpmnNode instanceof BpmnGatewayJoinXor
+        return BpmnCommonValidateServices.isGatewayJoin(this._bpmnNode)&&BpmnCommonValidateServices.isGatewayXOR(this._bpmnNode);
+       // return this._bpmnNode instanceof BpmnGatewayJoinXor
     }
 
 
@@ -169,11 +176,14 @@ export class SwitchableGateway extends SwitchableNode {
     }
 
     isSplitGateway(): boolean {
-        return this.AND_SPLIT() || this.OR_SPLIT() || this.XOR_SPLIT();
+     //   return this.AND_SPLIT() || this.OR_SPLIT() || this.XOR_SPLIT();
+        return BpmnCommonValidateServices.isGatewaySplit(this._bpmnNode);
+
     }
 
     isJoinGateway(): boolean {
-        return this.AND_JOIN() || this.OR_JOIN() || this.XOR_JOIN();
+      //  return this.AND_JOIN() || this.OR_JOIN() || this.XOR_JOIN();
+        return BpmnCommonValidateServices.isGatewayJoin(this._bpmnNode);
     }
 
     /**
@@ -194,7 +204,8 @@ export class SwitchableGateway extends SwitchableNode {
   * @returns Returns true if split and join gateway have the same type
   */
     public static splitJoinSameType(split: SwitchableGateway, join: SwitchableGateway): boolean {
-        return ((split.OR_SPLIT() && join.OR_JOIN()) || (split.AND_SPLIT() && join.AND_JOIN()) || (split.XOR_SPLIT() && join.XOR_JOIN()))
+      //  return ((split.OR_SPLIT() && join.OR_JOIN()) || (split.AND_SPLIT() && join.AND_JOIN()) || (split.XOR_SPLIT() && join.XOR_JOIN()))
+        return BpmnCommonValidateServices.splitJoinSameType(split._bpmnNode, join._bpmnNode);
     }
 
 
@@ -231,10 +242,11 @@ export class SwitchableGateway extends SwitchableNode {
             }
         }
         return (!fail) ? joingateway : undefined;
+     //   return BpmnCommonValidateServices.searchResponsibleJoinGateway(this);
     }
 
 
-    /** Search For Responsible */
+    // /** Search For Responsible */
     private helpSearchRecursiveResponsibleJoinGateway(searchNode: SwitchableNode, innerGatewayArray: SwitchableGateway[]): SwitchableGateway | undefined {
         let joingateway: SwitchableGateway | undefined = undefined;
         if (searchNode !== undefined)

@@ -29,28 +29,35 @@ export class Sugiyama {
         this.table = block.alignNodes()
 
         this.reverseReversedEdges();
-
+       // this.addCorner();
         this.assignColumnAndRowToNodesNotInTable()
 
     }
+
+    // addCorner(): void {
+    //     for (const edge of this.acyc.edges) { 
+    //         edge.
+    //     }
+    // }
+
     assignColumnAndRowToNodesNotInTable() {
         const remainingNodes = [...this.table.notInTable]
         for (const node of remainingNodes) {
             const lowestRow = this.table.columns[0].map(n => n.row).sort((a, b) => b - a)[0];
             console.log(lowestRow)
-            node.row = lowestRow +1
-            this.table.setColumnOfNode(node,0)
+            node.row = lowestRow + 1
+            this.table.setColumnOfNode(node, 0)
 
         }
     }
     reverseReversedEdges() {
         const revEdges = this.table.edges.filter((edge) => edge.reversed);
         for (const ra of revEdges) {
-            this.table.removeEdge(ra.from.id, ra.to.id); 
+            this.table.removeEdge(ra.from.id, ra.to.id);
             this.table.addEdge(ra.to.id, ra.from.id);
         }
         for (const dummy of this.table.getAllDummyNodes()) {
-            if(dummy.edgeIsInversed){
+            if (dummy.edgeIsInversed) {
                 const from = dummy.fromId;
                 const to = dummy.toId;
                 dummy.toId = from;
@@ -59,7 +66,7 @@ export class Sugiyama {
             }
         }
     }
-   
+
     /**
      * changes order of nodes inside columns, inorder to minimize crossings of edges
      */
@@ -110,7 +117,7 @@ export class Sugiyama {
                 if (childrenUnordered)
                     e.row = median(e.parents.map((n) => n.row));
                 else e.row = median(e.children.map((n) => n.row));
-            } 
+            }
         }
 
         toBeOrderd.sort((a, b) => a.row - b.row);
@@ -166,7 +173,7 @@ export class Sugiyama {
             this.acyc.edges
         );
 
-        const remainingEdgesInverted =[]
+        const remainingEdgesInverted = []
         for (const a of remainingEdges) {
             remainingEdgesInverted.push(new SimpleEdge(a.to, a.from, true))
         }
@@ -179,7 +186,7 @@ export class Sugiyama {
     private leveling() {
         this.table.import(this.acyc);
         for (const source of this.table.getSources()) {
-            this.table.setColumnOfNode(source,0)
+            this.table.setColumnOfNode(source, 0)
         }
         for (const sink of this.table.getSinks()) {
             this.table.setColumnOfNode(sink, this.maxColumnOfParents(sink) + 1);
@@ -196,7 +203,7 @@ export class Sugiyama {
             if (pn.column > max) {
                 max = pn.column;
             }
-            
+
         }
         return max;
     }
@@ -226,7 +233,7 @@ export class Sugiyama {
                 }
                 this.table.addEdge(prev, edge.to.id, edgeIsInversed);
             }
-            
+
         }
     }
 }
