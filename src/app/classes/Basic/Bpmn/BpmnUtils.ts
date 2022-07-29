@@ -78,8 +78,8 @@ export class BpmnUtils {
         return nodes.filter(node => BpmnUtils.isTask(node)).map(node => node as BpmnTask)
     }
 
-    public static hasNoMatchingGateway(node: BpmnGateway): boolean {
-        return true
+    public static hasNoMatchingGateway(gateway: BpmnGateway): boolean {
+        return !this.getCorrespondingGateway(gateway)
     }
 
     /**
@@ -215,6 +215,30 @@ export class BpmnUtils {
         return node.inEdges[0].from
     }
 
+    public static getCorrespondingGateway(gateway: BpmnGateway): BpmnGateway | null {
+        if (this.isGatewayJoin(gateway))
+            return this.getCorrespondingSplit(gateway)
+
+        if (this.isGatewaySplit(gateway))
+            return this.getCorrespondingJoin(gateway)
+
+        return null
+    }
+
+    public static getCorrespondingSplit(gateway: BpmnGateway): BpmnGateway | null {
+
+        if (this.isJoinAnd(gateway))
+            return this.getCorrespondingAndSplit(gateway)
+
+        if (this.isJoinOr(gateway))
+            return this.getCorrespondingOrSplit(gateway)
+
+        if (this.isJoinXor(gateway))
+            return this.getCorrespondingXorSplit(gateway)
+
+        return null
+    }
+
     public static getCorrespondingJoin(gateway: BpmnGateway): BpmnGateway | null {
 
         if (this.isSplitAnd(gateway))
@@ -230,6 +254,9 @@ export class BpmnUtils {
     }
 
     public static getCorrespondingAndJoin(node: BpmnNode): BpmnGatewayJoinAnd | null {
+        if (!node)
+            return null
+
         while (this.hasOutEdges(node)) {
             node = this.next(node);
 
@@ -245,6 +272,9 @@ export class BpmnUtils {
     }
 
     public static getCorrespondingOrJoin(node: BpmnNode): BpmnGatewayJoinOr | null {
+        if (!node)
+            return null
+
         while (this.hasOutEdges(node)) {
             node = this.next(node);
 
@@ -260,6 +290,9 @@ export class BpmnUtils {
     }
 
     public static getCorrespondingXorJoin(node: BpmnNode): BpmnGatewayJoinXor | null {
+        if (!node)
+            return null
+
         while (this.hasOutEdges(node)) {
             node = this.next(node);
 
@@ -275,7 +308,59 @@ export class BpmnUtils {
     }
 
 
+    public static getCorrespondingAndSplit(node: BpmnNode): BpmnGatewaySplitAnd | null {
+        if (!node)
+            return null
 
+        while (this.hasInEdges(node)) {
+            node = this.before(node);
+
+            if (this.isSplitAnd(node))
+                return node as BpmnGatewaySplitAnd;
+
+            //nested AND gateway
+            if (this.isJoinAnd(node))
+                node = this.getCorrespondingAndSplit(node)!;
+        }
+
+        return null;
+    }
+
+    public static getCorrespondingOrSplit(node: BpmnNode): BpmnGatewaySplitOr | null {
+        if (!node)
+            return null
+
+        while (this.hasInEdges(node)) {
+            node = this.before(node);
+
+            if (this.isSplitOr(node))
+                return node as BpmnGatewaySplitOr;
+
+            //nested OR gateway
+            if (this.isJoinOr(node))
+                node = this.getCorrespondingOrSplit(node)!;
+        }
+
+        return null;
+    }
+
+    public static getCorrespondingXorSplit(node: BpmnNode): BpmnGatewaySplitXor | null {
+        if (!node)
+            return null
+
+        while (this.hasInEdges(node)) {
+            node = this.before(node);
+
+            if (this.isSplitXor(node))
+                return node as BpmnGatewaySplitXor;
+
+            //nested XOR gateway
+            if (this.isJoinXor(node))
+                node = this.getCorrespondingXorSplit(node)!;
+        }
+
+        return null;
+    }
 
     public static splitJoinSameType(split: BpmnGateway, join: BpmnGateway) {
         let orMatch = this.isSplitOr(split) && this.isJoinOr(join)
