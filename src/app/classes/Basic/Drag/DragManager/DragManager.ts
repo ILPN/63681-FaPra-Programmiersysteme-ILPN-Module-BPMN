@@ -1,3 +1,4 @@
+import { Vector } from "src/app/classes/Utils/Vector";
 import { DragHandle } from "../DragHandle";
 
 export class DragManager{
@@ -26,13 +27,16 @@ export class DragManager{
     }
     startDrag(event: MouseEvent, dh: DragHandle ) {
         this.dragedDragHandle = dh;
-
-        
-        this.dragedDragHandle.startDrag(event);
+        //this.dragedDragHandle.startDrag();
         this.snapingView.appendChild(dh.getSnapSvg());
     }
+    domXYToSvgXY(event:MouseEvent){
+        const pt = new DOMPoint(event.x,event.y);
+        pt.matrixTransform( this.dragingSurface.getScreenCTM()!.inverse() );
+        return new Vector(pt.x,pt.y)
+    }
     drag(event: MouseEvent) {
-        this.dragedDragHandle?.draging(event);
+        this.dragedDragHandle?.draging(this.domXYToSvgXY(event));
     }
     private _onStopDrag: (dh: DragHandle) => void = () => { };
     public set onStopDrag(value: (dh: DragHandle) => void) {

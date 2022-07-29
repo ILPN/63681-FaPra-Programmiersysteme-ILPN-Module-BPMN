@@ -45,27 +45,6 @@ export class ParserService {
      */
     positionOfNodesAndEdgesChanged(nodes: BpmnNode[], dummyNodes: BpmnDummyEdgeCorner[], edgeStarts: BpmnEdgeCorner[], edgeEnds: BpmnEdgeCorner[]) {
         //@Vanessa
-
-        console.log(nodes)
-        console.log(dummyNodes)
-        console.log(edgeStarts)
-        console.log(edgeEnds)
-
-    }
-
-    /**
-     * this functions is called after the layout by the sugiyama algorithm has been done
-     * and allows to override the positions set by the alogrithm
-     */
-    setHardcodedPositions(bpmnGraph: BpmnGraph) {
-        //@Vanessa
-        for (const node of bpmnGraph.nodes) {
-            const id = node.id
-            //if (pos is defined in text)  => node.setPosXY(...,...)
-        }
-        for (const edge of bpmnGraph.edges) {
-        }
-        //console.log("read existing positions from text and set them to the nodes and edges")
     }
 
     parse(text: string): BpmnGraph | undefined {

@@ -46,7 +46,7 @@ export class DragManagerReorder extends DragManager{
         this.startPositions.sort((a,b)=> a.y-b.y)
 
         for (const dragHandle of this.dragHandlesToReorder) {
-            dragHandle.startDrag(event)
+           // dragHandle.startDrag()
         }
     }
 
