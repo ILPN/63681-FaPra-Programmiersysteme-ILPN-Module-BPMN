@@ -13,7 +13,7 @@ export class FormValidationService {
     }
 
     validateFormat(input: string): boolean {
-        console.log(input);
+        //console.log(input);
         if (!input.includes(".activities" && ".sequences")) {
             this.displayErrorService.displayError("wrong format");
             //console.log("wrong format");
@@ -57,7 +57,7 @@ export class FormValidationService {
             default: return false;
         }
 
-        console.log("validating category:" + category);
+        //console.log("validating category:" + category);
         const lines = input.split('\n');
         let substring = input.substring(input.indexOf("." + category));
         let pos;
@@ -68,7 +68,7 @@ export class FormValidationService {
         } else {
             pos = lines.indexOf(cat)+1;
             while(pos < lines.length && lines[pos].match(/^\w/) !== null) {
-                let match = lines[pos].match(regexp); 
+                let match = lines[pos].match(regexp);
                 if (match === null) {
                     //console.log("format error at " + category);
                     this.displayErrorService.displayError("format error at " + category);
@@ -81,5 +81,5 @@ export class FormValidationService {
         //console.log(category + " validated");
         return true;
         }
-    
+
     }

@@ -1,9 +1,10 @@
-import { Component, OnDestroy } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { ParserService } from './services/parser.service';
-import { DisplayService } from './services/display.service';
-import { debounceTime, Subscription } from 'rxjs';
-import { BpmnGraph } from './classes/Basic/Bpmn/BpmnGraph';
+import {Component, OnDestroy} from '@angular/core';
+import {FormControl} from '@angular/forms';
+import {ParserService} from './services/parser.service';
+import {DisplayService} from './services/display.service';
+import {debounceTime, Subscription} from 'rxjs';
+import {BpmnGraph} from './classes/Basic/Bpmn/BpmnGraph';
+import {GraphValidationService} from "./services/graph-validation.service";
 
 @Component({
     selector: 'app-root',
@@ -15,19 +16,29 @@ export class AppComponent implements OnDestroy {
     mode = "free dragging"
     public textareaFc: FormControl;
     private _sub: Subscription;
+<<<<<<< HEAD
     private _sub1: Subscription;
+=======
+    private result: any; //todo: any  muss weg
+>>>>>>> master
 
     constructor(
         private _parserService: ParserService,
-        private _displayService: DisplayService
+        private _displayService: DisplayService,
+        private graphValidationService: GraphValidationService
     ) {
         this.textareaFc = new FormControl();
         this._sub = this.textareaFc.valueChanges
+<<<<<<< HEAD
             .pipe(debounceTime(400))
             .subscribe((val) => this.processSourceChange(val));
         this._sub1 = _parserService.positionChange.
             pipe(debounceTime(400)).
             subscribe((val) => this.textareaFc.setValue(val));
+=======
+        .pipe(debounceTime(400))
+        .subscribe((val) => this.processSourceChange(val));
+>>>>>>> master
         this.textareaFc.setValue(`Your advertising could be here`);
     }
 
@@ -36,15 +47,21 @@ export class AppComponent implements OnDestroy {
     }
 
     private processSourceChange(newSource: string) {
-        const result = this._parserService.parse(newSource);
-        if (result !== undefined) {
-            
-            if(result.nodes.length ==0){
+        this.result = this._parserService.parse(newSource);
+        if (this.result !== undefined) {
+
+            if (this.result.nodes.length == 0) {
                 this._displayService.display(BpmnGraph.anotherMonsterGraph());
 
-            }else{
-                this._displayService.display(result);
+            } else {
+                this._displayService.display(this.result);
             }
+        }
+    }
+
+    validateGraph(): void {
+        if (this.result.isValidateable()) {
+            this.graphValidationService.validateGraph(this.result);
         }
     }
 }

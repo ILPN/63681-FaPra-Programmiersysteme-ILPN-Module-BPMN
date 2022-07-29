@@ -4,7 +4,7 @@ import { SnapElement } from '../classes/Basic/Drag/SnapElements/SnapElement';
 import { SnapPoint } from '../classes/Basic/Drag/SnapElements/SnapPoint';
 import { SnapX } from '../classes/Basic/Drag/SnapElements/SnapX';
 import { SnapY } from '../classes/Basic/Drag/SnapElements/SnapY';
-import { LeveledGraph, LNode } from '../classes/Sugiyama/LeveledGraph';
+import { TableGraph, LNode } from '../classes/Sugiyama/TableGraph';
 import { SimpleGraph } from '../classes/Sugiyama/SimpleGraph';
 import { Sugiyama } from '../classes/Sugiyama/Sugiyama';
 import { Vector } from '../classes/Utils/Vector';
@@ -23,37 +23,21 @@ export class LayoutService {
             this.layout(bpmnGraph, w, h);
         }
     }
+    getSnapsFor(id: string): SnapElement[] {
+        return this.getSnapsForNode();
+    }
     getSnapsForNode(): SnapElement[] {
         const snaps = [];
+        const lowestRow =
+            this.sugiResult!.getAllNodes().map(n => n.row).sort((a,b)=> b-a)[0]
 
-        //snaps.push(new SnapX(this.getPosForLevelAndOrder(ln.level,ln.order).x))
-        const biggestOrderIndex =
-            [...this.sugiResult!.levels].sort(
-                (l1, l2) => l2.length - l1.length
-            )[0].length - 1;
-
-        for (let level = 0; level < this.sugiResult!.levels.length; level++) {
-            snaps.push(new SnapX(this.getPosForLevelAndOrder(level, 0).x));
+        for (let column = 0; column < this.sugiResult!.columns.length; column++) {
+            snaps.push(new SnapX(this.getPosForColumnAndRow(column, 0).x));
         }
-        for (let i = -1; i <= biggestOrderIndex+1; i++) {
-            snaps.push(new SnapY(this.getPosForLevelAndOrder(0, i).y));
+        for (let i = -1; i <= lowestRow+1; i++) {
+            snaps.push(new SnapY(this.getPosForColumnAndRow(0, i).y));
         }
         return snaps;
-    }
-    getSnapsFor(id: string): SnapElement[] {
-        /*
-        const ln = this.sugiResult?.getNode(id)
-        if(ln == undefined) return[]
-        const snaps = []
-        snaps.push(new SnapX(this.getPosForLevelAndOrder(ln.level,ln.order).x))
-
-        const biggestOrderIndex = [...this.sugiResult!.levels].sort((l1,l2) =>l2.length -l1.length)[0].length-1
-        for (let i = 0; i <= biggestOrderIndex; i++) {
-            snaps.push(new SnapPoint(this.getPosForLevelAndOrder(ln.level,i)))
-            
-        }
-        */
-        return this.getSnapsForNode();
     }
 
     initalLayoutHasBeenDone = false;
@@ -97,7 +81,7 @@ export class LayoutService {
     private setCoordinates(bpmnGraph: BpmnGraph) {
         for (const bpmnNode of bpmnGraph.nodes) {
             const ln = this.sugiResult!.getNode(bpmnNode.id);
-            bpmnNode.setPos(this.getPosForLevelAndOrder(ln!.level, ln!.order));
+            bpmnNode.setPos(this.getPosForColumnAndRow(ln!.column, ln!.row));
 
             const inEdges = bpmnGraph.edges.filter((e) => e.to == bpmnNode);
             for (const inEdge of inEdges) {
@@ -119,7 +103,7 @@ export class LayoutService {
             for (const d of dNodes) {
                 edge.addDummyCorner(
                     d.id,
-                    this.getPosForLevelAndOrder(d.level, d.order)
+                    this.getPosForColumnAndRow(d.column, d.row)
                 );
             }
         }
@@ -130,26 +114,26 @@ export class LayoutService {
         let biggestX = 0;
         let biggestY = 0;
         for (const n of this.sugiResult!.getAllNodes()) {
-            const pos = this.getPosForLevelAndOrder(n.level, n.order);
+            const pos = this.getPosForColumnAndRow(n.column, n.row);
             if (pos.x > biggestX) biggestX = pos.x;
             if (pos.y > biggestY) biggestY = pos.y;
         }
         this._graphDimensions = new Vector(biggestX, biggestY);
         return this._graphDimensions;
     }
-    private getPosForLevelAndOrder(level: number, order: number): Vector {
-        const x = level * this.spacingXAxis;
+    private getPosForColumnAndRow(column: number, order: number): Vector {
+        const x = column * this.spacingXAxis;
         const y = order * this.spacingYAxis;
         return new Vector(x, y);
     }
 
-    private _sugiResult: LeveledGraph | undefined;
-    public get sugiResult(): LeveledGraph | undefined {
+    private _sugiResult: TableGraph | undefined;
+    public get sugiResult(): TableGraph | undefined {
         return this._sugiResult;
     }
     private getSugiyamaResult(bpmnGraph: BpmnGraph): Sugiyama {
         const sugi = new Sugiyama(SimpleGraph.convert(bpmnGraph));
-        const result: LeveledGraph = sugi.getResult();
+        const result: TableGraph = sugi.getResult();
         this._sugiResult = result;
         return sugi;
     }

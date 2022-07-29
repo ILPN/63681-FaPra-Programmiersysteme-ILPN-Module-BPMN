@@ -1,9 +1,9 @@
-import { BpmnNode } from "../Bpmn/BpmnNode";
-import { BpmnEventEnd } from "../Bpmn/events/BpmnEventEnd";
-import { BpmnEventStart } from "../Bpmn/events/BpmnEventStart";
-import { SwitchController } from "./switch-controller";
-import { SwitchState } from "./switchstatetype";
-import { SwitchUtils } from "./SwitchUtils";
+import {BpmnNode} from "../Bpmn/BpmnNode";
+import {BpmnEventEnd} from "../Bpmn/events/BpmnEventEnd";
+import {BpmnEventStart} from "../Bpmn/events/BpmnEventStart";
+import {SwitchController} from "./switch-controller";
+import {SwitchState} from "./switchstatetype";
+import {SwitchUtils} from "./SwitchUtils";
 
 export class SwitchableNode {
     protected _bpmnNode: BpmnNode
@@ -32,6 +32,14 @@ export class SwitchableNode {
         this._bpmnNode.svgManager.getNewSvg().onmousedown = (e) => controller.press(this)
     }
 
+    containsOutEdges(): boolean {
+        return this._bpmnNode.outEdges.length > 0;
+    }
+
+    containsInEdges() {
+        return this._bpmnNode.inEdges.length > 0;
+    }
+
 
     get predecessors(): Array<SwitchableNode> {
         return this._predecessors
@@ -40,6 +48,7 @@ export class SwitchableNode {
     get successors(): Array<SwitchableNode> {
         return this._successors
     }
+
     addSuccessor(node: SwitchableNode) {
         SwitchUtils.addItem(node, this._successors)
     }
@@ -66,8 +75,12 @@ export class SwitchableNode {
     switchRegular(): SwitchableNode[] {
         let nodesToSwitch: SwitchableNode[] = [];
         SwitchUtils.addItem(this, nodesToSwitch)
-        this._predecessors.forEach(before => { if (before.switchState === SwitchState.enabled) SwitchUtils.addItem(before, nodesToSwitch) });
-        this._successors.forEach(after => { if (after.switchState === SwitchState.disabled || after.switchState === SwitchState.switched) SwitchUtils.addItem(after, nodesToSwitch) });
+        this._predecessors.forEach(before => {
+            if (before.switchState === SwitchState.enabled) SwitchUtils.addItem(before, nodesToSwitch)
+        });
+        this._successors.forEach(after => {
+            if (after.switchState === SwitchState.disabled || after.switchState === SwitchState.switched) SwitchUtils.addItem(after, nodesToSwitch)
+        });
 
         return nodesToSwitch;
     }
@@ -75,6 +88,7 @@ export class SwitchableNode {
     disabled(): boolean {
         return this._switchState === SwitchState.disabled;
     }
+
     enableable(): boolean {
         return this.switchState === SwitchState.enableable
     }
@@ -82,7 +96,7 @@ export class SwitchableNode {
     enabled(): boolean {
         return this.switchState === SwitchState.enabled
     }
-    
+
     switchedButEnableForLoopRun(): boolean {
         return this.switchState === SwitchState.switchedButEnableForLoopRun
     }
@@ -90,42 +104,42 @@ export class SwitchableNode {
 
     /**
      * checks if this node is a gateway
-     * @returns 
+     * @returns
      */
     isGateway(): boolean {
         //we have to move the implementation to another class
         //because importing SwitchableGateway in this class
-        // creates circular dependency because of which webpack refuses to build the project 
+        // creates circular dependency because of which webpack refuses to build the project
         return SwitchUtils.isGateway(this);
     }
 
     /**
      * checks if this node is in state switched
-     * @returns 
+     * @returns
      */
     switched(): boolean {
         return this.switchState === SwitchState.switched
     }
 
-    /** checks if the graph node is a Start Event 
-    * @returns true if if the graph node is a Start Event 
-    */
+    /** checks if the graph node is a Start Event
+     * @returns true if if the graph node is a Start Event
+     */
     isStartEvent(): boolean {
         return this._bpmnNode instanceof BpmnEventStart;
     }
 
-    /** checks if the graph node is an End Event 
-  * @returns true if if the graph node is an End Event 
-  */
+    /** checks if the graph node is an End Event
+     * @returns true if the graph node is an End Event
+     */
     isEndEvent(): boolean {
         return this._bpmnNode instanceof BpmnEventEnd;
     }
 
     /** disables the node and changes its color */
     disable(): void {
-         if (this.switchState === SwitchState.switchedButEnableForLoopRun) {
-             this.switchTo(SwitchState.switched)
-         } else {
+        if (this.switchState === SwitchState.switchedButEnableForLoopRun) {
+            this.switchTo(SwitchState.switched)
+        } else {
             this.switchTo(SwitchState.disabled)
         }
     }
@@ -154,13 +168,14 @@ export class SwitchableNode {
     }
 
     /**
-     * switches node to specified new state 
-     * @param newState 
+     * switches node to specified new state
+     * @param newState
      */
     switchTo(newState: SwitchState): void {
         this.changeColor(this.switchState, newState)
         this.switchState = newState;
     }
+
     /**
      * sets new color according to the new state
      */
@@ -170,6 +185,7 @@ export class SwitchableNode {
         this.bpmnNode.svgManager.redraw();
 
     }
+
     /**
      * defines the transition to the next state from the current state
      * @returns the next state to switch to
@@ -186,12 +202,13 @@ export class SwitchableNode {
                 return SwitchState.switched;
 
             case SwitchState.switched:
-                return SwitchState.switchedButEnableForLoopRun; // For loops 
+                return SwitchState.switchedButEnableForLoopRun; // For loops
 
             case SwitchState.switchedButEnableForLoopRun:
-                return SwitchState.enabled; // For loops 
+                return SwitchState.enabled; // For loops
 
-            default: return SwitchState.disabled
+            default:
+                return SwitchState.disabled
 
         }
 

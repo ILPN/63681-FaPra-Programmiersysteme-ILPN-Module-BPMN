@@ -2,11 +2,13 @@
     {{buttonText}}
 
 
-    <div class="interactive-square" fxLayout="column" fxLayoutAlign="center" center appUpload 
+    <div class="interactive-square"
+         fxLayout="column"
+         fxLayoutAlign="center" center appUpload
         (filesChangeEmiter) ="onFileDragged($event)"
         (click)="fileUpload.click()"
         >
-        
+
         <mat-icon class="larger-icon">
             {{buttonIcon}}
         </mat-icon>

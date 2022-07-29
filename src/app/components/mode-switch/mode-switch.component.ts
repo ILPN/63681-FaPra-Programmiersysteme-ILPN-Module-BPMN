@@ -15,11 +15,11 @@ export class ModeSwitchComponent implements OnInit {
   }
 
   ngOnInit(): void {
-  
+
   }
 
   selectionChanged(item : any) {
-    console.log("Selected value: " + item.value);
+    //console.log("Selected value: " + item.value);
 
     this.selectedToggle = item.value
     this._appComponent.mode = item.value

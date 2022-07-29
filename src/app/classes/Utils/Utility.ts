@@ -1,6 +1,12 @@
 import { Vector } from "./Vector";
 
 export class Utility{
+    static cutSet<T>(set1: T[], set2:T[]) {
+        return set1.filter(n => set2.includes(n))
+   }
+    static substractArray<T>(set: T[], substraction:T[]) {
+         return set.filter(n => !substraction.includes(n))
+    }
     static lastElement(arr:any[]) {
         return arr[arr.length-1]
         }
