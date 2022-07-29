@@ -18,12 +18,14 @@ export class Validator {
     //messages
     private HAS_NO_IN_EDGES = " hat keine eingehenden Kanten. ";
     private HAS_MULTIPLE_IN_EDGES = " hat mehr als eine eingehende Kante. ";
+    private HAS_NO_MULTIPLE_IN_EDGES = " hat nicht mindestens zwei eingehende Kante. ";
     private HAS_NO_OUT_EDGES = " hat keine ausgehenden Kanten. ";
     private HAS_MULTIPLE_OUT_EDGES = " hat mehr als eine ausgehende Kante. ";
+    private HAS_NO_MULTIPLE_OUT_EDGES = " hat nicht mindestens zwei ausgehende Kante. ";
     private HAS_IN_EDGES = " hat eingehende Kante(n). ";
     private HAS_OUT_EDGES = " hat ausgehende Kante(n). ";
 
-
+    
     constructor(nodes: BpmnNode[]) {
 
         this.startEvents.push(...BpmnUtils.getStartEvents(nodes))
@@ -112,9 +114,6 @@ export class Validator {
         if (BpmnUtils.hasNoOutEdges(startEvent))
             message += messageStart + this.HAS_NO_OUT_EDGES;
 
-        if (BpmnUtils.hasMultipleOutEdges(startEvent))
-            message += messageStart + this.HAS_MULTIPLE_OUT_EDGES;
-
         return this.getValidationResult(message);
     }
 
@@ -132,15 +131,8 @@ export class Validator {
         if (BpmnUtils.hasNoInEdges(intermEvent))
             message += messageStart + this.HAS_NO_IN_EDGES
 
-        if (BpmnUtils.hasMultipleInEdges(intermEvent))
-            message += messageStart + this.HAS_MULTIPLE_IN_EDGES
-
         if (BpmnUtils.hasNoOutEdges(intermEvent))
             message += messageStart + this.HAS_NO_OUT_EDGES
-
-        if (BpmnUtils.hasMultipleOutEdges(intermEvent))
-            message += messageStart + this.HAS_MULTIPLE_OUT_EDGES
-
 
         return this.getValidationResult(message);
     }
@@ -165,9 +157,6 @@ export class Validator {
         let messageStart = " EndEvent " + endEvent.label + " ";
         if (BpmnUtils.hasNoInEdges(endEvent))
             message += messageStart + this.HAS_NO_IN_EDGES
-
-        if (BpmnUtils.hasMultipleInEdges(endEvent))
-            message += messageStart + this.HAS_MULTIPLE_IN_EDGES
 
         if (BpmnUtils.hasOutEdges(endEvent))
             message += messageStart + this.HAS_OUT_EDGES
@@ -194,9 +183,16 @@ export class Validator {
         if (BpmnUtils.hasNoOutEdges(gateway))
             message += messageStart + this.HAS_NO_OUT_EDGES
 
+        if (BpmnUtils.isGatewayJoin(gateway)) { 
+            if(BpmnUtils.hasMultipleInEdges(gateway)) message += messageStart + this.HAS_NO_MULTIPLE_IN_EDGES
+            if(!BpmnUtils.hasOnlyOneOutEdge(gateway))  message += messageStart + this.HAS_MULTIPLE_OUT_EDGES
+        } else {
+            if(BpmnUtils.hasMultipleOutEdges(gateway)) message += messageStart + this.HAS_NO_MULTIPLE_OUT_EDGES
+            if(!BpmnUtils.hasOnlyOneInEdge(gateway))  message += messageStart + this.HAS_MULTIPLE_IN_EDGES;
+        }
+
         if (BpmnUtils.hasNoMatchingGateway(gateway))
             message += messageStart + this.getNoMatchingGatewayError(gateway)
-
 
         return this.getValidationResult(message);
     }
