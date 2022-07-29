@@ -3,14 +3,18 @@ import {SwitchableNode} from "./SwitchableNode";
 import {SwitchableGraph} from "./SwitchableGraph";
 import {SwitchableGateway} from "./SwitchableGateway";
 import {SwitchUtils} from "./SwitchUtils";
+import { BpmnCommonValidateServices } from "../Bpmn/bpmn-common-validate-services";
+import { BpmnNode } from "../Bpmn/BpmnNode";
 
 export class SwitchController {
     private _startEvents: SwitchableNode[];
     private nodes: SwitchableNode[];
+    private _graph: SwitchableGraph;
 
     constructor(graph: SwitchableGraph) {
         this._startEvents = [];
-        this.nodes = graph.switchNodes
+        this.nodes = graph.switchNodes;
+        this._graph = graph;
     }
 
 
@@ -36,6 +40,17 @@ export class SwitchController {
      * @param clickedNode the clicked node
      */
     public press(clickedNode: SwitchableNode) {
+// test start
+let bpmnnodes : BpmnNode[] = [];
+this.nodes.forEach(element => {
+    bpmnnodes.push(element.bpmnNode);
+});
+let b : BpmnCommonValidateServices = new BpmnCommonValidateServices(bpmnnodes); 
+b.validateGraph();
+// test ende
+
+
+
         if (clickedNode.switchState === SwitchState.enableable || clickedNode.switchState === SwitchState.switchedButEnableForLoopRun) {
             //console.log("Clicked element " + clickedNode.id);
             if (clickedNode.isStartEvent()) this.disableAllOtherStartEvents(clickedNode);
@@ -45,7 +60,7 @@ export class SwitchController {
             nodesToSwitch.forEach(node => {
                 if (this.possibleToSwitchNode(node)) node.switch()
             });
-            if (clickedNode.isGateway() && (clickedNode as SwitchableGateway).OR_JOIN()) (clickedNode as SwitchableGateway).disablePathsNotTakenAfterOrJoin();
+            if (clickedNode.isGateway() && (clickedNode as SwitchableGateway).OR_JOIN()) (clickedNode as SwitchableGateway).disablePathsNotTakenAfterOrJoin(this._graph);
             this.checkAllEnableableNodesStillEnableable();
 
 

@@ -8,12 +8,13 @@ import { BpmnGatewaySplitXor } from "../Bpmn/gateways/BpmnGatewaySplitXor";
 import { SwitchableNode } from "./SwitchableNode";
 import { SwitchState } from "./switchstatetype";
 import { SwitchUtils } from "./SwitchUtils";
+import { SwitchableGraph } from "./SwitchableGraph";
 
 export class SwitchableGateway extends SwitchableNode {
 
 
     /**  Disables all alternative paths not taken in case of an or gateway*/
-    disablePathsNotTakenAfterOrJoin(): void {
+    disablePathsNotTakenAfterOrJoin(graph : SwitchableGraph): void {
         if (this.OR_JOIN()) {
             let split = this.searchResponsibleSplitGateway();
             if (split !== undefined)
@@ -217,7 +218,7 @@ export class SwitchableGateway extends SwitchableNode {
      * searches for the JOIN gateway corresponding to this SPLIT gateway
      * @returns matching JOIN gateway
      */
-    searchResponsibleJoinGateway(): SwitchableGateway | undefined { // private
+    searchResponsibleJoinGateway(graph : SwitchableGraph): SwitchableGateway | undefined { // private
         let joingateway: SwitchableGateway | undefined = undefined;
         let searchBranchNode: SwitchableGateway | undefined = undefined;
         let fail: boolean = false;
@@ -242,11 +243,47 @@ export class SwitchableGateway extends SwitchableNode {
             }
         }
         return (!fail) ? joingateway : undefined;
-     //   return BpmnCommonValidateServices.searchResponsibleJoinGateway(this);
+        // let t = BpmnCommonValidateServices.getCorrespondingJoin(this._bpmnNode);
+        // if(t == null) return undefined;
+        // return graph.getNode(t.id);
     }
 
+   /* searches for the JOIN gateway corresponding to this SPLIT gateway
+     * @returns matching JOIN gateway
+     */
+    searchResponsibleJoinGatewayID(): SwitchableGateway | undefined { // private
+        // let joingateway: SwitchableGateway | undefined = undefined;
+        // let searchBranchNode: SwitchableGateway | undefined = undefined;
+        // let fail: boolean = false;
+        // this.successors.forEach(successor => {
+        //     if (!fail) {
+        //         searchBranchNode = this.helpSearchRecursiveResponsibleJoinGateway(successor, []);
+        //         if (searchBranchNode !== joingateway && searchBranchNode !== undefined && joingateway !== undefined) {
+        //             fail = true;
+        //             console.warn("The search for the responsible gateway has yielded several different hits. The Ids of the elements involved are: " + searchBranchNode.id + " and " + joingateway.id);
+        //         } else {
+        //             if (searchBranchNode !== undefined && joingateway === undefined) {
+        //                 joingateway = searchBranchNode;
+        //             }
+        //         }
+        //     };
+        // });
+        // if (!fail && joingateway !== undefined) {
+        //     let joinGatewayNotUndefined: SwitchableGateway = joingateway;
+        //     if (!SwitchableGateway.splitJoinSameType(this, joinGatewayNotUndefined)) {
+        //         fail = true;
+        //         console.warn("The search for the responsible gateway has resulted in a gateway of a different type. The Ids of the elements involved are: " + this.id + " and " + joinGatewayNotUndefined.id);
+        //     }
+        // }
+        // return (!fail) ? joingateway : undefined;
 
-    // /** Search For Responsible */
+        let t = BpmnCommonValidateServices.getCorrespondingJoin(this._bpmnNode);
+        if(t == null) return undefined;
+        let gateway : SwitchableGateway | undefined;
+        
+        return gateway;
+    }
+    /** Search For Responsible */
     private helpSearchRecursiveResponsibleJoinGateway(searchNode: SwitchableNode, innerGatewayArray: SwitchableGateway[]): SwitchableGateway | undefined {
         let joingateway: SwitchableGateway | undefined = undefined;
         if (searchNode !== undefined)
@@ -276,6 +313,19 @@ export class SwitchableGateway extends SwitchableNode {
         if (joingateway !== undefined) console.log("Search get " + (joingateway as SwitchableGateway).id + " ");
         return joingateway;
     }
+
+
+
+    // /**
+    //  * searches for the Split gateway corresponding to this join gateway
+    //  * @returns matching split gateway
+    //  */
+    //  searchResponsibleSplitGateway(graph : SwitchableGraph): SwitchableGateway | undefined { // private
+    //     let t = BpmnCommonValidateServices.getCorrespondingJoin(this._bpmnNode);
+    //     if(t == null) return undefined;
+    //     return graph.getNode(t.id);
+    // }
+
 
     /**
      * searches for the SPLIT gateway corresponding to this JOIN gateway

@@ -13,29 +13,30 @@ import { BpmnGatewaySplitXor } from "./gateways/BpmnGatewaySplitXor"
 import { BpmnTask } from "./tasks/BpmnTask"
 
 export class BpmnCommonValidateServices {
-    private validateGraph(nodes: BpmnNode[]): void {
-        let startEventNodes: BpmnNode[] = [];
-        let endEventNodes: BpmnNode[] = [];
-        let bpmnTasks: BpmnNode[] = [];
-        let intermediateEventNodes: BpmnNode[] = [];
-        let gatewayNodes: BpmnNode[] = [];
+    private startEventNodes: BpmnNode[] = [];
+    private endEventNodes: BpmnNode[] = [];
+    private bpmnTasks: BpmnNode[] = [];
+    private intermediateEventNodes: BpmnNode[] = [];
+    private gatewayNodes: BpmnNode[] = [];
 
+    
+    constructor(nodes: BpmnNode[]) {
         nodes.forEach(node => {
             if (BpmnCommonValidateServices.isTask(node)) {
-                bpmnTasks.push(node);
+                this.bpmnTasks.push(node);
             } else {
                 if (BpmnCommonValidateServices.isGateway(node)) {
-                    gatewayNodes.push(node);
+                    this.gatewayNodes.push(node);
                 } else {
                     if (BpmnCommonValidateServices.isEvent(node)) {
                         if (BpmnCommonValidateServices.isStartEvent(node)) {
-                            startEventNodes.push(node);
+                            this.startEventNodes.push(node);
                         } else {
                             if (BpmnCommonValidateServices.isEndEvent(node)) {
-                                endEventNodes.push(node);
+                                this.endEventNodes.push(node);
                             } else {
                                 if (BpmnCommonValidateServices.isIntermediateEvent(node)) {
-                                    intermediateEventNodes.push(node);
+                                    this.intermediateEventNodes.push(node);
                                 }
                             }
                         }
@@ -48,9 +49,100 @@ export class BpmnCommonValidateServices {
 
 
 
+    public validateGraph(): boolean {
+    let isValide = true;
+    if(!this.validateTask()) isValide = false; 
+    if(!this.validateStartEventNodes()) isValide = false; 
+    if(!this.validateIntermediateEventNodes()) isValide = false; 
+    if(!this.validateEndEventNodes()) isValide = false; 
+    if(!this.validateGateways()) isValide = false; 
+    if(!isValide) console.error("Die Überprüfung des BPMN hat einen Fehler ergeben.");
+    if(isValide) console.log("Die Überprüfung des BPMN hat keinen Fehler ergeben.");
+    
+    return isValide;
+    };
+
+    private validateTask() : boolean {
+        let isValide = true;
+        this.bpmnTasks.forEach(node => {
+            if (!BpmnCommonValidateServices.isInputNotEmpty(node)||!BpmnCommonValidateServices.isOnlyOneInput(node)) isValide = false;
+            if (!BpmnCommonValidateServices.isOutputNotEmpty(node)||!BpmnCommonValidateServices.isOnlyOneOutput(node)) isValide = false;
+            if(!isValide) console.warn("Die Überprüfung von Task mit der ID: "+node.id+" hat einen Fehler ergeben.");
+        });
+        return isValide;
+    }
+    private validateStartEventNodes() : boolean {
+        let isValide = true;
+        if(this.startEventNodes.length < 1) isValide = false;
+        if(!isValide) console.warn("Es gibt kein Start-Event");
+        this.startEventNodes.forEach(node => {
+            if (BpmnCommonValidateServices.isInputNotEmpty(node)|| BpmnCommonValidateServices.isOnlyOneInput(node)) isValide = false;
+            if (!BpmnCommonValidateServices.isOutputNotEmpty(node)|| !BpmnCommonValidateServices.isOnlyOneOutput(node)) isValide = false;
+            if(!isValide) console.warn("Die Überprüfung von einem Start Event  mit der ID: "+node.id+" hat einen Fehler ergeben.");
+        });
+        return isValide;
+    }
+
+    private validateIntermediateEventNodes() : boolean {
+        let isValide = true;
+        this.intermediateEventNodes.forEach(node => {
+            if (!BpmnCommonValidateServices.isInputNotEmpty(node)||!BpmnCommonValidateServices.isOnlyOneInput(node)) isValide = false;
+            if (!BpmnCommonValidateServices.isOutputNotEmpty(node)|| !BpmnCommonValidateServices.isOnlyOneOutput(node)) isValide = false;
+            if(!isValide) console.warn("Die Überprüfung von einem Zwischen-Event  mit der ID: "+node.id+" hat einen Fehler ergeben.");
+        });
+        return isValide;
+    }
+
+    private validateEndEventNodes() : boolean {
+        let isValide = true;
+        if(this.endEventNodes.length < 1) isValide = false;
+        if(!isValide) console.warn("Es gibt kein End-Event");
+        this.endEventNodes.forEach(node => {
+            if (!BpmnCommonValidateServices.isInputNotEmpty(node)||!BpmnCommonValidateServices.isOnlyOneInput(node)) isValide = false;
+            if (BpmnCommonValidateServices.isOutputNotEmpty(node)|| BpmnCommonValidateServices.isOnlyOneOutput(node)) isValide = false;
+            if(!isValide) console.warn("Die Überprüfung von einem End-Event  mit der ID: "+node.id+" hat einen Fehler ergeben.");
+        });
+        return isValide;
+    }
+
+    private validateGateways() : boolean {
+        let isValide = true;
+        this.gatewayNodes.forEach(node => {
+            // Check Assoziationen
+            if (!BpmnCommonValidateServices.isInputNotEmpty(node) && !BpmnCommonValidateServices.isOutputNotEmpty(node) &&
+                ((BpmnCommonValidateServices.isGatewayJoin(node) && node.inEdges.length > 1 && node.outEdges.length === 1) ||
+                (BpmnCommonValidateServices.isGatewaySplit(node) && node.inEdges.length === 1 && node.outEdges.length > 1)))
+                 isValide = false;
+            if(BpmnCommonValidateServices.isGatewaySplit(node)) {
+                var gateway = BpmnCommonValidateServices.getCorrespondingUniversalJoin(node);
+                console.log("Split Gateway "+node.id+ " dazu passendes Join Gateway: "+gateway?.id);
+            } else {
+                var gateway = BpmnCommonValidateServices.getCorrespondingUniversalSplit(node);
+                console.log("Join Gateway "+node.id+ " dazu passendes Split Gateway: "+gateway?.id);
+            }
+            
 
 
 
+            if(!isValide) console.warn("Die Überprüfung von dem Gateway mit der ID: "+node.id+" hat einen Fehler ergeben.");
+        });
+        return isValide;
+    }
+
+
+public static isInputNotEmpty(node: BpmnNode) : boolean {
+        return this.countInEdge(node) !== 0;
+}
+public static isOnlyOneInput(node: BpmnNode) : boolean {
+    return this.countInEdge(node) === 1;
+}
+
+public static isOutputNotEmpty(node: BpmnNode) : boolean {
+    return this.countOutEdge(node) !== 0;
+}
+public static isOnlyOneOutput(node: BpmnNode) : boolean {
+return this.countOutEdge(node) === 1;
+}
 
 
 
@@ -207,6 +299,93 @@ export class BpmnCommonValidateServices {
         return node instanceof BpmnEventEnd
     }
     /* End: is collection */
+
+
+    private static isSplitAnd(node: BpmnNode): boolean {
+        return node instanceof BpmnGatewaySplitAnd
+    }
+
+    private static isJoinAnd(node: BpmnNode): boolean {
+        return node instanceof BpmnGatewayJoinAnd
+    }
+
+    private static isSplitXor(node: BpmnNode): boolean {
+        return node instanceof BpmnGatewaySplitXor
+    }
+
+    private static isJoinXor(node: BpmnNode): boolean {
+        return node instanceof BpmnGatewayJoinXor
+    }
+
+    private static isSplitOr(node: BpmnNode): boolean {
+        return node instanceof BpmnGatewaySplitOr
+    }
+
+    private static isJoinOr(node: BpmnNode): boolean {
+        return node instanceof BpmnGatewayJoinOr
+    }
+
+    private static hasOutEdges(node: BpmnNode): boolean {
+        return node.outEdges.length > 0;
+    }
+
+    private static hasInEdges(node: BpmnNode): boolean {
+        return node.inEdges.length > 0;
+    }
+
+    private static next(node: BpmnNode): BpmnNode {
+        return node.outEdges[0].to
+    }
+    private static before(node: BpmnNode): BpmnNode {
+        return node.inEdges[0].from
+    }
+
+    static getCorrespondingJoin(node: BpmnNode): BpmnNode | null {
+       // if(this.isJoinOr(node)) return this.getCorrespondingOrJoin(node);
+
+        return this.getCorrespondingUniversalJoin(node);
+    }
+
+    static getCorrespondingOrJoin(node: BpmnNode): BpmnNode | null {
+        while (this.hasOutEdges(node)) {
+            node = this.next(node);
+
+            if (this.isJoinOr(node))
+                return node;
+
+            //nested OR gateway
+            if (this.isSplitOr(node))
+                node = this.getCorrespondingOrJoin(node)!;
+        }
+
+        return null;
+    }
+
+    static getCorrespondingUniversalJoin(node: BpmnNode): BpmnNode | null {
+        while (this.hasOutEdges(node)) {
+            node = this.next(node);
+            if (this.isGatewayJoin(node))
+                return node;
+            //nested OR gateway
+            if (this.isGatewaySplit(node))
+                node = this.getCorrespondingUniversalJoin(node)!;
+        }
+        return null;
+    }
+
+    static getCorrespondingUniversalSplit(node: BpmnNode): BpmnNode | null {
+        while (this.hasInEdges(node)) {
+            node = this.before(node);
+            if (this.isGatewaySplit(node))
+                return node;
+            //nested OR gateway
+            if (this.isGatewayJoin(node))
+                node = this.getCorrespondingUniversalSplit(node)!;
+        }
+        return null;
+    }
+
+
 
 
 
