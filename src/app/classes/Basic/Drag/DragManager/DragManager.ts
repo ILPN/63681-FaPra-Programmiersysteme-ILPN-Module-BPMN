@@ -27,7 +27,7 @@ export class DragManager{
     }
     startDrag(event: MouseEvent, dh: DragHandle ) {
         this.dragedDragHandle = dh;
-        //this.dragedDragHandle.startDrag();
+        this.dragedDragHandle.startDrag(this.domXYToSvgXY(event));
         this.snapingView.appendChild(dh.getSnapSvg());
     }
     domXYToSvgXY(event:MouseEvent){
