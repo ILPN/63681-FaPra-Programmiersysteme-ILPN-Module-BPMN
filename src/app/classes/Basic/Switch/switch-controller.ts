@@ -1,10 +1,8 @@
-import { SwitchState } from "./switchstatetype";
-import { SwitchableNode } from "./SwitchableNode";
-import { SwitchableGraph } from "./SwitchableGraph";
 import { SwitchableGateway } from "./SwitchableGateway";
+import { SwitchableGraph } from "./SwitchableGraph";
+import { SwitchableNode } from "./SwitchableNode";
+import { SwitchState } from "./switchstatetype";
 import { SwitchUtils } from "./SwitchUtils";
-import { Validator } from "../Bpmn/graph-validator";
-import { BpmnNode } from "../Bpmn/BpmnNode";
 
 export class SwitchController {
     private _startEvents: SwitchableNode[];
@@ -99,7 +97,7 @@ export class SwitchController {
         if (node.isGateway() && (node.disabled() || node.enableable() || node.switchedButEnableForLoopRun())) {
 
             let gateway: SwitchableGateway = node as SwitchableGateway;
-            return gateway.canBeSwitched()
+            return gateway.canBeSwitched(this._graph)
 
         }
         return true;

@@ -51,28 +51,28 @@ describe('OR graph with nested OR gateway', () => {
 
 
     test('Recursive search for preceding NESTED SPLIT gateway', () => {
-        let nestedSplit = gatewayJoinOrNested.searchResponsibleSplitGateway()
+        let nestedSplit = gatewayJoinOrNested.searchCorrespondingSplitGateway()
 
         expect(nestedSplit?.id).toEqual(gatewaySplitOrNested.id)
 
     });
 
     test('Recursive search for preceding PARENT SPLIT gateway', () => {
-        let parentSplit = gatewayJoinOrParent.searchResponsibleSplitGateway()
+        let parentSplit = gatewayJoinOrParent.searchCorrespondingSplitGateway()
 
         expect(parentSplit?.id).toEqual(gatewaySplitOrParent.id)
 
     });
 
     test('Recursive search for following NESTED SPLIT gateway', () => {
-        let nestedJoin = gatewaySplitOrNested.searchResponsibleJoinGateway()
+        let nestedJoin = gatewaySplitOrNested.searchCorrespondingJoinGateway()
 
         expect(nestedJoin?.id).toEqual(gatewayJoinOrNested.id)
 
     });
 
     test('Recursive search for following PARENT SPLIT gateway', () => {
-        let parentJoin = gatewaySplitOrParent.searchResponsibleJoinGateway()
+        let parentJoin = gatewaySplitOrParent.searchCorrespondingJoinGateway()
 
         expect(parentJoin?.id).toEqual(gatewayJoinOrParent.id)
 

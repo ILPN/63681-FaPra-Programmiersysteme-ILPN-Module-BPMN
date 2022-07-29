@@ -290,14 +290,14 @@ describe('Simple graph with OR gateway', () => {
 
 
     test('Recursive search for preceding SPLIT gateway', () => {
-        let splitGateway = gatewayJoinOr1.searchResponsibleSplitGateway()
+        let splitGateway = gatewayJoinOr1.searchCorrespondingSplitGateway()
 
         expect(splitGateway?.id).toEqual(gatewaySplitOr1.id)
 
     });
 
     test('Recursive search for following SPLIT gateway', () => {
-        let joinGateway = gatewaySplitOr1.searchResponsibleJoinGateway()
+        let joinGateway = gatewaySplitOr1.searchCorrespondingJoinGateway()
 
         expect(joinGateway?.id).toEqual(gatewayJoinOr1.id)
 
