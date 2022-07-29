@@ -1,20 +1,16 @@
-import { BpmnCommonValidateServices } from "../Bpmn/bpmn-common-validate-services";
-import { BpmnGatewayJoinAnd } from "../Bpmn/gateways/BpmnGatewayJoinAnd";
-import { BpmnGatewayJoinOr } from "../Bpmn/gateways/BpmnGatewayJoinOr";
-import { BpmnGatewayJoinXor } from "../Bpmn/gateways/BpmnGatewayJoinXor";
-import { BpmnGatewaySplitAnd } from "../Bpmn/gateways/BpmnGatewaySplitAnd";
-import { BpmnGatewaySplitOr } from "../Bpmn/gateways/BpmnGatewaySplitOr";
-import { BpmnGatewaySplitXor } from "../Bpmn/gateways/BpmnGatewaySplitXor";
+import { BpmnUtils } from "../Bpmn/BpmnUtils";
+import { BpmnGateway } from "../Bpmn/gateways/BpmnGateway";
+import { Validator } from "../Bpmn/graph-validator";
+import { SwitchableGraph } from "./SwitchableGraph";
 import { SwitchableNode } from "./SwitchableNode";
 import { SwitchState } from "./switchstatetype";
 import { SwitchUtils } from "./SwitchUtils";
-import { SwitchableGraph } from "./SwitchableGraph";
 
 export class SwitchableGateway extends SwitchableNode {
 
 
     /**  Disables all alternative paths not taken in case of an or gateway*/
-    disablePathsNotTakenAfterOrJoin(graph : SwitchableGraph): void {
+    disablePathsNotTakenAfterOrJoin(graph: SwitchableGraph): void {
         if (this.OR_JOIN()) {
             let split = this.searchResponsibleSplitGateway();
             if (split !== undefined)
@@ -61,8 +57,8 @@ export class SwitchableGateway extends SwitchableNode {
 
         // nodes after the clicked one
         clicked.successors.forEach(after => {
-             if (after.switchState === SwitchState.disabled || after.switchState === SwitchState.switched) SwitchUtils.addItem(after, nodesToSwitch)
-         });
+            if (after.switchState === SwitchState.disabled || after.switchState === SwitchState.switched) SwitchUtils.addItem(after, nodesToSwitch)
+        });
 
         return nodesToSwitch;
     }
@@ -75,13 +71,13 @@ export class SwitchableGateway extends SwitchableNode {
      * @param clicked
      * @returns nodes to switch
      */
-     private switchOrSplit(clicked: SwitchableNode): SwitchableNode[] {
+    private switchOrSplit(clicked: SwitchableNode): SwitchableNode[] {
         let nodesToSwitch: SwitchableNode[] = [this];
 
         // nodes after the clicked one
         clicked.successors.forEach(after => {
-             if (after.switchState === SwitchState.disabled || after.switchState === SwitchState.switched) SwitchUtils.addItem(after, nodesToSwitch)
-         });
+            if (after.switchState === SwitchState.disabled || after.switchState === SwitchState.switched) SwitchUtils.addItem(after, nodesToSwitch)
+        });
         return nodesToSwitch
     }
 
@@ -116,33 +112,27 @@ export class SwitchableGateway extends SwitchableNode {
 
 
     private AND_SPLIT(): boolean {
-        return BpmnCommonValidateServices.isGatewaySplit(this._bpmnNode)&&BpmnCommonValidateServices.isGatewayAnd(this._bpmnNode);
-       // return this._bpmnNode instanceof BpmnGatewaySplitAnd
+        return BpmnUtils.isSplitAnd(this.bpmnNode);
     }
 
     OR_SPLIT(): boolean {
-        return BpmnCommonValidateServices.isGatewaySplit(this._bpmnNode)&&BpmnCommonValidateServices.isGatewayOR(this._bpmnNode);
-        //return this._bpmnNode instanceof BpmnGatewaySplitOr
+        return BpmnUtils.isSplitOr(this.bpmnNode)
     }
 
     private XOR_SPLIT(): boolean {
-        return BpmnCommonValidateServices.isGatewaySplit(this._bpmnNode)&&BpmnCommonValidateServices.isGatewayXOR(this._bpmnNode);
-     //   return this._bpmnNode instanceof BpmnGatewaySplitXor
+        return BpmnUtils.isSplitXor(this.bpmnNode)
     }
 
     private AND_JOIN(): boolean {
-        return BpmnCommonValidateServices.isGatewayJoin(this._bpmnNode)&&BpmnCommonValidateServices.isGatewayAnd(this._bpmnNode);
-        //return this._bpmnNode instanceof BpmnGatewayJoinAnd
+        return BpmnUtils.isJoinAnd(this.bpmnNode)
     }
 
     OR_JOIN(): boolean {
-        return BpmnCommonValidateServices.isGatewayJoin(this._bpmnNode)&&BpmnCommonValidateServices.isGatewayOR(this._bpmnNode);
-        //return this._bpmnNode instanceof BpmnGatewayJoinOr
+        return BpmnUtils.isJoinOr(this.bpmnNode)
     }
 
     private XOR_JOIN(): boolean {
-        return BpmnCommonValidateServices.isGatewayJoin(this._bpmnNode)&&BpmnCommonValidateServices.isGatewayXOR(this._bpmnNode);
-       // return this._bpmnNode instanceof BpmnGatewayJoinXor
+        return BpmnUtils.isJoinXor(this.bpmnNode)
     }
 
 
@@ -177,14 +167,12 @@ export class SwitchableGateway extends SwitchableNode {
     }
 
     isSplitGateway(): boolean {
-     //   return this.AND_SPLIT() || this.OR_SPLIT() || this.XOR_SPLIT();
-        return BpmnCommonValidateServices.isGatewaySplit(this._bpmnNode);
+        return BpmnUtils.isGatewaySplit(this.bpmnNode)
 
     }
 
     isJoinGateway(): boolean {
-      //  return this.AND_JOIN() || this.OR_JOIN() || this.XOR_JOIN();
-        return BpmnCommonValidateServices.isGatewayJoin(this._bpmnNode);
+        return BpmnUtils.isGatewayJoin(this.bpmnNode)
     }
 
     /**
@@ -205,8 +193,8 @@ export class SwitchableGateway extends SwitchableNode {
   * @returns Returns true if split and join gateway have the same type
   */
     public static splitJoinSameType(split: SwitchableGateway, join: SwitchableGateway): boolean {
-      //  return ((split.OR_SPLIT() && join.OR_JOIN()) || (split.AND_SPLIT() && join.AND_JOIN()) || (split.XOR_SPLIT() && join.XOR_JOIN()))
-        return BpmnCommonValidateServices.splitJoinSameType(split._bpmnNode, join._bpmnNode);
+
+        return BpmnUtils.splitJoinSameType(split._bpmnNode as BpmnGateway, join._bpmnNode as BpmnGateway);
     }
 
 
@@ -218,7 +206,7 @@ export class SwitchableGateway extends SwitchableNode {
      * searches for the JOIN gateway corresponding to this SPLIT gateway
      * @returns matching JOIN gateway
      */
-    searchResponsibleJoinGateway(graph : SwitchableGraph): SwitchableGateway | undefined { // private
+    searchResponsibleJoinGateway(graph: SwitchableGraph): SwitchableGateway | undefined { // private
         let joingateway: SwitchableGateway | undefined = undefined;
         let searchBranchNode: SwitchableGateway | undefined = undefined;
         let fail: boolean = false;
@@ -248,9 +236,9 @@ export class SwitchableGateway extends SwitchableNode {
         // return graph.getNode(t.id);
     }
 
-   /* searches for the JOIN gateway corresponding to this SPLIT gateway
-     * @returns matching JOIN gateway
-     */
+    /* searches for the JOIN gateway corresponding to this SPLIT gateway
+      * @returns matching JOIN gateway
+      */
     searchResponsibleJoinGatewayID(): SwitchableGateway | undefined { // private
         // let joingateway: SwitchableGateway | undefined = undefined;
         // let searchBranchNode: SwitchableGateway | undefined = undefined;
@@ -277,10 +265,10 @@ export class SwitchableGateway extends SwitchableNode {
         // }
         // return (!fail) ? joingateway : undefined;
 
-        let t = BpmnCommonValidateServices.getCorrespondingJoin(this._bpmnNode);
-        if(t == null) return undefined;
-        let gateway : SwitchableGateway | undefined;
-        
+        let t = BpmnUtils.getCorrespondingJoin(this._bpmnNode as BpmnGateway);
+        if (t == null) return undefined;
+        let gateway: SwitchableGateway | undefined;
+
         return gateway;
     }
     /** Search For Responsible */

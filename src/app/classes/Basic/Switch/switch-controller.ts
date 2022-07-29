@@ -1,9 +1,9 @@
-import {SwitchState} from "./switchstatetype";
-import {SwitchableNode} from "./SwitchableNode";
-import {SwitchableGraph} from "./SwitchableGraph";
-import {SwitchableGateway} from "./SwitchableGateway";
-import {SwitchUtils} from "./SwitchUtils";
-import { BpmnCommonValidateServices } from "../Bpmn/bpmn-common-validate-services";
+import { SwitchState } from "./switchstatetype";
+import { SwitchableNode } from "./SwitchableNode";
+import { SwitchableGraph } from "./SwitchableGraph";
+import { SwitchableGateway } from "./SwitchableGateway";
+import { SwitchUtils } from "./SwitchUtils";
+import { Validator } from "../Bpmn/graph-validator";
 import { BpmnNode } from "../Bpmn/BpmnNode";
 
 export class SwitchController {
@@ -40,16 +40,6 @@ export class SwitchController {
      * @param clickedNode the clicked node
      */
     public press(clickedNode: SwitchableNode) {
-// test start
-let bpmnnodes : BpmnNode[] = [];
-this.nodes.forEach(element => {
-    bpmnnodes.push(element.bpmnNode);
-});
-let b : BpmnCommonValidateServices = new BpmnCommonValidateServices(bpmnnodes); 
-b.validateGraph();
-// test ende
-
-
 
         if (clickedNode.switchState === SwitchState.enableable || clickedNode.switchState === SwitchState.switchedButEnableForLoopRun) {
             //console.log("Clicked element " + clickedNode.id);
