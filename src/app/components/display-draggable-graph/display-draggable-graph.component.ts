@@ -50,15 +50,8 @@ export class DisplayDraggableGraphComponent
             if (bpmnGraph.isEmpty()) return;
             if (this.rootSvg == undefined || this.drawingArea == undefined)
                 return;
+
             this._bpmnGraph = bpmnGraph;
-
-            this._layoutService.layoutIfNeeded(
-                this._bpmnGraph,
-                this.rootSvg.nativeElement.clientWidth,
-                this.rootSvg.nativeElement.clientHeight
-            );
-            this._layoutService.setViewBox(this.drawingArea.nativeElement);
-
             this._draggableGraph = new DraggableGraph(
                 bpmnGraph,
                 this._layoutService,
@@ -66,10 +59,12 @@ export class DisplayDraggableGraphComponent
                 this.drawingArea.nativeElement,
                 this._parserService
             );
+
             Utility.removeAllChildren(this.drawingArea.nativeElement);
-            this.drawingArea.nativeElement.appendChild(
-                this._draggableGraph.svgManager.getSvg()
-            );
+            const svg =this._draggableGraph.svgManager.getSvg()
+            this.drawingArea.nativeElement.appendChild(svg);
+            this._layoutService.zoomDrawingAreaToSvg(svg, this.drawingArea.nativeElement)
+
         });
     }
 

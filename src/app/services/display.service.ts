@@ -27,10 +27,10 @@ export class DisplayService implements OnDestroy {
         return this._diagram$.getValue();
     }
 
-    public display(net: BpmnGraph) {
+    public display(bpmnGraph: BpmnGraph) {
         this._diagram$.getValue().svgManager.getSvg().remove()
-        this._layoutService.initalLayoutHasBeenDone = false
-        this._diagram$.next(net);
+        this._layoutService.applySugiyama(bpmnGraph)
+        this._diagram$.next(bpmnGraph);
     }
 
 }

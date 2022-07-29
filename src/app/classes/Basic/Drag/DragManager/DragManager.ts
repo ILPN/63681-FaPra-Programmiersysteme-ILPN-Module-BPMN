@@ -4,8 +4,10 @@ export class DragManager{
     protected dragHandles: Map<any,DragHandle> = new Map() // homeless dragHandles
     protected dragedDragHandle: DragHandle | undefined;
     private snapingView:SVGElement
+    private dragingSurface: SVGGraphicsElement
 
     constructor(dragingSurface:SVGElement, snapingView:SVGElement){
+        this.dragingSurface = dragingSurface as SVGGraphicsElement
         dragingSurface.onmouseup = (event) => this.stopDrag(event);
         dragingSurface.onmousemove = (event) => this.drag(event);
         this.snapingView = snapingView
@@ -24,6 +26,8 @@ export class DragManager{
     }
     startDrag(event: MouseEvent, dh: DragHandle ) {
         this.dragedDragHandle = dh;
+
+        
         this.dragedDragHandle.startDrag(event);
         this.snapingView.appendChild(dh.getSnapSvg());
     }

@@ -14,22 +14,25 @@ import { ParserService } from './parser.service';
     providedIn: 'root',
 })
 export class LayoutService {
+   
+    applySugiyama(bpmnGraph: BpmnGraph) {
+        console.log("sugiing around")
+        this.layout(bpmnGraph);
+
+    }
 
     constructor(
         private _parserService: ParserService,
     ){}
-    layoutIfNeeded(bpmnGraph: BpmnGraph, w: number, h: number) {
-        if (!this.initalLayoutHasBeenDone) {
-            this.layout(bpmnGraph, w, h);
-        }
-    }
     getSnapsFor(id: string): SnapElement[] {
         return this.getSnapsForNode();
     }
     getSnapsForNode(): SnapElement[] {
         const snaps = [];
+        if(this.sugiResult == undefined) return []
+
         const lowestRow =
-            this.sugiResult!.getAllNodes().map(n => n.row).sort((a,b)=> b-a)[0]
+            this.sugiResult.getAllNodes().map(n => n.row).sort((a,b)=> b-a)[0]
 
         for (let column = 0; column < this.sugiResult!.columns.length; column++) {
             snaps.push(new SnapX(this.getPosForColumnAndRow(column, 0).x));
@@ -57,15 +60,19 @@ export class LayoutService {
         );
     }
 
-    public layout(bpmnGraph: BpmnGraph, w: number, h: number): void {
+    zoomDrawingAreaToSvg(svgToZoomTo: SVGElement, drawingArea: SVGElement) {
+        if(!(svgToZoomTo instanceof SVGGraphicsElement)) throw Error("svgToZoomTo not instanceof SVGGraphicsElement")
+        const bBox = svgToZoomTo.getBBox()
+        drawingArea.setAttribute(
+            'viewBox',
+            `${bBox.x- this.padding.x} ${bBox.y-this.padding.y} ${bBox.width+ 2* this.padding.x} ${bBox.height+ 2* this.padding.y}`
+        );
+    }
+
+    public layout(bpmnGraph: BpmnGraph): void {
         this.getSugiyamaResult(bpmnGraph);
-        this.width = w;
-        this.height = h;
-        this.getGraphDimensions();
-        this.scaleWidthAndHeightIfGraphToBig();
         this.setCoordinates(bpmnGraph);
-        this._parserService.setHardcodedPositions(bpmnGraph)
-        this.initalLayoutHasBeenDone = true;
+        //this._parserService.setHardcodedPositions(bpmnGraph)
     }
     private scaleWidthAndHeightIfGraphToBig() {
         const xRatio =
