@@ -16,11 +16,8 @@ export class AppComponent implements OnDestroy {
     mode = "free dragging"
     public textareaFc: FormControl;
     private _sub: Subscription;
-<<<<<<< HEAD
     private _sub1: Subscription;
-=======
     private result: any; //todo: any  muss weg
->>>>>>> master
 
     constructor(
         private _parserService: ParserService,
@@ -29,16 +26,11 @@ export class AppComponent implements OnDestroy {
     ) {
         this.textareaFc = new FormControl();
         this._sub = this.textareaFc.valueChanges
-<<<<<<< HEAD
             .pipe(debounceTime(400))
             .subscribe((val) => this.processSourceChange(val));
         this._sub1 = _parserService.positionChange.
             pipe(debounceTime(400)).
             subscribe((val) => this.textareaFc.setValue(val));
-=======
-        .pipe(debounceTime(400))
-        .subscribe((val) => this.processSourceChange(val));
->>>>>>> master
         this.textareaFc.setValue(`Your advertising could be here`);
     }
 
