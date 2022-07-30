@@ -166,12 +166,12 @@ export class SwitchableGateway extends SwitchableNode {
     }
 
     isSplitGateway(): boolean {
-        return BpmnUtils.isGatewaySplit(this.bpmnNode)
+        return BpmnUtils.isSplitGateway(this.bpmnNode)
 
     }
 
     isJoinGateway(): boolean {
-        return BpmnUtils.isGatewayJoin(this.bpmnNode)
+        return BpmnUtils.isJoinGateway(this.bpmnNode)
     }
 
     /**

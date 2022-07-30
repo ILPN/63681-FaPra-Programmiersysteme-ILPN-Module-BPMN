@@ -1,13 +1,14 @@
-import { ComponentFactoryResolver } from "@angular/core";
-import { BpmnNode } from "./BpmnNode"
-import { BpmnUtils } from "./BpmnUtils"
+import { BpmnNode } from "./BpmnNode";
+import { BpmnUtils } from "./BpmnUtils";
 import { BpmnEventEnd } from "./events/BpmnEventEnd";
 import { BpmnEventIntermediate } from "./events/BpmnEventIntermediate";
 import { BpmnEventStart } from "./events/BpmnEventStart";
 import { BpmnGateway } from "./gateways/BpmnGateway";
 import { BpmnTask } from "./tasks/BpmnTask";
 
-
+/**
+ * validates BPMN graph, provides error messages
+ */
 export class Validator {
     private startEvents: BpmnEventStart[] = [];
     private endEvents: BpmnEventEnd[] = [];
@@ -184,7 +185,7 @@ export class Validator {
         if (BpmnUtils.hasNoOutEdges(gateway))
             message += messageStart + this.HAS_NO_OUT_EDGES
 
-        if (BpmnUtils.isGatewayJoin(gateway)) {
+        if (BpmnUtils.isJoinGateway(gateway)) {
             if (BpmnUtils.hasOnlyOneInEdge(gateway)) message += messageStart + this.HAS_NO_MULTIPLE_IN_EDGES
             if (BpmnUtils.hasMultipleOutEdges(gateway)) message += messageStart + this.HAS_MULTIPLE_OUT_EDGES
         
@@ -200,7 +201,7 @@ export class Validator {
     }
 
 
-    getNoMatchingGatewayError(gateway: BpmnGateway): string {
+    private getNoMatchingGatewayError(gateway: BpmnGateway): string {
         let error = " hat kein entsprechendes "
         if (BpmnUtils.isSplitAnd(gateway))
             return error + " AND-JOIN"

@@ -12,60 +12,123 @@ import { BpmnGatewaySplitOr } from "./gateways/BpmnGatewaySplitOr"
 import { BpmnGatewaySplitXor } from "./gateways/BpmnGatewaySplitXor"
 import { BpmnTask } from "./tasks/BpmnTask"
 
-
+/**
+ * provides various convenience methods for BpmnGraph
+ */
 export class BpmnUtils {
 
-
+    /**
+     * returns true if the specified node has at least one incoming edge
+     * @param node 
+     * @returns 
+     */
     public static hasInEdges(node: BpmnNode): boolean {
         return this.countInEdges(node) > 0;
     }
 
+    /**
+     * returns true if the specified node has no incoming edges
+     * @param node 
+     * @returns 
+     */
     public static hasNoInEdges(node: BpmnNode): boolean {
         return !this.hasInEdges(node);
     }
 
+    /**
+     * returns true if the specified node has exactly one incoming edge
+     * @param node 
+     * @returns 
+     */
     public static hasOnlyOneInEdge(node: BpmnNode): boolean {
         return this.countInEdges(node) === 1;
     }
 
+    /**
+     * returns true if the specified node has more than one incoming edges
+     * @param node 
+     * @returns 
+     */
     public static hasMultipleInEdges(node: BpmnNode): boolean {
         return this.countInEdges(node) > 1;
     }
 
+    /**
+     * returns true if the specified node has at least one outgoing edge
+     * @param node 
+     * @returns 
+     */
     public static hasOutEdges(node: BpmnNode): boolean {
         return this.countOutEdges(node) > 0;
     }
 
+    /**
+     * returns true if the specified node has no outgoing edges
+     * @param node 
+     * @returns 
+     */
     public static hasNoOutEdges(node: BpmnNode): boolean {
         return !this.hasOutEdges(node);
     }
-
+    /**
+     * returns true if the specified node has exactly one outgoing edge
+     * @param node 
+     * @returns 
+     */
     public static hasOnlyOneOutEdge(node: BpmnNode): boolean {
         return this.countOutEdges(node) === 1;
     }
 
+    /**
+     * returns true if the specified node has more than one outgoing edge
+     * @param node 
+     * @returns 
+     */
     public static hasMultipleOutEdges(node: BpmnNode): boolean {
         return this.countOutEdges(node) > 1;
     }
 
 
-    /** Returns the number of incoming edges  */
+    /**
+     * gets the number of incoming edges of the specified node
+     * @param node 
+     * @returns 
+     */
     public static countInEdges(node: BpmnNode): number {
         return node.inEdges.length
     }
-    /** Returns the number of outgoing edges  */
+
+    /**
+     * gets the number of outgoing edges of the specified node
+     * @param node 
+     * @returns 
+     */
     public static countOutEdges(node: BpmnNode): number {
         return node.outEdges.length
     }
-
+    /**
+     * filters out start events from the specified list of nodes
+     * @param nodes 
+     * @returns start events
+     */
     public static getStartEvents(nodes: BpmnNode[]): BpmnEventStart[] {
         return nodes.filter(node => BpmnUtils.isStartEvent(node)).map(node => node as BpmnEventStart)
     }
 
+    /**
+    * filters out end events from the specified list of nodes
+    * @param nodes 
+    * @returns end events
+    */
     public static getEndEvents(nodes: BpmnNode[]): BpmnEventEnd[] {
         return nodes.filter(node => BpmnUtils.isEndEvent(node)).map(node => node as BpmnEventEnd)
     }
 
+    /**
+    * filters out gateways from the specified list of nodes
+    * @param nodes 
+    * @returns start events
+    */
     public static getGateways(nodes: BpmnNode[]): BpmnGateway[] {
         return nodes.filter(node => BpmnUtils.isGateway(node)).map(node => node as BpmnGateway)
     }
@@ -78,107 +141,64 @@ export class BpmnUtils {
         return nodes.filter(node => BpmnUtils.isTask(node)).map(node => node as BpmnTask)
     }
 
+    /**
+     * checks if the specified gateway has a matching gateway,
+     * for ex., if SPLIT-AND has a corresponding JOIN-AND
+     * @param gateway 
+     * @returns true if matching gateway found
+     */
     public static hasNoMatchingGateway(gateway: BpmnGateway): boolean {
         return !this.getCorrespondingGateway(gateway)
     }
 
-    /**
-     * checks if the node is a BpmnGateway
-     * @param node
-     * @returns
-     */
     public static isGateway(node: BpmnNode): boolean {
         return node instanceof BpmnGateway
     }
 
 
-    /**
-    * checks if the node is a join BpmnGateway
-    * @param node
-    * @returns
-    */
-    public static isGatewayJoin(node: BpmnNode): boolean {
-        return (node instanceof BpmnGatewayJoinAnd || node instanceof BpmnGatewayJoinOr || node instanceof BpmnGatewayJoinXor);
-    }
-
-    /**
-      * checks if the node is a split BpmnGateway
-      * @param node
-      * @returns
-      */
-    public static isGatewaySplit(node: BpmnNode): boolean {
-        return (node instanceof BpmnGatewaySplitAnd || node instanceof BpmnGatewaySplitOr || node instanceof BpmnGatewaySplitXor);
+    public static isJoinGateway(node: BpmnNode): boolean {
+        return this.isJoinAnd(node) || this.isJoinOr(node) || this.isJoinXor(node);
     }
 
 
-    /**
-     * checks if the node is a or  join / split BpmnGateway
-     * @param node
-     * @returns
-     */
-    public static isGatewayOR(node: BpmnNode): boolean {
-        return (node instanceof BpmnGatewaySplitOr || node instanceof BpmnGatewayJoinOr);
+    public static isSplitGateway(node: BpmnNode): boolean {
+        return this.isSplitAnd(node) || this.isSplitOr(node) || this.isSplitXor(node);
     }
 
-    /**
-     * checks if the node is a xor  join / split BpmnGateway
-     * @param node
-     * @returns
-     */
-    public static isGatewayXOR(node: BpmnNode): boolean {
-        return (node instanceof BpmnGatewaySplitXor || node instanceof BpmnGatewayJoinXor);
+    public static isOrGateway(node: BpmnNode): boolean {
+        return this.isSplitOr(node) || this.isJoinOr(node);
     }
 
-    /**
-     * checks if the node is a and join / split BpmnGateway
-     * @param node
-     * @returns
-     */
-    public static isGatewayAnd(node: BpmnNode): boolean {
-        return (node instanceof BpmnGatewaySplitAnd || node instanceof BpmnGatewayJoinAnd);
+
+    public static isXorGateway(node: BpmnNode): boolean {
+        return this.isSplitXor(node) || this.isJoinXor(node);
     }
 
-    /**
-     * checks if the node is a BpmnTask
-     * @param node
-     * @returns
-     */
+
+    public static isAndGateway(node: BpmnNode): boolean {
+        return this.isSplitAnd(node) || this.isJoinAnd(node);
+    }
+
+
     public static isTask(node: BpmnNode): boolean {
         return node instanceof BpmnTask
     }
 
-    /**
-     * checks if the node is a BpmnEvent
-     * @param node
-     * @returns
-     */
+
     public static isEvent(node: BpmnNode): boolean {
         return node instanceof BpmnEvent
     }
 
-    /**
-     * checks if the node is a BpmnEventStart
-     * @param node
-     * @returns
-     */
+
     public static isStartEvent(node: BpmnNode): boolean {
         return node instanceof BpmnEventStart
     }
 
-    /**
-     * checks if the node is a BpmnEventIntermediate
-     * @param node
-     * @returns
-     */
+
     public static isIntermediateEvent(node: BpmnNode): boolean {
         return node instanceof BpmnEventIntermediate
     }
 
-    /**
-     * checks if the node is a BpmnEventEnd
-     * @param node
-     * @returns
-     */
     public static isEndEvent(node: BpmnNode): boolean {
         return node instanceof BpmnEventEnd
     }
@@ -208,23 +228,45 @@ export class BpmnUtils {
         return node instanceof BpmnGatewayJoinOr
     }
 
+    /**
+     * gets successor of the specified node
+     * (using an arbitrary outgoing edge if there are multiple outgoing edges)
+     * @param node 
+     * @returns node directly after the specified node 
+     */
     public static next(node: BpmnNode): BpmnNode {
         return node.outEdges[0].to
     }
+
+    /**
+     * gets predecessor of the specified node 
+     * (using an arbitrary incoming edge if there are multiple incoming edges)
+     * @param node 
+     * @returns node directly before the specified node 
+     */
     public static before(node: BpmnNode): BpmnNode {
         return node.inEdges[0].from
     }
 
+    /**
+    * traverses the graph starting from the specified node to find the matching gateway
+    * @param node node to start traversal from
+    * @returns matching gateway or null if not found
+    */
     public static getCorrespondingGateway(gateway: BpmnGateway): BpmnGateway | null {
-        if (this.isGatewayJoin(gateway))
+        if (this.isJoinGateway(gateway))
             return this.getCorrespondingSplit(gateway)
 
-        if (this.isGatewaySplit(gateway))
+        if (this.isSplitGateway(gateway))
             return this.getCorrespondingJoin(gateway)
 
         return null
     }
-
+    /**
+     * traverses the graph in reverse order to find the matching SPLIT gateway
+     * @param node node to start traversal from
+     * @returns preceding SPLIT gateway or null if not found
+     */
     public static getCorrespondingSplit(gateway: BpmnGateway): BpmnGateway | null {
 
         if (this.isJoinAnd(gateway))
@@ -238,7 +280,11 @@ export class BpmnUtils {
 
         return null
     }
-
+    /**
+     * traverses the graph forward to find the matching JOIN gateway
+     * @param node node to start traversal from
+     * @returns succeeding JOIN gateway or null if not found
+     */
     public static getCorrespondingJoin(gateway: BpmnGateway): BpmnGateway | null {
 
         if (this.isSplitAnd(gateway))
@@ -252,7 +298,11 @@ export class BpmnUtils {
 
         return null
     }
-
+    /**
+     * traverses the graph forward to find the matching AND-JOIN gateway
+     * @param node node to start traversal from
+     * @returns succeeding AND-JOIN gateway or null if not found
+     */
     public static getCorrespondingAndJoin(node: BpmnNode): BpmnGatewayJoinAnd | null {
         if (!node)
             return null
@@ -270,7 +320,11 @@ export class BpmnUtils {
 
         return null;
     }
-
+    /**
+     * traverses the graph forward to find the matching OR-JOIN gateway
+     * @param node node to start traversal from
+     * @returns succeeding OR-JOIN gateway or null if not found
+     */
     public static getCorrespondingOrJoin(node: BpmnNode): BpmnGatewayJoinOr | null {
         if (!node)
             return null
@@ -288,7 +342,11 @@ export class BpmnUtils {
 
         return null;
     }
-
+    /**
+    * traverses the graph forward to find the matching XOR-JOIN gateway
+    * @param node node to start traversal from
+    * @returns succeeding XOR-JOIN gateway or null if not found
+    */
     public static getCorrespondingXorJoin(node: BpmnNode): BpmnGatewayJoinXor | null {
         if (!node)
             return null
@@ -307,7 +365,11 @@ export class BpmnUtils {
         return null;
     }
 
-
+    /**
+     * traverses the graph in reverse order to find the matching AND-SPLIT gateway
+     * @param node node to start traversal from
+     * @returns preceding AND-SPLIT gateway or null if not found
+     */
     public static getCorrespondingAndSplit(node: BpmnNode): BpmnGatewaySplitAnd | null {
         if (!node)
             return null
@@ -325,7 +387,11 @@ export class BpmnUtils {
 
         return null;
     }
-
+    /**
+    * traverses the graph in reverse order to find the matching OR-SPLIT gateway
+    * @param node node to start traversal from
+    * @returns preceding OR-SPLIT gateway or null if not found
+    */
     public static getCorrespondingOrSplit(node: BpmnNode): BpmnGatewaySplitOr | null {
         if (!node)
             return null
@@ -343,7 +409,11 @@ export class BpmnUtils {
 
         return null;
     }
-
+    /**
+     * traverses the graph in reverse order to find the matching XOR-SPLIT gateway
+     * @param node node to start traversal from
+     * @returns preceding XOR-SPLIT gateway or null if not found
+     */
     public static getCorrespondingXorSplit(node: BpmnNode): BpmnGatewaySplitXor | null {
         if (!node)
             return null
@@ -362,6 +432,12 @@ export class BpmnUtils {
         return null;
     }
 
+    /**
+     * checks whether split and join gateway are of the same type, for ex. AND-SPLIT and AND-JOIN
+     * @param split split gateway
+     * @param join join gateway
+     * @returns true if the gateways are of the same type
+     */
     public static splitJoinSameType(split: BpmnGateway, join: BpmnGateway) {
         let orMatch = this.isSplitOr(split) && this.isJoinOr(join)
         let andMatch = this.isSplitAnd(split) && this.isJoinAnd(join)
