@@ -37,7 +37,10 @@ export class DisplaySwitchGraphComponent implements OnDestroy, AfterViewInit {
            const switchGraph = new SwitchableGraph(graph);
       this.validateGraph(switchGraph)
 
-      this.draw(switchGraph.svgManager.getSvg())
+      const svg = switchGraph.svgManager.getSvg()
+      this.draw(svg)
+      this._layoutService.zoomViewToSvg(svg, this.drawingArea.nativeElement,this.rootSvg.nativeElement)
+
 
     });
   }
