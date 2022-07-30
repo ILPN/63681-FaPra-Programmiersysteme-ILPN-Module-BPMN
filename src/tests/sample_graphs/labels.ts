@@ -1,0 +1,25 @@
+export class Labels{
+     //LABELS
+    public static  MANUAL = "ManualTask"
+    public static  BUSINESS = "BusinessRuleTask"
+    public static  SEND = "SendTask"
+    public static RECEIVE = "ReceiveTask"
+    public static  USER = "UserTask"
+    public static  USER2 = "UserTask2"
+    public static  SERVICE = "ServiceTask"
+    public static  INTEVENT1 = "IntermedEvent1"
+    public static  INTEVENT2 = "IntermedEvent2"
+    public static  END = "EndEvent"
+    public static  START = "StartEvent"
+    public static  XOR_SPLIT = "XORSplit"
+    public static  OR_SPLIT = "ORSplit"
+    public static  ORSPLIT_NEXT = "ORSplitNext"
+    public static  ORSPLIT_NESTED = "ORSplitNested"
+    public static  AND_SPLIT = "ANDSplit"
+    public static  AND_JOIN = "ANDJoin"
+    public static XOR_JOIN = "XORJoin"
+    public static  OR_JOIN = "ORJoin"
+    public static  ORJOIN_NESTED = "ORJoinNested"
+    public static  ORJOIN_NEXT = "ORJoinNext"
+ 
+}

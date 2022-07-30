@@ -24,8 +24,8 @@ export class DisplaySwitchGraphComponent implements OnDestroy, AfterViewInit {
   constructor(
     private _layoutService: LayoutService,
     private _svgService: SvgService,
-    private _displayService: DisplayService,
-    private graphValidationService: GraphValidationService
+    private _displayService: DisplayService
+  
   ) { }
 
   ngAfterViewInit(): void {
@@ -35,7 +35,6 @@ export class DisplaySwitchGraphComponent implements OnDestroy, AfterViewInit {
       if (this.rootSvg == undefined || this.drawingArea == undefined) return
       this.bpmnGraph = graph;
            const switchGraph = new SwitchableGraph(graph);
-      this.validateGraph(switchGraph)
 
       const svg = switchGraph.svgManager.getSvg()
       this.draw(svg)
@@ -44,10 +43,6 @@ export class DisplaySwitchGraphComponent implements OnDestroy, AfterViewInit {
 
     });
   }
-    private validateGraph(graph:SwitchableGraph) {
-        this.graphValidationService.validateGraph(graph);
-    }
-
 
   ngOnInit(): void {
   }

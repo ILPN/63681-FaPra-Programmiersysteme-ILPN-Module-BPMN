@@ -1,16 +1,18 @@
-import {SwitchState} from "./switchstatetype";
-import {SwitchableNode} from "./SwitchableNode";
-import {SwitchableGraph} from "./SwitchableGraph";
-import {SwitchableGateway} from "./SwitchableGateway";
-import {SwitchUtils} from "./SwitchUtils";
+import { SwitchableGateway } from "./SwitchableGateway";
+import { SwitchableGraph } from "./SwitchableGraph";
+import { SwitchableNode } from "./SwitchableNode";
+import { SwitchState } from "./switchstatetype";
+import { SwitchUtils } from "./SwitchUtils";
 
 export class SwitchController {
     private _startEvents: SwitchableNode[];
     private nodes: SwitchableNode[];
+    private _graph: SwitchableGraph;
 
     constructor(graph: SwitchableGraph) {
         this._startEvents = [];
-        this.nodes = graph.switchNodes
+        this.nodes = graph.switchNodes;
+        this._graph = graph;
     }
 
 
@@ -36,6 +38,7 @@ export class SwitchController {
      * @param clickedNode the clicked node
      */
     public press(clickedNode: SwitchableNode) {
+
         if (clickedNode.switchState === SwitchState.enableable || clickedNode.switchState === SwitchState.switchedButEnableForLoopRun) {
             //console.log("Clicked element " + clickedNode.id);
             if (clickedNode.isStartEvent()) this.disableAllOtherStartEvents(clickedNode);
@@ -45,7 +48,7 @@ export class SwitchController {
             nodesToSwitch.forEach(node => {
                 if (this.possibleToSwitchNode(node)) node.switch()
             });
-            if (clickedNode.isGateway() && (clickedNode as SwitchableGateway).OR_JOIN()) (clickedNode as SwitchableGateway).disablePathsNotTakenAfterOrJoin();
+            if (clickedNode.isGateway() && (clickedNode as SwitchableGateway).OR_JOIN()) (clickedNode as SwitchableGateway).disablePathsNotTakenAfterOrJoin(this._graph);
             this.checkAllEnableableNodesStillEnableable();
 
 
@@ -94,7 +97,7 @@ export class SwitchController {
         if (node.isGateway() && (node.disabled() || node.enableable() || node.switchedButEnableForLoopRun())) {
 
             let gateway: SwitchableGateway = node as SwitchableGateway;
-            return gateway.canBeSwitched()
+            return gateway.canBeSwitched(this._graph)
 
         }
         return true;
