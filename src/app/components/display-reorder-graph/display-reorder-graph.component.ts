@@ -46,7 +46,10 @@ export class DisplayReorderGraphComponent implements OnDestroy, AfterViewInit {
           this.bpmnGraph = graph;
           if (this.drawingArea == undefined || this.rootSvg == undefined) return;
 
-          const dragManager = new DragManagerReorder(this.rootSvg.nativeElement,this.drawingArea.nativeElement,this._layoutService.sugiResult!)
+          const dragManager = new DragManagerReorder(this.rootSvg.nativeElement,
+            this.drawingArea.nativeElement,
+            this.drawingArea.nativeElement as SVGGraphicsElement,
+            this._layoutService.sugiResult!)
           dragManager.onStopReorderDrag = (reorderdDragHandles) =>{
             const nodes: BpmnNode[] = []
             let dummyNodes: BpmnDummyEdgeCorner[] =[]

@@ -16,75 +16,57 @@ import { ParserService } from './parser.service';
 export class LayoutService {
    
     applySugiyama(bpmnGraph: BpmnGraph) {
-        console.log("sugiing around")
-        this.layout(bpmnGraph);
-
-    }
-
-    constructor(
-        private _parserService: ParserService,
-    ){}
-    getSnapsFor(id: string): SnapElement[] {
-        return this.getSnapsForNode();
+        this.getSugiyamaResult(bpmnGraph);
+        this.setCoordinates(bpmnGraph);
     }
     getSnapsForNode(): SnapElement[] {
         const snaps = [];
-        if(this.sugiResult == undefined) return []
+        const snapCountX = 60
+        const snapCountY = 60
 
-        const lowestRow =
-            this.sugiResult.getAllNodes().map(n => n.row).sort((a,b)=> b-a)[0]
+        for (let col = -snapCountX*0.5; col < snapCountX*0.5; col++) {
+            snaps.push(new SnapX(this.getPosForColumnAndRow(col, 0).x));
+        }
 
-        for (let column = 0; column < this.sugiResult!.columns.length; column++) {
-            snaps.push(new SnapX(this.getPosForColumnAndRow(column, 0).x));
+        for (let row = -snapCountY*0.5; row < snapCountY*0.5; row++) {
+            snaps.push(new SnapY(this.getPosForColumnAndRow(0, row).y));
         }
-        for (let i = -1; i <= lowestRow+1; i++) {
-            snaps.push(new SnapY(this.getPosForColumnAndRow(0, i).y));
-        }
+
         return snaps;
     }
-
-    initalLayoutHasBeenDone = false;
-    private width: number = 0;
-    private height: number = 0;
-
     private spacingXAxis = 200;
     private spacingYAxis = 110;
     private padding = new Vector(100, 50);
-    public setViewBox(drawingArea: SVGElement) {
-        const centerOfView = new Vector(this.width, this.height).half();
-        const centerOfGraph = this._graphDimensions!.half();
-        const shift = centerOfGraph.minus(centerOfView);
-        drawingArea.setAttribute(
-            'viewBox',
-            `${shift.x} ${shift.y} ${this.width} ${this.height}`
-        );
-    }
 
-    zoomDrawingAreaToSvg(svgToZoomTo: SVGElement, drawingArea: SVGElement) {
+    /**
+     * sets a Viewbox to svgWithViewbox. If svgToZoomTo(+padding) fits into the view, the viewbox is set, so that svgToZoomTo is centered
+     * If svgToZoomTo doesn't fit, the viewbox is set so that svgToZoomTo is centered and fits into the view
+     * @param svgToZoomTo 
+     * @param svgWithViewbox 
+     * @param view 
+     */
+    zoomViewToSvg(svgToZoomTo: SVGElement, svgWithViewbox: SVGElement, view:SVGElement) {
         if(!(svgToZoomTo instanceof SVGGraphicsElement)) throw Error("svgToZoomTo not instanceof SVGGraphicsElement")
         const bBox = svgToZoomTo.getBBox()
-        drawingArea.setAttribute(
-            'viewBox',
-            `${bBox.x- this.padding.x} ${bBox.y-this.padding.y} ${bBox.width+ 2* this.padding.x} ${bBox.height+ 2* this.padding.y}`
-        );
+
+        if(view.clientWidth >= bBox.width+ 2*this.padding.x &&
+            view.clientHeight >= bBox.height + 2 * this.padding.y){
+                const centerOfBBox = new Vector(bBox.x + (bBox.width * 0.5), bBox.y+ (bBox.height * 0.5))
+                const centerOfView = (new Vector(view.clientWidth, view.clientHeight)).half()
+                const delta = centerOfView.minus(centerOfBBox)
+                svgWithViewbox.setAttribute(
+                    'viewBox',
+                    `${-delta.x} ${-delta.y} ${view.clientWidth} ${view.clientHeight}`
+                );
+            }else{
+                svgWithViewbox.setAttribute(
+                    'viewBox',
+                    `${bBox.x- this.padding.x} ${bBox.y-this.padding.y} ${bBox.width+ 2* this.padding.x} ${bBox.height+ 2* this.padding.y}`
+                );
+            }
+        
     }
 
-    public layout(bpmnGraph: BpmnGraph): void {
-        this.getSugiyamaResult(bpmnGraph);
-        this.setCoordinates(bpmnGraph);
-        //this._parserService.setHardcodedPositions(bpmnGraph)
-    }
-    private scaleWidthAndHeightIfGraphToBig() {
-        const xRatio =
-            (this._graphDimensions!.x + 2 * this.padding.x) / this.width;
-        const yRatio =
-            (this._graphDimensions!.y + 2 * this.padding.y) / this.height;
-        const scalingFactor = xRatio > yRatio ? xRatio : yRatio;
-        if (scalingFactor > 1) {
-            this.width = this.width * scalingFactor;
-            this.height = this.height * scalingFactor;
-        }
-    }
     private setCoordinates(bpmnGraph: BpmnGraph) {
         for (const bpmnNode of bpmnGraph.nodes) {
             const ln = this.sugiResult!.getNode(bpmnNode.id);
@@ -116,18 +98,6 @@ export class LayoutService {
         }
     }
 
-    private _graphDimensions: Vector | undefined;
-    private getGraphDimensions(): Vector {
-        let biggestX = 0;
-        let biggestY = 0;
-        for (const n of this.sugiResult!.getAllNodes()) {
-            const pos = this.getPosForColumnAndRow(n.column, n.row);
-            if (pos.x > biggestX) biggestX = pos.x;
-            if (pos.y > biggestY) biggestY = pos.y;
-        }
-        this._graphDimensions = new Vector(biggestX, biggestY);
-        return this._graphDimensions;
-    }
     private getPosForColumnAndRow(column: number, order: number): Vector {
         const x = column * this.spacingXAxis;
         const y = order * this.spacingYAxis;
