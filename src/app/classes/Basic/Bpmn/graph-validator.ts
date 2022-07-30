@@ -194,6 +194,10 @@ export class Validator {
         if (BpmnUtils.hasNoMatchingGateway(gateway))
             message += messageStart + this.getNoMatchingGatewayError(gateway)
 
+            
+            let gateway2 = BpmnUtils.getCorrespondingJoin(gateway);
+            if (gateway2 !== null && !BpmnUtils.splitJoinSameType(gateway, gateway2)) message += messageStart + " und das passende Gateway mit der ID: "+ gateway2.id+" besitzen nicht den gleichen Typ (XOR,OR,AND).";
+  
         return this.getValidationResult(message);
     }
 
