@@ -3,79 +3,61 @@ import { SwitchableGateway } from "src/app/classes/Basic/Switch/SwitchableGatewa
 import { SwitchableGraph } from "src/app/classes/Basic/Switch/SwitchableGraph";
 import { SwitchableNode } from "src/app/classes/Basic/Switch/SwitchableNode";
 import { OrGraphWithNestedOr } from "../sample_graphs/or-graph-with-nested-or";
-import {GraphValidationService} from "../../../app/services/graph-validation.service";
+import { GraphValidationService } from "../../../app/services/graph-validation.service";
+import { Labels } from "../sample_graphs/labels";
 
 
 describe('OR graph with nested OR gateway', () => {
-    let diagram: SwitchableGraph;
+    let graph: SwitchableGraph;
     let controller: SwitchController;
 
-    //nodes
     let startEvent: SwitchableNode
-    let gatewaySplitOrParent: SwitchableGateway
-    let task1: SwitchableNode
-    let task2: SwitchableNode
-
-    //nested
-    let gatewaySplitOrNested: SwitchableGateway
-    let task3: SwitchableNode
-    let task4: SwitchableNode
-    let gatewayJoinOrNested: SwitchableGateway
-
-    let gatewayJoinOrParent: SwitchableGateway
-    let task5: SwitchableNode
+    let gatewaySplitOrParent: SwitchableNode;
+    let task1Manual: SwitchableNode;
+    let task2User: SwitchableNode;
+    let gatewaySplitOrNested: SwitchableNode
+    let task3Business: SwitchableNode
+    let task4Service: SwitchableNode
+    let gatewayJoinOrNested: SwitchableNode
+    let gatewayJoinOrParent: SwitchableNode
+    let task5Sending: SwitchableNode
     let endEvent: SwitchableNode
-    let graphValidationService:GraphValidationService;
-
-
 
     beforeEach(() => {
-        diagram = new SwitchableGraph(OrGraphWithNestedOr.create(), graphValidationService)
-        controller = diagram.controller
+        graph = new SwitchableGraph(OrGraphWithNestedOr.create())
+        controller = graph.controller
 
-        startEvent = diagram.getNode("StartEvent1")
-        gatewaySplitOrParent = diagram.getNode("GatewaySplitOrParent")
-        task1 = diagram.getNode("Task1")
-        task2 = diagram.getNode("Task2")
-        gatewaySplitOrNested = diagram.getNode("GatewaySplitOrNested")
-        task3 = diagram.getNode("Task3")
-        task4 = diagram.getNode("Task4")
-        gatewayJoinOrNested = diagram.getNode("GatewayJoinOrNested")
+        startEvent = graph.getNode(Labels.START)!
+        gatewaySplitOrParent = graph.getNode(Labels.OR_SPLIT)!
+        task1Manual = graph.getNode(Labels.MANUAL)!
+        task2User = graph.getNode(Labels.USER)!
+        gatewaySplitOrNested = graph.getNode(Labels.ORSPLIT_NESTED)!
+        task3Business = graph.getNode(Labels.BUSINESS)!
+        task4Service = graph.getNode(Labels.SERVICE)!
+        gatewayJoinOrNested = graph.getNode(Labels.ORJOIN_NESTED)!
 
-        gatewayJoinOrParent = diagram.getNode("GatewayJoinOrParent")
-        task5 = diagram.getNode("Task5")
-        endEvent = diagram.getNode("EndEvent1")
+        gatewayJoinOrParent = graph.getNode(Labels.OR_JOIN)!
+        task5Sending = graph.getNode(Labels.SEND)!
+        endEvent = graph.getNode(Labels.END)!
 
     });
 
 
 
     test('Recursive search for preceding NESTED SPLIT gateway', () => {
-        let nestedSplit = gatewayJoinOrNested.searchCorrespondingSplitGateway()
+        let nestedSplit = (gatewayJoinOrNested as SwitchableGateway).searchCorrespondingSplitGateway(graph)
 
         expect(nestedSplit?.id).toEqual(gatewaySplitOrNested.id)
 
     });
 
     test('Recursive search for preceding PARENT SPLIT gateway', () => {
-        let parentSplit = gatewayJoinOrParent.searchCorrespondingSplitGateway()
+        let parentSplit = (gatewayJoinOrParent as SwitchableGateway).searchCorrespondingSplitGateway(graph)
 
         expect(parentSplit?.id).toEqual(gatewaySplitOrParent.id)
 
     });
 
-    test('Recursive search for following NESTED SPLIT gateway', () => {
-        let nestedJoin = gatewaySplitOrNested.searchCorrespondingJoinGateway()
 
-        expect(nestedJoin?.id).toEqual(gatewayJoinOrNested.id)
-
-    });
-
-    test('Recursive search for following PARENT SPLIT gateway', () => {
-        let parentJoin = gatewaySplitOrParent.searchCorrespondingJoinGateway()
-
-        expect(parentJoin?.id).toEqual(gatewayJoinOrParent.id)
-
-    });
 
 });

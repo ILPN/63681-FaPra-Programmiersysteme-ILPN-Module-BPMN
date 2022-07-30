@@ -49,11 +49,8 @@ export class SwitchableGraph implements GetSvgManager {
         return this._controller
     }
 
-    getNode(id: string): any {
-        for (let node of this._switchNodes)
-            if (node.id === id)
-                return node
-        return null
+    getNode(id: string): SwitchableNode | undefined{
+        return this._switchNodes.find(node => node.id === id);
     }
 
     svgCreation(): SVGElement {

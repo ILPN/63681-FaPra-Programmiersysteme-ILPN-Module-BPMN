@@ -1,6 +1,5 @@
 import { BpmnUtils } from "../Bpmn/BpmnUtils";
 import { BpmnGateway } from "../Bpmn/gateways/BpmnGateway";
-import { Validator } from "../Bpmn/graph-validator";
 import { SwitchableGraph } from "./SwitchableGraph";
 import { SwitchableNode } from "./SwitchableNode";
 import { SwitchState } from "./switchstatetype";

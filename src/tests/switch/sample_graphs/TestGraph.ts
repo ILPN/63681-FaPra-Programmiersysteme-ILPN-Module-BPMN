@@ -16,17 +16,22 @@ import { BpmnTaskReceiving } from "src/app/classes/Basic/Bpmn/tasks/BpmnTaskRece
 import { BpmnTaskSending } from "src/app/classes/Basic/Bpmn/tasks/BpmnTaskSending";
 import { BpmnTaskService } from "src/app/classes/Basic/Bpmn/tasks/BpmnTaskService";
 import { BpmnTaskUserTask } from "src/app/classes/Basic/Bpmn/tasks/BpmnTaskUserTask";
+import { Labels } from "./labels";
 
 export class TestGraph {
     _edge_idx: number
     graph: BpmnGraph
+
+
+
+
     constructor() {
         this.graph = new BpmnGraph();
         this._edge_idx = 0;
     }
 
-    createNode(node: BpmnNode, label: string): BpmnNode {
-        node.label = label
+    createNode(node: BpmnNode): BpmnNode {
+        node.label = node.id
         this.graph.addNode(node)
         return node
     }
@@ -36,111 +41,113 @@ export class TestGraph {
         return this._edge_idx.toString()
     }
 
+    getNode(id: string) {
+        return this.graph.nodes.find(node => node.id === id)
+    }
+
     ////// TASKS ///////////////
 
     createManualTask(): BpmnNode {
-        return this.createNode(new BpmnTaskManual("ManualTask"), "ManualTask");
+        return this.createNode(new BpmnTaskManual(Labels.MANUAL));
     }
 
     createBusinessRuleTask(): BpmnNode {
-        return this.createNode(new BpmnTaskBusinessRule("BRTask"), "BusinessRule")
+        return this.createNode(new BpmnTaskBusinessRule(Labels.BUSINESS))
     }
 
     createSendingTask(): BpmnNode {
-        return this.createNode(new BpmnTaskSending("SendTask"), "SendTask");
+        return this.createNode(new BpmnTaskSending(Labels.SEND));
     }
 
     createReceivingTask(): BpmnNode {
-        return this.createNode(new BpmnTaskReceiving("ReceiveTask"), "ReceiveTask")
+        return this.createNode(new BpmnTaskReceiving(Labels.RECEIVE))
     }
 
     createUserTask(): BpmnNode {
-        return this.createNode(new BpmnTaskUserTask("UserTask"), "UserTask");
+        return this.createNode(new BpmnTaskUserTask(Labels.USER));
     }
 
     createUserTaskTwo(): BpmnNode {
-        return this.createNode(new BpmnTaskUserTask("UserTask2"), "UserTask2");
+        return this.createNode(new BpmnTaskUserTask(Labels.USER2));
     }
 
     createServiceTask(): BpmnNode {
-        return this.createNode(new BpmnTaskService("ServiceTask"), "ServiceTask");
+        return this.createNode(new BpmnTaskService(Labels.SERVICE));
     }
 
     // EVENTS
 
     createIntermediateEventOne(): BpmnNode {
-        return this.createNode(new BpmnEventIntermediate("IntEvent1"), "IntEvent1");
+        return this.createNode(new BpmnEventIntermediate(Labels.INTEVENT1));
     }
 
     createIntermediateEventTwo(): BpmnNode {
-        return this.createNode(new BpmnEventIntermediate("IntEvent2"), "IntEvent2");
+        return this.createNode(new BpmnEventIntermediate(Labels.INTEVENT2));
     }
 
     createEndEvent(): BpmnNode {
-        return this.createNode(new BpmnEventEnd("EndEvent"), "EndEvent")
+        return this.createNode(new BpmnEventEnd(Labels.END))
     }
 
     createStartEvent(): BpmnNode {
-        return this.createNode(new BpmnEventStart("StartEv"), "Start");
+        return this.createNode(new BpmnEventStart(Labels.START));
     }
 
     /// GATEWAYS /////
     createXorSplit(): BpmnNode {
-        return this.createNode(new BpmnGatewaySplitXor("XORSplit"), "XORSplit");
+        return this.createNode(new BpmnGatewaySplitXor(Labels.XOR_SPLIT));
     }
 
     createOrSplit(): BpmnNode {
-        return this.createNode(new BpmnGatewaySplitOr("ORSplit"), "ORSplit");
+        return this.createNode(new BpmnGatewaySplitOr(Labels.OR_SPLIT));
 
     }
 
     createOrSplitTwo(): BpmnNode {
-        return this.createNode(new BpmnGatewaySplitOr("ORSplitNext"), "ORSplitNext");
+        return this.createNode(new BpmnGatewaySplitOr(Labels.ORSPLIT_NEXT));
 
     }
 
     createNestedOrSplit(): BpmnNode {
-        return this.createNode(new BpmnGatewaySplitOr("NestedORSplit"), "NestedORSplit");
+        return this.createNode(new BpmnGatewaySplitOr(Labels.ORSPLIT_NESTED));
 
     }
 
     createOrJoin(): BpmnNode {
-        return this.createNode(new BpmnGatewayJoinOr("ORJoin"), "ORJoin");
+        return this.createNode(new BpmnGatewayJoinOr(Labels.OR_JOIN));
 
     }
 
     createOrJoinTwo(): BpmnNode {
-        return this.createNode(new BpmnGatewayJoinOr("ORJoinNext"), "ORJoinNext");
+        return this.createNode(new BpmnGatewayJoinOr(Labels.ORJOIN_NEXT));
 
     }
 
     createNestedOrJoin(): BpmnNode {
-        return this.createNode(new BpmnGatewayJoinOr("NestedORJoin"), "NestedORJoin");
+        return this.createNode(new BpmnGatewayJoinOr(Labels.ORJOIN_NESTED));
 
     }
 
-   
+
     createAndSplit(): BpmnNode {
-        return this.createNode(new BpmnGatewaySplitAnd("ANDSplit"), "ANDSplit");
+        return this.createNode(new BpmnGatewaySplitAnd(Labels.AND_SPLIT));
     }
 
-   
+
 
     createJoinAnd(): BpmnNode {
-        return this.createNode(new BpmnGatewayJoinAnd("ANDJoin"), "ANDJoin");
+        return this.createNode(new BpmnGatewayJoinAnd(Labels.AND_JOIN));
     }
 
     createXorJoin(): BpmnNode {
-        return this.createNode(new BpmnGatewayJoinXor("XORJoin"), "XORJoin");
+        return this.createNode(new BpmnGatewayJoinXor(Labels.XOR_JOIN));
     }
 
-    
+
     createEdge(from: BpmnNode, to: BpmnNode): void {
         this.graph.addEdge(new BpmnEdge(this.edge_idx, from, to));
     }
 
-   
 
    
-    
 }
