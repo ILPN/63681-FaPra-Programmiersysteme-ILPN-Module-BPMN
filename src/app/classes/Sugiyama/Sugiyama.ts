@@ -25,6 +25,7 @@ export class Sugiyama {
         this.addDummies();
         this.minimizeCrossings();
 
+        
         const block = new Block(this.table)
         this.table = block.alignNodes()
 
