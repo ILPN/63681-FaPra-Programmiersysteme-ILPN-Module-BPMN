@@ -2,9 +2,8 @@ import { SwitchController } from "src/app/classes/Basic/Switch/switch-controller
 import { SwitchableGateway } from "src/app/classes/Basic/Switch/SwitchableGateway";
 import { SwitchableGraph } from "src/app/classes/Basic/Switch/SwitchableGraph";
 import { SwitchableNode } from "src/app/classes/Basic/Switch/SwitchableNode";
-import { OrGraphWithNestedOr } from "../sample_graphs/or-graph-with-nested-or";
-import { GraphValidationService } from "../../../app/services/graph-validation.service";
-import { Labels } from "../sample_graphs/labels";
+import { Labels } from "../../sample_graphs/labels";
+import { OrGraphWithNestedOr } from "../../sample_graphs/or-graph-with-nested-or";
 
 
 describe('OR graph with nested OR gateway', () => {
