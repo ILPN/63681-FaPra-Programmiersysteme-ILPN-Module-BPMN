@@ -578,4 +578,8 @@ export class BpmnGraph
         return g
     }
 
+    public getNode(id: string): BpmnNode | undefined {
+        return this.nodes.find(node => node.id === id)
+    }
+
 }
