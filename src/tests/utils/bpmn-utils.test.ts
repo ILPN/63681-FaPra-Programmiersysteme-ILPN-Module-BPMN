@@ -1,6 +1,7 @@
 import { BpmnUtils } from "src/app/classes/Basic/Bpmn/BpmnUtils";
 import { BpmnGateway } from "src/app/classes/Basic/Bpmn/gateways/BpmnGateway";
 import { Labels } from "../sample_graphs/labels";
+import { OrGraphWithNestedOr } from "../sample_graphs/or-graph-with-nested-or";
 import { SimpleAndGraph } from "../sample_graphs/simple-and-graph";
 import { SimpleOrGraph } from "../sample_graphs/simple-or-graph";
 import { SimpleXorGraph } from "../sample_graphs/simple-xor-graph";
@@ -139,5 +140,37 @@ describe('Tests for methods in BpmnUtils', () => {
         expect(foundOrSplit2)
         expect(BpmnUtils.isSplitXor(foundOrSplit2!))
         expect(TestUtils.sameNode(foundOrSplit2!, orSplit2!))
+    });
+
+    test('Test search for corresponding OR gateways in nested OR graph', () => {
+        //arrange
+        let graph = OrGraphWithNestedOr.create()
+        let orSplit = graph.getNode(Labels.OR_SPLIT)!;
+        let orJoin = graph.getNode(Labels.OR_JOIN)
+        let orSplitNested = graph.getNode(Labels.ORSPLIT_NESTED)!;
+        let orJoinNested = graph.getNode(Labels.ORJOIN_NESTED)
+
+        //act
+        let foundOrJoin = BpmnUtils.getCorrespondingGateway(orSplit as BpmnGateway);
+        let foundOrSplit = BpmnUtils.getCorrespondingGateway(orJoin as BpmnGateway);
+        let foundNestedOrJoin = BpmnUtils.getCorrespondingGateway(orSplitNested as BpmnGateway);
+        let foundNestedOrSplit = BpmnUtils.getCorrespondingGateway(orJoinNested as BpmnGateway);
+
+        //assert
+        //Parent OR
+        expect(foundOrJoin)
+        expect(BpmnUtils.isJoinOr(foundOrJoin!))
+        expect(foundOrSplit)
+        expect(BpmnUtils.isSplitOr(foundOrSplit!))
+        expect(TestUtils.sameNode(foundOrJoin!, orJoin!))
+        expect(TestUtils.sameNode(foundOrSplit!, orSplit!))
+
+         //Nested OR
+         expect(foundNestedOrJoin)
+         expect(BpmnUtils.isJoinOr(foundNestedOrJoin!))
+         expect(foundNestedOrSplit)
+         expect(BpmnUtils.isSplitOr(foundNestedOrSplit!))
+         expect(TestUtils.sameNode(foundNestedOrJoin!, orJoinNested!))
+         expect(TestUtils.sameNode(foundNestedOrSplit!, orSplitNested!))
     });
 });
