@@ -1,8 +1,4 @@
 import { Validator } from "src/app/classes/Basic/Bpmn/graph-validator";
-import { SwitchController } from "src/app/classes/Basic/Switch/switch-controller";
-import { SwitchableGateway } from "src/app/classes/Basic/Switch/SwitchableGateway";
-import { SwitchableGraph } from "src/app/classes/Basic/Switch/SwitchableGraph";
-import { SwitchableNode } from "src/app/classes/Basic/Switch/SwitchableNode";
 import { AndGraphThreeLevelsWithEvents } from "../sample_graphs/and-graph-three-levels-with-events";
 import { DirectSplitJoinOr } from "../sample_graphs/direct-split-join-or-with-three-levels";
 import { OrGraphWithNestedOr } from "../sample_graphs/or-graph-with-nested-or";

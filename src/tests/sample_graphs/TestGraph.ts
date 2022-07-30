@@ -41,9 +41,7 @@ export class TestGraph {
         return this._edge_idx.toString()
     }
 
-    getNode(id: string) {
-        return this.graph.nodes.find(node => node.id === id)
-    }
+  
 
     ////// TASKS ///////////////
 
