@@ -1,13 +1,14 @@
-import {Injectable} from '@angular/core';
-import {SwitchableNode} from "../classes/Basic/Switch/SwitchableNode";
-import {DisplayErrorService} from "./display-error.service";
-import {BpmnNode} from "../classes/Basic/Bpmn/BpmnNode";
-import {BpmnGraph} from "../classes/Basic/Bpmn/BpmnGraph";
-import {BpmnEventEnd} from "../classes/Basic/Bpmn/events/BpmnEventEnd";
-import {BpmnEventStart} from "../classes/Basic/Bpmn/events/BpmnEventStart";
-import {BpmnEventIntermediate} from "../classes/Basic/Bpmn/events/BpmnEventIntermediate";
-import {BpmnGateway} from "../classes/Basic/Bpmn/gateways/BpmnGateway";
-import {BpmnTask} from "../classes/Basic/Bpmn/tasks/BpmnTask";
+import { Injectable } from '@angular/core';
+import { SwitchableNode } from "../classes/Basic/Switch/SwitchableNode";
+import { DisplayErrorService } from "./display-error.service";
+import { BpmnNode } from "../classes/Basic/Bpmn/BpmnNode";
+import { BpmnGraph } from "../classes/Basic/Bpmn/BpmnGraph";
+import { BpmnEventEnd } from "../classes/Basic/Bpmn/events/BpmnEventEnd";
+import { BpmnEventStart } from "../classes/Basic/Bpmn/events/BpmnEventStart";
+import { BpmnEventIntermediate } from "../classes/Basic/Bpmn/events/BpmnEventIntermediate";
+import { BpmnGateway } from "../classes/Basic/Bpmn/gateways/BpmnGateway";
+import { BpmnTask } from "../classes/Basic/Bpmn/tasks/BpmnTask";
+import { Validator } from '../classes/Basic/Bpmn/graph-validator';
 
 @Injectable({
     providedIn: 'root'
@@ -20,13 +21,19 @@ export class GraphValidationService {
     private errorMessage: string = '';
 
     validateGraph(validateableGraph: BpmnGraph) {
-        this.validateBpmnGraph(validateableGraph.nodes);
+        // this.validateBpmnGraph(validateableGraph.nodes);
 
-        if (this.errorMessage !== '') {
-            this.displayErrorService.displayError(this.errorMessage);
-        }
+        // if (this.errorMessage !== '') {
+        //     this.displayErrorService.displayError(this.errorMessage);
+        // }
+
+        let result = new Validator(validateableGraph.nodes).validateGraph()
+        if (result.valid)
+            this.displayErrorService.displayError("Happy BPMN graph")
+        else
+            this.displayErrorService.displayError(result.errors)
     }
-    resetErrorMessage():void {
+    resetErrorMessage(): void {
         this.errorMessage = '';
     }
 

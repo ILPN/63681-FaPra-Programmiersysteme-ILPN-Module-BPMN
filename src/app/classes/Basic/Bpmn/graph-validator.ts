@@ -1,3 +1,4 @@
+import { ComponentFactoryResolver } from "@angular/core";
 import { BpmnNode } from "./BpmnNode"
 import { BpmnUtils } from "./BpmnUtils"
 import { BpmnEventEnd } from "./events/BpmnEventEnd";
@@ -47,18 +48,17 @@ export class Validator {
 
         //validate and accumulate
         message += this.validateTasks().errors;
-        message += this.validateStartEvents();
-        message += this.validateIntermediateEvents();
-        message += this.validateEndEventNodes();
-        message += this.validateGateways();
-
+        message += this.validateStartEvents().errors;
+        message += this.validateIntermediateEvents().errors;
+        message += this.validateEndEventNodes().errors;
+        message += this.validateGateways().errors;
+        
         return this.getValidationResult(message);
     };
 
     private getValidationResult(message: string): { errors: string, valid: boolean } {
-        let errors = message.trim()
-        let valid = Boolean(message)
-        return { errors, valid };
+        let graphValid = message.trim() === ""
+        return { errors : message, valid : graphValid};
 
     }
 
