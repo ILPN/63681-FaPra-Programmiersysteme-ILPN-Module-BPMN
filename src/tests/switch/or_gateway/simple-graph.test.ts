@@ -3,9 +3,9 @@ import { SwitchableGateway } from "src/app/classes/Basic/Switch/SwitchableGatewa
 import { SwitchableGraph } from "src/app/classes/Basic/Switch/SwitchableGraph";
 import { SwitchableNode } from "src/app/classes/Basic/Switch/SwitchableNode";
 import { SwitchState } from "src/app/classes/Basic/Switch/switchstatetype";
+import { Labels } from "src/tests/sample_graphs/labels";
+import { SimpleOrGraph } from "src/tests/sample_graphs/simple-or-graph";
 import { Commons } from "../commons";
-import { Labels } from "../sample_graphs/labels";
-import { SimpleOrGraph } from "../sample_graphs/simple-or-graph";
 
 
 describe('Simple graph with OR gateway', () => {

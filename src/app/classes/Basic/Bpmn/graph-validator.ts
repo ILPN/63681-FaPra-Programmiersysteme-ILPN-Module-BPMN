@@ -16,15 +16,16 @@ export class Validator {
 
 
     //messages
-    private HAS_NO_IN_EDGES = " hat keine eingehenden Kanten. ";
-    private HAS_MULTIPLE_IN_EDGES = " hat mehr als eine eingehende Kante. ";
-    private HAS_NO_MULTIPLE_IN_EDGES = " hat nicht mindestens zwei eingehende Kante. ";
-    private HAS_NO_OUT_EDGES = " hat keine ausgehenden Kanten. ";
-    private HAS_MULTIPLE_OUT_EDGES = " hat mehr als eine ausgehende Kante. ";
-    private HAS_NO_MULTIPLE_OUT_EDGES = " hat nicht mindestens zwei ausgehende Kante. ";
-    private HAS_IN_EDGES = " hat eingehende Kante(n). ";
-    private HAS_OUT_EDGES = " hat ausgehende Kante(n). ";
-
+    public HAS_NO_IN_EDGES = " hat keine eingehenden Kanten. ";
+    public HAS_MULTIPLE_IN_EDGES = " hat mehr als eine eingehende Kante. ";
+    public HAS_NO_MULTIPLE_IN_EDGES = " hat nicht mindestens zwei eingehende Kante. ";
+    public HAS_NO_OUT_EDGES = " hat keine ausgehenden Kanten. ";
+    public HAS_MULTIPLE_OUT_EDGES = " hat mehr als eine ausgehende Kante. ";
+    public HAS_NO_MULTIPLE_OUT_EDGES = " hat nicht mindestens zwei ausgehende Kante. ";
+    public HAS_IN_EDGES = " hat eingehende Kante(n). ";
+    public HAS_OUT_EDGES = " hat ausgehende Kante(n). ";
+    public NO_START_EVENT = " Es gibt kein Start-Event. "
+    public NO_END_EVENT = " Es gibt kein End-Event. "
     
     constructor(nodes: BpmnNode[]) {
 
@@ -95,7 +96,7 @@ export class Validator {
     private validateStartEvents(): { errors: string, valid: boolean } {
 
         if (this.startEvents.length === 0)
-            return this.getValidationResult("Es gibt kein Start-Event. ");
+            return this.getValidationResult(this.NO_START_EVENT);
 
         let message = "";
         this.startEvents.forEach(startEvent => message += this.validateStartEvent(startEvent).errors);
@@ -142,7 +143,7 @@ export class Validator {
     private validateEndEventNodes(): { errors: string, valid: boolean } {
 
         if (this.endEvents.length === 0)
-            return this.getValidationResult(" Es gibt kein End-Event. ");
+            return this.getValidationResult(this.NO_END_EVENT);
 
         let message = ""
 
