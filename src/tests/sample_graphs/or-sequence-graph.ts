@@ -1,11 +1,4 @@
-import { BpmnEdge } from "src/app/classes/Basic/Bpmn/BpmnEdge/BpmnEdge";
 import { BpmnGraph } from "src/app/classes/Basic/Bpmn/BpmnGraph";
-import { BpmnEventEnd } from "src/app/classes/Basic/Bpmn/events/BpmnEventEnd";
-import { BpmnEventStart } from "src/app/classes/Basic/Bpmn/events/BpmnEventStart";
-import { BpmnGatewayJoinOr } from "src/app/classes/Basic/Bpmn/gateways/BpmnGatewayJoinOr";
-import { BpmnGatewaySplitOr } from "src/app/classes/Basic/Bpmn/gateways/BpmnGatewaySplitOr";
-import { BpmnTaskManual } from "src/app/classes/Basic/Bpmn/tasks/BpmnTaskManual";
-import { BpmnTaskUserTask } from "src/app/classes/Basic/Bpmn/tasks/BpmnTaskUserTask";
 import { TestGraph } from "./TestGraph";
 
 export class OrSequenceGraph extends TestGraph {

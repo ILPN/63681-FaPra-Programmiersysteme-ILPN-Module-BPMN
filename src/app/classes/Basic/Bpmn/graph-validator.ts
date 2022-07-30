@@ -26,7 +26,7 @@ export class Validator {
     public HAS_OUT_EDGES = " hat ausgehende Kante(n). ";
     public NO_START_EVENT = " Es gibt kein Start-Event. "
     public NO_END_EVENT = " Es gibt kein End-Event. "
-    
+
     constructor(nodes: BpmnNode[]) {
 
         this.startEvents.push(...BpmnUtils.getStartEvents(nodes))
@@ -184,21 +184,18 @@ export class Validator {
         if (BpmnUtils.hasNoOutEdges(gateway))
             message += messageStart + this.HAS_NO_OUT_EDGES
 
-        if (BpmnUtils.isGatewayJoin(gateway)) { 
-            if(BpmnUtils.hasMultipleInEdges(gateway)) message += messageStart + this.HAS_NO_MULTIPLE_IN_EDGES
-            if(!BpmnUtils.hasOnlyOneOutEdge(gateway))  message += messageStart + this.HAS_MULTIPLE_OUT_EDGES
+        if (BpmnUtils.isGatewayJoin(gateway)) {
+            if (BpmnUtils.hasOnlyOneInEdge(gateway)) message += messageStart + this.HAS_NO_MULTIPLE_IN_EDGES
+            if (BpmnUtils.hasMultipleOutEdges(gateway)) message += messageStart + this.HAS_MULTIPLE_OUT_EDGES
+        
+        //split gateway
         } else {
-            if(BpmnUtils.hasMultipleOutEdges(gateway)) message += messageStart + this.HAS_NO_MULTIPLE_OUT_EDGES
-            if(!BpmnUtils.hasOnlyOneInEdge(gateway))  message += messageStart + this.HAS_MULTIPLE_IN_EDGES;
+            if (BpmnUtils.hasOnlyOneOutEdge(gateway)) message += messageStart + this.HAS_NO_MULTIPLE_OUT_EDGES
+            if (BpmnUtils.hasMultipleInEdges(gateway)) message += messageStart + this.HAS_MULTIPLE_IN_EDGES;
+            if (BpmnUtils.hasNoMatchingGateway(gateway))
+                message += messageStart + this.getNoMatchingGatewayError(gateway)
         }
 
-        if (BpmnUtils.hasNoMatchingGateway(gateway))
-            message += messageStart + this.getNoMatchingGatewayError(gateway)
-
-            
-            let gateway2 = BpmnUtils.getCorrespondingJoin(gateway);
-            if (gateway2 !== null && !BpmnUtils.splitJoinSameType(gateway, gateway2)) message += messageStart + " und das passende Gateway mit der ID: "+ gateway2.id+" besitzen nicht den gleichen Typ (XOR,OR,AND).";
-  
         return this.getValidationResult(message);
     }
 
