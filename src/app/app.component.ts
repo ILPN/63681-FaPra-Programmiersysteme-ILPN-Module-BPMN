@@ -1,10 +1,10 @@
-import {Component, OnDestroy} from '@angular/core';
-import {FormControl} from '@angular/forms';
-import {ParserService} from './services/parser.service';
-import {DisplayService} from './services/display.service';
-import {debounceTime, Subscription} from 'rxjs';
-import {BpmnGraph} from './classes/Basic/Bpmn/BpmnGraph';
-import {GraphValidationService} from "./services/graph-validation.service";
+import { Component, OnDestroy } from '@angular/core';
+import { FormControl } from '@angular/forms';
+import { ParserService } from './services/parser.service';
+import { DisplayService } from './services/display.service';
+import { debounceTime, Subscription } from 'rxjs';
+import { BpmnGraph } from './classes/Basic/Bpmn/BpmnGraph';
+import { GraphValidationService } from "./services/graph-validation.service";
 
 @Component({
     selector: 'app-root',
@@ -40,20 +40,18 @@ export class AppComponent implements OnDestroy {
 
     private processSourceChange(newSource: string) {
         this.result = this._parserService.parse(newSource);
-        if (this.result !== undefined) {
+        if (this.result) {
 
-            if (this.result.nodes.length == 0) {
-                this._displayService.display(BpmnGraph.anotherMonsterGraph());
+            if (this.result.nodes.length === 0)
+                this.result = BpmnGraph.anotherMonsterGraph()
 
-            } else {
-                this._displayService.display(this.result);
-            }
+            this._displayService.display(this.result);
+
         }
     }
 
     validateGraph(): void {
-        if (this.result.isValidateable()) {
+        if (this.result)
             this.graphValidationService.validateGraph(this.result);
-        }
     }
 }
