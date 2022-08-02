@@ -111,7 +111,7 @@ export class ParserService {
      * this functions is called after the layout by the sugiyama algorithm has been done
      * and allows to override the positions set by the alogrithm
      */
-    setHardcodedPositions(bpmnGraph: BpmnGraph) {
+     setHardcodedPositions(bpmnGraph: BpmnGraph) {
         //@Vanessa
         for (const node of bpmnGraph.nodes) {
             const id = node.id;
@@ -370,6 +370,7 @@ export class ParserService {
             case("association"): type = Connectortype.Association; break;
             case("informationflow"): type = Connectortype.InformationFlow; break;
         } */
+
         let var1: BpmnNode;
         let var2: BpmnNode;
 
