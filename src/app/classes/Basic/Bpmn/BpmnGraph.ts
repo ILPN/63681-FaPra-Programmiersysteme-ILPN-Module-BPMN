@@ -422,6 +422,17 @@ export class BpmnGraph
             this.addEdge(connector);
         }
     }
+    private addMyConnectorDefaultEdge(fromID: string, toID: string) {
+        let fromNode: BpmnNode | undefined = this.getNodeFromID(fromID);
+        let toNode: BpmnNode | undefined = this.getNodeFromID(toID);
+        if (fromNode !== undefined && toNode !== undefined) {
+            let connector: BpmnEdge = new BpmnEdgeDefault("A-" + fromNode.id + "-" + toNode.id, fromNode, toNode);
+            connector.labelMid = "center"
+            connector.labelEnd = "end"
+            
+            this.addEdge(connector);
+        }
+    }
 
     getNodeFromID(toID: string): BpmnNode | undefined {
         let answer: BpmnNode | undefined = undefined;
@@ -493,7 +504,7 @@ export class BpmnGraph
         g.mixedGatewayForAnotherMonsterGraph();
 
 
-        g.addMyConnector("E1", "T1");
+        g.addMyConnectorDefaultEdge("E1", "T1");
         g.addMyConnector("T1", "G1J");
         g.addMyConnector("E2", "G1J");
         g.addMyConnector("G1J", "T2");

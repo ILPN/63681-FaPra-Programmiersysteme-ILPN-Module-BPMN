@@ -49,7 +49,7 @@ export class ParserService {
      */
     positionOfNodesAndEdgesChanged(nodes: BpmnNode[], dummyNodes: BpmnDummyEdgeCorner[], edgeStarts: BpmnEdgeCorner[], edgeEnds: BpmnEdgeCorner[]) {
         //@Vanessa
-        
+        /*
         for (const node of nodes) {
             if (this.text != []) {
                 let newCoordString = "(" + node.getPos().x + "," + node.getPos().y + ")";
@@ -106,7 +106,9 @@ export class ParserService {
         let emitText = this.text.join("\n");
         this.positionChange.emit(emitText);
         
-    }}
+    }
+*/
+}
     /**
      * this functions is called after the layout by the sugiyama algorithm has been done
      * and allows to override the positions set by the alogrithm

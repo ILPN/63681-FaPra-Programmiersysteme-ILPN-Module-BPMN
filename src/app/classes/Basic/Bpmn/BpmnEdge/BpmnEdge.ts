@@ -308,7 +308,8 @@ export class BpmnEdge extends BEdge implements GetSvgManager {
             (a: Vector, b: Vector) =>
                 a.distanceTo(outerPoint) - b.distanceTo(outerPoint)
         );
-        return intersections[0];
+        return intersections[0]? intersections[0]: innerPoint
+
     }
     private intersectionWithTask(
         outerPoint: Vector,
@@ -373,7 +374,8 @@ export class BpmnEdge extends BEdge implements GetSvgManager {
                 a.distanceTo(outerPoint) - b.distanceTo(outerPoint)
         );
 
-        return intersections[0];
+        
+        return intersections[0]? intersections[0]: innerPoint
     }
     private intersectionWithGateway(
         outerPoint: Vector,
@@ -439,6 +441,7 @@ export class BpmnEdge extends BEdge implements GetSvgManager {
                 a.distanceTo(outerPoint) - b.distanceTo(outerPoint)
         );
 
-        return intersections[0];
+        return intersections[0]? intersections[0]: innerPoint
+
     }
 }

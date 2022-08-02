@@ -57,8 +57,8 @@ export class DragHandle{
        return svg
     }
 
-    draging(e: MouseEvent) {
-        const currentMousePos = new Vector( e.clientX, e.clientY)
+    draging(e: Vector) {
+        const currentMousePos = new Vector( e.x, e.y)
         const delta = currentMousePos.minus(this.mouseStartPos)
         
         let newPos = this.startPos.plus(delta)
@@ -100,14 +100,13 @@ export class DragHandle{
 
     private mouseStartPos:Vector = new Vector()
 
-    startDrag(event:MouseEvent){
+    startDrag(mouse:Vector){
         if(this.beforeStartDrag != undefined)
             this.beforeStartDrag(this.dragedElement,this)
         this._startPos = this.dragedElement.getPos()
-        this.mouseStartPos.x = event.clientX
-        this.mouseStartPos.y = event.clientY
+        this.mouseStartPos = mouse
         for (const dragHandle of this.dragedAlong) {
-            dragHandle.startDrag(event)
+            dragHandle.startDrag(mouse)
         }
     }
     stopDrag(){
