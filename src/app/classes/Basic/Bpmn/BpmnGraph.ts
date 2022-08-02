@@ -20,6 +20,8 @@ import {BpmnGatewayJoinXor} from './gateways/BpmnGatewayJoinXor';
 import {BpmnTaskBusinessRule} from './tasks/BpmnTaskBusinessRule';
 import {BpmnEdgeDefault} from './BpmnEdge/BpmnEdgeDefault';
 import {ValidateableGraph} from "../Interfaces/ValidateableGraph";
+import { BpmnEdgeMessageflow } from './BpmnEdge/BpmnEdgeMessageflow';
+import { BpmnEdgeAssociation } from './BpmnEdge/BpmnEdgeAssociation';
 
 export class BpmnGraph
     extends BGraph<BpmnEdge, BpmnNode>
@@ -168,12 +170,12 @@ export class BpmnGraph
         let pfeil = new BpmnEdge("p2", elementG1, elementT1);
         g.addEdge(pfeil);
 
-        let connector2: BpmnEdge = new BpmnEdge("p3", elementG1, elementT2);
+        let connector2: BpmnEdge = new BpmnEdgeMessageflow("p3", elementG1, elementT2);
         connector2.addCornerXY(210, 320);
 
         g.addEdge(connector2);
 
-        let connector3: BpmnEdge = new BpmnEdge("A4", elementT1, elementG2);
+        let connector3: BpmnEdge = new BpmnEdgeAssociation("A4", elementT1, elementG2);
         connector3.addCornerXY(675, 60);
         g.addEdge(connector3);
 

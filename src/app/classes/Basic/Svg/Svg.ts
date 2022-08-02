@@ -1,6 +1,26 @@
 import { Vector } from "../../Utils/Vector";
 
 export class Svg {
+    static pointerNoFill(position: Vector, direction: Vector, headLength:number = 15, headWidth:number =10) {
+        const half = headWidth / 2
+
+        const pointerPath = `m 0,0 ${half},${headLength} ${-headWidth},${0} z`
+
+        const pointer = this.createSvgElement('path');
+        pointer.setAttribute(
+            'd',
+            pointerPath
+        );
+        //pointer.setAttribute("transform",`translate(0 0) rotate(${direction.radians()}rad)`)
+        const deg = direction.toUnitVector().degree().toFixed(1);
+        pointer.setAttribute("transform", `translate(${position.x} ${position.y}) rotate(${deg}) `)
+        //translate(${position.x} ${position.y})
+        pointer.setAttribute(
+            'style',
+            `fill:none;stroke:#000000;stroke-width:1px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1;fill-opacity:1`
+        );
+        return pointer
+    }
     static textFrom(text:string, pos:Vector,rotation:number =0, baseline:string= "middle", anchor:string = "left",dx:number =5, dy:number=-5, fontSize:number =12){
         const txt = this.createSvgElement('text');
         txt.setAttribute('x', 0+"");
@@ -61,12 +81,10 @@ export class Svg {
     static empty(): SVGElement {
         return this.createSvgElement("svg")
     }
-    static pointer(position: Vector, direction: Vector) {
-        const headLength = 15;
-        const headWidth = 10;
+    static pointer(position: Vector, direction: Vector, headLength:number = 15, headWidth:number =10) {
         const half = headWidth / 2
 
-        const pointerPath = `m 0,0 ${half},${headLength} ${-headWidth},${0}`
+        const pointerPath = `m 0,0 ${half},${headLength} ${-headWidth},${0} z`
 
         const pointer = this.createSvgElement('path');
         pointer.setAttribute(

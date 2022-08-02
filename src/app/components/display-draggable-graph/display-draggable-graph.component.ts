@@ -57,9 +57,9 @@ export class DisplayDraggableGraphComponent
         for (const [e,dEdge] of this._draggableGraph.dEdges.entries()) {
             const corners = [...dEdge.edge.corners]
             for (let i = 0; i < corners.length-1; i++) {
-                const c1 = dEdge.edge.corners[i];
-                const c2 = dEdge.edge.corners[i+1];
-                if(c1.y != c2.y){
+                const c1 = corners[i];
+                const c2 = corners[i+1];
+                if(c1.y !== c2.y){
                     const cs = [c1,c2]
                     cs.sort((a,b) => a.y-b.y)
                     const pos = new Vector(cs[0].x, cs[1].y)
