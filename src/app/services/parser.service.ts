@@ -2,6 +2,9 @@ import { Injectable, Output, EventEmitter} from '@angular/core';
 import { BpmnDummyEdgeCorner } from '../classes/Basic/Bpmn/BpmnEdge/BpmnDummyEdgeCorner';
 import { BpmnEdge } from '../classes/Basic/Bpmn/BpmnEdge/BpmnEdge';
 import { BpmnEdgeCorner } from '../classes/Basic/Bpmn/BpmnEdge/BpmnEdgeCorner';
+import { BpmnEdgeAssociation} from '../classes/Basic/Bpmn/BpmnEdge/BpmnEdgeAssociation'
+import { BpmnEdgeDefault } from '../classes/Basic/Bpmn/BpmnEdge/BpmnEdgeDefault';
+import { BpmnEdgeMessageflow } from '../classes/Basic/Bpmn/BpmnEdge/BpmnEdgeMessageflow';
 import { BpmnGraph } from '../classes/Basic/Bpmn/BpmnGraph';
 import { BpmnNode } from '../classes/Basic/Bpmn/BpmnNode';
 import { BpmnEvent } from '../classes/Basic/Bpmn/events/BpmnEvent';
@@ -33,12 +36,10 @@ export class ParserService {
     
     text:string[];
     result: BpmnGraph;
-    nodes: Array<BpmnNode>;
     
     constructor(private displayerrorService: DisplayErrorService) {
        this.text = [];
        this.result = new BpmnGraph();
-       this.nodes = new Array<BpmnNode>();
     }
 
     /**
@@ -75,9 +76,10 @@ export class ParserService {
 
                 if(matchLine != undefined) {
                     let index = this.text.indexOf(matchLine);
+                    //zweite (to) node auswählen 
+                    //dahinter: wenn schon was ist dann replacen. ansonsten neu rein
+
                     let matchLineNew = matchLine.replace(/\(-?[0-9]*,-?[0-9]*\)/,newCoordString);
-                    //todo: bei den sequences jeweils zwei Koordinaten Start und Ende einfügen
-                    //jeweils nach den start und ende Verbindungsnodes
                     if(matchLine.match(/\(-?[0-9]*,-?[0-9]*\)/) === null) {
                         matchLineNew = matchLine.concat(" "+newCoordString);
                     }
@@ -93,6 +95,8 @@ export class ParserService {
 
             if(matchLine != undefined) {
                 let index = this.text.indexOf(matchLine);
+                //erste (from) node auswählen
+                //dahinter: wenn schon was ist dann replacen. ansonsten neu rein
                 let matchLineNew = matchLine.replace(/\(-?[0-9]*,-?[0-9]*\)/,newCoordString);
                 const matches = matchLine.match(/\(-?[0-9]*,-?[0-9]*\)/);
                 if(matches === null) {
@@ -163,7 +167,6 @@ export class ParserService {
         const lines = text.split('\n');
         this.text = lines; 
         this.result = new BpmnGraph();
-        this.nodes = new Array<BpmnNode>();
 
         let pos;
         let act = lines.find(el => el.startsWith(".activities"));
@@ -172,7 +175,6 @@ export class ParserService {
             while (pos < lines.length && lines[pos].match(/^\w/) !== null) {
                 let el: BpmnNode|undefined = this.parseActivities(lines[pos]);
                 if(el != undefined) {
-                    this.nodes.push(el);
                     this.result.addNode(el);
                 }
                 pos++;
@@ -185,7 +187,6 @@ export class ParserService {
             while (pos < lines.length && lines[pos].match(/^\w/) !== null) {
                 let el: BpmnNode|undefined = this.parseEvents(lines[pos]);
                 if(el != undefined) {
-                    this.nodes.push(el);
                     this.result.addNode(el);
                 }
                 pos++;
@@ -198,7 +199,6 @@ export class ParserService {
             while (pos < lines.length && lines[pos].match(/^\w/) !== null) {
                 let el: BpmnNode|undefined = this.parseGateways(lines[pos]);
                 if(el != undefined) {
-                    this.nodes.push(el);
                     this.result.addNode(el);
                 }
                 pos++;
@@ -209,7 +209,7 @@ export class ParserService {
         if (seq) {
             pos = lines.indexOf(seq) + 1;
             while (pos < lines.length && lines[pos].match(/^\w/) !== null) {
-                let el:BpmnEdge|void = this.parseSequences(lines[pos], this.nodes);
+                let el:BpmnEdge|void = this.parseSequences(lines[pos]);
                 if (typeof el === 'object') {
                     this.result.addEdge(el);
                 } else {
@@ -398,7 +398,7 @@ export class ParserService {
 
     }
 
-    private parseSequences(line: string, elements: Array<BpmnNode>): BpmnEdge | void {
+    private parseSequences(line: string): BpmnEdge | void {
 
         let description = line.split('"')[1];
         let re = /"[\w ]*"/;
@@ -407,27 +407,39 @@ export class ParserService {
 
         const name = lineSplit[0];
 
-        /*
-        switch(lineSplit[1].toLowerCase()){
-            case("sequenceflow"): type = Connectortype.SequenceFlow; break;
-            case("association"): type = Connectortype.Association; break;
-            case("informationflow"): type = Connectortype.InformationFlow; break;
-            default: this.displayError("invalid connector type "+lineSplit[1]);
-        } */
 
-        let var1: BpmnNode;
-        let var2: BpmnNode;
+        for (let i = 0; i < this.result.nodes.length; i++) {
+            let node1 = this.result.nodes[i];
+            if (node1.id === lineSplit[3].trim()) {
+                for (let j = 0; j < this.result.nodes.length; j++) {
+                    let node2 = this.result.nodes[j];
+                    if (node2.id === lineSplit[4].trim()) {
+                        let sequence = new BpmnEdge(name, node1, node2);
 
-        for (let i = 0; i < elements.length; i++) {
-            if (elements[i].id === lineSplit[3].trim()) {
-                var1 = elements[i];
-                for (let j = 0; j < elements.length; j++) {
-                    if (elements[j].id === lineSplit[4].trim()) {
-                        var2 = elements[j];
-                        let sequence = new BpmnEdge(name, var1, var2);
+                        if(node1.constructor.name === 'BpmnGatewaySplitXor' && node2.constructor.name === 'BpmnGatewayJoinXor') {
+                            sequence = new BpmnEdgeDefault(name,node1,node2);
+                        } else switch(lineSplit[1].toLowerCase()){
+                            case("sequenceflow"): sequence = new BpmnEdge(name,node1,node2); break;
+                            case("association"): sequence = new BpmnEdgeAssociation(name,node1,node2); break;
+                            case("informationflow"): sequence = new BpmnEdgeMessageflow(name,node1,node2); break;
+                            default: this.displayerrorService.displayError("invalid connector type "+lineSplit[1]);
+                        } 
 
-                        let i = 5;
+                        //wenn bei den Verbindungsknoten Koordinaten angegeben sind, Ecken für die Kanten anlegen
+                        let matchFrom = this.text.find(line => line.startsWith(node1.id));
+                        if(matchFrom != undefined && matchFrom.match(/\(-?[0-9]*,-?[0-9]*\)/) != null) {
+                            console.log("adding corner:" + node1.getPos().x + node1.getPos().y);
+                            sequence.setStartPos(node1.getPos().x,node1.getPos().y);
+                        }
+
+                        let matchTo = this.text.find(line => line.startsWith(node2.id));
+                        if(matchTo != undefined && matchTo.match(/\(-?[0-9]*,-?[0-9]*\)/) != null) {
+                            console.log("adding corner:" + node2.getPos().x + node2.getPos().y);
+                            sequence.setEndPos(node2.getPos().x,node2.getPos().y);
+                        }
                         
+                        /*
+                        let i = 5;
                         while (lineSplit[i] && lineSplit[i] != undefined && !lineSplit[i].startsWith("\r")) {
                             let coordinates = lineSplit[i];
                             let coord = coordinates.split(',');
@@ -435,9 +447,13 @@ export class ParserService {
                             coord[1] = coord[1].replace(")", "").replace("\r", "");
                             let x = parseInt(coord[0]);
                             let y = parseInt(coord[1]);
+                            console.log("adding sequence from text");
                             sequence.addCornerXY(x, y);
                             i++;
                         }
+                        */
+
+                       
                         return sequence;
                     }; 
                 }
