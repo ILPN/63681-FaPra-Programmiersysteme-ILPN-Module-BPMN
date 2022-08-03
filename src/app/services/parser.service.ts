@@ -48,6 +48,7 @@ export class ParserService {
      * @param edgeStarts that have changed positions
      * @param edgeEnds that have changed positions
      */
+
     positionOfNodesAndEdgesChanged(nodes: BpmnNode[], dummyNodes: BpmnDummyEdgeCorner[], edgeStarts: BpmnEdgeCorner[], edgeEnds: BpmnEdgeCorner[]) {
         //@Vanessa
 
@@ -112,8 +113,7 @@ export class ParserService {
      * this functions is called after the layout by the sugiyama algorithm has been done
      * and allows to override the positions set by the alogrithm
      */
-    /*
-     setHardcodedPositions(bpmnGraph: BpmnGraph) {
+    /* setHardcodedPositions(bpmnGraph: BpmnGraph) {
         //@Vanessa
         for (const node of bpmnGraph.nodes) {
             const id = node.id;
@@ -220,7 +220,18 @@ export class ParserService {
             }
         }
 
-        console.log(this.result);
+        for(let i= 0; i < this.result.nodes.length; i++){
+            console.log("pos:" + this.result.nodes[i].id + " " + this.result.nodes[i].x + " " + this.result.nodes[i].y);
+        }
+
+        for(let i= 0; i < this.result.edges.length; i++){
+            let edge = this.result.edges[i];
+            console.log("edge pos:" + edge.id + " ") 
+            for(let j = 0; j < this.result.edges[i].corners.length; j++) {
+                console.log("corners:" + edge.corners[j].x + " " + edge.corners[j].y);
+            }
+        }
+
         let choose: number = 1;
         switch (choose) {
             case 1:
@@ -299,7 +310,6 @@ export class ParserService {
         const lineSplit = line.split(" ");
 
         const name = lineSplit[0];
-        console.log("parsing event" + line);
         if(this.result.nodes.find(el => el.id === name) != undefined) {
             this.displayerrorService.displayError("Bezeichner " + name + " schon vergeben");
             return;
