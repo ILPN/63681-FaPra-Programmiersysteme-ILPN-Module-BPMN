@@ -22,6 +22,7 @@ import { BpmnTaskReceiving } from '../classes/Basic/Bpmn/tasks/BpmnTaskReceiving
 import { BpmnTaskSending } from '../classes/Basic/Bpmn/tasks/BpmnTaskSending';
 import { BpmnTaskService } from '../classes/Basic/Bpmn/tasks/BpmnTaskService';
 import { BpmnTaskUserTask } from '../classes/Basic/Bpmn/tasks/BpmnTaskUserTask';
+import { DisplayErrorService } from './display-error.service';
 
 @Injectable({
     providedIn: 'root'
@@ -34,7 +35,7 @@ export class ParserService {
     result: BpmnGraph;
     nodes: Array<BpmnNode>;
     
-    constructor() {
+    constructor(private displayerrorService: DisplayErrorService) {
        this.text = [];
        this.result = new BpmnGraph();
        this.nodes = new Array<BpmnNode>();
@@ -49,7 +50,7 @@ export class ParserService {
      */
     positionOfNodesAndEdgesChanged(nodes: BpmnNode[], dummyNodes: BpmnDummyEdgeCorner[], edgeStarts: BpmnEdgeCorner[], edgeEnds: BpmnEdgeCorner[]) {
         //@Vanessa
-        /*
+
         for (const node of nodes) {
             if (this.text != []) {
                 let newCoordString = "(" + node.getPos().x + "," + node.getPos().y + ")";
@@ -63,43 +64,42 @@ export class ParserService {
                     }
                    
                     this.text[index] = matchLineNew;
+                    console.log("new node position:"+ matchLineNew);
                 }
                 
             }
-            for (const edge of edgeStarts){
+            for (const edge of node.inEdges){
                 let newCoordString = "(" + edgeEnds[0].x + "," + edgeEnds[0].y + ")";
-                console.log(newCoordString);
-                let matchLine = this.text.find(line => line.startsWith(edge.edge.id));
+                let matchLine = this.text.find(line => line.startsWith(edge.id));
 
                 if(matchLine != undefined) {
                     let index = this.text.indexOf(matchLine);
                     let matchLineNew = matchLine.replace(/\(-?[0-9]*,-?[0-9]*\)/,newCoordString);
                     //todo: bei den sequences jeweils zwei Koordinaten Start und Ende einfügen
+                    //jeweils nach den start und ende Verbindungsnodes
                     if(matchLine.match(/\(-?[0-9]*,-?[0-9]*\)/) === null) {
                         matchLineNew = matchLine.concat(" "+newCoordString);
                     }
                     this.text[index] = matchLineNew;
+                    console.log("new incoming edge position:" + matchLineNew);
             }
 
         }
 
-        for (const edge of edgeEnds){
+        for (const edge of node.outEdges){
             let newCoordString = "(" + edgeStarts[0].x + "," + edgeStarts[0].y + ")";
-            console.log(newCoordString);
-            let matchLine = this.text.find(line => line.startsWith(edge.edge.id));
+            let matchLine = this.text.find(line => line.startsWith(edge.id));
 
             if(matchLine != undefined) {
                 let index = this.text.indexOf(matchLine);
-                console.log(matchLine);
                 let matchLineNew = matchLine.replace(/\(-?[0-9]*,-?[0-9]*\)/,newCoordString);
                 const matches = matchLine.match(/\(-?[0-9]*,-?[0-9]*\)/);
-                console.log(matches);
-
                 if(matches === null) {
                     matchLineNew = matchLine.concat(" "+newCoordString);
+                }
                 this.text[index] = matchLineNew;
-                console.log(matchLineNew);
-        }}
+                console.log("new outgoing edge position:" + matchLineNew);
+        }
 
     }
 
@@ -107,12 +107,12 @@ export class ParserService {
         this.positionChange.emit(emitText);
         
     }
-*/
 }
     /**
      * this functions is called after the layout by the sugiyama algorithm has been done
      * and allows to override the positions set by the alogrithm
      */
+    /*
      setHardcodedPositions(bpmnGraph: BpmnGraph) {
         //@Vanessa
         for (const node of bpmnGraph.nodes) {
@@ -154,25 +154,27 @@ export class ParserService {
                     }   
                 }}     
         //console.log("read existing positions from text and set them to the nodes and edges")
-    }
-    
+    } */
 
     parse(text: string): BpmnGraph | undefined {
+       
         console.log("parsing");
 
         const lines = text.split('\n');
         this.text = lines; 
-        const result = new BpmnGraph();
-        const nodes = new Array<BpmnNode>();
+        this.result = new BpmnGraph();
+        this.nodes = new Array<BpmnNode>();
 
         let pos;
         let act = lines.find(el => el.startsWith(".activities"));
         if (act) {
             pos = lines.indexOf(act) + 1;
             while (pos < lines.length && lines[pos].match(/^\w/) !== null) {
-                let el: BpmnNode = this.parseActivities(lines[pos]);
-                this.nodes.push(el);
-                this.result.addNode(el);
+                let el: BpmnNode|undefined = this.parseActivities(lines[pos]);
+                if(el != undefined) {
+                    this.nodes.push(el);
+                    this.result.addNode(el);
+                }
                 pos++;
             }
         }
@@ -181,9 +183,11 @@ export class ParserService {
         if (evt) {
             pos = lines.indexOf(evt) + 1;
             while (pos < lines.length && lines[pos].match(/^\w/) !== null) {
-                let el: BpmnNode = this.parseEvents(lines[pos]);
-                this.nodes.push(el);
-                this.result.addNode(el);
+                let el: BpmnNode|undefined = this.parseEvents(lines[pos]);
+                if(el != undefined) {
+                    this.nodes.push(el);
+                    this.result.addNode(el);
+                }
                 pos++;
             }
         }
@@ -192,9 +196,11 @@ export class ParserService {
         if (gateway) {
             pos = lines.indexOf(gateway) + 1;
             while (pos < lines.length && lines[pos].match(/^\w/) !== null) {
-                let el: BpmnNode = this.parseGateways(lines[pos]);
-                this.nodes.push(el);
-                this.result.addNode(el);
+                let el: BpmnNode|undefined = this.parseGateways(lines[pos]);
+                if(el != undefined) {
+                    this.nodes.push(el);
+                    this.result.addNode(el);
+                }
                 pos++;
             }
         }
@@ -203,18 +209,18 @@ export class ParserService {
         if (seq) {
             pos = lines.indexOf(seq) + 1;
             while (pos < lines.length && lines[pos].match(/^\w/) !== null) {
-                let el = this.parseSequences(lines[pos], this.nodes);
+                let el:BpmnEdge|void = this.parseSequences(lines[pos], this.nodes);
                 if (typeof el === 'object') {
                     this.result.addEdge(el);
                 } else {
-                    console.log("nicht vorhandene Verbindungselemente bei" + el);
+                    console.log("nicht vorhandene Verbindungselemente bei einer Kante");
                 }
                 ;
                 pos++;
             }
         }
 
-
+        console.log(this.result);
         let choose: number = 1;
         switch (choose) {
             case 1:
@@ -234,13 +240,17 @@ export class ParserService {
     }
 
 
-    private parseActivities(line: string): BpmnNode {
+    private parseActivities(line: string): BpmnNode | undefined {
         let description = line.split('"')[1];
         let re = /"[\w ]*"/;
         line = line.replace(re, "");
         const lineSplit = line.split(" ");
 
         const name = lineSplit[0];
+        if(this.result.nodes.find(el => el.id === name) != undefined) {
+            this.displayerrorService.displayError("Bezeichner " + name + " schon vergeben");
+            return;
+        }
         let activity = new BpmnTask(name);
 
         switch (lineSplit[1].toLowerCase()) {
@@ -262,6 +272,9 @@ export class ParserService {
             case ("usertask"):
                 activity = new BpmnTaskUserTask(name);
                 break;
+            default: 
+                this.displayerrorService.displayError("invalid activity type "+ lineSplit[1]);
+                return;
         }
 
         activity.label = description;
@@ -279,13 +292,18 @@ export class ParserService {
     }
 
 
-    private parseEvents(line: string): BpmnNode {
+    private parseEvents(line: string): BpmnNode|undefined {
         let description = line.split('"')[1];
         let re = /"[\w ]*"/;
         line = line.replace(re, "");
         const lineSplit = line.split(" ");
 
         const name = lineSplit[0];
+        console.log("parsing event" + line);
+        if(this.result.nodes.find(el => el.id === name) != undefined) {
+            this.displayerrorService.displayError("Bezeichner " + name + " schon vergeben");
+            return;
+        }
         let event = new BpmnEvent(name);
 
         switch (lineSplit[1].toLowerCase()) {
@@ -298,6 +316,10 @@ export class ParserService {
             case ("end"):
                 event = new BpmnEventEnd(name);
                 break;
+            default: 
+                this.displayerrorService.displayError("invalid event type '" + lineSplit[1] + "'");
+                return;
+
         }
 
         event.label = description;
@@ -314,14 +336,20 @@ export class ParserService {
         return event;
     }
 
-    private parseGateways(line: string): BpmnNode {
+    private parseGateways(line: string): BpmnNode|undefined {
         let description = line.split('"')[1];
         let re = /"[\w ]*"/;
         line = line.replace(re, "");
 
         const lineSplit = line.split(" ");
+
         const name = lineSplit[0];
+        if(this.result.nodes.find(el => el.id === name) != undefined) {
+            this.displayerrorService.displayError("Bezeichner " + name + " schon vergeben");
+            return;
+        }
         let gateway = new BpmnGateway(name);
+
         switch (lineSplit[1].toLowerCase()) {
             case ("and_join"):
                 gateway = new BpmnGatewayJoinAnd(name);
@@ -341,6 +369,9 @@ export class ParserService {
             case ("xor_split"):
                 gateway = new BpmnGatewaySplitXor(name);
                 break;
+            default: 
+                this.displayerrorService.displayError("invalid gateway type " + lineSplit[1]); 
+                return;
         }
         gateway.label = description;
 
@@ -371,6 +402,7 @@ export class ParserService {
             case("sequenceflow"): type = Connectortype.SequenceFlow; break;
             case("association"): type = Connectortype.Association; break;
             case("informationflow"): type = Connectortype.InformationFlow; break;
+            default: this.displayError("invalid connector type "+lineSplit[1]);
         } */
 
         let var1: BpmnNode;
@@ -397,9 +429,9 @@ export class ParserService {
                             i++;
                         }
                         return sequence;
-                    }
+                    }; 
                 }
-            }
+            };
 
         }
     }

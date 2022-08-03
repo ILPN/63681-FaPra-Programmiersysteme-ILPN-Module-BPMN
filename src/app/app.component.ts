@@ -28,7 +28,7 @@ export class AppComponent implements OnDestroy {
         this._sub = this.textareaFc.valueChanges
             .pipe(debounceTime(400))
             .subscribe((val) => this.processSourceChange(val));
-        this._sub1 = _parserService.positionChange.
+        this._sub1 = this._parserService.positionChange.
             pipe(debounceTime(400)).
             subscribe((val) => this.textareaFc.setValue(val));
         this.textareaFc.setValue(`Your advertising could be here`);
