@@ -1,15 +1,14 @@
-import {Injectable} from '@angular/core';
-import {SwitchableNode} from "../classes/Basic/Switch/SwitchableNode";
-import {DisplayErrorService} from "./display-error.service";
-import {ValidateableGraph} from "../classes/Basic/Interfaces/ValidateableGraph";
-import {BpmnNode} from "../classes/Basic/Bpmn/BpmnNode";
-import {SwitchableGraph} from "../classes/Basic/Switch/SwitchableGraph";
-import {BpmnGraph} from "../classes/Basic/Bpmn/BpmnGraph";
-import {BpmnEventEnd} from "../classes/Basic/Bpmn/events/BpmnEventEnd";
-import {BpmnEventStart} from "../classes/Basic/Bpmn/events/BpmnEventStart";
-import {BpmnEventIntermediate} from "../classes/Basic/Bpmn/events/BpmnEventIntermediate";
-import {BpmnGateway} from "../classes/Basic/Bpmn/gateways/BpmnGateway";
-import {BpmnTask} from "../classes/Basic/Bpmn/tasks/BpmnTask";
+import { Injectable } from '@angular/core';
+import { BpmnGraph } from '../classes/Basic/Bpmn/BpmnGraph';
+import { Validator } from '../classes/Basic/Bpmn/BpmnGraphValidator';
+import { BpmnNode } from "../classes/Basic/Bpmn/BpmnNode";
+import { BpmnEventEnd } from "../classes/Basic/Bpmn/events/BpmnEventEnd";
+import { BpmnEventIntermediate } from "../classes/Basic/Bpmn/events/BpmnEventIntermediate";
+import { BpmnEventStart } from "../classes/Basic/Bpmn/events/BpmnEventStart";
+import { BpmnGateway } from "../classes/Basic/Bpmn/gateways/BpmnGateway";
+import { BpmnTask } from "../classes/Basic/Bpmn/tasks/BpmnTask";
+import { SwitchableNode } from "../classes/Basic/Switch/SwitchableNode";
+import { DisplayErrorService } from "./display-error.service";
 
 @Injectable({
     providedIn: 'root'
@@ -21,17 +20,13 @@ export class GraphValidationService {
     // gucken ob man die Fehlermeldungen alle untereinander ausgibt. Evtl errorMessages: string[] und dann ausgeben lassen
     private errorMessage: string = '';
 
-    validateGraph(validateableGraph: ValidateableGraph) {
-        if (validateableGraph instanceof SwitchableGraph) {
-            this.validateSwitchableGraph(validateableGraph.switchNodes);
-        }
-        if (validateableGraph instanceof BpmnGraph) {
-            this.validateBpmnGraph(validateableGraph.nodes);
-        }
-
-        if (this.errorMessage !== '') {
-            this.displayErrorService.displayError(this.errorMessage);
-        }
+    validateGraph(graph: BpmnGraph) {
+        
+        let result = new Validator(graph.nodes).validateGraph()
+        if (result.valid)
+            this.displayErrorService.displayError("Happy BPMN graph")
+        else
+            this.displayErrorService.displayError(result.errors)
     }
 
     private validateSwitchableGraph(nodes: SwitchableNode[]): void {

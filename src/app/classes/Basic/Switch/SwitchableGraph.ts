@@ -1,29 +1,30 @@
-import {BpmnEdge} from '../Bpmn/BpmnEdge/BpmnEdge';
-import {BpmnGraph} from '../Bpmn/BpmnGraph';
-import {BpmnNode} from '../Bpmn/BpmnNode';
-import {BpmnGateway} from '../Bpmn/gateways/BpmnGateway';
-import {GetSvgManager} from '../Interfaces/GetSvgManager';
-import {Svg} from '../Svg/Svg';
-import {SvgManager} from '../Svg/SvgManager/SvgManager';
-import {SwitchController} from './switch-controller';
-import {SwitchableEdge} from './SwitchableEdge';
-import {SwitchableGateway} from './SwitchableGateway';
-import {SwitchableNode} from './SwitchableNode';
-import {SwitchState} from './switchstatetype';
-import {SwitchUtils} from './SwitchUtils';
-import {ValidateableGraph} from "../Interfaces/ValidateableGraph";
+import { BpmnEdge } from '../Bpmn/BpmnEdge/BpmnEdge';
+import { BpmnGraph } from '../Bpmn/BpmnGraph';
+import { BpmnNode } from '../Bpmn/BpmnNode';
+import { BpmnGateway } from '../Bpmn/gateways/BpmnGateway';
+import { GetSvgManager } from '../Interfaces/GetSvgManager';
+import { Svg } from '../Svg/Svg';
+import { SvgManager } from '../Svg/SvgManager/SvgManager';
+import { SwitchController } from './switch-controller';
+import { SwitchableEdge } from './SwitchableEdge';
+import { SwitchableGateway } from './SwitchableGateway';
+import { SwitchableNode } from './SwitchableNode';
+import { SwitchState } from './switchstatetype';
+import { SwitchUtils } from './SwitchUtils';
 
 
-export class SwitchableGraph implements GetSvgManager, ValidateableGraph {
+export class SwitchableGraph implements GetSvgManager {
 
     private _switchEdges: SwitchableEdge[] = []
     private _switchNodes: SwitchableNode[] = []
     private _controller: SwitchController;
+    private _nodeMap: Map<BpmnNode, SwitchableNode>;
 
     constructor(bpmnGraph: BpmnGraph) {
 
         //controls how nodes are switched
         this._controller = new SwitchController(this);
+        this._nodeMap = new Map<BpmnNode, SwitchableNode>();
 
         bpmnGraph.edges.forEach((bpmnEdge: BpmnEdge) => {
             let switchEdge: SwitchableEdge = new SwitchableEdge(bpmnEdge);
@@ -33,6 +34,10 @@ export class SwitchableGraph implements GetSvgManager, ValidateableGraph {
         })
     }
 
+    get nodeMap() {
+        return this._nodeMap
+    }
+
     getNodes(): BpmnNode[] {
         const bpmnNodes: BpmnNode[] = [];
         this.switchNodes.forEach(switchNode => bpmnNodes.push(switchNode.bpmnNode));
@@ -40,20 +45,12 @@ export class SwitchableGraph implements GetSvgManager, ValidateableGraph {
     }
 
 
-    // workaround, wenn ValidateableGraph implementiert wurde
-    isValidateable(): boolean {
-        return true;
-    }
-
     get controller(): SwitchController {
         return this._controller
     }
 
-    getNode(id: string): any {
-        for (let node of this._switchNodes)
-            if (node.id === id)
-                return node
-        return null
+    getNode(id: string): SwitchableNode | undefined{
+        return this._switchNodes.find(node => node.id === id);
     }
 
     svgCreation(): SVGElement {
@@ -100,6 +97,10 @@ export class SwitchableGraph implements GetSvgManager, ValidateableGraph {
         //register predecessor and successor nodes
         switchNodeTo.addPredecessor(switchNodeFrom);
         switchNodeFrom.addSuccessor(switchNodeTo);
+
+        //add to map
+        this._nodeMap.set(edge.from, switchNodeFrom)
+        this._nodeMap.set(edge.to, switchNodeTo)
     }
 
     private getSwitchNode(nodeToFind: BpmnNode): any {
