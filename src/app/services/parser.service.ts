@@ -260,7 +260,6 @@ export class ParserService {
         const name = lineSplit[0];
         if(this.result.nodes.find(el => el.id === name) != undefined) {
             this.displayerrorService.displayError("Bezeichner " + name + " schon vergeben");
-            return;
         }
         let activity = new BpmnTask(name);
 
@@ -285,7 +284,6 @@ export class ParserService {
                 break;
             default: 
                 this.displayerrorService.displayError("invalid activity type "+ lineSplit[1]);
-                return;
         }
 
         activity.label = description;
@@ -328,8 +326,6 @@ export class ParserService {
                 break;
             default: 
                 this.displayerrorService.displayError("invalid event type '" + lineSplit[1] + "'");
-                return;
-
         }
 
         event.label = description;

@@ -29,19 +29,19 @@ export class AppComponent implements OnDestroy {
             .pipe(debounceTime(400))
             .subscribe((val) => this.processSourceChange(val));
         this._sub1 = this._parserService.positionChange.
-            pipe(debounceTime(400)).
+            pipe(debounceTime(200)).
             subscribe((val) => this.textareaFc.setValue(val));
         this.textareaFc.setValue(`Your advertising could be here`);
     }
 
     ngOnDestroy(): void {
         this._sub.unsubscribe();
+        this._sub1.unsubscribe();
     }
 
     private processSourceChange(newSource: string) {
         this.result = this._parserService.parse(newSource);
         if (this.result) {
-
             if (this.result.nodes.length === 0)
                 this.result = BpmnGraph.sampleGraph()
 
