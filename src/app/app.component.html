@@ -1,5 +1,6 @@
 <app-error-hint></app-error-hint>
 <button (click)="validateGraph()">validate Graph</button>
+<p *ngIf="graphIsValid">Validierung abgeschlossen. Der angezeigte Graph ist valide.</p>
 
 <div fxLayout="column" fxLayoutAlign="start stretch">
     <!--  Header  -->

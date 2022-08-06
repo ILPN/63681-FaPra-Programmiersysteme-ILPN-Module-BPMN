@@ -16,7 +16,8 @@ export class AppComponent implements OnDestroy {
     mode = "free dragging"
     public textareaFc: FormControl;
     private _sub: Subscription;
-    private result: any; //todo: any  muss weg
+    private result: any;
+    graphIsValid: boolean = false;
 
     constructor(
         private _parserService: ParserService,
@@ -49,7 +50,7 @@ export class AppComponent implements OnDestroy {
 
     validateGraph(): void {
         if (this.result !== undefined) {
-            this.graphValidationService.validateGraph(this.result);
+            this.graphIsValid = this.graphValidationService.isValid(this.result);
         }
     }
 }
