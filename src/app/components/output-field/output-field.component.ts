@@ -5,6 +5,7 @@ import { XmlExporter } from 'src/app/classes/XmlExport/xml-export';
 import { ParserService } from 'src/app/services/parser.service';
 import { BpmnGraph } from 'src/app/classes/Basic/Bpmn/BpmnGraph';
 import { BpmnEventStart } from 'src/app/classes/Basic/Bpmn/events/BpmnEventStart';
+import { DisplayService } from 'src/app/services/display.service';
 
 @Component({
     selector: 'output-field',
@@ -19,7 +20,8 @@ export class OutputFieldComponent {
 
     constructor(private displayErrorService: DisplayErrorService,
         private formValidationService: FormValidationService,
-        private parser: ParserService) {
+        private parser: ParserService,
+        private displayService: DisplayService) {
     }
 
     showMenu() {
@@ -38,9 +40,10 @@ export class OutputFieldComponent {
             }; break;
             case 'bpmn-xml': {
                 filetype = ".bpmn";
+                let graph = this.displayService.diagram
                 //let graph = this.parser.parse(this.text!)
-                let graph = new BpmnGraph();
-                graph.addNode(new BpmnEventStart("StartEvent"))
+                // let graph = new BpmnGraph();
+                // graph.addNode(new BpmnEventStart("StartEvent"))
                 textToExport = XmlExporter.exportBpmnAsXml(graph!);
                 if (!textToExport)
                     return
