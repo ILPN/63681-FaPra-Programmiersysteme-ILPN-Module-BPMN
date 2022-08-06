@@ -1,0 +1,25 @@
+.events
+e1 start "StartEvent" (60,190)
+e2 end "EndEvent" (1600,190)
+
+.activities
+t1 service "Service" (442,60)
+t2 manual "ManualTask" (442,320)
+t3 usertask "UserTask" (1225,190)
+
+.gateways 
+g1 and_split "ANDSplit" (210,190)
+g2 and_join "ANDJoin" (675,190)
+
+.sequences
+connector1 sequenceflow "1" e1 t1
+connector2 sequenceflow "p3" t1 g1 (210,320)
+connector3 sequenceflow "a4" g1 t2 (675,60)
+connector4 sequenceflow "a5" g1 t3 (675,320)
+connector5 sequenceflow "a6" t2 g2 
+connector6 sequenceflow "a7" t3 g2
+connector7 sequenceflow "a8" g2 e2
+
+ 
+
+

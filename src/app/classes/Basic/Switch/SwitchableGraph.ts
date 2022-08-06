@@ -18,11 +18,13 @@ export class SwitchableGraph implements GetSvgManager {
     private _switchEdges: SwitchableEdge[] = []
     private _switchNodes: SwitchableNode[] = []
     private _controller: SwitchController;
+    private _nodeMap: Map<BpmnNode, SwitchableNode>;
 
     constructor(bpmnGraph: BpmnGraph) {
 
         //controls how nodes are switched
         this._controller = new SwitchController(this);
+        this._nodeMap = new Map<BpmnNode, SwitchableNode>();
 
         bpmnGraph.edges.forEach((bpmnEdge: BpmnEdge) => {
             let switchEdge: SwitchableEdge = new SwitchableEdge(bpmnEdge);
@@ -30,6 +32,10 @@ export class SwitchableGraph implements GetSvgManager {
             this.addNodesConnectedByEdge(bpmnEdge, this._controller);
 
         })
+    }
+
+    get nodeMap() {
+        return this._nodeMap
     }
 
     getNodes(): BpmnNode[] {
@@ -43,11 +49,8 @@ export class SwitchableGraph implements GetSvgManager {
         return this._controller
     }
 
-    getNode(id: string): any {
-        for (let node of this._switchNodes)
-            if (node.id === id)
-                return node
-        return null
+    getNode(id: string): SwitchableNode | undefined {
+        return this._switchNodes.find(node => node.id === id);
     }
 
     svgCreation(): SVGElement {
@@ -94,6 +97,10 @@ export class SwitchableGraph implements GetSvgManager {
         //register predecessor and successor nodes
         switchNodeTo.addPredecessor(switchNodeFrom);
         switchNodeFrom.addSuccessor(switchNodeTo);
+
+        //add to map
+        this._nodeMap.set(edge.from, switchNodeFrom)
+        this._nodeMap.set(edge.to, switchNodeTo)
     }
 
     private getSwitchNode(nodeToFind: BpmnNode): any {

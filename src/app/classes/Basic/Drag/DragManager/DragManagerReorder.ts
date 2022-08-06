@@ -11,8 +11,8 @@ import { DragManager } from "./DragManager";
 
 export class DragManagerReorder extends DragManager{
     private sugiResult:TableGraph
-    constructor(dragingSurface:SVGElement,snapingView:SVGElement,sugiResult:TableGraph){
-        super(dragingSurface,snapingView)
+    constructor(dragingSurface:SVGElement,snapingView:SVGElement, svgWithViewport:SVGGraphicsElement,sugiResult:TableGraph){
+        super(dragingSurface,snapingView, svgWithViewport)
         this.sugiResult = sugiResult
     }
     private dragHandlesToReorder:DragHandle[] = []
@@ -46,7 +46,7 @@ export class DragManagerReorder extends DragManager{
         this.startPositions.sort((a,b)=> a.y-b.y)
 
         for (const dragHandle of this.dragHandlesToReorder) {
-            dragHandle.startDrag(event)
+           // dragHandle.startDrag()
         }
     }
 
@@ -71,7 +71,7 @@ export class DragManagerReorder extends DragManager{
 
         const dragHandlesThatChanged = []
         for (const dh of this.dragHandlesToReorder) {
-            if(!Utility.positionsAreEqual(dh.dragedElement.getPos(), dh.startPos)){
+            if(!dh.dragedElement.getPos().equals(dh.startPos)){
                 dragHandlesThatChanged.push(dh)
                 for (const dha of dh.dragedAlong) {
                     dragHandlesThatChanged.push(dha)

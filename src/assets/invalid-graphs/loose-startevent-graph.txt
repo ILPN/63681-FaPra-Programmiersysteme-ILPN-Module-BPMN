@@ -1,0 +1,22 @@
+.events
+StartEv start "StartEvent" (60,190)
+EndEvent end "EndEvent" (1600,190)
+
+.activities
+ManualTask manual "ManualTask" (442,320)
+UserTask usertask "UserTask" (1225,190)
+
+.gateways 
+XORSplit xor_split "XORSplit" (210,190)
+XORJoin xor_join "XORJoin" (675,190)
+
+.sequences
+connector3 sequenceflow "3" XORSplit ManualTask (675,60)
+connector4 sequenceflow "4" XORSplit UserTask (675,320) 
+connector5 sequenceflow "5" ManualTask XORJoin
+connector6 sequenceflow "6" UserTask XORJoin
+connector7 sequenceflow "7" XORJoin EndEvent
+
+ 
+
+

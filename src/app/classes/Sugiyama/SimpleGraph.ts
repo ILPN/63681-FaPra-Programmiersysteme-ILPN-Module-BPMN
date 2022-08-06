@@ -104,9 +104,6 @@ export class SimpleGraph{
         return this.edges.filter( a => a.from == id || a.to == id)
     }
    
-    
-
-
     static convert(bpmnGraph:BpmnGraph):SimpleGraph{
         const sGraph = new SimpleGraph()
         for (const node of bpmnGraph.nodes) {

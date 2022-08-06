@@ -1,7 +1,6 @@
-import {SwitchableGateway} from "./SwitchableGateway";
-import {SwitchableNode} from "./SwitchableNode";
-import {SwitchState} from "./switchstatetype";
-import {BpmnNode} from "../Bpmn/BpmnNode";
+import { SwitchableGateway } from "./SwitchableGateway";
+import { SwitchableNode } from "./SwitchableNode";
+import { SwitchState } from "./switchstatetype";
 
 export class SwitchUtils {
 
@@ -36,7 +35,7 @@ export class SwitchUtils {
      * @param node
      * @returns
      */
-    public static isGateway(node: SwitchableNode | BpmnNode): boolean {
+    public static isGateway(node: SwitchableNode): boolean {
         return node instanceof SwitchableGateway
     }
 
@@ -52,23 +51,6 @@ export class SwitchUtils {
         });
         return answer
     }
-
-    // /**       This method is not used, but has been programmed.
-    //  * This recursive method create a Array of SwitchableNode where inside all SwitchableNode the are between startNode and endNode. At the beginning the array must be empty. This method searches forward.
-    //  * @param startNode Start Node
-    //  * @param endNode End Node
-    //  * @param array Array must be [] when called, it is needed for recursion
-    //  * @return returns a array with nodes which are located between startNode and endNode
-    //  */
-    //  public static getAllElementsBetweenNodeToNodeForward(startNode: SwitchableNode, endNode: SwitchableNode, array: SwitchableNode[]): SwitchableNode[] {
-    //     if (startNode !== endNode) {
-    //         SwitchUtils.addItem(startNode, array);
-    //         startNode.successors.forEach(successor => {
-    //             this.getAllElementsBetweenNodeToNodeForward(successor, endNode, array);
-    //         });
-    //     }
-    //     return array
-    // }
 
 
     /**

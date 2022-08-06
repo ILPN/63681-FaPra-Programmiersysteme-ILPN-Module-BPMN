@@ -19,6 +19,9 @@ import {BpmnGatewaySplitXor} from './gateways/BpmnGatewaySplitXor';
 import {BpmnGatewayJoinXor} from './gateways/BpmnGatewayJoinXor';
 import {BpmnTaskBusinessRule} from './tasks/BpmnTaskBusinessRule';
 import {BpmnEdgeDefault} from './BpmnEdge/BpmnEdgeDefault';
+import {ValidateableGraph} from "../Interfaces/ValidateableGraph";
+import { BpmnEdgeMessageflow } from './BpmnEdge/BpmnEdgeMessageflow';
+import { BpmnEdgeAssociation } from './BpmnEdge/BpmnEdgeAssociation';
 
 export class BpmnGraph
     extends BGraph<BpmnEdge, BpmnNode>
@@ -163,12 +166,12 @@ export class BpmnGraph
         let pfeil = new BpmnEdge("p2", elementG1, elementT1);
         g.addEdge(pfeil);
 
-        let connector2: BpmnEdge = new BpmnEdge("p3", elementG1, elementT2);
+        let connector2: BpmnEdge = new BpmnEdgeMessageflow("p3", elementG1, elementT2);
         connector2.addCornerXY(210, 320);
 
         g.addEdge(connector2);
 
-        let connector3: BpmnEdge = new BpmnEdge("A4", elementT1, elementG2);
+        let connector3: BpmnEdge = new BpmnEdgeAssociation("A4", elementT1, elementG2);
         connector3.addCornerXY(675, 60);
         g.addEdge(connector3);
 
@@ -417,6 +420,17 @@ export class BpmnGraph
             this.addEdge(connector);
         }
     }
+    private addMyConnectorDefaultEdge(fromID: string, toID: string) {
+        let fromNode: BpmnNode | undefined = this.getNodeFromID(fromID);
+        let toNode: BpmnNode | undefined = this.getNodeFromID(toID);
+        if (fromNode !== undefined && toNode !== undefined) {
+            let connector: BpmnEdge = new BpmnEdgeDefault("A-" + fromNode.id + "-" + toNode.id, fromNode, toNode);
+            connector.labelMid = "center"
+            connector.labelEnd = "end"
+
+            this.addEdge(connector);
+        }
+    }
 
     getNodeFromID(toID: string): BpmnNode | undefined {
         let answer: BpmnNode | undefined = undefined;
@@ -488,7 +502,7 @@ export class BpmnGraph
         g.mixedGatewayForAnotherMonsterGraph();
 
 
-        g.addMyConnector("E1", "T1");
+        g.addMyConnectorDefaultEdge("E1", "T1");
         g.addMyConnector("T1", "G1J");
         g.addMyConnector("E2", "G1J");
         g.addMyConnector("G1J", "T2");
@@ -576,6 +590,10 @@ export class BpmnGraph
         g.addMyConnector("G2S", "G2J");
 
         return g
+    }
+
+    public getNode(id: string): BpmnNode | undefined {
+        return this.nodes.find(node => node.id === id)
     }
 
 }
