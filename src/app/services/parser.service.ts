@@ -26,6 +26,7 @@ import { BpmnTaskSending } from '../classes/Basic/Bpmn/tasks/BpmnTaskSending';
 import { BpmnTaskService } from '../classes/Basic/Bpmn/tasks/BpmnTaskService';
 import { BpmnTaskUserTask } from '../classes/Basic/Bpmn/tasks/BpmnTaskUserTask';
 import { DisplayErrorService } from './display-error.service';
+import { LayoutService } from './layout.service';
 
 @Injectable({
     providedIn: 'root'
@@ -37,9 +38,10 @@ export class ParserService {
     text:string[];
     result: BpmnGraph;
     
-    constructor(private displayerrorService: DisplayErrorService) {
+    constructor(private displayerrorService: DisplayErrorService, private layoutService:LayoutService) {
        this.text = [];
        this.result = new BpmnGraph();
+       layoutService.afterSugiyamaLayoutCallback = this.afterSugiyamaLayout
     }
 
     /**
@@ -117,49 +119,9 @@ export class ParserService {
      * this functions is called after the layout by the sugiyama algorithm has been done
      * and allows to override the positions set by the alogrithm
      */
-    /* setHardcodedPositions(bpmnGraph: BpmnGraph) {
-        //@Vanessa
-        for (const node of bpmnGraph.nodes) {
-            const id = node.id;
-            let matchLine = this.text.find(line => line.startsWith(node.id));
-                if(matchLine != undefined && matchLine.includes("(")) {
-                    let re = /"[\w ]*"/;
-                    matchLine = matchLine.replace(re, "");
-                    let lineSplit = matchLine.split(" ");
-                    if (lineSplit[3]) {
-                        let coordinates = lineSplit[3];
-                        let coord = coordinates.split(',');
-                        coord[0] = coord[0].replace("(", "");
-                        coord[1] = coord[1].replace(")", "");
-                        let x = parseInt(coord[0]);
-                        let y = parseInt(coord[1]);
-                        console.log("setNodePos" + node.id + x + y);
-                        node.setPosXY(x,y);   
-                }}  
-        }
-            
-              for (const edge of bpmnGraph.edges) {
-                const id = edge.id;
-                let matchLine = this.text.find(line => line.startsWith(edge.id));
-                if(matchLine != undefined && matchLine.includes("(")) {
-                    let sub = matchLine.substring(matchLine.indexOf("("));
-                    while (sub != "") {
-                        sub = sub.substring(sub.indexOf("(")+1,sub.indexOf(")"));
-                        let coord = sub.split(',');
-                        coord[0] = coord[0].replace("\r", "");
-                        coord[1] = coord[1].replace("\r", "");;
-                        let x = parseInt(coord[0]);
-                        let y = parseInt(coord[1]);
-                        console.log("adding corner:" + edge.id + x + y);
-                        edge.addCornerXY(x,y); 
-                        if(sub.includes("(")) {
-                            sub = sub.substring(sub.indexOf("("));
-                        }else sub = "";
-                    }   
-                }}     
-        //console.log("read existing positions from text and set them to the nodes and edges")
-    } */
-
+    afterSugiyamaLayout(){
+        console.log("after sugiyama layout")
+    }
     parse(text: string): BpmnGraph | undefined {
        
         console.log("parsing");
