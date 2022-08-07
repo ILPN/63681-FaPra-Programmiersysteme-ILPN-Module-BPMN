@@ -49,26 +49,18 @@ export class OutputFieldComponent {
             case 'bpmn-xml': {
                 filetype = ".bpmn";
 
-                let graph = this.displayService.diagram;
-                //no graph
-                if (!graph) {
-                    this.displayErrorService.displayError(this.NO_GRAPH_ERR)
+                //error message and abort if invalid graph
+                let graph = this.validate()
+                if (!graph)
                     return
-                }
-
-                //invalid
-                let validationResult = new Validator(graph.nodes).validateGraph()
-                if (!validationResult.valid) {
-                    this.displayErrorService.displayError(validationResult.errors)
-                    return
-                }
 
                 //valid graph
-                textToExport = XmlExporter.exportBpmnAsXml(graph!);
+                textToExport = XmlExporter.exportBpmnAsXml(graph);
                 if (!textToExport) {
                     this.displayErrorService.displayError(this.SOMETHING_WENT_WRONG)
                     return
                 }
+
                 break;
             }
 
@@ -87,5 +79,22 @@ export class OutputFieldComponent {
         }
     }
 
+    private validate(): BpmnGraph | null {
+        let graph = this.displayService.diagram;
+        //no graph
+        if (!graph) {
+            this.displayErrorService.displayError(this.NO_GRAPH_ERR)
+            return null
+        }
+
+        //invalid
+        let validationResult = new Validator(graph.nodes).validateGraph()
+        if (!validationResult.valid) {
+            this.displayErrorService.displayError(validationResult.errors)
+            return null
+        }
+
+        return graph
+    }
 
 }

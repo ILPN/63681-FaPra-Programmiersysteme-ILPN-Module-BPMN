@@ -22,6 +22,8 @@ export class EventExporter {
 
         let event = this.xmlDoc.createElementNS(Namespace.BPMN, this.getTagName(bpmnNode))
         event.setAttribute("id", bpmnNode.id + "_" + Random.id())
+        if (bpmnNode.label)
+            event.setAttribute("name", bpmnNode.label)
 
         return event
     }
@@ -48,7 +50,7 @@ export class EventExporter {
      * @returns 
      */
     private createEventBounds(bpmnNode: BpmnNode): Element {
-        
+
         var bounds = this.xmlDoc.createElementNS(Namespace.DC, Namespace.BOUNDS_ELEMENT)
         bounds.setAttribute("x", Utils.withOffset(bpmnNode.x, Constants.X_OFFSET))
         bounds.setAttribute("y", Utils.withOffset(bpmnNode.y, Constants.Y_OFFSET_EVENT))
