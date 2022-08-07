@@ -1,16 +1,16 @@
-import { BpmnEdge } from '../Bpmn/BpmnEdge/BpmnEdge';
-import { BpmnGraph } from '../Bpmn/BpmnGraph';
-import { BpmnNode } from '../Bpmn/BpmnNode';
-import { BpmnGateway } from '../Bpmn/gateways/BpmnGateway';
-import { GetSvgManager } from '../Interfaces/GetSvgManager';
-import { Svg } from '../Svg/Svg';
-import { SvgManager } from '../Svg/SvgManager/SvgManager';
-import { SwitchController } from './switch-controller';
-import { SwitchableEdge } from './SwitchableEdge';
-import { SwitchableGateway } from './SwitchableGateway';
-import { SwitchableNode } from './SwitchableNode';
-import { SwitchState } from './switchstatetype';
-import { SwitchUtils } from './SwitchUtils';
+import {BpmnEdge} from '../Bpmn/BpmnEdge/BpmnEdge';
+import {BpmnGraph} from '../Bpmn/BpmnGraph';
+import {BpmnNode} from '../Bpmn/BpmnNode';
+import {BpmnGateway} from '../Bpmn/gateways/BpmnGateway';
+import {GetSvgManager} from '../Interfaces/GetSvgManager';
+import {Svg} from '../Svg/Svg';
+import {SvgManager} from '../Svg/SvgManager/SvgManager';
+import {SwitchController} from './switch-controller';
+import {SwitchableEdge} from './SwitchableEdge';
+import {SwitchableGateway} from './SwitchableGateway';
+import {SwitchableNode} from './SwitchableNode';
+import {SwitchState} from './switchstatetype';
+import {SwitchUtils} from './SwitchUtils';
 
 
 export class SwitchableGraph implements GetSvgManager {
@@ -49,7 +49,7 @@ export class SwitchableGraph implements GetSvgManager {
         return this._controller
     }
 
-    getNode(id: string): SwitchableNode | undefined{
+    getNode(id: string): SwitchableNode | undefined {
         return this._switchNodes.find(node => node.id === id);
     }
 
