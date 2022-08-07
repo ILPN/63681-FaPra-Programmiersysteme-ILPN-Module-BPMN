@@ -20,8 +20,8 @@ export class AppComponent implements OnDestroy {
     private result: any; //todo: any  muss weg
 
     constructor(
-        private _parserService: ParserService,
         private _displayService: DisplayService,
+        private _parserService: ParserService,
         private graphValidationService: GraphValidationService
     ) {
         this.textareaFc = new FormControl();

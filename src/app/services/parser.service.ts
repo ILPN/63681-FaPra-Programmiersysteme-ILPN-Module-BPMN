@@ -28,6 +28,7 @@ import { BpmnTaskUserTask } from '../classes/Basic/Bpmn/tasks/BpmnTaskUserTask';
 import { DisplayErrorService } from './display-error.service';
 import { LayoutService } from './layout.service';
 import { SelectMultipleControlValueAccessor } from '@angular/forms';
+import { DisplayService } from './display.service';
 
 @Injectable({
     providedIn: 'root'
@@ -37,11 +38,13 @@ export class ParserService {
     @Output() positionChange = new EventEmitter<string>();
     
     text:string[];
-    result: BpmnGraph;
+    private result!: BpmnGraph;
     
-    constructor(private displayerrorService: DisplayErrorService, private layoutService:LayoutService) {
+    constructor(private displayService:DisplayService,
+        private displayerrorService: DisplayErrorService, 
+        private layoutService:LayoutService)
+         {
        this.text = [];
-       this.result = new BpmnGraph();
        layoutService.afterSugiyamaLayoutCallback = this.afterSugiyamaLayout
     }
 
@@ -109,11 +112,12 @@ export class ParserService {
                 console.log("new outgoing edge position:" + matchLineNew);
         }
 
-    }
+        }
+
 
         let emitText = this.text.join("\n");
         this.positionChange.emit(emitText);
-        
+
     }
 }
     /**
@@ -121,14 +125,14 @@ export class ParserService {
      * and allows to override the positions set by the alogrithm
      */
     afterSugiyamaLayout(){
-        console.log("after sugiyama layout");
+        //console.log("after sugiyama layout");
     }
 
 
     parse(text: string): BpmnGraph | undefined {
        
         console.log("parsing");
-
+        
         const lines = text.split('\n');
         this.text = lines; 
         this.result = new BpmnGraph();
@@ -229,7 +233,6 @@ export class ParserService {
             this.displayerrorService.displayError("Bezeichner " + name + " schon vergeben");
         }
         let activity = new BpmnTask(name);
-        console.log("lineSplit2:" +lineSplit[2]);
 
         if(lineSplit[2]){
         switch (lineSplit[1].toLowerCase()) {
@@ -371,7 +374,6 @@ export class ParserService {
         line = line.replace(re,description.split(" ").join(""));
         const lineSplit = line.split(" ");
         const name = lineSplit[0];
-        console.log(lineSplit[2]);
 
         for (let i = 0; i < this.result.nodes.length; i++) {
             let node1 = this.result.nodes[i];
@@ -395,13 +397,13 @@ export class ParserService {
                         //wenn bei den Verbindungsknoten Koordinaten angegeben sind, Ecken für die Kanten anlegen
                         let matchFrom = this.text.find(line => line.startsWith(node1.id));
                         if(matchFrom != undefined && matchFrom.match(/\(-?[0-9]*,-?[0-9]*\)/) != null) {
-                            console.log("adding corner:" + node1.getPos().x + node1.getPos().y);
+                            //console.log("adding corner:" + node1.getPos().x + node1.getPos().y);
                             sequence.setStartPos(node1.getPos().x,node1.getPos().y);
                         }
 
                         let matchTo = this.text.find(line => line.startsWith(node2.id));
                         if(matchTo != undefined && matchTo.match(/\(-?[0-9]*,-?[0-9]*\)/) != null) {
-                            console.log("adding corner:" + node2.getPos().x + node2.getPos().y);
+                            //console.log("adding corner:" + node2.getPos().x + node2.getPos().y);
                             sequence.setEndPos(node2.getPos().x,node2.getPos().y);
                         }
                         
