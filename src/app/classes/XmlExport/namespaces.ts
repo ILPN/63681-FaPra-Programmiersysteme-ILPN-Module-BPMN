@@ -1,5 +1,8 @@
 import { Random } from "./utils"
 
+/**
+ * XML namespaces and tags
+ */
 export class Namespace {
 
     public static BPMN = "http://www.omg.org/spec/BPMN/20100524/MODEL"
@@ -41,6 +44,12 @@ export class Namespace {
     public static TASK_ELEMENT = this.bpmn(this.TASK)
     public static SEQUENCE_FLOW = "sequenceFlow"
     public static SEQUENCE_FLOW_ELEMENT = this.bpmn(this.SEQUENCE_FLOW)
+    public static PARALLEL_GATEWAY = "parallelGateway" //AND
+    public static PARALLEL_GATEWAY_ELEMENT = this.bpmn(this.PARALLEL_GATEWAY)
+    public static EXCLUSIVE_GATEWAY = "exclusiveGateway" //XOR
+    public static EXCLUSIVE_GATEWAY_ELEMENT = this.bpmn(this.EXCLUSIVE_GATEWAY)
+    public static INCLUSIVE_GATEWAY = "inclusiveGateway" //OR
+    public static INCLUSIVE_GATEWAY_ELEMENT = this.bpmn(this.INCLUSIVE_GATEWAY)
 
     //BPMNDI Diagram and children
     public static BPMNDI_prefix = "bpmndi:"

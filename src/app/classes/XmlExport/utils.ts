@@ -1,4 +1,3 @@
-import { Constants } from "./constants";
 
 export class Random{
 
@@ -22,21 +21,19 @@ export class Random{
 }
 
 export class Utils{
-    public static roundCoord(coordinate : number): string{
-        return String(Math.floor(coordinate))
+
+    /**
+     * adds offset to the specified coordinate
+     * @param coordinate 
+     * @param offset 
+     * @returns 
+     */
+    public static withOffset(coordinate : number, offset: number): string{
+        return String(Math.floor(coordinate) + offset)
     }
 
-    public static withXOffset(coordinate : number): string{
-        return String(Math.floor(coordinate) + parseInt(Constants.X_OFFSET))
-    }
+    
 
-    public static withYOffset(coordinate : number): string{
-        return String(Math.floor(coordinate) + parseInt(Constants.Y_OFFSET))
-    }
-
-    public static withYOffsetForEvent(coordinate : number): string{
-        return String(Math.floor(coordinate) + parseInt(Constants.Y_OFFSET_EVENT))
-    }
 
     
 }

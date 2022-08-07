@@ -6,6 +6,7 @@ import { ParserService } from 'src/app/services/parser.service';
 import { BpmnGraph } from 'src/app/classes/Basic/Bpmn/BpmnGraph';
 import { BpmnEventStart } from 'src/app/classes/Basic/Bpmn/events/BpmnEventStart';
 import { DisplayService } from 'src/app/services/display.service';
+import { Validator } from 'src/app/classes/Basic/Bpmn/BpmnGraphValidator';
 
 @Component({
     selector: 'output-field',
@@ -17,6 +18,9 @@ export class OutputFieldComponent {
     @Input() buttonText: string | undefined;
     @Input() buttonIcon: string | undefined;
     @Input() text: string | undefined;
+
+    private NO_GRAPH_ERR = "Kein BPMN Graph!"
+    private SOMETHING_WENT_WRONG = "Etwas schief gelaufen bei Konvertierung"
 
     constructor(private displayErrorService: DisplayErrorService,
         private formValidationService: FormValidationService,
@@ -32,25 +36,42 @@ export class OutputFieldComponent {
         let textToExport = this.text;
         let filetype = '.txt';
         switch (type) {
-            case 'bpmn': if (textToExport) {
-                if (!this.formValidationService.validateFormat(textToExport)) {
-                    this.displayErrorService.displayError("BPMN-Format ist verletzt; nicht exportierbar");
-                    return;
-                }
-            }; break;
+            case 'bpmn': {
+                if (textToExport) {
+                    if (!this.formValidationService.validateFormat(textToExport)) {
+                        this.displayErrorService.displayError("BPMN-Format ist verletzt; nicht exportierbar");
+                        return;
+                    }
+
+                };
+                break;
+            }
             case 'bpmn-xml': {
                 filetype = ".bpmn";
-                let graph = this.displayService.diagram
-                //let graph = this.parser.parse(this.text!)
-                // let graph = new BpmnGraph();
-                // graph.addNode(new BpmnEventStart("StartEvent"))
-                textToExport = XmlExporter.exportBpmnAsXml(graph!);
-                if (!textToExport)
+
+                let graph = this.displayService.diagram;
+                //no graph
+                if (!graph) {
+                    this.displayErrorService.displayError(this.NO_GRAPH_ERR)
                     return
-                //this.displayErrorService.displayError("XML-Format wird noch implementiert");
-                //todo: textToExport zu XML-Format konvertieren; return entfernen
-            }
+                }
+
+                //invalid
+                let validationResult = new Validator(graph.nodes).validateGraph()
+                if (!validationResult.valid) {
+                    this.displayErrorService.displayError(validationResult.errors)
+                    return
+                }
+
+                //valid graph
+                textToExport = XmlExporter.exportBpmnAsXml(graph!);
+                if (!textToExport) {
+                    this.displayErrorService.displayError(this.SOMETHING_WENT_WRONG)
+                    return
+                }
                 break;
+            }
+
             case 'pn':
                 this.displayErrorService.displayError("PN-Format wird noch implementiert");
                 //todo: textToExport zu PN-Format konvertieren; return entfernen
@@ -65,4 +86,6 @@ export class OutputFieldComponent {
             a.setAttribute('download', type + filetype);
         }
     }
+
+
 }

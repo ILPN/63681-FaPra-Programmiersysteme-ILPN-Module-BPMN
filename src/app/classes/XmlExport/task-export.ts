@@ -4,39 +4,56 @@ import { Constants } from "./constants";
 import { Namespace } from "./namespaces";
 import { Random, Utils } from "./utils";
 
+/**
+ * creates XML representation for tasks
+ */
 export class TaskExporter {
 
 
-    constructor(public bpmnNode: BpmnNode, public xmlDoc: XMLDocument) {
+    constructor(public xmlDoc: XMLDocument) {
 
     }
 
-    bpmnTaskXml(): Element {
+    /**
+     * creates XML element <bpmn:> for the task under <bpmn:process>
+     * @param bpmnNode 
+     * @returns 
+     */
+    bpmnTaskXml(bpmnNode: BpmnNode): Element {
 
         //add under <bpmn:process>
-        let task = this.xmlDoc.createElementNS(Namespace.BPMN, this.getTagName())
-        task.setAttribute("id", this.bpmnNode.id + "_" + Random.id())
-        task.setAttribute("name", this.bpmnNode.label)
-
-        
+        let task = this.xmlDoc.createElementNS(Namespace.BPMN, this.getTagName(bpmnNode))
+        task.setAttribute("id", bpmnNode.id + "_" + Random.id())
+        task.setAttribute("name", bpmnNode.label)
 
         return task
     }
 
-    bpmnShapeXml(taskId: string): Element {
+    /**
+     * creates <bpmndi:BPMNShape> element under <bpmndi:BPMNPlane>
+     * @param bpmnNode 
+     * @param eventId reference to <bpmn:> XML element under <bpmn:process>
+     * @returns 
+     */
+    bpmnShapeXml(bpmnNode: BpmnNode, taskId: string): Element {
         //add under diagram's <bpmndi:BPMNPlane>
         var shape = this.xmlDoc.createElementNS(Namespace.BPMNDI, Namespace.SHAPE_ELEMENT)
-        shape.setAttribute("id", Namespace.SHAPE + "_" + this.bpmnNode.id + "_" + Random.id())
+        shape.setAttribute("id", Namespace.SHAPE + "_" + bpmnNode.id + "_" + Random.id())
         shape.setAttribute("bpmnElement", taskId)
-        shape.appendChild(this.createBounds())
+        shape.appendChild(this.createBounds(bpmnNode))
 
         return shape
     }
 
-    private createBounds(): Element {
+    /**
+    * creates <dc:Bounds> XML element as child of the Task to define its size and location
+    * @param bpmnNode 
+    * @returns 
+    */
+    private createBounds(bpmnNode: BpmnNode): Element {
         var bounds = this.xmlDoc.createElementNS(Namespace.DC, Namespace.BOUNDS_ELEMENT)
-        bounds.setAttribute("x", Utils.withXOffset(this.bpmnNode.x))
-        bounds.setAttribute("y", Utils.withYOffset(this.bpmnNode.y))
+        bounds.setAttribute("x", Utils.withOffset(bpmnNode.x, Constants.X_OFFSET))
+        bounds.setAttribute("y", Utils.withOffset(bpmnNode.y, Constants.Y_OFFSET))
         bounds.setAttribute("width", Constants.TASK_WIDTH)
         bounds.setAttribute("height", Constants.TASK_HEIGHT)
 
@@ -44,16 +61,17 @@ export class TaskExporter {
         return bounds
     }
 
-    private getTagName(): string {
-        if (BpmnUtils.isManualTask(this.bpmnNode))
+    //task type
+    private getTagName(bpmnNode: BpmnNode): string {
+        if (BpmnUtils.isManualTask(bpmnNode))
             return Namespace.MANUAL_TASK_ELEMENT
-        if (BpmnUtils.isServiceTask(this.bpmnNode))
+        if (BpmnUtils.isServiceTask(bpmnNode))
             return Namespace.SERVICE_TASK_ELEMENT
-        if (BpmnUtils.isUserTask(this.bpmnNode))
+        if (BpmnUtils.isUserTask(bpmnNode))
             return Namespace.USER_TASK_ELEMENT
-        if (BpmnUtils.isReceivingTask(this.bpmnNode))
+        if (BpmnUtils.isReceivingTask(bpmnNode))
             return Namespace.RECEIVE_TASK_ELEMENT
-        if (BpmnUtils.isSendingTask(this.bpmnNode))
+        if (BpmnUtils.isSendingTask(bpmnNode))
             return Namespace.SEND_TASK_ELEMENT
 
         return Namespace.TASK_ELEMENT
