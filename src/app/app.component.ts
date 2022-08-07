@@ -16,32 +16,32 @@ export class AppComponent implements OnDestroy {
     mode = "free dragging"
     public textareaFc: FormControl;
     private _sub: Subscription;
-    private _sub1: Subscription;
+    //private _sub1: Subscription;
     private result: any; //todo: any  muss weg
 
     constructor(
-        private _parserService: ParserService,
         private _displayService: DisplayService,
+        private _parserService: ParserService,
         private graphValidationService: GraphValidationService
     ) {
         this.textareaFc = new FormControl();
         this._sub = this.textareaFc.valueChanges
             .pipe(debounceTime(400))
             .subscribe((val) => this.processSourceChange(val));
-        this._sub1 = _parserService.positionChange.
+        /*this._sub1 = this._parserService.positionChange.
             pipe(debounceTime(400)).
-            subscribe((val) => this.textareaFc.setValue(val));
+            subscribe((val) => this.textareaFc.setValue(val));*/
         this.textareaFc.setValue(`Your advertising could be here`);
     }
 
     ngOnDestroy(): void {
         this._sub.unsubscribe();
+        //this._sub1.unsubscribe();
     }
 
     private processSourceChange(newSource: string) {
         this.result = this._parserService.parse(newSource);
         if (this.result) {
-
             if (this.result.nodes.length === 0)
                 this.result = BpmnGraph.sampleGraph()
 
