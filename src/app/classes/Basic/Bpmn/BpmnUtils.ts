@@ -11,6 +11,12 @@ import { BpmnGatewaySplitAnd } from "./gateways/BpmnGatewaySplitAnd"
 import { BpmnGatewaySplitOr } from "./gateways/BpmnGatewaySplitOr"
 import { BpmnGatewaySplitXor } from "./gateways/BpmnGatewaySplitXor"
 import { BpmnTask } from "./tasks/BpmnTask"
+import { BpmnTaskBusinessRule } from "./tasks/BpmnTaskBusinessRule"
+import { BpmnTaskManual } from "./tasks/BpmnTaskManual"
+import { BpmnTaskReceiving } from "./tasks/BpmnTaskReceiving"
+import { BpmnTaskSending } from "./tasks/BpmnTaskSending"
+import { BpmnTaskService } from "./tasks/BpmnTaskService"
+import { BpmnTaskUserTask } from "./tasks/BpmnTaskUserTask"
 
 /**
  * provides various convenience methods for BpmnGraph
@@ -182,6 +188,30 @@ export class BpmnUtils {
 
     public static isTask(node: BpmnNode): boolean {
         return node instanceof BpmnTask
+    }
+
+    public static isManualTask(node: BpmnNode): boolean {
+        return node instanceof BpmnTaskManual
+    }
+
+    public static isBusinessRuleTask(node: BpmnNode): boolean {
+        return node instanceof BpmnTaskBusinessRule
+    }
+
+    public static isReceivingTask(node: BpmnNode): boolean {
+        return node instanceof BpmnTaskReceiving
+    }
+
+    public static isSendingTask(node: BpmnNode): boolean {
+        return node instanceof BpmnTaskSending
+    }
+
+    public static isServiceTask(node: BpmnNode): boolean {
+        return node instanceof BpmnTaskService
+    }
+
+    public static isUserTask(node: BpmnNode): boolean {
+        return node instanceof BpmnTaskUserTask
     }
 
 
