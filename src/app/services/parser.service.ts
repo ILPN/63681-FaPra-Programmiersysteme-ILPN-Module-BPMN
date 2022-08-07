@@ -120,8 +120,10 @@ export class ParserService {
      * and allows to override the positions set by the alogrithm
      */
     afterSugiyamaLayout(){
-        console.log("after sugiyama layout")
+        console.log("after sugiyama layout");
     }
+
+
     parse(text: string): BpmnGraph | undefined {
        
         console.log("parsing");
@@ -181,7 +183,8 @@ export class ParserService {
                 pos++;
             }
         }
-
+        
+        /*
         for(let i= 0; i < this.result.nodes.length; i++){
             console.log("pos:" + this.result.nodes[i].id + " " + this.result.nodes[i].x + " " + this.result.nodes[i].y);
         }
@@ -193,6 +196,8 @@ export class ParserService {
                 console.log("corners:" + edge.corners[j].x + " " + edge.corners[j].y);
             }
         }
+        console.log(this.result);
+        */
 
         let choose: number = 1;
         switch (choose) {
@@ -210,6 +215,7 @@ export class ParserService {
                 return this.result;
 
         }
+     
     }
 
 
