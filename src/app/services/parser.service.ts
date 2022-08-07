@@ -27,6 +27,7 @@ import { BpmnTaskService } from '../classes/Basic/Bpmn/tasks/BpmnTaskService';
 import { BpmnTaskUserTask } from '../classes/Basic/Bpmn/tasks/BpmnTaskUserTask';
 import { DisplayErrorService } from './display-error.service';
 import { LayoutService } from './layout.service';
+import { SelectMultipleControlValueAccessor } from '@angular/forms';
 
 @Injectable({
     providedIn: 'root'
@@ -176,9 +177,7 @@ export class ParserService {
                 let el:BpmnEdge|void = this.parseSequences(lines[pos]);
                 if (typeof el === 'object') {
                     this.result.addEdge(el);
-                } else {
-                    console.log("nicht vorhandene Verbindungselemente bei einer Kante");
-                }
+                } 
                 ;
                 pos++;
             }
@@ -222,7 +221,7 @@ export class ParserService {
     private parseActivities(line: string): BpmnNode | undefined {
         let description = line.split('"')[1];
         let re = /"[\w ]*"/;
-        line = line.replace(re, "");
+        line = line.replace(re,description.split(" ").join(""));
         const lineSplit = line.split(" ");
 
         const name = lineSplit[0];
@@ -230,7 +229,9 @@ export class ParserService {
             this.displayerrorService.displayError("Bezeichner " + name + " schon vergeben");
         }
         let activity = new BpmnTask(name);
+        console.log("lineSplit2:" +lineSplit[2]);
 
+        if(lineSplit[2]){
         switch (lineSplit[1].toLowerCase()) {
             case ("sending"):
                 activity = new BpmnTaskSending(name);
@@ -253,6 +254,7 @@ export class ParserService {
             default: 
                 this.displayerrorService.displayError("invalid activity type "+ lineSplit[1]);
         }
+    }
 
         activity.label = description;
 
@@ -272,7 +274,7 @@ export class ParserService {
     private parseEvents(line: string): BpmnNode|undefined {
         let description = line.split('"')[1];
         let re = /"[\w ]*"/;
-        line = line.replace(re, "");
+        line = line.replace(re,description.split(" ").join(""));
         const lineSplit = line.split(" ");
 
         const name = lineSplit[0];
@@ -282,6 +284,7 @@ export class ParserService {
         }
         let event = new BpmnEvent(name);
 
+        if(lineSplit[2]){
         switch (lineSplit[1].toLowerCase()) {
             case ("start"):
                 event = new BpmnEventStart(name);
@@ -294,7 +297,7 @@ export class ParserService {
                 break;
             default: 
                 this.displayerrorService.displayError("invalid event type '" + lineSplit[1] + "'");
-        }
+        }}
 
         event.label = description;
 
@@ -313,8 +316,7 @@ export class ParserService {
     private parseGateways(line: string): BpmnNode|undefined {
         let description = line.split('"')[1];
         let re = /"[\w ]*"/;
-        line = line.replace(re, "");
-
+        line = line.replace(re,description.split(" ").join(""));
         const lineSplit = line.split(" ");
 
         const name = lineSplit[0];
@@ -323,7 +325,7 @@ export class ParserService {
             return;
         }
         let gateway = new BpmnGateway(name);
-
+        if(lineSplit[2]){
         switch (lineSplit[1].toLowerCase()) {
             case ("and_join"):
                 gateway = new BpmnGatewayJoinAnd(name);
@@ -345,8 +347,8 @@ export class ParserService {
                 break;
             default: 
                 this.displayerrorService.displayError("invalid gateway type " + lineSplit[1]); 
-                return;
-        }
+        }}
+
         gateway.label = description;
 
         if (lineSplit[3]) {
@@ -366,11 +368,10 @@ export class ParserService {
 
         let description = line.split('"')[1];
         let re = /"[\w ]*"/;
-        line = line.replace(re, "");
+        line = line.replace(re,description.split(" ").join(""));
         const lineSplit = line.split(" ");
-
         const name = lineSplit[0];
-
+        console.log(lineSplit[2]);
 
         for (let i = 0; i < this.result.nodes.length; i++) {
             let node1 = this.result.nodes[i];
@@ -379,15 +380,17 @@ export class ParserService {
                     let node2 = this.result.nodes[j];
                     if (node2.id === lineSplit[4].trim()) {
                         let sequence = new BpmnEdge(name, node1, node2);
+                        sequence.labelMid = description;
 
                         if(node1.constructor.name === 'BpmnGatewaySplitXor' && node2.constructor.name === 'BpmnGatewayJoinXor') {
                             sequence = new BpmnEdgeDefault(name,node1,node2);
-                        } else switch(lineSplit[1].toLowerCase()){
+                        } else if(lineSplit[2]) {
+                            switch(lineSplit[1].toLowerCase()){
                             case("sequenceflow"): sequence = new BpmnEdge(name,node1,node2); break;
                             case("association"): sequence = new BpmnEdgeAssociation(name,node1,node2); break;
                             case("informationflow"): sequence = new BpmnEdgeMessageflow(name,node1,node2); break;
                             default: this.displayerrorService.displayError("invalid connector type "+lineSplit[1]);
-                        } 
+                        }}
 
                         //wenn bei den Verbindungsknoten Koordinaten angegeben sind, Ecken für die Kanten anlegen
                         let matchFrom = this.text.find(line => line.startsWith(node1.id));
@@ -416,13 +419,16 @@ export class ParserService {
                             i++;
                         }
                         */
-
-                       
                         return sequence;
                     }; 
                 }
             };
 
+        }
+        //wenn beide Knoten angegeben sind, aber keine sequence zurückgegeben wurde
+        //--> fehlerhafte Knotenangabe
+        if(lineSplit[3] && lineSplit[4]) {
+            this.displayerrorService.displayError("nicht vorhandene Verbindungselemente bei Kante " + name);
         }
     }
 }
