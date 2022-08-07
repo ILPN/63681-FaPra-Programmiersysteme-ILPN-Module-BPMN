@@ -19,9 +19,8 @@ import {BpmnGatewaySplitXor} from './gateways/BpmnGatewaySplitXor';
 import {BpmnGatewayJoinXor} from './gateways/BpmnGatewayJoinXor';
 import {BpmnTaskBusinessRule} from './tasks/BpmnTaskBusinessRule';
 import {BpmnEdgeDefault} from './BpmnEdge/BpmnEdgeDefault';
-import {ValidateableGraph} from "../Interfaces/ValidateableGraph";
-import { BpmnEdgeMessageflow } from './BpmnEdge/BpmnEdgeMessageflow';
-import { BpmnEdgeAssociation } from './BpmnEdge/BpmnEdgeAssociation';
+import {BpmnEdgeMessageflow} from './BpmnEdge/BpmnEdgeMessageflow';
+import {BpmnEdgeAssociation} from './BpmnEdge/BpmnEdgeAssociation';
 
 export class BpmnGraph
     extends BGraph<BpmnEdge, BpmnNode>
@@ -420,6 +419,7 @@ export class BpmnGraph
             this.addEdge(connector);
         }
     }
+
     private addMyConnectorDefaultEdge(fromID: string, toID: string) {
         let fromNode: BpmnNode | undefined = this.getNodeFromID(fromID);
         let toNode: BpmnNode | undefined = this.getNodeFromID(toID);
