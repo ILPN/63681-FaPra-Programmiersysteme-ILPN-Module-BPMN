@@ -31,10 +31,11 @@ export class OutputFieldComponent {
     }
 
     download(type: string) {
-        let textToExport = this.text;
+        let textToExport;
         let filetype = '.txt';
         switch (type) {
             case 'bpmn': {
+                textToExport = this.text;
                 if (textToExport) {
                     if (!this.formValidationService.validateFormat(textToExport)) {
                         this.displayErrorService.displayError("BPMN-Format ist verletzt; nicht exportierbar");
@@ -63,12 +64,12 @@ export class OutputFieldComponent {
             }
 
             case 'pn': {
-            
+
                 //error message and abort if invalid graph
                 let graph = this.validate()
                 if (!graph)
                     return
-                
+
                 //valid graph
                 let result = new Petrinet(graph.nodes).print();
                 if (!result.valid) {
@@ -80,11 +81,12 @@ export class OutputFieldComponent {
             }
         }
 
-
-        let a = document.getElementById(type);
-        if (a && textToExport) {
-            a.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(textToExport));
-            a.setAttribute('download', type + filetype);
+        if (textToExport) {
+            let a = document.getElementById(type);
+            if (a && textToExport) {
+                a.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(textToExport));
+                a.setAttribute('download', type + filetype);
+            }
         }
     }
 
