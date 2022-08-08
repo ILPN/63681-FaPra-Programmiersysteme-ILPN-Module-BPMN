@@ -11,7 +11,7 @@ XORSplit xor_split "XORSplit" (210,190)
 XORJoin xor_join "XORJoin" (675,190)
 
 .sequences
-connector1 sequenceflow "1" StartEvent XORSplit (675,60)
+connector1 sequenceflow "1" StartEv XORSplit (675,60)
 connector3 sequenceflow "3" XORSplit ManualTask (675,60)
 connector4 sequenceflow "4" XORSplit UserTask (675,320) 
 connector5 sequenceflow "5" ManualTask XORJoin

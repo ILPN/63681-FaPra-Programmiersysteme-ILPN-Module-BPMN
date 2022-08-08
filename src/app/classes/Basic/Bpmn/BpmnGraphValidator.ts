@@ -30,13 +30,13 @@ export class Validator {
     public NO_END_EVENT = " Es gibt kein End-Event. "
 
     constructor(nodes: BpmnNode[]) {
-
-        this.startEvents.push(...BpmnUtils.getStartEvents(nodes))
-        this.endEvents.push(...BpmnUtils.getEndEvents(nodes))
-        this.gateways.push(...BpmnUtils.getGateways(nodes))
-        this.intermediateEvents.push(...BpmnUtils.getIntermedEvents(nodes))
-        this.tasks.push(...BpmnUtils.getTasks(nodes))
-
+        if (nodes) {
+            this.startEvents.push(...BpmnUtils.getStartEvents(nodes))
+            this.endEvents.push(...BpmnUtils.getEndEvents(nodes))
+            this.gateways.push(...BpmnUtils.getGateways(nodes))
+            this.intermediateEvents.push(...BpmnUtils.getIntermedEvents(nodes))
+            this.tasks.push(...BpmnUtils.getTasks(nodes))
+        }
     }
 
 
@@ -53,13 +53,13 @@ export class Validator {
         message += this.validateIntermediateEvents().errors;
         message += this.validateEndEventNodes().errors;
         message += this.validateGateways().errors;
-        
+
         return this.getValidationResult(message);
     };
 
     private getValidationResult(message: string): { errors: string, valid: boolean } {
         let graphValid = message.trim() === ""
-        return { errors : message, valid : graphValid};
+        return { errors: message, valid: graphValid };
 
     }
 
@@ -188,8 +188,8 @@ export class Validator {
         if (BpmnUtils.isJoinGateway(gateway)) {
             if (BpmnUtils.hasOnlyOneInEdge(gateway)) message += messageStart + this.HAS_NO_MULTIPLE_IN_EDGES
             if (BpmnUtils.hasMultipleOutEdges(gateway)) message += messageStart + this.HAS_MULTIPLE_OUT_EDGES
-        
-        //split gateway
+
+            //split gateway
         } else {
             if (BpmnUtils.hasOnlyOneOutEdge(gateway)) message += messageStart + this.HAS_NO_MULTIPLE_OUT_EDGES
             if (BpmnUtils.hasMultipleInEdges(gateway)) message += messageStart + this.HAS_MULTIPLE_IN_EDGES;
