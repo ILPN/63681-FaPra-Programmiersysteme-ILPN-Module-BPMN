@@ -292,6 +292,77 @@ export class BpmnUtils {
 
         return null
     }
+
+
+    /**
+        * traverses the graph starting from the specified node to find the matching gateway
+        * @param node node to start traversal from
+        * @returns matching gateway or null if not found
+        */
+    public static getCorrespondingGatewayWithoutTyp(gateway: BpmnGateway): BpmnGateway | null {
+        if (this.isJoinGateway(gateway))
+            return this.getCorrespondingSplitWithoutTyp(gateway)
+
+        if (this.isSplitGateway(gateway))
+            return this.getCorrespondingJoinWithoutTyp(gateway)
+
+        return null
+    }
+
+    /**
+       * traverses the graph in reverse order to find the matching SPLIT gateway
+       * @param node node to start traversal from
+       * @returns preceding SPLIT gateway or null if not found
+       */
+    public static getCorrespondingSplitWithoutTyp(node: BpmnNode): BpmnGateway | null {
+        if (!node)
+            return null
+
+        while (this.hasInEdges(node)) {
+            node = this.before(node);
+
+            if (this.isSplitGateway(node))
+                return node as BpmnGateway;
+
+
+            if (this.isJoinGateway(node))
+                node = this.getCorrespondingSplitWithoutTyp(node)!;
+        }
+
+
+        return null
+    }
+    /*
+    * traverses the graph forward to find the matching JOIN gateway
+    * @param node node to start traversal from
+    * @returns succeeding JOIN gateway or null if not found
+    */
+    public static getCorrespondingJoinWithoutTyp(node: BpmnNode): BpmnGateway | null {
+        if (!node)
+            return null
+
+        while (this.hasOutEdges(node)) {
+            node = this.next(node);
+
+            if (this.isJoinGateway(node))
+                return node as BpmnGateway;
+
+            //nested AND gateway
+            if (this.isSplitGateway(node))
+                node = this.getCorrespondingJoinWithoutTyp(node)!;
+        }
+        return null;
+    }
+
+
+
+
+
+
+
+
+
+
     /**
      * traverses the graph in reverse order to find the matching SPLIT gateway
      * @param node node to start traversal from
