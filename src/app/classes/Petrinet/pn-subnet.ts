@@ -21,7 +21,7 @@ export class PnSubnet {
 
     constructor(public bpmnNode: BpmnNode) {
 
-        this.id = bpmnNode.id;
+        this.id = bpmnNode.id
         this._transitions = new Array<Transition>();
         this._places = new Array<Place>();
         this._arcs = new Array<Arc>();

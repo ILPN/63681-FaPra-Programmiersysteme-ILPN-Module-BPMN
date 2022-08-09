@@ -1,31 +1,35 @@
 import { BpmnNode } from "../Basic/Bpmn/BpmnNode"
 import { BpmnUtils } from "../Basic/Bpmn/BpmnUtils"
 import { Constants } from "./constants"
+import { Exporter } from "./exporter"
 import { Namespace } from "./namespaces"
 import { Random, Utils } from "./utils"
 
 /**
  * creates XML representation for events
  */
-export class EventExporter {
+export class EventExporter extends Exporter {
 
-    constructor(public xmlDoc: XMLDocument) {
 
-    }
 
     /**
-     * creates XML element <bpmn:startEvent> or <bpmn:endEvent> under <bpmn:process>
+     * creates XML element <bpmn:startEvent> or <bpmn:endEvent> or <bpmn:intermediateThrowEvent> under <bpmn:process>
      * @param bpmnNode 
      * @returns 
      */
-    bpmnEventXml(bpmnNode: BpmnNode): Element {
+    bpmnEventXml(bpmnNode: BpmnNode): { element: Element | null, error: string } {
 
-        let event = this.xmlDoc.createElementNS(Namespace.BPMN, this.getTagName(bpmnNode))
-        event.setAttribute("id", bpmnNode.id + "_" + Random.id())
-        if (bpmnNode.label)
-            event.setAttribute("name", bpmnNode.label)
+        let createElementResult = this.createElementNS(bpmnNode, Namespace.BPMN, this.getTagName(bpmnNode))
+        if (createElementResult.element) {
+            let event = createElementResult.element
+            event.setAttribute("id", bpmnNode.id + "_" + Random.id())
+            if (bpmnNode.label)
+                event.setAttribute("name", bpmnNode.label)
+            return { element: event, error: "" }
+        }
 
-        return event
+
+        return { element: null, error: createElementResult.error }
     }
 
     /**
@@ -61,9 +65,14 @@ export class EventExporter {
     }
 
     //type of event
-    private getTagName(bpmnNode: BpmnNode): string {
+    private getTagName(bpmnNode: BpmnNode): string | undefined {
         if (BpmnUtils.isStartEvent(bpmnNode))
             return Namespace.START_ELEMENT
-        return Namespace.END_ELEMENT
+        if (BpmnUtils.isIntermediateEvent(bpmnNode))
+            return Namespace.INTERMEDIATE_EVENT_ELEMENT
+
+        if (BpmnUtils.isEndEvent(bpmnNode))
+            return Namespace.END_ELEMENT
+        return undefined
     }
 }

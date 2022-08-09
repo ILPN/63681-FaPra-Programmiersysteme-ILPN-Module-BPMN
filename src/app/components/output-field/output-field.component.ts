@@ -19,7 +19,7 @@ export class OutputFieldComponent {
     @Input() text: string | undefined;
 
     private NO_GRAPH_ERR = "Kein BPMN Graph!"
-    private SOMETHING_WENT_WRONG = "Etwas schief gelaufen bei Konvertierung"
+    private SOMETHING_WENT_WRONG = "Problem bei Konvertierung: "
 
     constructor(private displayErrorService: DisplayErrorService,
         private formValidationService: FormValidationService,
@@ -54,11 +54,13 @@ export class OutputFieldComponent {
                     return
 
                 //valid graph
-                textToExport = XmlExporter.exportBpmnAsXml(graph);
-                if (!textToExport) {
-                    this.displayErrorService.displayError(this.SOMETHING_WENT_WRONG)
+                let result = XmlExporter.exportBpmnAsXml(graph);
+                if (!result.ok) {
+                    this.displayErrorService.displayError(this.SOMETHING_WENT_WRONG + result.error)
                     return
                 }
+
+                textToExport = result.xmlText
 
                 break;
             }

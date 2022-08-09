@@ -1,32 +1,35 @@
 import { BpmnNode } from "../Basic/Bpmn/BpmnNode";
 import { BpmnUtils } from "../Basic/Bpmn/BpmnUtils";
 import { Constants } from "./constants";
+import { Exporter } from "./exporter";
 import { Namespace } from "./namespaces";
 import { Random, Utils } from "./utils";
 
 /**
  * creates XML representation for tasks
  */
-export class TaskExporter {
+export class TaskExporter extends Exporter {
 
-
-    constructor(public xmlDoc: XMLDocument) {
-
-    }
 
     /**
      * creates XML element <bpmn:> for the task under <bpmn:process>
      * @param bpmnNode 
      * @returns 
      */
-    bpmnTaskXml(bpmnNode: BpmnNode): Element {
+    bpmnTaskXml(bpmnNode: BpmnNode): { element: Element | null, error: string } {
 
         //add under <bpmn:process>
-        let task = this.xmlDoc.createElementNS(Namespace.BPMN, this.getTagName(bpmnNode))
-        task.setAttribute("id", bpmnNode.id + "_" + Random.id())
-        task.setAttribute("name", bpmnNode.label)
+        let createTaskResult = this.createElementNS(bpmnNode, Namespace.BPMN, this.getTagName(bpmnNode))
 
-        return task
+        if (createTaskResult.element) {
+            let task = createTaskResult.element
+            task.setAttribute("id", bpmnNode.id + "_" + Random.id())
+            task.setAttribute("name", bpmnNode.label)
+
+            return { element: task, error: "" }
+        }
+
+        return { element: null, error: createTaskResult.error }
     }
 
     /**
@@ -62,7 +65,7 @@ export class TaskExporter {
     }
 
     //task type
-    private getTagName(bpmnNode: BpmnNode): string {
+    private getTagName(bpmnNode: BpmnNode): string | undefined {
         if (BpmnUtils.isManualTask(bpmnNode))
             return Namespace.MANUAL_TASK_ELEMENT
         if (BpmnUtils.isServiceTask(bpmnNode))
@@ -74,6 +77,10 @@ export class TaskExporter {
         if (BpmnUtils.isSendingTask(bpmnNode))
             return Namespace.SEND_TASK_ELEMENT
 
-        return Namespace.TASK_ELEMENT
+        //general task without type
+        if (BpmnUtils.isTask(bpmnNode))
+            return Namespace.TASK_ELEMENT
+
+        return undefined
     }
 }
