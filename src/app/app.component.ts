@@ -132,7 +132,6 @@ this.textareaFc.setValue(s);
 
             if (this.result.nodes.length === 0)
                 this.result = BpmnGraph.anotherMonsterGraph();
-
             this._displayService.display(this.result);
 
         }
