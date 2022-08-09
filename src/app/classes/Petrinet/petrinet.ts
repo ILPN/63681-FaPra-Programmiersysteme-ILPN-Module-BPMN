@@ -34,6 +34,7 @@ export class Petrinet {
         this.convert(BpmnUtils.getStartEvents, bpmnNodes)
         this.convert(BpmnUtils.getTasks, bpmnNodes)
         this.convert(BpmnUtils.getGateways, bpmnNodes)
+        this.convert(BpmnUtils.getIntermedEvents, bpmnNodes)
         this.convert(BpmnUtils.getEndEvents, bpmnNodes)
 
         // OR-Split-Transitions and OR-join-Transitions need to be connected by a direct arc with a place inbetween

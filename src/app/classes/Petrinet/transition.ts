@@ -4,10 +4,10 @@ import { PnElement } from "./pn-element";
  * transition in petri net
  */
 export class Transition extends PnElement{
-    
-    constructor(id: string, public label: string, public counter = 0){
+    _label: string
+    constructor(id: string, label: string, public counter = 0){
         super(id);
-
+        this._label = this.replaceAllWhiteSpaces(label)
         //counter is only for the cases where BpmnNode is represented by more than one transition
         //for ex., Or-Gateways
         if(counter > 0){
@@ -15,6 +15,14 @@ export class Transition extends PnElement{
             this.label += counter
         }
 
+    }
+
+    get label(){
+        return this._label
+    }
+
+    set label(newLabel: string){
+        this._label = newLabel
     }
 
     print(): string{

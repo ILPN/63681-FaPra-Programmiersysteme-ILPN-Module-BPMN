@@ -22,13 +22,18 @@ export class XmlExporter {
     private gatewayExporter: GatewayExporter
     private eventExporter: EventExporter
 
+    //for error handling - collects all errors 
+    private error = ""
+    private validXml;
+
+
 
     /**
      * converts BPMN Graph into XML BPMN 2.0
      * @param bpmnGraph 
      * @returns XML as string
      */
-    static exportBpmnAsXml(bpmnGraph: BpmnGraph): string {
+    static exportBpmnAsXml(bpmnGraph: BpmnGraph): { xmlText: string | null, ok: boolean, error: string } {
         return new XmlExporter().generateXml(bpmnGraph)
     }
 
@@ -46,6 +51,9 @@ export class XmlExporter {
         this.taskExporter = new TaskExporter(this.doc)
         this.gatewayExporter = new GatewayExporter(this.doc)
         this.eventExporter = new EventExporter(this.doc)
+
+        //error handling
+        this.validXml = true
     }
 
     /**
@@ -53,65 +61,131 @@ export class XmlExporter {
      * @param bpmnGraph 
      * @returns XML as string
      */
-    generateXml(bpmnGraph: BpmnGraph): string {
+    generateXml(bpmnGraph: BpmnGraph): { xmlText: string | null, ok: boolean, error: string } {
 
         //convert BPMN elements into XML tree 
         bpmnGraph.nodes.forEach(node => this.convertBpmnNodeToXml(node))
 
         //create <bpmndi:BPMNEdge> elements (children of <bpmndi:BPMNPlane>)
         //at this point the coordinates of all elements are known so we can calculate the coordinates of edges
-        this.edgeExporter.createBpmnEdgeXmlElements().forEach(
-            edge => this.plane.appendChild(edge)
-        )
+        this.addBpmnEdgeXmlElementsToPlane()
+
 
         //create <bpmn:sequenceFlow>    elements (children of <bpmn:process>)
         //at this point the ids of all elements are set so we can create sequence flows
-        this.edgeExporter.createSequenceFlows().forEach(
-            flow => this.process.appendChild(flow)
-        )
+        this.addSequenceFlowsToProcess()
 
-        //to string
-        var xmlString = new XMLSerializer().serializeToString(this.doc);
 
-        return this.header + xmlString
+        //check if there were errors during XML generation
+        if (this.validXml) {
+            var xmlString = new XMLSerializer().serializeToString(this.doc);
+            return { xmlText: xmlString, ok: true, error: "" }
+        }
+
+
+        return { xmlText: null, ok: false, error: this.error }
+    }
+
+    private addSequenceFlowsToProcess() {
+        let result = this.edgeExporter.createSequenceFlows()
+
+        if (!result.elements)
+            this.setInvalidResult(result.error)
+        else
+            result.elements.forEach(
+                sequenceFlow => this.process.appendChild(sequenceFlow)
+            )
+    }
+
+    private addBpmnEdgeXmlElementsToPlane() {
+
+        let result = this.edgeExporter.createBpmnEdgeXmlElements()
+        if (!result.elements)
+            this.setInvalidResult(result.error)
+        else
+            result.elements.forEach(edge => this.plane.appendChild(edge))
+
     }
 
     private convertBpmnNodeToXml(bpmnNode: BpmnNode) {
+        console.log("converting " + bpmnNode.id + " : " + bpmnNode.label)
         BpmnUtils.isStartEvent(bpmnNode) && this.createStartEvent(bpmnNode)
 
         BpmnUtils.isTask(bpmnNode) && this.createTask(bpmnNode)
         BpmnUtils.isEndEvent(bpmnNode) && this.createEndEvent(bpmnNode)
 
         BpmnUtils.isGateway(bpmnNode) && this.createGateway(bpmnNode)
+
+        BpmnUtils.isIntermediateEvent(bpmnNode) && this.createIntermediateEvent(bpmnNode)
     }
 
-    
+    private createIntermediateEvent(bpmnNode: BpmnNode) {
+        //<bpmn:startEvent> under <bpmn:process>
+        let createIntermEventResult = this.eventExporter.bpmnEventXml(bpmnNode);
+        if (createIntermEventResult.element) {
+            let intermEvent = createIntermEventResult.element
+            this.process.appendChild(intermEvent)
+
+            // <bpmndi:BPMNShape> under <bpmndi:BPMNPlane>
+            var eventShape = this.eventExporter.bpmnShapeXml(bpmnNode, intermEvent.getAttribute("id")!)
+            this.plane.appendChild(eventShape)
+
+            // outgoing and incoming edges as XML children of <bpmn:intermediateThrowEvent>
+            bpmnNode.inEdges.forEach(inEdge => this.edgeExporter.createBpmnIncomingXml(inEdge, intermEvent, eventShape))
+            bpmnNode.outEdges.forEach(outEdge => this.edgeExporter.createBpmnOutgoingXml(outEdge, intermEvent, eventShape))
+        }
+        //error handling
+        else this.setInvalidResult(createIntermEventResult.error)
+    }
+
+    setInvalidResult(error: string) {
+        {
+            this.validXml = false
+            this.error += error
+        }
+    }
+
     private createGateway(bpmnNode: BpmnNode) {
-        //<bpmn:*gateway> under <bpmn:process>
-        let gateway = this.gatewayExporter.bpmnGatewayXml(bpmnNode);
-        this.process.appendChild(gateway)
+        let createGatewayResult = this.gatewayExporter.bpmnGatewayXml(bpmnNode);
 
-        // <bpmndi:BPMNShape> under <bpmndi:BPMNPlane>
-        let gatewayShape = this.gatewayExporter.bpmnShapeXml(bpmnNode, gateway.getAttribute("id")!)
-        this.plane.appendChild(gatewayShape)
+        if (createGatewayResult.element) {
+            //<bpmn:*gateway> under <bpmn:process>
+            let gateway = createGatewayResult.element
+            this.process.appendChild(gateway)
 
-        // edges as XML children of <bpmn:*gateway>
-        bpmnNode.outEdges.forEach(outEdge => this.edgeExporter.createBpmnOutgoingXml(outEdge, gateway, gatewayShape))
-        bpmnNode.inEdges.forEach(inEdge => this.edgeExporter.createBpmnIncomingXml(inEdge, gateway, gatewayShape))
+            // <bpmndi:BPMNShape> under <bpmndi:BPMNPlane>
+            let gatewayShape = this.gatewayExporter.bpmnShapeXml(bpmnNode, gateway.getAttribute("id")!)
+            this.plane.appendChild(gatewayShape)
+
+            // edges as XML children of <bpmn:*gateway>
+            bpmnNode.outEdges.forEach(outEdge => this.edgeExporter.createBpmnOutgoingXml(outEdge, gateway, gatewayShape))
+            bpmnNode.inEdges.forEach(inEdge => this.edgeExporter.createBpmnIncomingXml(inEdge, gateway, gatewayShape))
+        }
+        //error handling
+        else this.setInvalidResult(createGatewayResult.error)
+
     }
 
     private createTask(bpmnNode: BpmnNode) {
-        //<bpmn:*task> under <bpmn:process>
-        let task = this.taskExporter.bpmnTaskXml(bpmnNode);
-        this.process.appendChild(task)
+        let createTaskResult = this.taskExporter.bpmnTaskXml(bpmnNode);
 
-        // <bpmndi:BPMNShape> under <bpmndi:BPMNPlane>
-        let taskShape = this.taskExporter.bpmnShapeXml(bpmnNode, task.getAttribute("id")!)
-        this.plane.appendChild(taskShape)
+        if (createTaskResult.element) {
+            //<bpmn:*task> under <bpmn:process>
+            let task = createTaskResult.element
+            this.process.appendChild(task)
 
-        // edges as XML children of <bpmn:*task>
-        bpmnNode.outEdges.forEach(outEdge => this.edgeExporter.createBpmnOutgoingXml(outEdge, task, taskShape))
-        bpmnNode.inEdges.forEach(inEdge => this.edgeExporter.createBpmnIncomingXml(inEdge, task, taskShape))
+            // <bpmndi:BPMNShape> under <bpmndi:BPMNPlane>
+            let taskShape = this.taskExporter.bpmnShapeXml(bpmnNode, task.getAttribute("id")!)
+            this.plane.appendChild(taskShape)
+
+            // edges as XML children of <bpmn:*task>
+
+            bpmnNode.outEdges.forEach(outEdge => this.edgeExporter.createBpmnOutgoingXml(outEdge, task, taskShape))
+            bpmnNode.inEdges.forEach(inEdge => this.edgeExporter.createBpmnIncomingXml(inEdge, task, taskShape))
+        }
+        //error handling
+        else this.setInvalidResult(createTaskResult.error)
+
     }
 
     //<bpmn:definitions>
@@ -134,34 +208,44 @@ export class XmlExporter {
         return definitions
     }
 
-    private createStartEvent(bpmnNode: BpmnNode): Element {
-        //<bpmn:startEvent> under <bpmn:process>
-        let start = this.eventExporter.bpmnEventXml(bpmnNode);
-        this.process.appendChild(start)
+    private createStartEvent(bpmnNode: BpmnNode) {
+        
+        let createStartResult = this.eventExporter.bpmnEventXml(bpmnNode);
 
-        // <bpmndi:BPMNShape> under <bpmndi:BPMNPlane>
-        var startShape = this.eventExporter.bpmnShapeXml(bpmnNode, start.getAttribute("id")!)
-        this.plane.appendChild(startShape)
+        if (createStartResult.element) {
+            //<bpmn:startEvent> under <bpmn:process>
+            let start = createStartResult.element
+            this.process.appendChild(start)
 
-        // outgoing edges as XML children of <bpmn:startEvent>
-        bpmnNode.outEdges.forEach(outEdge => this.edgeExporter.createBpmnOutgoingXml(outEdge, start, startShape))
+            // <bpmndi:BPMNShape> under <bpmndi:BPMNPlane>
+            var startShape = this.eventExporter.bpmnShapeXml(bpmnNode, start.getAttribute("id")!)
+            this.plane.appendChild(startShape)
 
-        return start
+            // outgoing edges as XML children of <bpmn:startEvent>
+            bpmnNode.outEdges.forEach(outEdge => this.edgeExporter.createBpmnOutgoingXml(outEdge, start, startShape))
+        }
+        //error handling
+        else this.setInvalidResult(createStartResult.error)
     }
 
-    private createEndEvent(bpmnNode: BpmnNode): Element {
-        //<bpmn:endEvent> under <bpmn:process>
-        let end = this.eventExporter.bpmnEventXml(bpmnNode);
-        this.process.appendChild(end)
+    private createEndEvent(bpmnNode: BpmnNode) {
+        let createEndResult = this.eventExporter.bpmnEventXml(bpmnNode);
+        if (createEndResult.element) {
+            //<bpmn:endEvent> under <bpmn:process>
+            let end = createEndResult.element
+            this.process.appendChild(end)
 
-        // <bpmndi:BPMNShape> under <bpmndi:BPMNPlane>
-        var endShape = this.eventExporter.bpmnShapeXml(bpmnNode, end.getAttribute("id")!)
-        this.plane.appendChild(endShape)
+            // <bpmndi:BPMNShape> under <bpmndi:BPMNPlane>
+            var endShape = this.eventExporter.bpmnShapeXml(bpmnNode, end.getAttribute("id")!)
+            this.plane.appendChild(endShape)
 
-        //incoming edges as XML children of <bpmn:endEvent>
-        bpmnNode.inEdges.forEach(inEdge => this.edgeExporter.createBpmnIncomingXml(inEdge, end, endShape))
+            //incoming edges as XML children of <bpmn:endEvent>
+            bpmnNode.inEdges.forEach(inEdge => this.edgeExporter.createBpmnIncomingXml(inEdge, end, endShape))
+        }
 
-        return end
+
+        //error handling
+        else this.setInvalidResult(createEndResult.error)
     }
 
     //<bpmn:process>
@@ -187,7 +271,12 @@ export class XmlExporter {
     private createBpmnPlane(diagram: Element): Element {
         var plane = this.doc.createElementNS(Namespace.BPMNDI, Namespace.PLANE_ELEMENT)
         plane.setAttribute("id", Namespace.PLANE_ID)
-        plane.setAttribute("bpmnElement", this.process.getAttribute("id")!)
+
+        let processId = this.process.getAttribute("id")
+        if (processId)
+            plane.setAttribute("bpmnElement", processId)
+        else
+            this.setInvalidResult(" Element bpmndi:BPMNPlane konnte nicht erstellt werden, weil Element bpmn:process keine ID hat. ")
         diagram.appendChild(plane);
 
         return plane
