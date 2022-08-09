@@ -22,6 +22,7 @@ import {BpmnEdgeDefault} from './BpmnEdge/BpmnEdgeDefault';
 import {ValidateableGraph} from "../Interfaces/ValidateableGraph";
 import { BpmnEdgeMessageflow } from './BpmnEdge/BpmnEdgeMessageflow';
 import { BpmnEdgeAssociation } from './BpmnEdge/BpmnEdgeAssociation';
+import { BpmnTaskSending } from './tasks/BpmnTaskSending';
 
 export class BpmnGraph
     extends BGraph<BpmnEdge, BpmnNode>

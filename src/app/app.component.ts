@@ -43,7 +43,7 @@ export class AppComponent implements OnDestroy {
         this.result = this._parserService.parse(newSource);
         if (this.result) {
             if (this.result.nodes.length === 0)
-                this.result = BpmnGraph.sampleGraph()
+                this.result = BpmnGraph.anotherMonsterGraph()
 
             this._displayService.display(this.result);
 
