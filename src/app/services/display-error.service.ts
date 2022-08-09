@@ -5,7 +5,7 @@ import {ErrorHintComponent} from "../components/error-hint/error-hint.component"
     providedIn: 'root'
 })
 export class DisplayErrorService {
-    errorHint: ErrorHintComponent | undefined; // TODO: dieses undefined entfernen
+    errorHint: ErrorHintComponent | undefined;
 
     displayError(msg: string): void {
         if (this.errorHint !== undefined) {

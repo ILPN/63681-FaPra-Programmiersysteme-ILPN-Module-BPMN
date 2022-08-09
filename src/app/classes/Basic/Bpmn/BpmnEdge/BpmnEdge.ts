@@ -44,8 +44,8 @@ export class BpmnEdge extends BEdge implements GetSvgManager {
     public get corners() {
         return this._corners;
     }
-    from: BpmnNode;
-    to: BpmnNode;
+    public from: BpmnNode;
+    public to: BpmnNode;
 
     constructor(id: string, from: BpmnNode, to: BpmnNode) {
         super(from.id, to.id);
@@ -232,7 +232,7 @@ export class BpmnEdge extends BEdge implements GetSvgManager {
             this._corners[0].getPos(),
             this.from
         );
-        
+
         this.nodeIntersection1 = intersectionWithStartElement;
         pointsToBeConnected.push(intersectionWithStartElement);
 
@@ -258,7 +258,7 @@ export class BpmnEdge extends BEdge implements GetSvgManager {
         const directionOfStart = pointsToBeConnected[1].minus(
             startOfLine
         );
-        
+
 
         return pointsToBeConnected
     }
@@ -367,7 +367,7 @@ export class BpmnEdge extends BEdge implements GetSvgManager {
                 a.distanceTo(outerPoint) - b.distanceTo(outerPoint)
         );
 
-        
+
         return intersections[0]? intersections[0]: innerPoint
     }
     private intersectionWithGateway(

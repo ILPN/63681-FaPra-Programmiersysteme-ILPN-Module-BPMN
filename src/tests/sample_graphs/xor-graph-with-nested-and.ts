@@ -7,16 +7,16 @@ export class XorGraphWithNestedAnd extends TestGraph{
        
         //startEvent --> Parent XOR SPLIT
         let startEvent = this.createStartEvent();
-        let gatewaySplitOrParent = this.createXorSplit()
-        this.createEdge(startEvent, gatewaySplitOrParent);
+        let gatewaySplitXorParent = this.createXorSplit()
+        this.createEdge(startEvent, gatewaySplitXorParent);
 
         //Parent XOR SPLIT --> Task1
         let task1 = this.createSendingTask();
-        this.createEdge(gatewaySplitOrParent, task1);
+        this.createEdge(gatewaySplitXorParent, task1);
 
         //SPLIT_XOR gateway --> Task2
         let task2 = this.createReceivingTask();
-        this.createEdge(gatewaySplitOrParent, task2)
+        this.createEdge(gatewaySplitXorParent, task2)
 
         //Task2 --> nested AND SPLIT
         let gatewaySplitAndNested = this.createAndSplit();

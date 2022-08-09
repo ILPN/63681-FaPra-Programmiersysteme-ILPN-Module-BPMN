@@ -17,7 +17,8 @@ export class AppComponent implements OnDestroy {
     public textareaFc: FormControl;
     private _sub: Subscription;
     //private _sub1: Subscription;
-    private result: any; //todo: any  muss weg
+    private result: any;
+    graphIsValid: boolean = false;
 
     constructor(
         private _displayService: DisplayService,
@@ -42,6 +43,7 @@ export class AppComponent implements OnDestroy {
     private processSourceChange(newSource: string) {
         this.result = this._parserService.parse(newSource);
         if (this.result) {
+
             if (this.result.nodes.length === 0)
                 this.result = BpmnGraph.anotherMonsterGraph()
 
@@ -51,7 +53,8 @@ export class AppComponent implements OnDestroy {
     }
 
     validateGraph(): void {
-        if (this.result)
-            this.graphValidationService.validateGraph(this.result);
+        if (this.result !== undefined) {
+            this.graphIsValid = this.graphValidationService.isValid(this.result);
+        }
     }
 }

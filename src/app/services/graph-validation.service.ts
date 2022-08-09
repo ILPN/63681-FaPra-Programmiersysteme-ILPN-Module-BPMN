@@ -1,169 +1,186 @@
-import { Injectable } from '@angular/core';
-import { BpmnGraph } from '../classes/Basic/Bpmn/BpmnGraph';
-import { Validator } from '../classes/Basic/Bpmn/BpmnGraphValidator';
-import { BpmnNode } from "../classes/Basic/Bpmn/BpmnNode";
-import { BpmnEventEnd } from "../classes/Basic/Bpmn/events/BpmnEventEnd";
-import { BpmnEventIntermediate } from "../classes/Basic/Bpmn/events/BpmnEventIntermediate";
-import { BpmnEventStart } from "../classes/Basic/Bpmn/events/BpmnEventStart";
-import { BpmnGateway } from "../classes/Basic/Bpmn/gateways/BpmnGateway";
-import { BpmnTask } from "../classes/Basic/Bpmn/tasks/BpmnTask";
-import { SwitchableNode } from "../classes/Basic/Switch/SwitchableNode";
-import { DisplayErrorService } from "./display-error.service";
+import {Injectable} from '@angular/core';
+import {DisplayErrorService} from "./display-error.service";
+import {BpmnNode} from "../classes/Basic/Bpmn/BpmnNode";
+import {BpmnGraph} from "../classes/Basic/Bpmn/BpmnGraph";
+import {BpmnEventEnd} from "../classes/Basic/Bpmn/events/BpmnEventEnd";
+import {BpmnEventStart} from "../classes/Basic/Bpmn/events/BpmnEventStart";
+import {BpmnEventIntermediate} from "../classes/Basic/Bpmn/events/BpmnEventIntermediate";
+import {BpmnGateway} from "../classes/Basic/Bpmn/gateways/BpmnGateway";
+import {BpmnTask} from "../classes/Basic/Bpmn/tasks/BpmnTask";
+import {BpmnUtils} from "../classes/Basic/Bpmn/BpmnUtils";
 
 @Injectable({
     providedIn: 'root'
 })
 export class GraphValidationService {
+
     constructor(private displayErrorService: DisplayErrorService) {
     }
 
-    // gucken ob man die Fehlermeldungen alle untereinander ausgibt. Evtl errorMessages: string[] und dann ausgeben lassen
+    // todo: Notizen sind im Todoist
+
     private errorMessage: string = '';
 
-    validateGraph(graph: BpmnGraph) {
-        
-        let result = new Validator(graph.nodes).validateGraph()
-        if (result.valid)
-            this.displayErrorService.displayError("Happy BPMN graph")
-        else
-            this.displayErrorService.displayError(result.errors)
-    }
-
-    private validateSwitchableGraph(nodes: SwitchableNode[]): void {
-        let startEventNodes: SwitchableNode[] = [];
-        let endEventNodes: SwitchableNode[] = [];
-        let gatewayNodes: SwitchableNode[] = [];
-        nodes.forEach(node => {
-            if (node.isEndEvent()) {
-                endEventNodes.push(node);
-            }
-            if (node.isStartEvent()) {
-                startEventNodes.push(node);
-            }
-            if (node.isGateway()) {
-                gatewayNodes.push(node);
-            }
-        });
-        this.validateEndEventNodes(endEventNodes);
-        this.validateStartEventNodes(startEventNodes);
-        // this.validateGatewayNodes(gatewayNodes);
-
-    }
-
-    private validateEndEventNodes(endEvents: SwitchableNode[]): void {
-        if (this.containsOutEdges(endEvents)) {
-            this.errorMessage += 'EndEvent enthaelt einen Ausgang!';
+    isValid(validateableGraph: BpmnGraph): boolean {
+        this.validateGraph(validateableGraph.nodes);
+        if (this.isEmpty(this.errorMessage)) {
+            return true;
+        } else {
+            this.displayErrorService.displayError(this.errorMessage);
+            return false
         }
     }
 
-    private validateBpmnEndEventNodes(endEvents: BpmnNode[]): void {
-        if (this.containsOutEdgesBpmn(endEvents)) {
-            this.errorMessage += 'EndEvent enthaelt einen Ausgang!';
-        }
+    resetErrorMessage(): void {
+        this.errorMessage = '';
+    }
+
+    private validateEndEvents(endEvents: BpmnNode[]): void {
         if (!this.cointainsEndEvent(endEvents)) {
-            this.errorMessage += 'enthaelt kein EndEvent!';
+            this.errorMessage += 'Graph enthaelt kein EndEvent! ';
+        } else {
+            let outgoingEdgeLabel: string = this.getOutgoingEdgeLabel(endEvents);
+            if (!this.isEmpty(outgoingEdgeLabel)) {
+                this.errorMessage += `EndEvent mit dem Label "${outgoingEdgeLabel}" enthaelt  einen Ausgang!`;
+            }
         }
     }
 
-    private containsOutEdgesBpmn(endEventNodes: BpmnNode[]): boolean {
-        let outEdges: number = 0;
+    private getOutgoingEdgeLabel(endEventNodes: BpmnNode[]): string {
+        let label: string = '';
         endEventNodes.forEach(endEventNode => {
             if (endEventNode.outEdges.length > 0) {
-                outEdges++;
+                label += endEventNode.label;
             }
         });
-        return outEdges > 0;
+        return label;
     }
 
-    private containsOutEdges(endEventNodes: SwitchableNode[]): boolean {
-        let outEdges: number = 0;
-        endEventNodes.forEach(endEventNode => {
-            if (endEventNode.containsOutEdges()) {
-                outEdges++;
-            }
-        });
-        return outEdges > 0;
-    }
-
-    private validateStartEventNodes(startEventNodes: SwitchableNode[]): void {
-        if (this.containsInEdges(startEventNodes)) {
-            this.errorMessage += 'Fehler, Startevent hat inEdges!';
-        }
-    }
-
-    private validateBpmnStartEventNodes(startEventNodes: BpmnNode[]): void {
-        if (this.containsInEdgesBpmn(startEventNodes)) {
-            this.errorMessage += 'Fehler, Startevent hat inEdges!';
-        }
+    private validateStartEvents(startEventNodes: BpmnNode[]): void {
         if (!this.cointainsStartEvent(startEventNodes)) {
-            this.errorMessage += 'enthaelt kein StartEvent!';
+            this.errorMessage += 'Graph enthaelt kein StartEvent! ';
+        } else {
+            let labelOfStartEventWithInEdges = this.getLabelOfStartEventWithInEdges(startEventNodes);
+            if (!this.isEmpty(labelOfStartEventWithInEdges)) {
+                this.errorMessage += `StartEvent mit dem Label "${labelOfStartEventWithInEdges}" hat eingehende Kanten! `;
+            }
         }
 
     }
 
-    private containsInEdges(startEventNodes: SwitchableNode[]): boolean {
-        let inEdges: number = 0;
-        startEventNodes.forEach(startEventNode => {
-            if (startEventNode.containsInEdges()) {
-                inEdges++;
-            }
-        });
-        return inEdges > 0;
+    private isEmpty(label: string) {
+        return label === '';
     }
 
-    private containsInEdgesBpmn(startEventNodes: BpmnNode[]): boolean {
-        let inEdges: number = 0;
+    private getLabelOfStartEventWithInEdges(startEventNodes: BpmnNode[]): string {
+        let label: string = '';
         startEventNodes.forEach(startEventNode => {
             if (startEventNode.inEdges.length > 0) {
-                inEdges++;
+                label += startEventNode.label;
             }
         });
-        return inEdges > 0;
+        return label;
     }
 
-    // todo: work in progress
-    private validateGatewayNodes(gatewayNodes: SwitchableNode[]): void {
-        console.log('passiert noch nichts');
+    private isNotXorGateway(node: BpmnNode): boolean {
+        return BpmnUtils.isGateway(node) && !BpmnUtils.isXorGateway(node);
+    }
+
+    private isNotAndGateway(node: BpmnNode): boolean {
+        return BpmnUtils.isGateway(node) && !BpmnUtils.isAndGateway(node);
+    }
+
+    private isNotOrGateway(node: BpmnNode): boolean {
+        return BpmnUtils.isGateway(node) && !BpmnUtils.isOrGateway(node);
+    }
+
+    private isOneLabelEmpty(label1: string, label2: string): boolean {
+        return this.isEmpty(label1) || this.isEmpty(label2);
     }
 
 
-    private validateBpmnGraph(nodes: BpmnNode[]): void {
-        let startEventNodes: BpmnNode[] = [];
-        let endEventNodes: BpmnNode[] = [];
-        let bpmnTasks: BpmnNode[] = [];
+    private validateGateways(gateways: BpmnNode[]): void {
+        // todo: refactoring
+        gateways.forEach(gateway => {
+            // XOR-Gateway-Validierung
+            let gatewayInEdges = gateway.inEdges;
+            if (BpmnUtils.isXorGateway(gateway)) {
+                gatewayInEdges.forEach(gatewayInEdge => {
+                    if (this.isNotXorGateway(gatewayInEdge.from)) {
+                        if (this.isOneLabelEmpty(gatewayInEdge.from.label, gateway.label)) {
+                            this.errorMessage += "Ein Gateway (ohne Label) welches kein XOR-Gateway und referenziert auf ein andere Gateway (ohne Label) welches ein XOR-Gateway ist! "
+                        } else {
+                            this.errorMessage += gatewayInEdge.from.label + " ist kein XOR-Gateway und referenziert auf " + gateway.label + " welches ein XOR-Gateway ist! "
+                        }
+                    }
+                })
+            }
+
+            // AND-Gateway-Validierung
+            if (BpmnUtils.isAndGateway(gateway)) {
+                gatewayInEdges.forEach(gatewayInEdge => {
+                    if (this.isNotAndGateway(gatewayInEdge.from)) {
+                        if (this.isOneLabelEmpty(gatewayInEdge.from.label, gateway.label)) {
+                            this.errorMessage += "Ein Gateway (ohne Label) welches kein AND-Gateway und referenziert auf ein andere Gateway (ohne Label) welches ein AND-Gateway ist! "
+                        } else {
+                            this.errorMessage += gatewayInEdge.from.label + " ist kein AND-Gateway und referenziert auf " + gateway.label + " welches ein AND-Gateway ist! "
+                        }
+                    }
+                })
+            }
+
+            // OR-Gateway-Validierung
+            if (BpmnUtils.isOrGateway(gateway)) {
+                gatewayInEdges.forEach(gatewayInEdge => {
+                    if (this.isNotOrGateway(gatewayInEdge.from)) {
+                        if (this.isOneLabelEmpty(gatewayInEdge.from.label, gateway.label)) {
+                            this.errorMessage += "Ein Gateway (ohne Label) welches kein OR-Gateway und referenziert auf ein andere Gateway (ohne Label) welches ein OR-Gateway ist! "
+                        } else {
+                            this.errorMessage += gatewayInEdge.from.label + " ist kein OR-Gateway und referenziert auf " + gateway.label + " welches ein OR-Gateway ist! "
+                        }
+                    }
+                })
+            }
+        })
+    }
+
+
+    private validateGraph(nodes: BpmnNode[]): void {
+        let startEvents: BpmnNode[] = [];
+        let endEvents: BpmnNode[] = [];
+        let tasks: BpmnNode[] = [];
         let intermediateEventNodes: BpmnNode[] = [];
-        let gatewayNodes: BpmnNode[] = [];
+        let gateways: BpmnNode[] = [];
 
 
         nodes.forEach(node => {
             if (this.isEndEvent(node)) {
-                endEventNodes.push(node);
+                endEvents.push(node);
             }
             if (this.isStartEvent(node)) {
-                startEventNodes.push(node);
+                startEvents.push(node);
             }
             if (this.isBpmnTask(node)) {
-                console.log(node.label);
-                bpmnTasks.push(node);
+                tasks.push(node);
             }
             if (this.isIntermediateEvent(node)) {
                 intermediateEventNodes.push(node);
             }
             if (this.isGateway(node)) {
-                gatewayNodes.push(node);
+                gateways.push(node);
             }
         });
-        console.log(startEventNodes.length);
-        console.log(endEventNodes.length);
-        console.log('BpmnTask:');
-        console.log(bpmnTasks.length);
-        console.log(intermediateEventNodes.length);
-        console.log(gatewayNodes.length);
-        this.validateBpmnEndEventNodes(endEventNodes);
-        // this.validateBpmnIntermediateEventNodes(intermediateEventNodes); // muessen erst die passenden Faelle kommen
-        this.validateBpmnStartEventNodes(startEventNodes);
-        this.validateBpmnTasks(bpmnTasks);
-        // this.validateGatewayNodes(gatewayNodes);
+
+        // console.log(startEvents.length);
+        // console.log(endEvents.length);
+        // console.log('BpmnTask:');
+        // console.log(tasks.length);
+        // console.log(intermediateEventNodes.length);
+        // console.log(gateways.length);
+        this.validateEndEvents(endEvents);
+        this.validateStartEvents(startEvents);
+        this.validateTasks(tasks);
+        this.validateGateways(gateways);
 
     }
 
@@ -208,49 +225,32 @@ export class GraphValidationService {
         return node instanceof BpmnEventIntermediate;
     }
 
-    private validateBpmnIntermediateEventNodes(intermediateEventNodes: BpmnNode[]): void {
-        if (this.containsMissingInEdgesBpmn(intermediateEventNodes)) {
-            this.errorMessage += 'IntermediateEvent enthaelt keinen Eingang!';
-        }
-        // if(!this.containsOutEdgesBpmn(intermediateEventNodes)){
-        //     this.errorMessage += 'IntermediateEvent enthaelt keinen Ausgang!';
-        // }
-
-    }
-
-    // todo: wip - work in progress
-    private containsMissingInEdgesBpmn(intermediateEventNodes: BpmnNode[]) {
-        let missingInEdges: number = 0;
-        intermediateEventNodes.forEach(intermediateEventNode => {
-            console.log(intermediateEventNode.outEdges.length);
-            console.log(intermediateEventNode.inEdges.length);
-            if (intermediateEventNode.inEdges.length == 0) {
-                missingInEdges++;
-                console.log('containsMissingInEdgesBpmn');
-                console.log(intermediateEventNode.label);
-            }
-        });
-        return missingInEdges != 0;
-    }
-
-    private validateBpmnTasks(tasks: BpmnNode[]): void {
+    private validateTasks(tasks: BpmnNode[]): void {
         tasks.forEach(task => {
-            if (this.isAtTheBeginning(task)) {
-                this.errorMessage += 'Task enthaelt kein Startevent';
+            let taskLabelOfMissingStartEvent = this.getTaskLabelOfMissingStartEvent(task);
+            if (!this.isEmpty(taskLabelOfMissingStartEvent)) {
+                this.errorMessage += `Task mit dem Label "${taskLabelOfMissingStartEvent}" enthaelt keinen Eingang. `;
             }
-            if (this.hasMissingOutEdges(task)) {
-                this.errorMessage += 'Task enthaelt Fehlerhafte Ausgabe/Referenz';
+            let getLabelOfTaskWithMissingOutEdges = this.hasMissingOutEdges(task);
+            if (!this.isEmpty(getLabelOfTaskWithMissingOutEdges)) {
+                this.errorMessage += `Task mit dem Label "${getLabelOfTaskWithMissingOutEdges}" hat keine Kanten die auf etwas referenzieren! `;
             }
         })
 
     }
 
-    private isAtTheBeginning(task: BpmnNode): boolean {
-        return (task.inEdges.length === 0) && !this.isStartEvent(task);
+    private getTaskLabelOfMissingStartEvent(task: BpmnNode): string {
+        if (task.inEdges.length === 0) {
+            return task.label;
+        }
+        return '';
 
     }
 
-    private hasMissingOutEdges(task: BpmnNode) {
-        return task.outEdges.length === 0;
+    private hasMissingOutEdges(task: BpmnNode): string {
+        if (task.outEdges.length === 0) {
+            return task.label;
+        }
+        return '';
     }
 }
