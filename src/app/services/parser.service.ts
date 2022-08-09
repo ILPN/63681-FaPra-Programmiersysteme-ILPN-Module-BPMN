@@ -387,7 +387,7 @@ export class ParserService {
                         let sequence = new BpmnEdge(name, node1, node2);
                         sequence.labelMid = description;
 
-                        if(node1.constructor.name === 'BpmnGatewaySplitXor' && node2.constructor.name === 'BpmnGatewayJoinXor') {
+                        if(node1.constructor.name === 'BpmnGatewaySplitXor' && node2.constructor.name === 'BpmnGatewayJoinXor' || node1.constructor.name === 'BpmnGatewaySplitOr' && node2.constructor.name === 'BpmnGatewayJoinOr') {
                             sequence = new BpmnEdgeDefault(name,node1,node2);
                         } else if(lineSplit[2]) {
                             switch(lineSplit[1].toLowerCase()){

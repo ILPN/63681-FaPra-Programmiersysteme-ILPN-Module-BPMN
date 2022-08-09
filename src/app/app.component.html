@@ -1,11 +1,10 @@
 <app-error-hint></app-error-hint>
-<button (click)="validateGraph()">validate Graph</button>
-<p *ngIf="graphIsValid">Validierung abgeschlossen. Der angezeigte Graph ist valide.</p>
+
 
 <div fxLayout="column" fxLayoutAlign="start stretch">
     <!--  Header  -->
     <a href="https://www.fernuni-hagen.de/ilovepetrinets/"><h1>I <span class="red">❤</span> Petri Nets</h1></a>
-    <h2>Subtitle</h2>
+    <h2>BPMN</h2>
     <app-mode-switch></app-mode-switch>
     <!--    Main content    -->
     <div [ngSwitch]="mode">
@@ -15,8 +14,10 @@
         class="padding full-size"></app-display-reorder-graph>
         <app-display-switch-graph *ngSwitchCase="'switch diagram'"
         class="padding full-size"></app-display-switch-graph>
-    </div>
-
+    
+    <button (click)="validateGraph()" style="margin-left:15px" mat-raised-button>validate Graph</button>
+    <p *ngIf="graphIsValid">Validierung abgeschlossen. Der angezeigte Graph ist valide.</p>
+</div>
     <div fxLayout="row" fxLayoutAlign="space-evenly start">
         <input-field buttonText="File upload"
                      buttonIcon="publish"
