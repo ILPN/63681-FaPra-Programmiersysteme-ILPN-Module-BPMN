@@ -77,6 +77,10 @@ export class TaskExporter extends Exporter {
         if (BpmnUtils.isSendingTask(bpmnNode))
             return Namespace.SEND_TASK_ELEMENT
 
+        //general task without type
+        if (BpmnUtils.isTask(bpmnNode))
+            return Namespace.TASK_ELEMENT
+
         return undefined
     }
 }

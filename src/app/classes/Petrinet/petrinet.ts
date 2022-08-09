@@ -138,7 +138,7 @@ export class Petrinet {
     }
 
     private connectSubnets(before: PnSubnet, after: PnSubnet): void {
-
+        
         let result = before.addArcTo(after.inputPlace!);//null-verification caught in result
         if (result.ok)
             after.inputPlace!.setConnected()

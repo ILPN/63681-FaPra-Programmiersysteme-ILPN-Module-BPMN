@@ -108,7 +108,7 @@ export class XmlExporter {
     }
 
     private convertBpmnNodeToXml(bpmnNode: BpmnNode) {
-        console.log("converting " + bpmnNode.id + " : " + bpmnNode.label)
+        
         BpmnUtils.isStartEvent(bpmnNode) && this.createStartEvent(bpmnNode)
 
         BpmnUtils.isTask(bpmnNode) && this.createTask(bpmnNode)

@@ -19,9 +19,7 @@ export class PnAndJoin extends PnSubnet {
             let place = this.addPlace(Place.create({ isStartPlace: false }));
             this.addArc(Arc.create(place, this.transitions[0]))
         }
-        console.log("AND JOIN places ")
-        for (let place of this.places)
-            console.log("Place " + place.id + " is connected: " + place.isConnected())
+       
     }
 
     /**

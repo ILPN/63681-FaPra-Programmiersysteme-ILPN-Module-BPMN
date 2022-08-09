@@ -29,7 +29,7 @@ export class EdgeExporter extends Exporter {
      * @returns XML element as a child of sourceElement under <bpmn:process>
      */
     createBpmnOutgoingXml(bpmnEdge: BpmnEdge, sourceElement: Element, sourceShape: Element): { element: Element | null, error: string } {
-        console.log("Edge id " + bpmnEdge.id + " from " + bpmnEdge.from.label + " to " + bpmnEdge.to.label)
+        
         if (!sourceElement)
             return { element: null, error: this.NO_SOURCE_ELEMENT_ERR + bpmnEdge.id}
 
