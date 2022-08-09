@@ -1,0 +1,31 @@
+.events
+e1 start ""
+e2 end "Reise gebucht"
+
+.activities
+t1 usertask "Reise planen"
+t2 usertask "Flug suchen"
+t3 usertask "Hotel suchen"
+t4 sending "Flug buchen"
+t5 sending "Hotel buchen"
+t6 service "Reiseunterlagen speichern"
+
+
+.gateways 
+g1 and_split ""
+g2 and_join ""
+
+.sequences
+a1 sequenceflow "a1" e1 t1
+a2 sequenceflow "a2" t1 g1
+a3 sequenceflow "a3" g1 t2
+a4 sequenceflow "a4 " g1 t3
+a5 sequenceflow "a5" t2 t4
+a6 sequenceflow "a6" t3 t5
+a7 sequenceflow "a7" t4 g2
+a8 sequenceflow "a8" t5 g2
+a9 sequenceflow "a9" g2 t6
+a10 sequenceflow "a10" t6 e2
+
+
+

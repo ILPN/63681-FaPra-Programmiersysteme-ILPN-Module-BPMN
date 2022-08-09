@@ -1,0 +1,35 @@
+.events
+e1 start "2 Monate vor Urlaubsbeginn"
+e2 start "Werbung fuer lateinamerikanische Laender"
+e3 intermediate "Flug ist gebucht"
+e4 intermediate "Hotel ist gebucht"
+e5 intermediate "Buchungsbestaetigung ist erhalten"
+e6 intermediate "Buchungsbestaetigung ist erhalten"
+e7 end "Reise gebucht"
+
+.activities
+t1 usertask "Reise planen"
+t2 usertask "Flug suchen"
+t3 usertask " Hotel Suchen"
+t4 service "Reiseunterlagen speichern"
+
+.gateways 
+g1 xor_join ""
+g2 and_split ""
+g3 and_join ""
+
+.sequences
+a1 sequenceflow "a1" e1 g1
+a2 sequenceflow "a2" e2 g1
+a3 sequenceflow "a3" g1 t1
+a4 sequenceflow "a4 " t1 g2
+a5 sequenceflow "a5" g2 t2
+a6 sequenceflow "a6" g2 t3
+a7 sequenceflow "a7" t2 e3
+a8 sequenceflow "a8" t3 e4
+a9 sequenceflow "a9" e3 e5
+a10 sequenceflow "a10" e4 e6
+a11 sequenceflow "a11" e5 g3
+a12 sequenceflow "a12" e6 g3
+a13 sequenceflow "a13" g3 t4
+a14 sequenceflow "a14" t4 e7

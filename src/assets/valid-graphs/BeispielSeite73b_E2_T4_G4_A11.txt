@@ -1,0 +1,28 @@
+.events
+e1 start ""
+e2 end ""
+
+.activities
+t1 none "Genehmigung einholen"
+t2 none " Reise planen"
+t3 none "Flug buchen"
+t4 none "Hotel buchen"
+
+.gateways 
+g1 xor_split ""
+g2 xor_join ""
+g3 and_split ""
+g4 and_join ""
+
+.sequences
+a1 sequenceflow "a1" e1 g1
+a2 sequenceflow "a2" g1 t1
+a3 sequenceflow "a3" t1 t2
+a4 sequenceflow "a4 " t2 g3
+a5 sequenceflow "a5" g3 t3
+a6 sequenceflow "a6" g3 t4
+a7 sequenceflow "a7" t3 g4
+a8 sequenceflow "a8" t4 g4
+a9 sequenceflow "a9" g4 g2
+a10 sequenceflow "a10" g2 e2
+a11 sequenceflow "a11" g2 g1

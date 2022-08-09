@@ -1,0 +1,23 @@
+.events
+e1 start "Start"
+e2 end "Ende"
+
+.activities
+t1 service "BpmnTaskService"
+t2 manual "BpmnTaskManual"
+t3 usertask "BpmnTaskUser"
+t4 usertask "Boese"
+
+.gateways 
+g1 or_split ""
+g2 or_join ""
+
+.sequences
+connector1 sequenceflow "a1" e1 t1
+connector2 sequenceflow "a2" t1 g1
+connector3 sequenceflow "a3" g1 t2
+connector4 sequenceflow "a4" g1 t3
+connector5 sequenceflow "a5" t2 g2
+connector6 sequenceflow "a6" t3 g2
+connector7 sequenceflow "a7" g2 e2
+connector8 sequenceflow "a8" t4 g2

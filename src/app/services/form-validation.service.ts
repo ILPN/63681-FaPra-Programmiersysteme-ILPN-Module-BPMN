@@ -50,7 +50,7 @@ export class FormValidationService {
             //die für die Eingabe gültig sind, dann kann ich sie hier mit überprüfen
             //aktuell sind nur die Typen für Gateways eindeutig definiert
 
-            case "activities": regexp = /^[\w]+ (Sending|Manual|Service|BusinessRule|Receiving|UserTask) "[\w ]*"(?: \([0-9]*,[0-9]*\))?/i; break;
+            case "activities": regexp = /^[\w]+ (None|Sending|Manual|Service|BusinessRule|Receiving|UserTask) "[\w ]*"(?: \([0-9]*,[0-9]*\))?/i; break;
             case "sequences": regexp = /^[\w]+ (SequenceFlow|Association|InformationFlow) "[\w ]*" [\w]+ [\w]+(?: \([0-9]*,[0-9]*\))?/i; break;
             case "events": regexp = /^[\w]+ (Start|End|Intermediate) "[\w ]*"(?: \([0-9]*,[0-9]*\))?/i; break;
             case "gateways": regexp = /^[\w]+ (XOR_SPLIT|XOR_JOIN|AND_SPLIT|AND_JOIN|OR_SPLIT|OR_JOIN) "[\w ]*"(?: \([0-9]*,[0-9]*\))?/i; break;
