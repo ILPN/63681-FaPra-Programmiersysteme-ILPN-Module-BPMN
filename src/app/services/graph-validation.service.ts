@@ -37,11 +37,15 @@ export class GraphValidationService {
 
     private validateEndEvents(endEvents: BpmnNode[]): void {
         if (!this.cointainsEndEvent(endEvents)) {
-            this.errorMessage += 'Graph enthaelt kein EndEvent! ';
+            this.errorMessage += 'Graph enthaelt kein EndEvent!\n';
         } else {
             let outgoingEdgeLabel: string = this.getOutgoingEdgeLabel(endEvents);
             if (!this.isEmpty(outgoingEdgeLabel)) {
-                this.errorMessage += `EndEvent mit dem Label "${outgoingEdgeLabel}" enthaelt  einen Ausgang!`;
+                this.errorMessage += `EndEvent mit dem Label "${outgoingEdgeLabel}" enthaelt  einen Ausgang!\n`;
+            }
+            let labelOfStartEventWithInEdges = this.getLabelOfStartEventWithInEdges(endEvents);
+            if (this.isEmpty(labelOfStartEventWithInEdges)) {
+                this.errorMessage += `EndEvent mit dem Label "${labelOfStartEventWithInEdges}" hat keine eingehende Kanten!\n`;
             }
         }
     }
@@ -62,7 +66,11 @@ export class GraphValidationService {
         } else {
             let labelOfStartEventWithInEdges = this.getLabelOfStartEventWithInEdges(startEventNodes);
             if (!this.isEmpty(labelOfStartEventWithInEdges)) {
-                this.errorMessage += `StartEvent mit dem Label "${labelOfStartEventWithInEdges}" hat eingehende Kanten! `;
+                this.errorMessage += `StartEvent mit dem Label "${labelOfStartEventWithInEdges}" hat eingehende Kanten!\n`;
+            }
+            let outgoingEdgeLabel: string = this.getOutgoingEdgeLabel(startEventNodes);
+            if (this.isEmpty(outgoingEdgeLabel)) {
+                this.errorMessage += `StartEvent mit dem Label "${outgoingEdgeLabel}" enthaelt  keinen Ausgang!\n`;
             }
         }
 
