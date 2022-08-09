@@ -73,7 +73,7 @@ export class BpmnGraph
     static sampleGraph(): BpmnGraph {
         const g = new BpmnGraph();
         let e1 = new BpmnEventStart("E1");
-        e1.label = "Am Start!"
+        e1.label = "Am Start!1"
         e1.setPosXY(60, 190);
         g.addNode(e1);
 
