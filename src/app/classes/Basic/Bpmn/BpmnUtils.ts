@@ -299,12 +299,12 @@ export class BpmnUtils {
         * @param node node to start traversal from
         * @returns matching gateway or null if not found
         */
-    public static getCorrespondingGatewayWithoutTyp(gateway: BpmnGateway): BpmnGateway | null {
+    public static getCorrespondingGatewayWithoutType(gateway: BpmnGateway): BpmnGateway | null {
         if (this.isJoinGateway(gateway))
-            return this.getCorrespondingSplitWithoutTyp(gateway)
+            return this.getCorrespondingSplitWithoutType(gateway)
 
         if (this.isSplitGateway(gateway))
-            return this.getCorrespondingJoinWithoutTyp(gateway)
+            return this.getCorrespondingJoinWithoutType(gateway)
 
         return null
     }
@@ -314,7 +314,7 @@ export class BpmnUtils {
        * @param node node to start traversal from
        * @returns preceding SPLIT gateway or null if not found
        */
-    public static getCorrespondingSplitWithoutTyp(node: BpmnNode): BpmnGateway | null {
+    public static getCorrespondingSplitWithoutType(node: BpmnNode): BpmnGateway | null {
         if (!node)
             return null
 
@@ -326,7 +326,7 @@ export class BpmnUtils {
 
 
             if (this.isJoinGateway(node))
-                node = this.getCorrespondingSplitWithoutTyp(node)!;
+                node = this.getCorrespondingSplitWithoutType(node)!;
         }
 
 
@@ -337,7 +337,7 @@ export class BpmnUtils {
     * @param node node to start traversal from
     * @returns succeeding JOIN gateway or null if not found
     */
-    public static getCorrespondingJoinWithoutTyp(node: BpmnNode): BpmnGateway | null {
+    public static getCorrespondingJoinWithoutType(node: BpmnNode): BpmnGateway | null {
         if (!node)
             return null
 
@@ -349,7 +349,7 @@ export class BpmnUtils {
 
             //nested AND gateway
             if (this.isSplitGateway(node))
-                node = this.getCorrespondingJoinWithoutTyp(node)!;
+                node = this.getCorrespondingJoinWithoutType(node)!;
         }
         return null;
     }

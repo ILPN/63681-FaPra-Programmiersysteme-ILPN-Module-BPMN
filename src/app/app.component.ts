@@ -127,6 +127,7 @@ this.textareaFc.setValue(s);
     }
 
     private processSourceChange(newSource: string) {
+        this.graphIsValid = false
         this.result = this._parserService.parse(newSource);
         if (this.result) {
 

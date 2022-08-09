@@ -149,7 +149,7 @@ export class GraphValidationService {
             //         }
             //     })
             // }
-            var correspondingGateway = BpmnUtils.getCorrespondingGatewayWithoutTyp(gateway as BpmnGateway);
+            var correspondingGateway = BpmnUtils.getCorrespondingGatewayWithoutType(gateway as BpmnGateway);
             if (correspondingGateway != null) {
                 if (BpmnUtils.isJoinGateway(gateway)) {
                     if (!BpmnUtils.splitJoinSameType(correspondingGateway, gateway as BpmnGateway)) {
