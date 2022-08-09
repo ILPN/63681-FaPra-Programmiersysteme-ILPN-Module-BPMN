@@ -236,6 +236,9 @@ export class ParserService {
 
         if(lineSplit[2]){
         switch (lineSplit[1].toLowerCase()) {
+            case ("none"):
+                activity = new BpmnTask(name);
+                break;
             case ("sending"):
                 activity = new BpmnTaskSending(name);
                 break;
