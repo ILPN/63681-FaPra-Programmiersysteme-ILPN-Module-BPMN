@@ -75,7 +75,7 @@ export class Validator {
     private validateTask(task: BpmnTask): { errors: string, valid: boolean } {
         let message: string = "";
 
-        let messageStart = " Task " + task.label + " ";
+        let messageStart = " Task " + this.getLabel(task) + " ";
 
         if (BpmnUtils.hasNoInEdges(task))
             message += messageStart + this.HAS_NO_IN_EDGES
@@ -90,6 +90,14 @@ export class Validator {
             message += messageStart + this.HAS_MULTIPLE_OUT_EDGES
 
         return this.getValidationResult(message);
+
+    }
+
+    private getLabel(node: BpmnNode): string {
+        if (!node.label)
+            return node.id
+
+        return node.label
 
     }
 
@@ -109,7 +117,7 @@ export class Validator {
 
         let message = "";
 
-        let messageStart = " StartEvent " + startEvent.label + " ";
+        let messageStart = " StartEvent " + this.getLabel(startEvent) + " ";
         if (BpmnUtils.hasInEdges(startEvent))
             message += messageStart + this.HAS_IN_EDGES;
 
@@ -129,7 +137,7 @@ export class Validator {
 
         let message = "";
 
-        let messageStart = " Event " + intermEvent.label + " ";
+        let messageStart = " Event " + this.getLabel(intermEvent) + " ";
         if (BpmnUtils.hasNoInEdges(intermEvent))
             message += messageStart + this.HAS_NO_IN_EDGES
 
@@ -156,7 +164,7 @@ export class Validator {
     private validateEndEvent(endEvent: BpmnEventEnd): { errors: string, valid: boolean } {
         let message = "";
 
-        let messageStart = " EndEvent " + endEvent.label + " ";
+        let messageStart = " EndEvent " + this.getLabel(endEvent) + " ";
         if (BpmnUtils.hasNoInEdges(endEvent))
             message += messageStart + this.HAS_NO_IN_EDGES
 
@@ -178,7 +186,7 @@ export class Validator {
     validateGateway(gateway: BpmnGateway): { errors: string, valid: boolean } {
         let message = "";
 
-        let messageStart = " Gateway " + gateway.label + " ";
+        let messageStart = " Gateway " + this.getLabel(gateway) + " ";
         if (BpmnUtils.hasNoInEdges(gateway))
             message += messageStart + this.HAS_NO_IN_EDGES
 
@@ -193,8 +201,10 @@ export class Validator {
         } else {
             if (BpmnUtils.hasOnlyOneOutEdge(gateway)) message += messageStart + this.HAS_NO_MULTIPLE_OUT_EDGES
             if (BpmnUtils.hasMultipleInEdges(gateway)) message += messageStart + this.HAS_MULTIPLE_IN_EDGES;
-            if (BpmnUtils.hasNoMatchingGateway(gateway))
-                message += messageStart + this.getNoMatchingGatewayError(gateway)
+
+            if (!BpmnUtils.isSplitXor(gateway))
+                if (BpmnUtils.hasNoMatchingGateway(gateway))
+                    message += messageStart + this.getNoMatchingGatewayError(gateway)
         }
 
         return this.getValidationResult(message);
