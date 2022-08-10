@@ -14,8 +14,8 @@ t8 none "Vorauszahlung durchfuehren"
 t9 none "Reise durchfuehren"
 
 .gateways 
-g1 xor_split ""
-g2 xor_join ""
+g1 xor_join ""
+g2 xor_split ""
 g3 and_split ""
 g4 and_join ""
 g5 or_split ""
