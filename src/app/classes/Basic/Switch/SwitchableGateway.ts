@@ -90,7 +90,6 @@ export class SwitchableGateway extends SwitchableNode {
      */
     private switchXorSplit(clicked: SwitchableNode): SwitchableNode[] {
         //disable all alternative successors of this XOR gateway
-        console.log("Press XOR");
         this.successors.forEach(after => {
             if (!(after === clicked)) {
                 after.disable();
