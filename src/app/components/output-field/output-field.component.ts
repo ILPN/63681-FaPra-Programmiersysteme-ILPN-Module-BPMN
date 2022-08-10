@@ -31,10 +31,12 @@ export class OutputFieldComponent {
     }
 
     download(type: string) {
-        let textToExport;
+        this.resetButton(type)
+        let textToExport = null;
         let filetype = '.txt';
         switch (type) {
             case 'bpmn': {
+                
                 textToExport = this.text;
                 if (textToExport) {
                     if (!this.formValidationService.validateFormat(textToExport)) {
@@ -83,15 +85,27 @@ export class OutputFieldComponent {
             }
         }
 
-        if (textToExport) {
-            let a = document.getElementById(type);
-            if (a && textToExport) {
-                a.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(textToExport));
-                a.setAttribute('download', type + filetype);
-            }
+
+        let a = document.getElementById(type);
+        if (a && textToExport) {
+            a.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(textToExport));
+            a.setAttribute('download', type + filetype);
+
+        }
+
+
+
+    }
+    private resetButton(type: string) {
+        let a = document.getElementById(type);
+        if (a) {
+            if (a.getAttribute('href'))
+                a.removeAttribute('href')
+
+            if (a.getAttribute('download'))
+                a.removeAttribute('download');
         }
     }
-
     private validate(): BpmnGraph | null {
         let graph = this.displayService.diagram;
         //no graph
