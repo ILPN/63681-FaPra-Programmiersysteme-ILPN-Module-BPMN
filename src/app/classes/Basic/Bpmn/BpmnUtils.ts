@@ -257,6 +257,14 @@ export class BpmnUtils {
     public static isJoinOr(node: BpmnNode): boolean {
         return node instanceof BpmnGatewayJoinOr
     }
+ /** get a Notation of the Node as String with "mit der ID node.id"  or "mit dem Namen node.label" */
+    public static getNotationNode(node: BpmnNode): String {
+        let name = 'mit der ID " '+node.id+'"';
+        if (node.label !== null && node.label !== "") {
+            name = 'mit dem Namen "' + node.label+'" ';
+        }
+        return name;
+    }
 
     /**
      * gets successor of the specified node

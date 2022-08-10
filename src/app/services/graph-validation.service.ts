@@ -149,6 +149,17 @@ export class GraphValidationService {
             //         }
             //     })
             // }
+            if(BpmnUtils.isSplitGateway(gateway)) {
+                if(gateway.inEdges.length === 0)  this.errorMessage += "Das Split-Gateway " + BpmnUtils.getNotationNode(gateway) + " verfügt über keinen Eingang.\n"
+                if(gateway.inEdges.length > 1)    this.errorMessage += "Das Split-Gateway " + BpmnUtils.getNotationNode(gateway) + " verfügt über mehrere Eingänge. Dies verstößt gegen Modellierungsrichtlinien.\n"
+                if(gateway.outEdges.length === 0)  this.errorMessage += "Das Split-Gateway " + BpmnUtils.getNotationNode(gateway) + " verfügt über keinen Ausgang.\n"
+                if(gateway.outEdges.length === 1)    this.errorMessage += "Das Split-Gateway " + BpmnUtils.getNotationNode(gateway) + " verfügt nur über einen Ausgang. Dies verstößt gegen Modellierungsrichtlinien.\n"
+            } else {
+                  if(gateway.inEdges.length === 0)  this.errorMessage += "Das Join-Gateway " + BpmnUtils.getNotationNode(gateway) + " verfügt über keinen Eingang.\n"
+                  if(gateway.inEdges.length === 1)    this.errorMessage += "Das Join-Gateway " + BpmnUtils.getNotationNode(gateway) + " verfügt nur über einen Eingang. Dies verstößt gegen Modellierungsrichtlinien.\n"
+                  if(gateway.outEdges.length === 0)  this.errorMessage += "Das Join-Gateway " + BpmnUtils.getNotationNode(gateway) + " verfügt über keinen Ausgang.\n"
+                  if(gateway.outEdges.length > 1)    this.errorMessage += "Das Join-Gateway " + BpmnUtils.getNotationNode(gateway) + " verfügt über mehrere Ausgänge. Dies verstößt gegen Modellierungsrichtlinien.\n"
+            }
             var correspondingGateway = BpmnUtils.getCorrespondingGatewayWithoutType(gateway as BpmnGateway);
             if (correspondingGateway != null) {
                 if (BpmnUtils.isJoinGateway(gateway)) {
@@ -165,12 +176,8 @@ export class GraphValidationService {
     }
 
     private gatewayErrorMassage(gateway: BpmnGateway, correspondingGateway: BpmnGateway) {
-        let nameGateway = "mit der ID: " + gateway.id;
-        let nameCorrespondingGateway = "mit der ID: " + correspondingGateway.id;
-        if (gateway.label !== null && gateway.label !== "" && correspondingGateway.label !== null && correspondingGateway.label !== "") {
-            nameGateway = "mit dem Namen " + gateway.label;
-            nameCorrespondingGateway = "mit dem Namen " + correspondingGateway.label;
-        }
+        let nameGateway = BpmnUtils.getNotationNode(gateway);
+        let nameCorrespondingGateway = BpmnUtils.getNotationNode(correspondingGateway);
         let splitOrJoinGateway: String = this.gatewaySplitOrJoinAsString(gateway);
         let typGateway: String = this.gatewayTypAsString(gateway);
         let splitOrJoinCorrespondingGateway: String = this.gatewaySplitOrJoinAsString(correspondingGateway);
@@ -178,6 +185,8 @@ export class GraphValidationService {
         this.errorMessage += "Das " + splitOrJoinGateway + "-Gateway " + nameGateway + " hat als zugehöriges " + splitOrJoinCorrespondingGateway + "-Gateway, das Gateway " + nameCorrespondingGateway + ". Diese besitzen jedoch unterschiedliche Typen (" + typGateway + "|" + typCorrespondingGateway + ") und können deshalb nicht zusammengehören.\n"
 
     }
+
+
 
     private gatewaySplitOrJoinAsString(gateway: BpmnGateway): String {
         if (BpmnUtils.isSplitGateway(gateway)) return "Split";
