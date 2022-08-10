@@ -9,8 +9,8 @@ t3 none "Flug buchen"
 t4 none "Hotel buchen"
 
 .gateways 
-g1 xor_split ""
-g2 xor_join ""
+g1 xor_join ""
+g2 xor_split ""
 g3 and_split ""
 g4 and_join ""
 
