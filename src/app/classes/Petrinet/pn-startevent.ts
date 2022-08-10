@@ -13,7 +13,7 @@ export class PnStartEvent extends PnSubnet {
 
     }
     override addInputPlace(): Place {
-       return this.addPlace(Place.create({ isStartPlace: true }));
+       return this.addPlace(Place.create());
     }
 
 }
