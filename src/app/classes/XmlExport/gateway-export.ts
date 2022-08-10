@@ -1,32 +1,35 @@
 import { BpmnNode } from "../Basic/Bpmn/BpmnNode"
 import { BpmnUtils } from "../Basic/Bpmn/BpmnUtils"
 import { Constants } from "./constants"
+import { Exporter } from "./exporter"
 import { Namespace } from "./namespaces"
 import { Random, Utils } from "./utils"
 
 /**
  * creates XML representation for gateways
  */
-export class GatewayExporter {
-
-    constructor(public xmlDoc: XMLDocument) {
-
-    }
+export class GatewayExporter extends Exporter {
 
     /**
      * creates XML element <bpmn:> of corresponding gateway type under <bpmn:process>
      * @param bpmnNode 
      * @returns 
      */
-    bpmnGatewayXml(bpmnNode: BpmnNode): Element {
+    bpmnGatewayXml(bpmnNode: BpmnNode): { element: Element | null, error: string } {
 
         //add under <bpmn:process>
-        let gateway = this.xmlDoc.createElementNS(Namespace.BPMN, this.getTagName(bpmnNode))
-        gateway.setAttribute("id", bpmnNode.id + "_" + Random.id())
-        if (bpmnNode.label)
-            gateway.setAttribute("name", bpmnNode.label)
+        let createGatewayResult = this.createElementNS(bpmnNode, Namespace.BPMN, this.getTagName(bpmnNode))
+        if (createGatewayResult.element) {
+            let gateway = createGatewayResult.element
+            gateway.setAttribute("id", bpmnNode.id + "_" + Random.id())
+            if (bpmnNode.label)
+                gateway.setAttribute("name", bpmnNode.label)
 
-        return gateway
+            return { element: gateway, error: "" }
+
+        }
+
+        return { element: null, error: createGatewayResult.error }
     }
 
     /**
@@ -62,12 +65,15 @@ export class GatewayExporter {
     }
 
     //gateway type
-    private getTagName(bpmnNode: BpmnNode): string {
+    private getTagName(bpmnNode: BpmnNode): string | undefined {
         if (BpmnUtils.isAndGateway(bpmnNode))
             return Namespace.PARALLEL_GATEWAY_ELEMENT
         if (BpmnUtils.isOrGateway(bpmnNode))
             return Namespace.INCLUSIVE_GATEWAY_ELEMENT
 
-        return Namespace.EXCLUSIVE_GATEWAY_ELEMENT
+        if (BpmnUtils.isXorGateway(bpmnNode))
+            return Namespace.EXCLUSIVE_GATEWAY_ELEMENT
+
+        return undefined
     }
 }

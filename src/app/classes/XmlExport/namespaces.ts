@@ -24,6 +24,8 @@ export class Namespace {
     public static START_ELEMENT = this.bpmn(this.START)
     public static END = "endEvent"
     public static END_ELEMENT = this.bpmn(this.END)
+    public static INTERMEDIATE_EVENT = "intermediateThrowEvent"
+    public static INTERMEDIATE_EVENT_ELEMENT = this.bpmn(this.INTERMEDIATE_EVENT)
     public static OUTGOING = "outgoing"
     public static OUTGOING_ELEMENT = this.bpmn(this.OUTGOING)
     public static INCOMING = "incoming"

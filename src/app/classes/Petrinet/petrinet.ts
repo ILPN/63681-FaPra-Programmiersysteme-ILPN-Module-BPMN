@@ -1,5 +1,9 @@
+import { BpmnEdge } from "../Basic/Bpmn/BpmnEdge/BpmnEdge";
 import { BpmnNode } from "../Basic/Bpmn/BpmnNode";
 import { BpmnUtils } from "../Basic/Bpmn/BpmnUtils";
+import { BpmnEventStart } from "../Basic/Bpmn/events/BpmnEventStart";
+import { BpmnGatewaySplitOr } from "../Basic/Bpmn/gateways/BpmnGatewaySplitOr";
+import { BpmnGatewaySplitXor } from "../Basic/Bpmn/gateways/BpmnGatewaySplitXor";
 import { Arc } from "./arc";
 import { Place } from "./place";
 import { PlaceCounter } from "./place-counter";
@@ -31,9 +35,10 @@ export class Petrinet {
 
         //in principle, nodes can be processed in any order;
         //we process them in specific order to make indexing of the corresponding places more transparent 
-        this.convert(BpmnUtils.getStartEvents, bpmnNodes)
+        this.convertStartEvents(BpmnUtils.getStartEvents(bpmnNodes))
         this.convert(BpmnUtils.getTasks, bpmnNodes)
         this.convert(BpmnUtils.getGateways, bpmnNodes)
+        this.convert(BpmnUtils.getIntermedEvents, bpmnNodes)
         this.convert(BpmnUtils.getEndEvents, bpmnNodes)
 
         // OR-Split-Transitions and OR-join-Transitions need to be connected by a direct arc with a place inbetween
@@ -41,6 +46,42 @@ export class Petrinet {
         //we can only be sure to have all necessary transitions after every BPMN node has been converted
         this.connectEachOrSplitWithOrJoin()
     }
+
+    private convertStartEvents(startEvents: Array<BpmnNode>) {
+        //if there is one start - process as any other node
+        if (startEvents.length === 1)
+            this.createSingeStartEvent(startEvents[0])
+
+        //add petrinet representation of XOR Split and connect all start events to it
+        else
+            this.createSplitXorBeforeStartEvents(startEvents)
+
+    }
+
+    private createSingeStartEvent(startEvent: BpmnNode) {
+        let start = this.addSubnetForEachOutgoingConnection(startEvent)
+        start.inputPlace?.setAsPetrinetStart()
+
+    }
+
+    private createSplitXorBeforeStartEvents(startEvents: Array<BpmnNode>) {
+
+        //create fake BPMN node to realize XOR split before real start events
+        let fakeSplitXor = new BpmnGatewaySplitXor("FakeStart");
+        fakeSplitXor.label = "FakeStart"
+
+        //connect fake XOR split to start events 
+        startEvents.forEach(start => fakeSplitXor.addOutEdge(new
+            BpmnEdge(fakeSplitXor.id + start.id, fakeSplitXor, start)))
+
+        let fakeStart = this.addSubnetForEachOutgoingConnection(fakeSplitXor)
+        fakeStart.inputPlace!.setAsPetrinetStart()
+
+        startEvents.forEach(start => this.addSubnetForEachOutgoingConnection(start))
+
+    }
+
+
 
     private convert(filter: (nodes: Array<BpmnNode>) => Array<BpmnNode>, bpmnNodes: Array<BpmnNode>) {
         let filteredNodes = filter(bpmnNodes);
@@ -126,13 +167,15 @@ export class Petrinet {
 
     //each BPMN element is represented by PnSubnet - a collection of places and transitions
     //connect the subnet for the specified BPMN node with the subnets of the outgoing connections
-    private addSubnetForEachOutgoingConnection(bpmnNode: BpmnNode): void {
+    private addSubnetForEachOutgoingConnection(bpmnNode: BpmnNode): PnSubnet {
         let before: PnSubnet = this.add(bpmnNode);
 
         bpmnNode.outEdges.forEach(outEdge => {
             let after: PnSubnet = this.add(outEdge.to);
             this.connectSubnets(before, after);
         })
+
+        return before
 
     }
 
@@ -186,7 +229,6 @@ export class Petrinet {
 
         return new PnSubnet(bpmnNode)
     }
-
 
 }
 

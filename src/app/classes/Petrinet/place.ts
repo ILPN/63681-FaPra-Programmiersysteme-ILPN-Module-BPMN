@@ -2,28 +2,30 @@ import { PlaceCounter } from "./place-counter";
 import { PnElement } from "./pn-element"
 
 export class Place extends PnElement {
+    private _token: number
 
-
-    private constructor(id: number, public token: number) {
+    private constructor(id: number) {
         super("p_" + id)
+
+        //token = 0 for non-start place
+        this._token = 0
 
     }
 
-    static create(args: { isStartPlace: boolean }): Place {
+    setAsPetrinetStart() {
+        this._token = 1
+    }
+
+    static create(): Place {
         let id = PlaceCounter.get();
         PlaceCounter.increment()
 
-        //token = 1 for start place
-        if (args.isStartPlace)
-            return new Place(id, 1);
 
-
-        //token = 0 for non-start place
-        return new Place(id, 0);
+        return new Place(id);
     }
 
     print(): string {
-        return this.id + " " + this.token
+        return this.id + " " + this._token
     }
 
 
