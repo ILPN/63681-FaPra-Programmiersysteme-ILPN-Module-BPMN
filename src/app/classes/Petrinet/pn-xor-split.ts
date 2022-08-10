@@ -1,6 +1,5 @@
 import { BpmnNode } from "../Basic/Bpmn/BpmnNode";
 import { Arc } from "./arc";
-import { Place } from "./place";
 import { PnElement } from "./pn-element";
 import { PnSubnet } from "./pn-subnet";
 import { Transition } from "./transition";
@@ -31,6 +30,8 @@ export class PnXorSplit extends PnSubnet {
         }
 
     }
+
+    
 
     override addArcTo(to: PnElement) : {error: string, ok: boolean}{
         let transition: Transition | undefined = this.findNotConnectedTransition();

@@ -123,7 +123,7 @@ export class PnSubnet {
     }
 
     addInputPlace(): Place {
-        return this.addPlace(Place.create({ isStartPlace: false }));
+        return this.addPlace(Place.create());
     }
 
     getTransitionsByIds(ids: Array<string>): Array<Transition> {

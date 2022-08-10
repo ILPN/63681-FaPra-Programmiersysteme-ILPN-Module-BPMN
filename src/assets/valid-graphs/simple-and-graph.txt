@@ -1,6 +1,8 @@
 .events
 e1 start "StartEvent" (60,190)
-e2 end "EndEvent" (1600,190)
+e2 intermediate "IntermEvent" (1600,190)
+e3 end "EndEvent" (1600,190)
+
 
 .activities
 t1 service "Service" (442,60)
@@ -19,7 +21,7 @@ connector4 sequenceflow "a5" g1 t3 (675,320)
 connector5 sequenceflow "a6" t2 g2 
 connector6 sequenceflow "a7" t3 g2
 connector7 sequenceflow "a8" g2 e2
-
+connector8 sequenceflow "8" e2 e3
  
 
 

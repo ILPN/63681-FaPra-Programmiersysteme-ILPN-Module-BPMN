@@ -15,7 +15,7 @@ export class PnEndEvent extends PnSubnet {
 
     //final place in petri net
     addEndPlace(): void {
-        let endPlace: Place = this.addPlace(Place.create({ isStartPlace: false }))
+        let endPlace: Place = this.addPlace(Place.create())
         this.addArc(Arc.create(this.transitions[0], endPlace))
     }
 

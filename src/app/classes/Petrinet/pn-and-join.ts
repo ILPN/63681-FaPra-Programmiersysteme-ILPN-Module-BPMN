@@ -1,5 +1,4 @@
 
-import { not } from "@angular/compiler/src/output/output_ast";
 import { BpmnNode } from "../Basic/Bpmn/BpmnNode";
 import { Arc } from "./arc";
 import { Place } from "./place";
@@ -16,7 +15,7 @@ export class PnAndJoin extends PnSubnet {
         //create as many places as there are incoming edges
         //connect every place with the only transition
         while (this.places.length != bpmnNode.inEdges.length) {
-            let place = this.addPlace(Place.create({ isStartPlace: false }));
+            let place = this.addPlace(Place.create());
             this.addArc(Arc.create(place, this.transitions[0]))
         }
        

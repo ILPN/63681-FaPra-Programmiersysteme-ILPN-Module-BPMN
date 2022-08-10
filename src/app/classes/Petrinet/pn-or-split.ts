@@ -51,7 +51,7 @@ export class PnOrSplit extends PnOrGateway {
         let pairs = PnUtils.getMatchingOrSplitJoinTransitions(this.simpleTransitions, orJoin.simpleTransitions)
 
         pairs.forEach((join, split) => {
-            let place = Place.create({ isStartPlace: false });
+            let place = Place.create();
             this.addPlace(place)
             this.addArc(Arc.create(split, place));
             orJoin.addArc(Arc.create(place, join))
