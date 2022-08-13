@@ -50,8 +50,8 @@ export class OutputFieldComponent {
             case 'bpmn-xml': {
                 filetype = ".bpmn";
 
-                //error message and abort if invalid graph
-                let graph = this.validate()
+                //error message and abort if graph is null
+                let graph = this.getGraph()
                 if (!graph)
                     return
 
@@ -69,8 +69,8 @@ export class OutputFieldComponent {
 
             case 'pn': {
 
-                //error message and abort if invalid graph
-                let graph = this.validate()
+                //error message and abort if graph is null
+                let graph = this.getGraph()
                 if (!graph)
                     return
 
@@ -106,18 +106,11 @@ export class OutputFieldComponent {
                 a.removeAttribute('download');
         }
     }
-    private validate(): BpmnGraph | null {
+    private getGraph(): BpmnGraph | null {
         let graph = this.displayService.diagram;
         //no graph
         if (!graph) {
             this.displayErrorService.displayError(this.NO_GRAPH_ERR)
-            return null
-        }
-
-        //invalid
-        let validationResult = new Validator(graph.nodes).validateGraph()
-        if (!validationResult.valid) {
-            this.displayErrorService.displayError(validationResult.errors)
             return null
         }
 
