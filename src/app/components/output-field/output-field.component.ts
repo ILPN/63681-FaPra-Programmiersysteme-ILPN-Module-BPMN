@@ -36,7 +36,7 @@ export class OutputFieldComponent {
         let filetype = '.txt';
         switch (type) {
             case 'bpmn': {
-                
+
                 textToExport = this.text;
                 if (textToExport) {
                     if (!this.formValidationService.validateFormat(textToExport)) {
@@ -57,12 +57,10 @@ export class OutputFieldComponent {
 
                 //valid graph
                 let result = XmlExporter.exportBpmnAsXml(graph);
-                if (!result.ok) {
-                    this.displayErrorService.displayError(this.SOMETHING_WENT_WRONG + result.error)
-                    return
-                }
-
-                textToExport = result.xmlText
+                if (result.xmlText)
+                    textToExport = result.xmlText
+                else
+                    textToExport = result.error
 
                 break;
             }
