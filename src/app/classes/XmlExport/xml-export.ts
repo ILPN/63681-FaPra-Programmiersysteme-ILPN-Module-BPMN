@@ -77,13 +77,16 @@ export class XmlExporter {
 
 
         //check if there were errors during XML generation
-        if (this.validXml) {
-            var xmlString = new XMLSerializer().serializeToString(this.doc);
-            return { xmlText: xmlString, ok: true, error: "" }
+        var xmlString = ""
+        try{
+            xmlString = new XMLSerializer().serializeToString(this.doc);
+        }
+        catch(err){
+            this.error  = (err as Error).message;
         }
 
 
-        return { xmlText: null, ok: false, error: this.error }
+        return { xmlText: xmlString, ok: this.validXml, error: this.error }
     }
 
     private addSequenceFlowsToProcess() {
