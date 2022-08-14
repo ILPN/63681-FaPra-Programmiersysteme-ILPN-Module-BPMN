@@ -20,6 +20,7 @@ import { FormsModule } from '@angular/forms';
 import { DisplayDraggableGraphComponent } from './components/display-draggable-graph/display-draggable-graph.component';
 import { DisplayReorderGraphComponent } from './components/display-reorder-graph/display-reorder-graph.component';
 import { DisplaySwitchGraphComponent } from './components/display-switch-graph/display-switch-graph.component';
+import { MatDialogModule } from '@angular/material/dialog';
 
 @NgModule({
     declarations: [
@@ -32,7 +33,7 @@ import { DisplaySwitchGraphComponent } from './components/display-switch-graph/d
         ModeSwitchComponent,
         DisplayDraggableGraphComponent,
         DisplayReorderGraphComponent,
-        DisplaySwitchGraphComponent
+        DisplaySwitchGraphComponent,
     ],
     imports: [
         BrowserModule,
@@ -44,8 +45,7 @@ import { DisplaySwitchGraphComponent } from './components/display-switch-graph/d
         MatButtonToggleModule,
         FormsModule,
         MatIconModule,
-        ReactiveFormsModule,
-    ],
+        ReactiveFormsModule,    ],
     providers: [],
     bootstrap: [AppComponent]
 })

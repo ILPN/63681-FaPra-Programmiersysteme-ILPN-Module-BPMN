@@ -41,9 +41,13 @@ export class DisplayReorderGraphComponent implements OnDestroy, AfterViewInit {
       private _parserService: ParserService
   ) {}
 
+  onReset(){
+    this.ngAfterViewInit()
+}
   ngAfterViewInit(): void {
       this._sub = this._displayService.diagram$.subscribe((graph) => {
           this.bpmnGraph = graph;
+          this._layoutService.applySugiyama(this.bpmnGraph)
           if (this.drawingArea == undefined || this.rootSvg == undefined) return;
 
           const dragManager = new DragManagerReorder(this.rootSvg.nativeElement,
