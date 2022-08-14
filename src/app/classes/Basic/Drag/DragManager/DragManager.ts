@@ -47,15 +47,6 @@ export class DragManager{
     private domXYToSvgXY(event:MouseEvent){
         const pt = new DOMPoint(event.x,event.y);
         const matrix = this.svgWithViewport.getScreenCTM()!
-        /*
-        if(matrix.isIdentity){
-            console.log("identity")
-            return new Vector(pt.x,pt.y)
-        }else{
-            const tpt = pt.matrixTransform( matrix.inverse());
-            return new Vector(tpt.x,tpt.y)
-        }
-        */
         const tpt = pt.matrixTransform( matrix.inverse());
         return new Vector(tpt.x,tpt.y)
         
