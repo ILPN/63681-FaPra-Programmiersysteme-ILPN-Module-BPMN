@@ -35,8 +35,7 @@ export class OutputFieldComponent {
         let textToExport = null;
         let filetype = '.txt';
         switch (type) {
-            case 'bpmn': {
-                
+            case 'bpmn': {   
                 let diagram = this.displayService.diagram;
                 if (this.text) {
                     let outputText = this.addCoordinates(diagram);
@@ -52,27 +51,25 @@ export class OutputFieldComponent {
             case 'bpmn-xml': {
                 filetype = ".bpmn";
 
-                //error message and abort if invalid graph
-                let graph = this.validate()
+                //error message and abort if graph is null
+                let graph = this.getGraph()
                 if (!graph)
                     return
 
                 //valid graph
                 let result = XmlExporter.exportBpmnAsXml(graph);
-                if (!result.ok) {
-                    this.displayErrorService.displayError(this.SOMETHING_WENT_WRONG + result.error)
-                    return
-                }
-
-                textToExport = result.xmlText
+                if (result.xmlText)
+                    textToExport = result.xmlText
+                else
+                    textToExport = result.error
 
                 break;
             }
 
             case 'pn': {
 
-                //error message and abort if invalid graph
-                let graph = this.validate()
+                //error message and abort if graph is null
+                let graph = this.getGraph()
                 if (!graph)
                     return
 
@@ -108,18 +105,11 @@ export class OutputFieldComponent {
                 a.removeAttribute('download');
         }
     }
-    private validate(): BpmnGraph | null {
+    private getGraph(): BpmnGraph | null {
         let graph = this.displayService.diagram;
         //no graph
         if (!graph) {
             this.displayErrorService.displayError(this.NO_GRAPH_ERR)
-            return null
-        }
-
-        //invalid
-        let validationResult = new Validator(graph.nodes).validateGraph()
-        if (!validationResult.valid) {
-            this.displayErrorService.displayError(validationResult.errors)
             return null
         }
 
