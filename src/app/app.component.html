@@ -30,10 +30,32 @@
                       cdkAutosizeMinRows="10"
                       cdkAutosizeMaxRows="20"
                       [formControl]="textareaFc"></textarea>
+                      <p></p>
+            <details>
+                <summary>
+                    <b>Textspezifikation</b>
+                </summary>
+                    <p>.tasks</p>
+                    <p>id type "label" (x,y)</p>
+                    <p>.events</p>
+                    <p>id type "label" (x,y)</p>
+                    <p>.gateways</p>
+                    <p>id type "label" (x,y)</p>
+                    <p>.edges</p>
+                    <p>idFrom idTo type "label"</p>
+                    <p></p>
+                    <p>Labels und Koordinaten sind jeweils optional</p>
+                    <p>types:</p>
+                    <p>tasks: sending, manual, usertask, service, businessrule, receiving, none</p>
+                    <p>events: start, end, intermediate</p>
+                    <p>gateways: or_split, or_join, and_split, and_join, xor_split, xor_join</p>
+                    <p>edges: sequenceflow, association, informationflow, defaultflow</p>
+            </details>
         </mat-form-field>
         <output-field buttonText="File download"
                       buttonIcon="download"
-                      [text]="textareaFc.value"></output-field>
+                      [text]="textareaFc.value">
+        </output-field>
     </div>
 
     <!--  Footer  -->

@@ -3,23 +3,23 @@ e1 start "E1 Start1"
 e2 start "E2 Start2"
 e3 end "E3 Ende"
 
-.activities
-t1 none "T1"
-t2 none "T2"
+.tasks
+t1 manual "T1"
+t2 usertask "T2"
 t3 none "T3"
-t4 none "T4"
-t5 none "T5"
-t6 none "T6"
-t7 none "T7"
-t8 none "T8"
-t9 none "T9"
-t10 none "T10"
-t11 none "T11"
-t12 none "T12"
-t13 none "T13"
-t14 none "T14"
-t15 none "T15"
-t16 none "T16"
+t4 usertask "T4"
+t5 usertask "T5"
+t6 usertask "T6"
+t7 usertask "T7"
+t8 usertask "T8"
+t9 usertask "T9"
+t10 manual "T10"
+t11 service "T11"
+t12 usertask "T12"
+t13 manual "T13"
+t14 usertask "T14"
+t15 manual "T15"
+t16 service "T16"
 
 .gateways
 g1J or_join "G1J"
@@ -36,41 +36,41 @@ g6J xor_join "G6J"
 g7S or_split "G7S"
 g7J or_join "G7J"
 
-.sequences
-a1 sequenceflow "a1" e1 t1      
-a2 sequenceflow "a2" t1 g1J 
-a3 sequenceflow "a3" e2 g1J 
-a4 sequenceflow "a4" g1J t2
-a5 sequenceflow "a5" t2 g2S
-a6 sequenceflow "a6" g2S t3
-a7 sequenceflow "a7" t3 g3S
-a8 sequenceflow "a8" g3S t6
-a9 sequenceflow "a9" t6 g6S
-a10 sequenceflow "a10" g6S t7
-a11 sequenceflow "a11" g6S t8
-a12 sequenceflow "a12" t7 t15
-a13 sequenceflow "a13" t8 t16
-a15 sequenceflow "a15" t15 g6J
-a16 sequenceflow "a16" t16 g6J
-a14 sequenceflow "a14" g6J g3J
-a17 sequenceflow "a17" g3S t9
-a18 sequenceflow "a18" t9 g7S
-a19 sequenceflow "a19" g7S t10
-a20 sequenceflow "a20" g7S t11
-a21 sequenceflow "a21" t10 g7J
-a22 sequenceflow "a22" t11 g7J
-a23 sequenceflow "a23" g7J g3J
-a24 sequenceflow "a24" g2S g4S
-a25 sequenceflow "a25" g4S t4
-a26 sequenceflow "a26" t4 t12
-a27 sequenceflow "a27" t12 g4J
-a28 sequenceflow "a28" g4S t5
-a29 sequenceflow "a29" t5 g5S
-a30 sequenceflow "a30" g5S t13
-a31 sequenceflow "a31" g5S t14
-a32 sequenceflow "a32" t13 g5J
-a33 sequenceflow "a33" t14 g5J
-a34 sequenceflow "a34" g5J g4J
-a35 sequenceflow "a35" g3J g2J
-a36 sequenceflow "a36" g4J g2J
-a37 sequenceflow "a37" g2J e3
+.edges
+e1 t1 sequenceflow    
+t1 g1J sequenceflow 
+e2 g1J sequenceflow "a3" 
+g1J t2 sequenceflow
+t2 g2S sequenceflow
+g2S t3 sequenceflow
+t3 g3S sequenceflow
+g3S t6 sequenceflow
+t6 g6S sequenceflow
+g6S t7 sequenceflow
+g6S t8 sequenceflow "t8"
+t7 t15 sequenceflow
+t8 t16 sequenceflow
+t15 g6J sequenceflow
+t16 g6J sequenceflow
+g6J g3J sequenceflow
+g3S t9 sequenceflow
+t9 g7S sequenceflow
+g7S t10 sequenceflow
+g7S t11 sequenceflow
+t10 g7J sequenceflow
+t11 g7J sequenceflow
+g7J g3J sequenceflow
+g2S g4S sequenceflow
+g4S t4 sequenceflow
+t4 t12 sequenceflow
+t12 g4J sequenceflow
+g4S t5 sequenceflow
+t5 g5S sequenceflow
+g5S t13 sequenceflow
+g5S t14 sequenceflow
+t13 g5J sequenceflow
+t14 g5J sequenceflow
+g5J g4J sequenceflow
+g3J g2J sequenceflow
+g4J g2J sequenceflow
+g2J e3 sequenceflow

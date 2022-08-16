@@ -1,34 +1,34 @@
 .events
-e1 start "StartEvent" (60,190)
-e2 end "EndEvent" (1600,190)
+e1 start "StartEvent"
+e2 end "EndEvent"
 
-.activities
-t1 sending "SendingTask" (442,60)
-t2 receiving "ReceiveTask" (442,320)
-t3 usertask "UserTask" (1225,190)
-t4 service "Service" (1225,190)
-t5 manual "ManualTask" (1225,190)
-t6 usertask "UserTask2" (1225,190)
+.tasks
+t1 sending "SendingTask"
+t2 receiving "ReceiveTask"
+t3 usertask "UserTask"
+t4 service "Service"
+t5 manual "ManualTask"
+t6 usertask "UserTask2"
 
 .gateways 
-g1 xor_split "XORSplit" (210,190)
-g2 xor_join "XORJoin" (675,190)
-g3 and_split "ANDSplit" (210,190)
-g4 and_join "ANDJoin" (675,190)
+g1 xor_split "XORSplit"
+g2 xor_join "XORJoin"
+g3 and_split "ANDSplit"
+g4 and_join "ANDJoin"
 
-.sequences
-connector1 sequenceflow "1" e1 g1
-connector2 sequenceflow "2" g1 t1
-connector3 sequenceflow "3" t1 g2
-connector4 sequenceflow "4" g1 t2
-connector5 sequenceflow "5" t2 g2
-connector6 sequenceflow "6" g2 t3
-connector7 sequenceflow "7" t3 g3
-connector8 sequenceflow "8" g3 t4
-connector9 sequenceflow "9" t4 g4
-connector10 sequenceflow "10" g3 t5
-connector11 sequenceflow "11" t5 t6
-connector12 sequenceflow "12" t6 g4
-connector13 sequenceflow "13" g4 e2
+.edges
+e1 g1 sequenceflow "1" 
+g1 t1 sequenceflow "2" 
+t1 g2 sequenceflow "3" 
+g1 t2 sequenceflow "4" 
+t2 g2 sequenceflow "5" 
+g2 t3 sequenceflow "6" 
+t3 g3 sequenceflow "7" 
+g3 t4 sequenceflow "8" 
+t4 g4 sequenceflow "9" 
+g3 t5 sequenceflow "10"
+t5 t6 sequenceflow "11" 
+t6 g4 sequenceflow "12" 
+g4 e2 sequenceflow "13" 
 
 

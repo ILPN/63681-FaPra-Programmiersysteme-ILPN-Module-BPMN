@@ -33,4 +33,8 @@ export class DisplayService implements OnDestroy {
         this._diagram$.next(bpmnGraph);
     }
 
+    public displayOnly(bpmnGraph: BpmnGraph){
+        this._diagram$.next(bpmnGraph);
+    }
+
 }

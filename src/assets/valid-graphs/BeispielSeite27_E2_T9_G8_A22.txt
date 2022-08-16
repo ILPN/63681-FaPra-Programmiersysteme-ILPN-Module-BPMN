@@ -2,7 +2,7 @@
 e1 start "e1"
 e2 end "e2"
 
-.activities
+.tasks
 t1 none "Reise planen"
 t2 none "Antrag stellen"
 t3 none " Reise genehmigen"
@@ -14,35 +14,35 @@ t8 none "Vorauszahlung durchfuehren"
 t9 none "Reise durchfuehren"
 
 .gateways 
-g1 xor_join ""
-g2 xor_split ""
-g3 and_split ""
-g4 and_join ""
-g5 or_split ""
-g6 or_join ""
-g7 xor_split ""
-g8 xor_join ""
+g1 xor_join
+g2 xor_split
+g3 and_split
+g4 and_join
+g5 or_split
+g6 or_join
+g7 xor_split
+g8 xor_join
 
-.sequences
-a1 sequenceflow "a1" e1 t1
-a2 sequenceflow "a2" t1 g1
-a3 sequenceflow "a3" g1 t2
-a4 sequenceflow "a4" t2 g2
-a5 sequenceflow "a5" g2 t3
-a6 sequenceflow "a6" t3 g3
-a7 sequenceflow "a7" g2 g1
-a8 sequenceflow "a8" g3 t4
-a9 sequenceflow "a9" g3 g5
-a10 sequenceflow "a10" t4 g4
-a11 sequenceflow "a11" g4 t7
-a12 sequenceflow "a12" g5 t5
-a13 sequenceflow "a13" g5 t6
-a15 sequenceflow "a15" t5 g6
-a16 sequenceflow "a16" t6 g6
-a14 sequenceflow "a14" g6 g4
-a17 sequenceflow "a17" t7 g7
-a18 sequenceflow "a18" g7 g8
-a19 sequenceflow "a19" g8 t9
-a20 sequenceflow "a20" g7 t8
-a21 sequenceflow "a21" t8 g8
-a22 sequenceflow "a22" t9 e2
+.edges
+e1 t1 sequenceflow "a1"
+t1 g1 sequenceflow "a2" 
+g1 t2 sequenceflow "a3" 
+t2 g2 sequenceflow "a4"
+g2 t3 sequenceflow "a5" 
+t3 g3 sequenceflow "a6" 
+g2 g1 sequenceflow "a7" 
+g3 t4 sequenceflow "a8"
+g3 g5 sequenceflow "a9" 
+t4 g4 sequenceflow "a10" 
+g4 t7 sequenceflow "a11" 
+g5 t5 sequenceflow "a12"
+g5 t6 sequenceflow "a13"
+t5 g6 sequenceflow "a15"
+t6 g6 sequenceflow "a16"
+g6 g4 sequenceflow "a14"
+t7 g7 sequenceflow "a17"
+g7 g8 sequenceflow "a18" 
+g8 t9 sequenceflow "a19" 
+g7 t8 sequenceflow "a20"
+t8 g8 sequenceflow "a21"
+t9 e2 sequenceflow "a22"
