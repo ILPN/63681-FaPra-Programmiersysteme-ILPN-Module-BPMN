@@ -34,7 +34,6 @@ export class AppComponent implements OnDestroy {
             pipe(debounceTime(400)).
             subscribe((val) => this.textareaFc.setValue(val));
 
-
         // this.textareaFc.setValue(`Your advertising could be here`);
 
 
@@ -123,7 +122,7 @@ this.textareaFc.setValue(s);
 
     ngOnDestroy(): void {
         this._sub.unsubscribe();
-        //this._sub1.unsubscribe();
+        this._sub1.unsubscribe();
     }
 
     private processSourceChange(newSource: string) {

@@ -42,10 +42,11 @@ export class DisplayReorderGraphComponent implements OnDestroy, AfterViewInit {
   ) {}
 
   onReset(){
-    this.ngAfterViewInit()
+    this.ngAfterViewInit();
 }
   ngAfterViewInit(): void {
       this._sub = this._displayService.diagram$.subscribe((graph) => {
+
           this.bpmnGraph = graph;
           this._layoutService.applySugiyama(this.bpmnGraph)
           if (this.drawingArea == undefined || this.rootSvg == undefined) return;
@@ -75,10 +76,11 @@ export class DisplayReorderGraphComponent implements OnDestroy, AfterViewInit {
                         edgeEnds.push(corner)
                     }
                 }
+                if(!(nodes.length == 0 && dummyNodes.length ==0 && edgeStarts.length ==0 && edgeEnds.length ==0)){
+                    this._parserService.positionOfNodesAndEdgesChanged(nodes,dummyNodes,edgeStarts,edgeEnds)
+                }
             }
-            if(!(nodes.length == 0 && dummyNodes.length ==0 && edgeStarts.length ==0 && edgeEnds.length ==0)){
-                this._parserService.positionOfNodesAndEdgesChanged(nodes,dummyNodes,edgeStarts,edgeEnds)
-            }
+          
           }
           const bpmnGraphSvg = this.bpmnGraph.svgManager.getNewSvg()
           for (const node of this.bpmnGraph.nodes) {
@@ -118,7 +120,9 @@ export class DisplayReorderGraphComponent implements OnDestroy, AfterViewInit {
         this.drawingArea.nativeElement.appendChild(dragHandleSvgs);
         this._layoutService.zoomViewToSvg(bpmnGraphSvg, this.drawingArea.nativeElement,this.rootSvg.nativeElement)
       });
-  }
+      this._parserService.resetCoordinates();
+
+    }
 
   ngOnDestroy(): void {
       this._sub?.unsubscribe();

@@ -129,7 +129,7 @@ export class OutputFieldComponent {
                     let matchLineNew = matchLine.replace(/\(-?[0-9]*,-?[0-9]*\)/,newCoordString);
                   
                     if(matchLine.match(/\(-?[0-9]*,-?[0-9]*\)/) === null) {
-                        matchLineNew = matchLine.concat(" "+newCoordString);
+                        matchLineNew = matchLine.replace(/[\n\r]/,"").concat(" "+newCoordString);
                     }
                    
                     text[index] = matchLineNew;
@@ -147,7 +147,7 @@ export class OutputFieldComponent {
 
                     let matchLineNew = matchLine.replace(/\(-?[0-9]*,-?[0-9]*\)/,newCoordString1 + " " + newCoordString2);
                     if(matchLine.match(/\(-?[0-9]*,-?[0-9]*\)/) === null) {
-                        matchLineNew = matchLine.concat(" "+newCoordString1 + " " + newCoordString2);
+                        matchLineNew = matchLine.replace(/[\n\r]/,"").concat(" "+newCoordString1 + " " + newCoordString2);
                     }
                     text[index] = matchLineNew;
             }}

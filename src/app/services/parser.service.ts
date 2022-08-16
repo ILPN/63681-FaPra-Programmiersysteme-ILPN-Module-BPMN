@@ -64,7 +64,7 @@ export class ParserService {
 
     positionOfNodesAndEdgesChanged(nodes: BpmnNode[], dummyNodes: BpmnDummyEdgeCorner[], edgeStarts: BpmnEdgeCorner[], edgeEnds: BpmnEdgeCorner[]) {
         //@Vanessa
-
+        console.log("positionMedthod");
         for (const node of nodes) {
 
             if (this.text != []) {
@@ -75,7 +75,7 @@ export class ParserService {
                     let matchLineNew = matchLine.replace(/\(-?[0-9]*,-?[0-9]*\)/,newCoordString);
                   
                     if(matchLine.match(/\(-?[0-9]*,-?[0-9]*\)/) === null) {
-                        matchLineNew = matchLine.concat(" "+newCoordString);
+                        matchLineNew = matchLine.replace(/[\n\r]/,"").concat(" "+newCoordString);
                     }
                    
                     this.text[index] = matchLineNew;
@@ -90,15 +90,13 @@ export class ParserService {
 
                 if(matchLine != undefined) {
                     let index = this.text.indexOf(matchLine);
-                    //zweite (to) node auswählen 
-                    //dahinter: wenn schon was ist dann replacen. ansonsten neu rein
 
                     let matchLineNew = matchLine.replace(/\(-?[0-9]*,-?[0-9]*\)/,newCoordString);
                     if(matchLine.match(/\(-?[0-9]*,-?[0-9]*\)/) === null) {
-                        matchLineNew = matchLine.concat(" "+newCoordString);
+                        matchLineNew = matchLine.replace(/[\n\r]/,"").concat(" "+newCoordString);
                     }
                     this.text[index] = matchLineNew;
-                    console.log("new incoming edge position:" + matchLineNew);
+                    //console.log("new incoming edge position:" + matchLineNew);
             }
 
         }
@@ -109,15 +107,13 @@ export class ParserService {
 
             if(matchLine != undefined) {
                 let index = this.text.indexOf(matchLine);
-                //erste (from) node auswählen
-                //dahinter: wenn schon was ist dann replacen. ansonsten neu rein
                 let matchLineNew = matchLine.replace(/\(-?[0-9]*,-?[0-9]*\)/,newCoordString);
                 const matches = matchLine.match(/\(-?[0-9]*,-?[0-9]*\)/);
                 if(matches === null) {
                     matchLineNew = matchLine.concat(" "+newCoordString);
                 }
                 this.text[index] = matchLineNew;
-                console.log("new outgoing edge position:" + matchLineNew);
+                //console.log("new outgoing edge position:" + matchLineNew);
         }
 
         }
@@ -160,6 +156,17 @@ export class ParserService {
         this.displayService.displayOnly(bpmnGraph);
     }
     
+    //called when the "reset" button is pushed
+    resetCoordinates() {
+        for(let i = 0; i < this.text.length; i++) {
+            console.log(this.text[i].match(/\(-?[0-9]*,-?[0-9]*\)/));
+            this.text[i] = this.text[i].replace(/\(-?[0-9]*,-?[0-9]*\)/,"");
+            console.log(this.text[i]);
+        }
+        let emitText = this.text.join("\n");
+
+        this.positionChange.emit(emitText);
+    }
 
     parse(text: string): BpmnGraph | undefined {
        
@@ -262,6 +269,7 @@ export class ParserService {
             return;
         }
         let activity = new BpmnTask(name);
+        console.log(lineSplit);
 
         //if line ends with a \n
         let type = lineSplit[1];
@@ -359,7 +367,6 @@ export class ParserService {
         let gateway = new BpmnGateway(name);
 
         let type = lineSplit[1];
-        console.log(lineSplit);
         switch (type.toLowerCase()) {
             case ("and_join"):
                 gateway = new BpmnGatewayJoinAnd(name);
