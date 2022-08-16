@@ -78,8 +78,9 @@ export class DisplayReorderGraphComponent implements OnDestroy, AfterViewInit {
                 }
                 if(!(nodes.length == 0 && dummyNodes.length ==0 && edgeStarts.length ==0 && edgeEnds.length ==0)){
                     this._parserService.positionOfNodesAndEdgesChanged(nodes,dummyNodes,edgeStarts,edgeEnds)
-                }
+                }   
             }
+          
           
           }
           const bpmnGraphSvg = this.bpmnGraph.svgManager.getNewSvg()

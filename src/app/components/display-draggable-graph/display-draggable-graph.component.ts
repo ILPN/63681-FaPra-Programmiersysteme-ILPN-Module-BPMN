@@ -71,7 +71,6 @@ export class DisplayDraggableGraphComponent
         }
     }
     ngAfterViewInit(): void {
-        console.log("init");
         this._sub = this._displayService.diagram$.subscribe((bpmnGraph) => {
             if (bpmnGraph == undefined) return;
             if (bpmnGraph.isEmpty()) return;
