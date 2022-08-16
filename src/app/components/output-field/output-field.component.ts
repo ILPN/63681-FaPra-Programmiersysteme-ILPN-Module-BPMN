@@ -57,11 +57,12 @@ export class OutputFieldComponent {
 
                 //valid graph
                 let result = XmlExporter.exportBpmnAsXml(graph);
+
                 if (result.xmlText)
                     textToExport = result.xmlText
                 else
                     textToExport = result.error
-
+                console.error(result.error)
                 break;
             }
 

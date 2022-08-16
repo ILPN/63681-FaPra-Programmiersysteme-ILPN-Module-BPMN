@@ -19,7 +19,7 @@ export class EdgeExporter extends Exporter {
     private NO_TARGET_SHAPE_ERR = this.ERROR_START + " Eingangselement bpmndi:BPMNShape fehlt. ID: "
     private NO_COORD_SOURCE_ERR = this.ERROR_START + " Ausgangselement bpmndi:BPMNShape hat keine Koordinaten. ID: "
     private NO_COORD_TARGET_ERR = this.ERROR_START + " Eingangselement bpmndi:BPMNShape hat keine Koordinaten. ID: "
-
+    private UNDEFINED_ID = "unknown"
 
     /**
      * creates <bpmn:outgoing> element to represent outgoing edge of an element
@@ -29,12 +29,12 @@ export class EdgeExporter extends Exporter {
      * @returns XML element as a child of sourceElement under <bpmn:process>
      */
     createBpmnOutgoingXml(bpmnEdge: BpmnEdge, sourceElement: Element, sourceShape: Element): { element: Element | null, error: string } {
-        
+
         if (!sourceElement)
-            return { element: null, error: this.NO_SOURCE_ELEMENT_ERR + bpmnEdge.id}
+            return { element: null, error: this.NO_SOURCE_ELEMENT_ERR + bpmnEdge.id }
 
         if (!sourceShape)
-            return { element: null, error: this.NO_SOURCE_SHAPE_ERR + bpmnEdge.id}
+            return { element: null, error: this.NO_SOURCE_SHAPE_ERR + bpmnEdge.id }
 
         let edge = this.createNewEdgeIfNotExists(bpmnEdge)
         edge.sourceShape = sourceShape
@@ -71,11 +71,10 @@ export class EdgeExporter extends Exporter {
      * @returns XML element under a child of targetElement under <bpmn:process>
      */
     createBpmnIncomingXml(bpmnEdge: BpmnEdge, targetElement: Element, targetShape: Element): { element: Element | null, error: string } {
-        if (!targetElement)
-            return { element: null, error: this.NO_TARGET_ELEMENT_ERR + bpmnEdge.id}
 
+        let errMessage = ""
         if (!targetShape)
-            return { element: null, error: this.NO_TARGET_SHAPE_ERR + bpmnEdge.id}
+            errMessage += this.NO_TARGET_SHAPE_ERR + bpmnEdge.id
 
         let edge = this.createNewEdgeIfNotExists(bpmnEdge)
         edge.targetShape = targetShape
@@ -84,8 +83,18 @@ export class EdgeExporter extends Exporter {
         //XML element under a child of targetElement under <bpmn:process>
         let inEdgeXml = this.xmlDoc.createElementNS(Namespace.BPMN, Namespace.INCOMING_ELEMENT)
         inEdgeXml.innerHTML = edge.id
+
+        errMessage += this.appendEdgeToTargetElement(targetElement, inEdgeXml, bpmnEdge.id)
+
+        return { element: inEdgeXml, error: errMessage }
+    }
+
+    appendEdgeToTargetElement(targetElement: Element, inEdgeXml: Element, bpmnEdgeId: string): string {
+        if (!targetElement)
+            return this.NO_TARGET_ELEMENT_ERR + bpmnEdgeId
+
         targetElement.appendChild(inEdgeXml)
-        return { element: inEdgeXml, error: "" }
+        return ""
     }
 
     /**
@@ -93,9 +102,10 @@ export class EdgeExporter extends Exporter {
      * and references the corresponding <bpmn:> XML element under <bpmn:process>
      * @returns list of XML elements <bpmndi:BPMNEdge>
      */
-    createBpmnEdgeXmlElements(): { elements: Array<Element> | null, error: string } {
+    createBpmnEdgeXmlElements(): { elements: Array<Element>, errors: string } {
         let elementsList = new Array<Element>();
 
+        let errMessage = ""
         for (let edge of this.edges) {
             let bpmnEdgeXml = this.xmlDoc.createElementNS(Namespace.BPMNDI, Namespace.EDGE_ELEMENT)
             bpmnEdgeXml.setAttribute("id", Namespace.FLOW + "_" + edge.id + "_di")
@@ -105,21 +115,18 @@ export class EdgeExporter extends Exporter {
 
             //start
             let createEdgeStart = this.createWayPointForEdgeStart(edge)
-            if (!createEdgeStart.element)
-                return { elements: null, error: createEdgeStart.error }
             bpmnEdgeXml.appendChild(createEdgeStart.element)
-
+            errMessage += createEdgeStart.error
 
             //end
             let createEdgeEnd = this.createWayPointForEdgeEnd(edge)
-            if (!createEdgeEnd.element)
-                return { elements: null, error: createEdgeEnd.error }
             bpmnEdgeXml.appendChild(createEdgeEnd.element)
+            errMessage += createEdgeEnd.error
 
             elementsList.push(bpmnEdgeXml)
 
         }
-        return { elements: elementsList, error: "" }
+        return { elements: elementsList, errors: errMessage }
     }
 
     /**
@@ -127,17 +134,24 @@ export class EdgeExporter extends Exporter {
      * @param edge 
      * @returns <di:waypoint> XML element representing the coordinates
      */
-    createWayPointForEdgeStart(edge: Edge): { element: Element | null, error: string } {
+    createWayPointForEdgeStart(edge: Edge): { element: Element, error: string } {
+        let errMessage = "";
+
         //x and y coordinates of source element (BPMNShape) are specified in its child element Bounds
 
         //check errors
         let coord_result_x = this.getCoordinateSource("x", edge)
-        if (!coord_result_x.coordinate)
-            return { element: null, error: coord_result_x.error }
+        if (!coord_result_x.coordinate) {
+            coord_result_x.coordinate = "0"
+            errMessage += coord_result_x.error
+        }
+
 
         let coord_result_y = this.getCoordinateSource("y", edge)
-        if (!coord_result_y.coordinate)
-            return { element: null, error: coord_result_y.error }
+        if (!coord_result_y.coordinate) {
+            coord_result_y.coordinate = "0"
+            errMessage += coord_result_y.error
+        }
 
         var startPoint = this.xmlDoc.createElementNS(Namespace.DI, Namespace.WAYPOINT_ELEMENT)
 
@@ -150,22 +164,22 @@ export class EdgeExporter extends Exporter {
         let y = parseInt(coord_result_y.coordinate) + this.getYoffset(edge.bpmnEdge.from)
         startPoint.setAttribute("y", y.toString())
 
-        return { element: startPoint, error: "" }
+        return { element: startPoint, error: errMessage }
     }
 
     private getCoordinateSource(coord: string, edge: Edge): { coordinate: string | null, error: string } {
         let edgeSourceShape = edge.sourceShape
         if (!edgeSourceShape)
-            return { coordinate: null, error: this.NO_COORD_SOURCE_ERR + edge.bpmnEdge.id}
+            return { coordinate: null, error: this.NO_COORD_SOURCE_ERR + edge.bpmnEdge.id }
 
 
         let boundsElement = edgeSourceShape.children.item(0)
         if (!boundsElement)
-            return { coordinate: null, error: this.NO_COORD_SOURCE_ERR + edge.bpmnEdge.id}
+            return { coordinate: null, error: this.NO_COORD_SOURCE_ERR + edge.bpmnEdge.id }
 
         let coordValue = boundsElement.getAttribute(coord)
         if (!coord)
-            return { coordinate: null, error: this.NO_COORD_SOURCE_ERR + edge.bpmnEdge.id}
+            return { coordinate: null, error: this.NO_COORD_SOURCE_ERR + edge.bpmnEdge.id }
 
         return { coordinate: coordValue, error: "" }
     }
@@ -173,16 +187,16 @@ export class EdgeExporter extends Exporter {
     private getCoordinateTarget(coord: string, edge: Edge): { coordinate: string | null, error: string } {
         let edgeTargetShape = edge.targetShape
         if (!edgeTargetShape)
-            return { coordinate: null, error: this.NO_COORD_TARGET_ERR + edge.bpmnEdge.id}
+            return { coordinate: null, error: this.NO_COORD_TARGET_ERR + edge.bpmnEdge.id }
 
 
         let boundsElement = edgeTargetShape.children.item(0)
         if (!boundsElement)
-            return { coordinate: null, error: this.NO_COORD_TARGET_ERR + edge.bpmnEdge.id}
+            return { coordinate: null, error: this.NO_COORD_TARGET_ERR + edge.bpmnEdge.id }
 
         let coordValue = boundsElement.getAttribute(coord)
         if (!coord)
-            return { coordinate: null, error: this.NO_COORD_TARGET_ERR + edge.bpmnEdge.id}
+            return { coordinate: null, error: this.NO_COORD_TARGET_ERR + edge.bpmnEdge.id }
 
         return { coordinate: coordValue, error: "" }
     }
@@ -213,17 +227,22 @@ export class EdgeExporter extends Exporter {
     * @param edge 
     * @returns <di:waypoint> XML element representing the coordinates
     */
-    createWayPointForEdgeEnd(edge: Edge): { element: Element | null, error: string } {
+    createWayPointForEdgeEnd(edge: Edge): { element: Element, error: string } {
+        let errMessage = ""
         //x and y coordinates of source element (BPMNShape) are specified in its child element Bounds
 
         //check errors
         let coord_result_x = this.getCoordinateTarget("x", edge)
-        if (!coord_result_x.coordinate)
-            return { element: null, error: coord_result_x.error }
+        if (!coord_result_x.coordinate) {
+            coord_result_x.coordinate = "0"
+            errMessage += coord_result_x.error
+        }
 
         let coord_result_y = this.getCoordinateTarget("y", edge)
-        if (!coord_result_y.coordinate)
-            return { element: null, error: coord_result_y.error }
+        if (!coord_result_y.coordinate) {
+            coord_result_y.coordinate = "0"
+            errMessage += coord_result_y.error
+        }
 
 
         var endPoint = this.xmlDoc.createElementNS(Namespace.DI, Namespace.WAYPOINT_ELEMENT)
@@ -235,63 +254,68 @@ export class EdgeExporter extends Exporter {
         let y = parseInt(coord_result_y.coordinate) + this.getYoffset(edge.bpmnEdge.to)
         endPoint.setAttribute("y", y.toString())
 
-        return { element: endPoint, error: "" }
+        return { element: endPoint, error: errMessage }
     }
 
     /**
      * for each edge creates <bpmn:sequenceFlow> XML element under <bpmn:process>
      * @returns a list of <bpmn:sequenceFlow> XML elements
      */
-    createSequenceFlows(): { elements: Array<Element> | null, error: string } {
+    createSequenceFlows(): { elements: Array<Element>, errors: string } {
         let elementsList = new Array<Element>();
 
+        let errMessage = "";
         for (let edge of this.edges) {
             let seqFlowXml = this.xmlDoc.createElementNS(Namespace.BPMN, Namespace.SEQUENCE_FLOW_ELEMENT)
             seqFlowXml.setAttribute("id", edge.id)
 
             //set source reference
-            let result = this.setSourceRef(seqFlowXml, edge)
-            if (result.error)
-                return { elements: null, error: result.error }
-
+            errMessage += this.setSourceRef(seqFlowXml, edge)
 
             //set target reference
-            result = this.setTargetRef(seqFlowXml, edge)
-            if (result.error)
-                return { elements: null, error: result.error }
+            errMessage += this.setTargetRef(seqFlowXml, edge)
 
             elementsList.push(seqFlowXml)
 
         }
 
-        return { elements: elementsList, error: "" }
+        return { elements: elementsList, errors: errMessage }
     }
 
-    setSourceRef(seqFlowXml: Element, edge: Edge): { error: string | null } {
-        if (!edge.sourceElement)
-            return { error: this.NO_SOURCE_ELEMENT_ERR }
+    setSourceRef(seqFlowXml: Element, edge: Edge): string {
+
+        if (!edge.sourceElement) {
+            seqFlowXml.setAttribute("sourceRef", this.UNDEFINED_ID)
+            return this.NO_SOURCE_ELEMENT_ERR
+        }
 
         let id = edge.sourceElement.getAttribute("id")
-        if (!id)
-            return { error: this.NO_SOURCE_ELEMENT_ERR }
+        if (!id) {
+            seqFlowXml.setAttribute("sourceRef", this.UNDEFINED_ID)
+            return this.NO_SOURCE_ELEMENT_ERR
+        }
 
         seqFlowXml.setAttribute("sourceRef", id)
-
-        return { error: null }
+        return ""
 
     }
 
-    setTargetRef(seqFlowXml: Element, edge: Edge): { error: string | null } {
-        if (!edge.targetElement)
-            return { error: this.NO_TARGET_ELEMENT_ERR }
+    setTargetRef(seqFlowXml: Element, edge: Edge): string {
+        if (!edge.targetElement) {
+            seqFlowXml.setAttribute("targetRef", this.UNDEFINED_ID)
+            return this.NO_TARGET_ELEMENT_ERR
+        }
 
         let id = edge.targetElement.getAttribute("id")
-        if (!id)
-            return { error: this.NO_TARGET_ELEMENT_ERR }
+        if (!id) {
+            seqFlowXml.setAttribute("targetRef", this.UNDEFINED_ID)
+            return this.NO_TARGET_ELEMENT_ERR
+
+        }
 
         seqFlowXml.setAttribute("targetRef", id)
 
-        return { error: null }
+        return ""
 
     }
 

@@ -15,21 +15,17 @@ export class GatewayExporter extends Exporter {
      * @param bpmnNode 
      * @returns 
      */
-    bpmnGatewayXml(bpmnNode: BpmnNode): { element: Element | null, error: string } {
+    bpmnGatewayXml(bpmnNode: BpmnNode): Element {
 
         //add under <bpmn:process>
-        let createGatewayResult = this.createElementNS(bpmnNode, Namespace.BPMN, this.getTagName(bpmnNode))
-        if (createGatewayResult.element) {
-            let gateway = createGatewayResult.element
-            gateway.setAttribute("id", bpmnNode.id + "_" + Random.id())
-            if (bpmnNode.label)
-                gateway.setAttribute("name", bpmnNode.label)
+        let gateway = this.createElementNS(bpmnNode, Namespace.BPMN, this.getTagName(bpmnNode))
 
-            return { element: gateway, error: "" }
+        gateway.setAttribute("id", bpmnNode.id + "_" + Random.id())
+        if (bpmnNode.label)
+            gateway.setAttribute("name", bpmnNode.label)
 
-        }
+        return gateway
 
-        return { element: null, error: createGatewayResult.error }
     }
 
     /**
@@ -65,7 +61,7 @@ export class GatewayExporter extends Exporter {
     }
 
     //gateway type
-    private getTagName(bpmnNode: BpmnNode): string | undefined {
+    private getTagName(bpmnNode: BpmnNode): string {
         if (BpmnUtils.isAndGateway(bpmnNode))
             return Namespace.PARALLEL_GATEWAY_ELEMENT
         if (BpmnUtils.isOrGateway(bpmnNode))
@@ -74,6 +70,7 @@ export class GatewayExporter extends Exporter {
         if (BpmnUtils.isXorGateway(bpmnNode))
             return Namespace.EXCLUSIVE_GATEWAY_ELEMENT
 
-        return undefined
+        //general gateway without type
+        return Namespace.GATEWAY_ELEMENT
     }
 }
