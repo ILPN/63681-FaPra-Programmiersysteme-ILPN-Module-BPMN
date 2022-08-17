@@ -68,11 +68,15 @@ export class ParserService {
 
             if (this.text != []) {
                 let newCoordString = "(" + node.getPos().x + "," + node.getPos().y + ")";
+                if(!node.getPos().y) {
+                    newCoordString = "(" + node.getPos().x + "," + 0 + ")";
+                }
                 let matchLine = this.text.find(line => line.startsWith(node.id));
                 if(matchLine != undefined) {
                     let index = this.text.indexOf(matchLine);
+
                     let matchLineNew = matchLine.replace(/\(-?[0-9]*,-?[0-9]*\)/,newCoordString);
-                  
+
                     if(matchLine.match(/\(-?[0-9]*,-?[0-9]*\)/) === null) {
                         matchLineNew = matchLine.replace(/[\n\r]/,"").concat(" "+newCoordString);
                     }
@@ -94,6 +98,8 @@ export class ParserService {
                     if(matchLine.match(/\(-?[0-9]*,-?[0-9]*\)/) === null) {
                         matchLineNew = matchLine.replace(/[\n\r]/,"").concat(" "+newCoordString);
                     }
+
+
                     this.text[index] = matchLineNew;
                     //console.log("new incoming edge position:" + matchLineNew);
             }
