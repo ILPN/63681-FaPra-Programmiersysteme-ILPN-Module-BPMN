@@ -3,10 +3,10 @@ e1 start
 e2 end
 
 .tasks
-t1 none "Flug suchen"
-t2 none " Hotel Suchen"
-t3 none "Flug buchen"
-t4 none "Hotel buchen"
+t1 "Flug suchen"
+t2 " Hotel Suchen"
+t3 "Flug buchen"
+t4 "Hotel buchen"
 
 .gateways 
 g1 xor_split

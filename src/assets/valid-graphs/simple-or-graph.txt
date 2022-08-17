@@ -6,6 +6,7 @@ EndEvent end "EndEvent" (1600,190)
 BRTask businessrule "BusinessRule" (442,60)
 ManualTask manual "ManualTask" (442,320)
 UserTask usertask "UserTask" (442,190)
+
 .gateways 
 ORSplit or_split "ORSplit" (210,190)
 ORJoin or_join "ORJoin" (675,190)

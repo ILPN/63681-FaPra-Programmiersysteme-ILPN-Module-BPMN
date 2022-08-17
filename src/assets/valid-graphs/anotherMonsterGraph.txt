@@ -6,7 +6,7 @@ e3 end "E3 Ende"
 .tasks
 t1 manual "T1"
 t2 usertask "T2"
-t3 none "T3"
+t3 "T3"
 t4 usertask "T4"
 t5 usertask "T5"
 t6 usertask "T6"

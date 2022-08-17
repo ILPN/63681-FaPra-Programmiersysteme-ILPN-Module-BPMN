@@ -264,9 +264,8 @@ export class ParserService {
             return;
         }
         let activity = new BpmnTask(name);
-        //console.log(lineSplit);
 
-        if(lineSplit[1] && !lineSplit[1].startsWith("(") && !(lineSplit[1] === description)){
+        if(lineSplit[1] && !lineSplit[1].startsWith("(") && !(lineSplit[1] === description.split(" ").join(""))){
             let type = lineSplit[1];
             switch (type.toLowerCase()) {
             case ("sending"):
@@ -288,7 +287,7 @@ export class ParserService {
                 activity = new BpmnTaskUserTask(name);
                 break;
             default: 
-                this.displayerrorService.displayError("Ungültiger Task Typ"+ type);
+                this.displayerrorService.displayError("Ungültiger Task Typ "+ type);
         }}
 
         if(description) activity.label = description;

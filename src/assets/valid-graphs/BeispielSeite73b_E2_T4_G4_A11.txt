@@ -3,10 +3,10 @@ e1 start
 e2 end
 
 .tasks
-t1 none "Genehmigung einholen"
-t2 none " Reise planen"
-t3 none "Flug buchen"
-t4 none "Hotel buchen"
+t1 "Genehmigung einholen"
+t2 " Reise planen"
+t3 "Flug buchen"
+t4 "Hotel buchen"
 
 .gateways 
 g1 xor_join

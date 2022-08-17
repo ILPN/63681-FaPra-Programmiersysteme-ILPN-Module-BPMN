@@ -3,12 +3,12 @@ e1 start
 e2 end
 
 .tasks
-t1 none " Reise planen"
-t2 none "Flug buchen"
-t3 none "Zug buchen"
-t4 none "Sitzplatz buchen"
-t5 none "Hotel buchen"
-t6 none "Vorgang archivieren"
+t1 " Reise planen"
+t2 "Flug buchen"
+t3 "Zug buchen"
+t4 "Sitzplatz buchen"
+t5 "Hotel buchen"
+t6 "Vorgang archivieren"
 
 
 .gateways 
