@@ -46,11 +46,11 @@ let s : String = '.events\n'+
 '.tasks\n'+
 't1 manual "t1"\n'+
 't2 usertask "T2"\n'+
-'t3 none "T3"\n'+
+'t3 "T3"\n'+
 't4 usertask "T4"\n'+
-'t5 usertask "T5"\n'+
+'t5\n'+
 't6 usertask "T6"\n'+
-'t7 usertask "T7"\n'+
+'t7 "T7"\n'+
 't8 usertask "T8"\n'+
 't9 usertask "T9"\n'+
 't10 manual "T10"\n'+

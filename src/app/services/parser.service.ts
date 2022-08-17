@@ -42,7 +42,7 @@ export class ParserService {
     
     private text:string[];
     private result!: BpmnGraph;
-    seqCount: number;
+    private seqCount: number;
 
     constructor(private displayService:DisplayService,
         private displayerrorService: DisplayErrorService, 
@@ -64,7 +64,6 @@ export class ParserService {
 
     positionOfNodesAndEdgesChanged(nodes: BpmnNode[], dummyNodes: BpmnDummyEdgeCorner[], edgeStarts: BpmnEdgeCorner[], edgeEnds: BpmnEdgeCorner[]) {
         //@Vanessa
-        console.log("positionMedthod");
         for (const node of nodes) {
 
             if (this.text != []) {
@@ -79,7 +78,7 @@ export class ParserService {
                     }
                    
                     this.text[index] = matchLineNew;
-                    console.log("new node position:"+ matchLineNew);
+                    //console.log("new node position:"+ matchLineNew);
                     
                 }
                 
@@ -156,7 +155,7 @@ export class ParserService {
         this.displayService.displayOnly(bpmnGraph);
     }
     
-    //called when the "reset" button is pushed
+    //called when sugiyama layout is selected
     resetCoordinates() {
         for(let i = 0; i < this.text.length; i++) {
             console.log(this.text[i].match(/\(-?[0-9]*,-?[0-9]*\)/));
@@ -169,12 +168,8 @@ export class ParserService {
     }
 
     parse(text: string): BpmnGraph | undefined {
-       
+
         console.log("parsing");
-        if (!this.formValidationService.validateFormat(text)) {
-            this.displayerrorService.displayError("Fehler beim Textformat. bitte Spezifikation beachten");
-            return;
-        } else {
         
         const lines = text.split('\n');
         this.text = lines; 
@@ -248,10 +243,10 @@ export class ParserService {
         }
      
     }
-}
 
 
     private parseTasks(line: string): BpmnNode | undefined {
+
         let description = "";
         if(line.includes('"')) {
             description = line.split('"')[1];
@@ -269,14 +264,11 @@ export class ParserService {
             return;
         }
         let activity = new BpmnTask(name);
-        console.log(lineSplit);
+        //console.log(lineSplit);
 
-        //if line ends with a \n
-        let type = lineSplit[1];
-        switch (type.toLowerCase()) {
-            case ("none"):
-                activity = new BpmnTask(name);
-                break;
+        if(lineSplit[1] && !lineSplit[1].startsWith("(") && !(lineSplit[1] === description)){
+            let type = lineSplit[1];
+            switch (type.toLowerCase()) {
             case ("sending"):
                 activity = new BpmnTaskSending(name);
                 break;
@@ -296,8 +288,8 @@ export class ParserService {
                 activity = new BpmnTaskUserTask(name);
                 break;
             default: 
-                this.displayerrorService.displayError("invalid task type "+ type);
-        }
+                this.displayerrorService.displayError("Ungültiger Task Typ"+ type);
+        }}
 
         if(description) activity.label = description;
 
@@ -339,7 +331,7 @@ export class ParserService {
                 event = new BpmnEventEnd(name);
                 break;
             default: 
-                this.displayerrorService.displayError("invalid event type '" + type + "'");
+                this.displayerrorService.displayError("Ungültiger Event Typ " + type + "'");
         }
 
         if(description) event.label = description;
@@ -387,7 +379,7 @@ export class ParserService {
                 gateway = new BpmnGatewaySplitXor(name);
                 break;
             default: 
-                this.displayerrorService.displayError("invalid gateway type " + type); 
+                this.displayerrorService.displayError("Ungültiger Gateway Typ " + type); 
         }
         if(description) gateway.label = description;
         return gateway;
@@ -430,7 +422,7 @@ export class ParserService {
                             case("sequenceflow"): sequence = new BpmnEdge(name,node1,node2); break;
                             case("association"): sequence = new BpmnEdgeAssociation(name,node1,node2); break;
                             case("informationflow"): sequence = new BpmnEdgeMessageflow(name,node1,node2); break;
-                            default: this.displayerrorService.displayError("invalid connector type "+ type + node1.id + node2.id);
+                            default: this.displayerrorService.displayError("Ungültiger Edge Typ "+ type + node1.id + node2.id);
                         }
                         if(description) sequence.labelMid = description;
                         

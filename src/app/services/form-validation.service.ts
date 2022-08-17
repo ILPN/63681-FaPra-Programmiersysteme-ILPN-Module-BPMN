@@ -13,32 +13,26 @@ export class FormValidationService {
     }
 
     validateFormat(input: string): boolean {
-        if (!input.includes(".tasks" && ".edges")) {
-            this.displayErrorService.displayError("wrong format");
-            //console.log("wrong format");
-            return false;
-        } else {
+        if (input.includes(".tasks")){
             if (!this.validateCategory("tasks", input)) {
                 return false;
             }
+        }
+        if(input.includes(".edges")){
             if (!this.validateCategory("edges", input)) {
                 return false;
             }
-            ;
-
-            if (input.includes(".events")) {
-                if (!this.validateCategory("events", input)) {
-                    return false;
-                }
-            }
-            if (input.includes(".gateways")) {
-                if (!this.validateCategory("gateways", input)) {
-                    return false;
-                }
-            }
-
-
         }
+        if (input.includes(".events")) {
+            if (!this.validateCategory("events", input)) {
+                return false;
+                }
+            }
+        if (input.includes(".gateways")) {
+            if (!this.validateCategory("gateways", input)) {
+                return false;
+                }
+            }
         return true;
     }
 
@@ -46,8 +40,8 @@ export class FormValidationService {
         let regexp: RegExp;
         switch (category) {
 
-            case "tasks": regexp = /^[\w]+( "[\w ]*")? (Sending|Manual|Service|BusinessRule|Receiving|UserTask|none)(?: \([0-9]*,[0-9]*\))?/i; break;
-            case "edges": regexp = /^[\w]+ [\w]+( "[\w ]*")? (SequenceFlow|Association|InformationFlow)(?: \([0-9]*,[0-9]*\))?/i; break;
+            case "tasks": regexp = /^[\w]+( "[\w ]*")? (Sending|Manual|Service|BusinessRule|Receiving|UserTask)? (?: \([0-9]*,[0-9]*\))?/i; break;
+            case "edges": regexp = /^[\w]+ [\w]+( "[\w ]*")? (SequenceFlow|Association|InformationFlow|DefaultFlow)(?: \([0-9]*,[0-9]*\))?/i; break;
             case "events": regexp = /^[\w]+( "[\w ]*")? (Start|End|Intermediate)(?: \([0-9]*,[0-9]*\))?/i; break;
             case "gateways": regexp = /^[\w]+( "[\w ]*")? (XOR_SPLIT|XOR_JOIN|AND_SPLIT|AND_JOIN|OR_SPLIT|OR_JOIN)(?: \([0-9]*,[0-9]*\))?/i; break;
             default: return false;
