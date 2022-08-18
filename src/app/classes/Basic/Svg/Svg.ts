@@ -43,13 +43,13 @@ export class Svg {
     static event(pos: Vector, radius: number, label: string) {
         const c = Svg.relativeContainerWithClass(pos, "Event")
         c.append(Svg.circleNoStyle(new Vector(0, 0), radius, "nodeBackground"))
-        c.appendChild(this.getText(label, 0, radius + 15, 12, 2))
+        c.appendChild(this.getText(label, 0, radius + 15, 20, 2))
         return c
     }
     static gateway(pos: Vector, width: number, label: string) {
         const g = this.relativeContainerWithClass(pos, "Gateway")
         g.appendChild(this.rotatetSquare(0, 0, width))
-        g.appendChild(Svg.getText(label, 0, width / 2 + 15, 12, 2))
+        g.appendChild(Svg.getText(label, 0, width / 2 + 15, 20, 2))
         // g.appendChild(this.image(iconUrl,dimen.half().invers().plus(new Vector(10,10))))
         return g
     }
@@ -229,7 +229,7 @@ export class Svg {
         return txt;
     }
 
-    static getText(text: string, x: number = 0, y: number = 0, fontSize: number = 12, maxZeilen: number = 4): SVGElement {
+    static getText(text: string, x: number = 0, y: number = 0, fontSize: number = 20, maxZeilen: number = 4): SVGElement {
         if(text == undefined) text = ""
         text = text.trim()
         

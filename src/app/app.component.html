@@ -8,17 +8,17 @@
     <app-mode-switch></app-mode-switch>
     <!--    Main content    -->
     <div [ngSwitch]="mode">
-        <app-display-draggable-graph *ngSwitchCase="'free dragging'"
+        <app-display-draggable-graph *ngSwitchCase="'free layout'"
                                      class="padding full-size"></app-display-draggable-graph>
-        <app-display-reorder-graph *ngSwitchCase="'change order'"
+        <app-display-reorder-graph *ngSwitchCase="'Sugiyama layout'"
                                    class="padding full-size"></app-display-reorder-graph>
-        <app-display-switch-graph *ngSwitchCase="'switch diagram'"
+        <app-display-switch-graph *ngSwitchCase="'simulation'"
                                   class="padding full-size"></app-display-switch-graph>
 
         <button (click)="checkForGuidelines()" style="margin-left:15px" mat-raised-button>Check for guidelines</button>
         <p *ngIf="graphIsSound">Validierung abgeschlossen. Der angezeigte Graph ist Well Handled (Sound).</p>
         <app-violated-guidelines></app-violated-guidelines>
-    </div>
+</div>
     <div fxLayout="row" fxLayoutAlign="space-evenly start">
         <input-field buttonText="File upload"
                      buttonIcon="publish"

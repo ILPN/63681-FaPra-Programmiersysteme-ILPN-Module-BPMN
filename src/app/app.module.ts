@@ -14,13 +14,13 @@ import {InputFieldComponent} from './components/input-field/input-field.componen
 import {OutputFieldComponent} from './components/output-field/output-field.component';
 import {InputDirective} from './directives/input.directive';
 import {ErrorHintComponent} from './components/error-hint/error-hint.component';
-import { ModeSwitchComponent } from './components/mode-switch/mode-switch.component';
+import {ModeSwitchComponent} from './components/mode-switch/mode-switch.component';
 import {MatButtonToggleModule} from '@angular/material/button-toggle';
-import { FormsModule } from '@angular/forms';
-import { DisplayDraggableGraphComponent } from './components/display-draggable-graph/display-draggable-graph.component';
-import { DisplayReorderGraphComponent } from './components/display-reorder-graph/display-reorder-graph.component';
-import { DisplaySwitchGraphComponent } from './components/display-switch-graph/display-switch-graph.component';
-import { ViolatedGuidelinesComponent } from './components/violated-guidelines/violated-guidelines.component';
+import {FormsModule} from '@angular/forms';
+import {DisplayDraggableGraphComponent} from './components/display-draggable-graph/display-draggable-graph.component';
+import {DisplayReorderGraphComponent} from './components/display-reorder-graph/display-reorder-graph.component';
+import {DisplaySwitchGraphComponent} from './components/display-switch-graph/display-switch-graph.component';
+import {ViolatedGuidelinesComponent} from './components/violated-guidelines/violated-guidelines.component';
 
 @NgModule({
     declarations: [
@@ -46,8 +46,7 @@ import { ViolatedGuidelinesComponent } from './components/violated-guidelines/vi
         MatButtonToggleModule,
         FormsModule,
         MatIconModule,
-        ReactiveFormsModule,
-    ],
+        ReactiveFormsModule,],
     providers: [],
     bootstrap: [AppComponent]
 })

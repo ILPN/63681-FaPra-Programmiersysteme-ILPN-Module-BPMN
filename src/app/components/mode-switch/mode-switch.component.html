@@ -1,7 +1,13 @@
 <p>
-    <mat-button-toggle-group [(value)]="selectedToggle" #group="matButtonToggleGroup" multiple=false>
-        <mat-button-toggle *ngFor="let item of toggleOptions;" (change)="selectionChanged($event)" [value]="item">
+    <mat-button-toggle-group
+        [(value)]="selectedToggle"
+        #group="matButtonToggleGroup"
+        multiple="false">
+        <mat-button-toggle *ngFor="let item of [toggleOptions[0], toggleOptions[1]];" (change)="selectionChanged($event)" [value]="item">
             {{item}}</mat-button-toggle>
-    </mat-button-toggle-group>
 
+            <mat-button-toggle *ngFor="let item of [toggleOptions[2]];" (change)="selectionChanged($event)" [value]="item">
+                {{item}}</mat-button-toggle>
+
+    </mat-button-toggle-group>
 </p>
