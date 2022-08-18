@@ -10,6 +10,7 @@ import {GraphValidationService} from "../../services/graph-validation.service";
 export class ErrorHintComponent {
     errorVisible: boolean = false;
     msg: string = "";
+    messages: string[] = [];
 
     constructor(service: DisplayErrorService, private graphValidationService: GraphValidationService) {
         service.errorHint = this;
@@ -22,12 +23,17 @@ export class ErrorHintComponent {
     public removeMessage(): void {
         this.errorVisible = false;
         this.msg = '';
+        this.messages = [];
         this.graphValidationService.resetErrorMessage();
     }
 
     public setMessage(msg: string) {
         this.msg = msg;
         this.showError();
+    }
+
+    public addErrorMessage(msg: string): void {
+        this.messages.push(msg);
     }
 
 }

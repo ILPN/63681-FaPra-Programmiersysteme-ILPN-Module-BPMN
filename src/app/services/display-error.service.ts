@@ -12,4 +12,9 @@ export class DisplayErrorService {
             this.errorHint.setMessage(msg);
         }
     }
+
+    addErrorMessage(message: string): void {
+        this.errorHint?.addErrorMessage(message);
+    }
+
 }
