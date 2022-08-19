@@ -1,5 +1,9 @@
 import { BpmnNode } from "../Basic/Bpmn/BpmnNode"
 import { BpmnUtils } from "../Basic/Bpmn/BpmnUtils"
+import { BpmnEvent } from "../Basic/Bpmn/events/BpmnEvent"
+import { BpmnEventEnd } from "../Basic/Bpmn/events/BpmnEventEnd"
+import { BpmnEventIntermediate } from "../Basic/Bpmn/events/BpmnEventIntermediate"
+import { BpmnEventStart } from "../Basic/Bpmn/events/BpmnEventStart"
 import { Constants } from "./constants"
 import { Exporter } from "./exporter"
 import { Namespace } from "./namespaces"
@@ -13,23 +17,39 @@ export class EventExporter extends Exporter {
 
 
     /**
-     * creates XML element <bpmn:startEvent> or <bpmn:endEvent> or <bpmn:intermediateThrowEvent> under <bpmn:process>
+     * creates XML element <bpmn:intermediateThrowEvent> under <bpmn:process>
      * @param bpmnNode 
      * @returns 
      */
-    bpmnEventXml(bpmnNode: BpmnNode): { element: Element | null, error: string } {
+    bpmnIntermEventXml(bpmnNode: BpmnEventIntermediate): Element {
+        return this.createEvent(bpmnNode, Namespace.INTERMEDIATE_EVENT_ELEMENT)
+    }
 
-        let createElementResult = this.createElementNS(bpmnNode, Namespace.BPMN, this.getTagName(bpmnNode))
-        if (createElementResult.element) {
-            let event = createElementResult.element
-            event.setAttribute("id", bpmnNode.id + "_" + Random.id())
-            if (bpmnNode.label)
-                event.setAttribute("name", bpmnNode.label)
-            return { element: event, error: "" }
-        }
+    /**
+     * creates XML element <bpmn:endEvent> under <bpmn:process>
+     * @param bpmnNode 
+     * @returns 
+     */
+    bpmnEndEventXml(bpmnNode: BpmnEventEnd): Element {
+        return this.createEvent(bpmnNode, Namespace.END_ELEMENT)
+    }
 
+    /**
+     * creates XML element <bpmn:startEvent> under <bpmn:process>
+     * @param bpmnNode 
+     * @returns 
+     */
+    bpmnStartEventXml(bpmnNode: BpmnEventStart): Element {
+        return this.createEvent(bpmnNode, Namespace.START_ELEMENT)
+    }
 
-        return { element: null, error: createElementResult.error }
+    createEvent(bpmnNode: BpmnEvent, xmlTag: string): Element {
+        let event = this.createElementNS(bpmnNode, Namespace.BPMN, xmlTag)
+
+        event.setAttribute("id", bpmnNode.id + "_" + Random.id())
+        if (bpmnNode.label)
+            event.setAttribute("name", bpmnNode.label)
+        return event
     }
 
     /**
@@ -64,15 +84,6 @@ export class EventExporter extends Exporter {
 
     }
 
-    //type of event
-    private getTagName(bpmnNode: BpmnNode): string | undefined {
-        if (BpmnUtils.isStartEvent(bpmnNode))
-            return Namespace.START_ELEMENT
-        if (BpmnUtils.isIntermediateEvent(bpmnNode))
-            return Namespace.INTERMEDIATE_EVENT_ELEMENT
 
-        if (BpmnUtils.isEndEvent(bpmnNode))
-            return Namespace.END_ELEMENT
-        return undefined
-    }
+
 }
