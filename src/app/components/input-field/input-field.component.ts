@@ -47,10 +47,12 @@ export class InputFieldComponent {
                 if (validated) {
                     // console.log("validation successful");
                     this.newInputEvent.emit(input);
+                } else {
+                    this.displayErrorService.displayError("Fehler beim Textformat. bitte Spezifikation beachten");
+                    return;
+                 }
                 }
 
-            }
-        })
+            })
+        }
     }
-
-}

@@ -2,23 +2,23 @@
 StartEv start "StartEvent" (60,190)
 EndEvent end "EndEvent" (1600,190)
 
-.activities
+.tasks
 BRTask businessrule "BusinessRule" (442,60)
 ManualTask manual "ManualTask" (442,320)
-UserTask usertask "UserTask" (1225,190)
+UserTask usertask "UserTask" (442,190)
 
 .gateways 
 ORSplit or_split "ORSplit" (210,190)
 ORJoin or_join "ORJoin" (675,190)
 
-.sequences
-connector1 sequenceflow "1" StartEv BRTask
-connector2 sequenceflow "2" BRTask ORSplit (210,320)
-connector3 sequenceflow "3" ORSplit ManualTask (675,60)
-connector4 sequenceflow "4" ORSplit UserTask (675,320)
-connector5 sequenceflow "5" ManualTask ORJoin 
-connector6 sequenceflow "6" UserTask ORJoin
-connector7 sequenceflow "7" ORJoin EndEvent
+.edges
+StartEv BRTask sequenceflow "1" 
+BRTask ORSplit sequenceflow "2"
+ORSplit ManualTask sequenceflow "3"
+ORSplit UserTask sequenceflow "4"
+ManualTask ORJoin sequenceflow "5" 
+UserTask ORJoin sequenceflow "6" 
+ORJoin EndEvent sequenceflow "7"
 
  
 
