@@ -62,7 +62,6 @@ export class OutputFieldComponent {
                     textToExport = result.xmlText
                 else
                     textToExport = result.error
-                console.error(result.error)
                 break;
             }
 

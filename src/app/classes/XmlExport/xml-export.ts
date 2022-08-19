@@ -90,8 +90,6 @@ export class XmlExporter {
             this.error = (err as Error).message;
         }
 
-        console.log("ERR " + this.error)
-
         return { xmlText: xmlString, ok: valid, error: this.error }
     }
 
