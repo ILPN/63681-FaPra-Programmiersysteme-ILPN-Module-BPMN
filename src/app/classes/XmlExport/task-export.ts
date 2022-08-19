@@ -22,7 +22,7 @@ export class TaskExporter extends Exporter {
         //add under <bpmn:process>
         let task = this.createElementNS(bpmnNode, Namespace.BPMN, this.getTagName(bpmnNode))
 
-        task.setAttribute("id", bpmnNode.id + "_" + Random.id())
+        task.setAttribute("id", Random.id() + "_" + bpmnNode.id)
         task.setAttribute("name", bpmnNode.label)
 
         return task

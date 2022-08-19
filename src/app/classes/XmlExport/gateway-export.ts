@@ -20,7 +20,7 @@ export class GatewayExporter extends Exporter {
         //add under <bpmn:process>
         let gateway = this.createElementNS(bpmnNode, Namespace.BPMN, this.getTagName(bpmnNode))
 
-        gateway.setAttribute("id", bpmnNode.id + "_" + Random.id())
+        gateway.setAttribute("id", Random.id() + "_" + bpmnNode.id)
         if (bpmnNode.label)
             gateway.setAttribute("name", bpmnNode.label)
 
