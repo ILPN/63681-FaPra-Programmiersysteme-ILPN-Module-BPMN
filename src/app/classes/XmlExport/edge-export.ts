@@ -57,7 +57,7 @@ export class EdgeExporter extends Exporter {
             if (edge.bpmnEdge === bpmnEdge)
                 return edge
 
-        let newEdge = new Edge(bpmnEdge, bpmnEdge.id + "_" + Random.id())
+        let newEdge = new Edge(bpmnEdge, Random.id() + "_" + bpmnEdge.id)
         this.edges.push(newEdge)
 
         return newEdge

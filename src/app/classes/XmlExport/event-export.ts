@@ -46,7 +46,7 @@ export class EventExporter extends Exporter {
     createEvent(bpmnNode: BpmnEvent, xmlTag: string): Element {
         let event = this.createElementNS(bpmnNode, Namespace.BPMN, xmlTag)
 
-        event.setAttribute("id", bpmnNode.id + "_" + Random.id())
+        event.setAttribute("id", Random.id() + "_" + bpmnNode.id)
         if (bpmnNode.label)
             event.setAttribute("name", bpmnNode.label)
         return event
