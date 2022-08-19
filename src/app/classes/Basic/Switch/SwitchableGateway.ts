@@ -1,11 +1,19 @@
+import { BpmnNode } from "../Bpmn/BpmnNode";
 import { BpmnUtils } from "../Bpmn/BpmnUtils";
 import { BpmnGateway } from "../Bpmn/gateways/BpmnGateway";
+import { SwitchController } from "./switch-controller";
 import { SwitchableGraph } from "./SwitchableGraph";
 import { SwitchableNode } from "./SwitchableNode";
 import { SwitchState } from "./switchstatetype";
 import { SwitchUtils } from "./SwitchUtils";
 
 export class SwitchableGateway extends SwitchableNode {
+
+
+//     override addSuccessor(node: SwitchableNode) {
+//     super.addSuccessor(node);
+//    // this._permutationsArray = this.getCombinationsOfNodes(this.successors);
+// }
 
 
     /**  Disables all alternative paths not taken in case of an or gateway*/
@@ -223,8 +231,163 @@ export class SwitchableGateway extends SwitchableNode {
     }
 
 
+// ------ Classic Switch Code --------
+private _permutationsArray : SwitchableNode[][] = this.getCombinationsOfNodes(this.successors);
+private _permutationNumber: number = 0;
 
+toggleGateway() {
+    console.log("Größe Array = "+this._permutationNumber +" ----- "+this._permutationsArray.length+ " "+this.successors.length);
 
+    this._permutationsArray  = this.getCombinationsOfNodes([...this.successors]);
+
+    this.deactivateToggleGateway();
+    if(this._permutationNumber < (this._permutationsArray.length-1)) {
+        this._permutationNumber++;
+    } else {
+        this._permutationNumber = 0;
+    }
+    this.activateToggleGateway();
+    console.log("Größe Array = "+this._permutationNumber +" ----- "+this._permutationsArray.length+ " "+this.successors.length);
+    // if(this._permutationNumber === 0) {
+    //     this.activateToggleGateway();
+    //     this._permutationNumber++;
+    // } else {
+    //     this._permutationNumber = 0;
+    //     this.deactivateToggleGateway();
+    // }
+    
+
+   // let num : string[] = ["1","2","3","4"]
+//let newh = this.getCombinationsOfNodes(this.successors);
+
+// console.log("it beginns:");
+// newh.forEach(element => {
+//     var zeile : String = "";
+//     element.forEach(e => { zeile += e + " ";
+//     });
+//     console.log(zeile);
+// });
 
 
 }
+
+
+/**
+     * creates a list for each combination of the specified ids 
+     * @param ids 
+     * @returns list of lists
+     */
+ getCombinationsOfNodes(nodes: SwitchableNode[]): SwitchableNode[][] {
+    let combis: SwitchableNode[][] = [];
+    while (nodes.length >= 1) {
+        //minimal combination consists of 2 values
+        let combi_len: number = 1;
+        while (combi_len <= nodes.length) {
+
+            combis.push(...this.getCombinationsOfLength(nodes, combi_len))
+            combi_len++;
+        }
+
+        //remove first element
+        nodes.splice(0, 1);
+    }
+
+    return combis;
+}
+
+private getCombinationsOfLength(nodes: SwitchableNode[], len: number): SwitchableNode[][] {
+    let combis: SwitchableNode[][] = [];
+
+    let start: number = 1;
+    let end: number = start + len - 1;
+    while (end <= nodes.length) {
+        //always add first element and combination of <len-1> other elements
+        let combi: SwitchableNode[] = [nodes[0], ...nodes.slice(start, end)];
+        combis.push(combi);
+
+        start++;
+        end++;
+    }
+
+    return combis;
+
+}
+
+// /**
+//      * creates a list for each combination of the specified ids 
+//      * @param ids 
+//      * @returns list of lists
+//      */
+//  getCombinationsOfIds(ids: string[]): string[][] {
+//     let combis: string[][] = [];
+//     while (ids.length >= 1) {
+//         //minimal combination consists of 2 values
+//         let combi_len: number = 1;
+//         while (combi_len <= ids.length) {
+
+//             combis.push(...this.getCombinationsOfLength(ids, combi_len))
+//             combi_len++;
+//         }
+
+//         //remove first element
+//         ids.splice(0, 1);
+//     }
+
+//     return combis;
+// }
+
+// private getCombinationsOfLength(ids: string[], len: number): string[][] {
+//     let combis: string[][] = [];
+
+//     let start: number = 1;
+//     let end: number = start + len - 1;
+//     while (end <= ids.length) {
+//         //always add first element and combination of <len-1> other elements
+//         let combi: string[] = [ids[0], ...ids.slice(start, end)];
+//         combis.push(combi);
+
+//         start++;
+//         end++;
+//     }
+
+//     return combis;
+
+// }
+
+activateToggleGateway() {
+    this._permutationsArray[this._permutationNumber].forEach(node => {
+        node.enable();
+    });
+}
+
+deactivateToggleGateway() {
+    this._permutationsArray[this._permutationNumber].forEach(node => {
+        node.disable();
+    });
+}
+
+switchGateway() {}
+
+// ------ Ende Classic Switch --------
+
+
+}
+
+//  class permut {
+//     private _permutation : SwitchableNode[] = [];
+
+//     constructor(input : SwitchableNode[]) {
+//         this._permutation = input;
+//     }
+
+
+//     get permutation(): Array<SwitchableNode> {
+//         return this._permutation
+//     }
+
+//     addToPermutation(node: SwitchableNode) {
+//         SwitchUtils.addItem(node, this._permutation)
+//     }
+
+//  }
+

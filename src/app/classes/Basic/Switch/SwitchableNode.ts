@@ -136,6 +136,15 @@ export class SwitchableNode {
     }
 
     /** disables the node and changes its color */
+    enable(): void {
+        if (this.switchState === SwitchState.disabled) {
+            this.switchTo(SwitchState.enableable)
+        } else {
+            this.switchTo(SwitchState.switchedButEnableForLoopRun)
+        }
+    }
+
+    /** disables the node and changes its color */
     disable(): void {
         if (this.switchState === SwitchState.switchedButEnableForLoopRun) {
             this.switchTo(SwitchState.switched)
