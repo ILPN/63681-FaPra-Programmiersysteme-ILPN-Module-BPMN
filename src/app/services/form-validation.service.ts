@@ -13,47 +13,37 @@ export class FormValidationService {
     }
 
     validateFormat(input: string): boolean {
-        //console.log(input);
-        if (!input.includes(".activities" && ".sequences")) {
-            this.displayErrorService.displayError("wrong format");
-            //console.log("wrong format");
-            return false;
-        } else {
-            if (!this.validateCategory("activities", input)) {
+        if (input.includes(".tasks")){
+            if (!this.validateCategory("tasks", input)) {
                 return false;
             }
-            if (!this.validateCategory("sequences", input)) {
-                return false;
-            }
-            ;
-
-            if (input.includes(".events")) {
-                if (!this.validateCategory("events", input)) {
-                    return false;
-                }
-            }
-            if (input.includes(".gateways")) {
-                if (!this.validateCategory("gateways", input)) {
-                    return false;
-                }
-            }
-
-
         }
+        if(input.includes(".edges")){
+            if (!this.validateCategory("edges", input)) {
+                return false;
+            }
+        }
+        if (input.includes(".events")) {
+            if (!this.validateCategory("events", input)) {
+                return false;
+                }
+            }
+        if (input.includes(".gateways")) {
+            if (!this.validateCategory("gateways", input)) {
+                return false;
+                }
+            }
         return true;
     }
 
     private validateCategory(category: string, input: string): boolean {
         let regexp: RegExp;
         switch (category) {
-            //bei Aktivitäten und Events müssen wir uns noch auf Typen einigen
-            //die für die Eingabe gültig sind, dann kann ich sie hier mit überprüfen
-            //aktuell sind nur die Typen für Gateways eindeutig definiert
 
-            case "activities": regexp = /^[\w]+ (None|Sending|Manual|Service|BusinessRule|Receiving|UserTask) "[\w ]*"(?: \([0-9]*,[0-9]*\))?/i; break;
-            case "sequences": regexp = /^[\w]+ (SequenceFlow|Association|InformationFlow) "[\w ]*" [\w]+ [\w]+(?: \([0-9]*,[0-9]*\))?/i; break;
-            case "events": regexp = /^[\w]+ (Start|End|Intermediate) "[\w ]*"(?: \([0-9]*,[0-9]*\))?/i; break;
-            case "gateways": regexp = /^[\w]+ (XOR_SPLIT|XOR_JOIN|AND_SPLIT|AND_JOIN|OR_SPLIT|OR_JOIN) "[\w ]*"(?: \([0-9]*,[0-9]*\))?/i; break;
+            case "tasks": regexp = /^[\w]+( "[\w ]*")? (Sending|Manual|Service|BusinessRule|Receiving|UserTask)?(?: \([0-9]*,[0-9]*\))?/i; break;
+            case "edges": regexp = /^[\w]+ [\w]+( "[\w ]*")? (SequenceFlow|Association|InformationFlow|DefaultFlow)(?: \([0-9]*,[0-9]*\))?/i; break;
+            case "events": regexp = /^[\w]+( "[\w ]*")? (Start|End|Intermediate)(?: \([0-9]*,[0-9]*\))?/i; break;
+            case "gateways": regexp = /^[\w]+( "[\w ]*")? (XOR_SPLIT|XOR_JOIN|AND_SPLIT|AND_JOIN|OR_SPLIT|OR_JOIN)(?: \([0-9]*,[0-9]*\))?/i; break;
             default: return false;
         }
 
@@ -78,7 +68,7 @@ export class FormValidationService {
                 pos++;
             }
         }
-        //console.log(category + " validated");
+        console.log(category + " validated");
         return true;
         }
 

@@ -2,15 +2,15 @@
 StartEv start "StartEvent" (60,190)
 EndEvent end "EndEvent" (1600,190)
 
-.activities
+.tasks
 ServiceTask service "ServiceTask" (442,60)
 
 .gateways 
 
 
-.sequences
-connector1 sequenceflow "1" StartEv ServiceTask
-connector7 sequenceflow "2" ServiceTask EndEvent
+.edges
+StartEv ServiceTask sequenceflow "1" 
+ServiceTask EndEvent sequenceflow "2" 
 
  
 

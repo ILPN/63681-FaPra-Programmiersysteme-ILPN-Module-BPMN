@@ -89,9 +89,9 @@ export class DisplayDraggableGraphComponent
             Utility.removeAllChildren(this.drawingArea.nativeElement);
             const svg =this._draggableGraph.svgManager.getSvg()
             this.drawingArea.nativeElement.appendChild(svg);
-            this._layoutService.zoomViewToSvg(svg, this.drawingArea.nativeElement,this.rootSvg.nativeElement)
-
+            this._layoutService.zoomViewToSvg(svg, this.drawingArea.nativeElement,this.rootSvg.nativeElement);
         });
+
     }
 
     ngOnDestroy(): void {

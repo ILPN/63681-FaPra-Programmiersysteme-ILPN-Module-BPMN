@@ -14,15 +14,14 @@ import { ParserService } from './parser.service';
     providedIn: 'root',
 })
 export class LayoutService {
-   
-    private _afterSugiyamaLayoutCallback = () => {}
-    public set afterSugiyamaLayoutCallback(value:()=>any) {
+
+    private _afterSugiyamaLayoutCallback = (bpmnGraph:BpmnGraph,text:string) => {}
+    public set afterSugiyamaLayoutCallback(value:(bpmnGraph: BpmnGraph,text:string)=>any) {
         this._afterSugiyamaLayoutCallback = value;
     }
     applySugiyama(bpmnGraph: BpmnGraph) {
         this.getSugiyamaResult(bpmnGraph);
         this.setCoordinates(bpmnGraph);
-        this._afterSugiyamaLayoutCallback()
     }
     getSnapsForNode(): SnapElement[] {
         const snaps = [];
