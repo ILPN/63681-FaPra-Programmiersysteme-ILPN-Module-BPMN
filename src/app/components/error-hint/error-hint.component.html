@@ -5,8 +5,7 @@
         class="closeButton"
         (click)="removeMessage()">X
     </button>
-    <!--    <p class="message">{{msg}}</p>-->
-    <!--    msg noch drinnen lassen, fuer andere Fehlermeldungen. Nicht sound ist es ja nur bei meinen Sachen nicht-->
+        <p class="message">{{msg}}</p>
     <div class="messages">
         <h1 class="message-header">Graph ist nicht sound:</h1>
         <ul *ngFor="let message of messages">

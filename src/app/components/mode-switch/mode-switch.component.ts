@@ -1,35 +1,40 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
-import { AppComponent } from 'src/app/app.component';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
+import {AppComponent} from 'src/app/app.component';
 
 @Component({
-  selector: 'app-mode-switch',
-  templateUrl: './mode-switch.component.html',
-  styleUrls: ['./mode-switch.component.scss']
+    selector: 'app-mode-switch',
+    templateUrl: './mode-switch.component.html',
+    styleUrls: ['./mode-switch.component.scss']
 })
-export class ModeSwitchComponent implements OnInit,AfterViewInit {
-  selectedToggle: string;
-  toggleOptions: Array<string> = ["free layout", "Sugiyama layout", "simulation"];
-  constructor( private _appComponent: AppComponent) {
-    this.selectedToggle = this.toggleOptions[0]
-  }
-  ngAfterViewInit(): void {
-  }
+export class ModeSwitchComponent implements OnInit, AfterViewInit {
+    selectedToggle: string;
+    toggleOptions: Array<string> = ["free layout", "Sugiyama layout", "simulation"];
 
-  ngOnInit(): void {
-  }
-
-  selectionChanged(item : any) {
-
-    if(item.value == this.toggleOptions[1]){
-      if(!confirm("reapplying the sugiyama layout will override set positions of nodes and delete all corners of edges, do you want to proceed?")) {
-        setTimeout(()=>{ this.selectedToggle = this._appComponent.mode},5)
-        return
-      }
+    constructor(private _appComponent: AppComponent) {
+        this.selectedToggle = this.toggleOptions[0]
     }
-    this.selectedToggle = item.value
-    this._appComponent.mode = item.value
+
+    ngAfterViewInit(): void {
+    }
+
+    ngOnInit(): void {
+    }
+
+    selectionChanged(item: any) {
+        this._appComponent.checkForGuidelines();
+
+        if (item.value == this.toggleOptions[1]) {
+            if (!confirm("reapplying the sugiyama layout will override set positions of nodes and delete all corners of edges, do you want to proceed?")) {
+                setTimeout(() => {
+                    this.selectedToggle = this._appComponent.mode
+                }, 5)
+                return
+            }
+        }
+        this.selectedToggle = item.value
+        this._appComponent.mode = item.value
 
 
-  }
+    }
 
 }
