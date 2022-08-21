@@ -1,4 +1,4 @@
-import { Transition } from "./transition";
+import { Transition } from "./pn-transition";
 
 
 /**
@@ -24,8 +24,14 @@ export class CombiTransition extends Transition {
         return this.transitions.map(trans => trans.id);
     }
 
+    containsId(id: string): boolean{
+        return this.getIds().includes(id)
+    }
 
 
+    override isCombi(): boolean {
+        return true
+    }
 
 
 

@@ -1,21 +1,21 @@
 import { BpmnNode } from "../Basic/Bpmn/BpmnNode";
+import { BpmnUtils } from "../Basic/Bpmn/BpmnUtils";
 import { Arc } from "./arc";
-import { Place } from "./place";
+import { Place } from "./pn-place";
 import { PnElement } from "./pn-element";
-import { Transition } from "./transition";
+import { Transition } from "./pn-transition";
 
 /**
  * combination of petri net transitions and places that represent BPMN element
  */
-export class PnSubnet {
+export abstract class PnSubnet {
     id: string;
-    _inputPlace: Place;
+
 
     _transitions: Array<Transition>;
     _places: Array<Place>;
     _arcs: Array<Arc>;
 
-    valid: boolean = true
     errors: string = ""
 
 
@@ -26,10 +26,6 @@ export class PnSubnet {
         this._places = new Array<Place>();
         this._arcs = new Array<Arc>();
 
-        //every BPMN element is mapped to a combination of at least one place and following transition
-        let transition = this.addTransition(new Transition(bpmnNode.id, bpmnNode.label))
-        this._inputPlace = this.addInputPlace();
-        this.addArc(Arc.create(this._inputPlace, transition))
     }
 
     get transitions(): Array<Transition> {
@@ -39,17 +35,36 @@ export class PnSubnet {
         return this._arcs;
     }
 
-    get inputPlace(): Place | undefined {
-        return this._inputPlace
+    get label(): string {
+
+        if (this.bpmnNode.label)
+            return this.bpmnNode.label
+        return this.bpmnNode.id
+
     }
+
+    abstract get transitionsToConnectToNextSubnet(): Array<Transition>
+
+    abstract get placeToConnectToPreviousSubnet(): Place | undefined
+
+
 
     public get places(): Array<Place> {
         return this._places;
     }
 
-    setErrorStatus(errors: string) {
-        this.valid = false
-        this.errors += errors
+    /**
+   * find one of the transitions that is not connected to the following PN-Subnet yet
+   */
+    findNotConnectedTransition(): Transition | undefined {
+        return this.transitions.find(trans => trans.notConnected())
+    }
+
+    /**
+    * find one of the input places that is not connected to preceding PN-Subnet yet
+    */
+    findNotConnectedPlace(): Place | undefined {
+        return this.places.find(place => place.notConnected())
     }
 
     arcExists(arcToCheck: Arc): boolean {
@@ -75,20 +90,7 @@ export class PnSubnet {
 
     }
 
-    /**
-     * creates new arc to the specified PN element
-     * @param to target element
-     */
-    addArcTo(to: PnElement): { error: string, ok: boolean } {
-        let arc: Arc = Arc.create(this.transitions[0], to);
-        if (!arc.valid)
-            return { error: arc.errors, ok: false }
 
-        this.addArc(arc);
-
-        return { error: "", ok: true }
-
-    }
 
     addPlace(place: Place): Place {
         if (!this.places.includes(place))
@@ -102,28 +104,6 @@ export class PnSubnet {
             this.transitions.push(trans)
 
         return trans
-    }
-
-    /**
-     * one of the input places of PnSubnet that is not connected to preceding PnSubnet yet
-     * @returns 
-     */
-    findNotConnectedInputPlace(): Place | undefined {
-
-        return this.places.find(place => place.notConnected())
-    }
-
-    /**
-     * one of the transitions of PnSubnet that is not connected to following PnSubnet yet
-     * @returns 
-     */
-    findNotConnectedTransition(): Transition | undefined {
-
-        return this.transitions.find(trans => trans.notConnected())
-    }
-
-    addInputPlace(): Place {
-        return this.addPlace(Place.create());
     }
 
     getTransitionsByIds(ids: Array<string>): Array<Transition> {

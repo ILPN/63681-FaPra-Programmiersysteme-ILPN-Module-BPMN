@@ -1,7 +1,7 @@
 import { BpmnNode } from "../Basic/Bpmn/BpmnNode";
 import { BpmnUtils } from "../Basic/Bpmn/BpmnUtils";
 import { PnElement } from "./pn-element";
-import { Transition } from "./transition";
+import { Transition } from "./pn-transition";
 
 export class PnUtils {
     /**

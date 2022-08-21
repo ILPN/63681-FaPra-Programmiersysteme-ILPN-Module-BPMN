@@ -1,46 +1,43 @@
 import { BpmnNode } from "../Basic/Bpmn/BpmnNode";
 import { Arc } from "./arc";
-import { CombiTransition } from "./combi-transition";
-import { Place } from "./place";
+import { CombiTransition } from "./pn-combi-transition";
 import { PnElement } from "./pn-element";
-import { PnOrGateway } from "./pn-or-gateway";
+import { OnePlaceMultiTransitionsPnSubnet } from "./pn-oneplace-multitrans-subnet";
 import { PnOrJoin } from "./pn-or-join";
+import { Transition } from "./pn-transition";
 import { PnUtils } from "./pn-utils";
-import { Transition } from "./transition";
 
 /**
  * to convert OrSplit in BPMN graph all paths and their combinations 
  * have to be represented in petri net as transitions connected to one preceding place 
  */
-export class PnOrSplit extends PnOrGateway {
+export class PnOrSplit extends OnePlaceMultiTransitionsPnSubnet {
 
     constructor(bpmnNode: BpmnNode) {
         super(bpmnNode);
 
-        //for adding index to the label of each transition
-        let counter: number = 1;
-
-        //one transition already exists
-        this.transitions[0].addCounterToLabelAndId(counter++);
-
-        //create as many transitions as there are outgoing edges
-        //connect the only one incoming place to all the transitions
-        while (this.transitions.length < bpmnNode.outEdges.length) {
-            let trans = this.addTransition(new Transition(bpmnNode.id, bpmnNode.label, counter++));
-            this.addArc(Arc.create(this.inputPlace!, trans))
-        }
-
         //create transitions representing combinations of paths
-        let combinationsOfIds: string[][] = PnUtils.getCombinationsOfIds(PnUtils.getIds(this.simpleTransitions))
+        let combinationsOfIds: string[][] = PnUtils.getCombinationsOfIds(PnUtils.getIds(this.transitions))
         for (let combinationOfIds of combinationsOfIds) {
             let combiTrans = new CombiTransition(bpmnNode.id, bpmnNode.label,
                 this.getTransitionsByIds(combinationOfIds));
 
             this.addTransition(combiTrans)
-            this.addArc(Arc.create(this.inputPlace!, combiTrans))
+            this.addArc(Arc.create(this._inputPlace, combiTrans))
 
         }
 
+    }
+
+    override get transitionsToConnectToNextSubnet(): Array<Transition> {
+        let transitions = new Array<Transition>()
+        let notConnected = this.findNotConnectedTransition()
+        if (notConnected) {
+            transitions.push(notConnected)
+            transitions.push(...this.findCombiTransitionsContainingId(notConnected.id))
+        }
+
+        return transitions
     }
 
     /**
@@ -48,44 +45,36 @@ export class PnOrSplit extends PnOrGateway {
      * @param orJoin 
      */
     connectToOrJoin(orJoin: PnOrJoin): void {
-        let pairs = PnUtils.getMatchingOrSplitJoinTransitions(this.simpleTransitions, orJoin.simpleTransitions)
+        // let pairs = PnUtils.getMatchingOrSplitJoinTransitions(this.simpleTransitions, orJoin.simpleTransitions)
 
-        pairs.forEach((join, split) => {
-            let place = Place.create();
-            this.addPlace(place)
-            this.addArc(Arc.create(split, place));
-            orJoin.addArc(Arc.create(place, join))
+        // pairs.forEach((join, split) => {
+        //     let place = Place.create({ startPlace: false });
+        //     this.addPlace(place)
+        //     this.addArc(Arc.create(split, place));
+        //     orJoin.addArc(Arc.create(place, join))
 
-        })
+        // })
     }
 
-    override addArcTo(to: PnElement): { error: string, ok: boolean } {
-        let transition: Transition = this.findNotConnectedTransition()!;
-        let arc: Arc = Arc.create(transition, to);
-        if (!arc.valid)
-            return { error: arc.errors, ok: false }
-        transition.setConnected();
-        this.addArc(arc);
 
-        //connect every combiTransition that contains 
-        //the id of the previously connected transition in its corresponding combination list
-        let combis: Array<Transition> = this.findCombiTransitionsContainingId(transition.id);
-
-        for (let combi of combis) {
-            let arc: Arc = Arc.create(combi, to);
-            if (!arc.valid)
-                return { error: arc.errors, ok: false }
-            this.addArc(arc);
-        }
-
-        return { error: "", ok: true }
-
-    }
 
     //transitions representing combinations of paths contain references to simple transitions 
     //representing these paths
     findCombiTransitionsContainingId(simpleTransId: string): Array<CombiTransition> {
-        return this.combiTransitions.filter(combi => combi.getIds().includes(simpleTransId))
+        let combis = new Array<CombiTransition>()
+        for (let trans of this.transitions) {
+            if (trans.isCombi()) {
+
+                let combi = (trans as CombiTransition)
+                if (combi.containsId(simpleTransId))
+                    combis.push(combi)
+            }
+        }
+
+
+        return combis;
     }
+
+
 
 }

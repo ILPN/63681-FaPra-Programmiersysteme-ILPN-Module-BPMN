@@ -40,4 +40,8 @@ export class Transition extends PnElement{
         this.label += counter;
     }
 
+    isCombi(): boolean{
+        return false;
+    }
+
 }

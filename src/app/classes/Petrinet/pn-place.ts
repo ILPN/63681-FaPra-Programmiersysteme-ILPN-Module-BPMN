@@ -16,12 +16,16 @@ export class Place extends PnElement {
         this._token = 1
     }
 
-    static create(): Place {
+    static create(args: { startPlace: boolean | false }): Place {
         let id = PlaceCounter.get();
         PlaceCounter.increment()
 
+        let place = new Place(id);
 
-        return new Place(id);
+        if (args.startPlace)
+            place.setAsPetrinetStart()
+
+        return place
     }
 
     print(): string {

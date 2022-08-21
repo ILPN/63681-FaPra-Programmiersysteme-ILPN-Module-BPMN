@@ -4,7 +4,7 @@ import { PnElement } from "./pn-element";
  */
 export class Arc {
 
-    valid: boolean = true
+
     errors: string = ""
     private constructor(public weight: number, public from?: PnElement, public to?: PnElement) {
 
@@ -13,22 +13,26 @@ export class Arc {
 
     static create(from: PnElement | undefined, to: PnElement | undefined): Arc {
         if (!from)
-            return this.createInvalidArc(" Arc konnte nicht erstellt werden, weil der Ausgangselement null ist ")
+            return this.createInvalidArc(" Failed to create Arc because source element is null ")
         if (!to)
-            return this.createInvalidArc(" Arc konnte nicht erstellt werden, weil der Eingangselement null ist ")
+            return this.createInvalidArc(" Failed to create Arc because target element is null ")
 
         return new Arc(Arc.calcWeight(), from, to)
     }
 
     static createInvalidArc(error: string) {
         let arc: Arc = new Arc(0)
-        arc.valid = false
+
         arc.errors = error
         return arc
     }
 
     static calcWeight(): number {
         return 1;
+    }
+
+    valid(): boolean{
+        return !this.errors
     }
 
     print(): string {
