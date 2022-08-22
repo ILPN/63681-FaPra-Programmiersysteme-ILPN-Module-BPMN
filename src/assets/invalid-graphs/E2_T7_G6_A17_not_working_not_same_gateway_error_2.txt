@@ -2,7 +2,7 @@
 e1 start "Start"
 e2 end "Ende"
 
-.activities
+.tasks
 t1 service "BpmnTaskService t1"
 t2 manual "BpmnTaskManual t2"
 t3 usertask "BpmnTaskUser t3"
@@ -13,7 +13,7 @@ t7 usertask "BpmnTaskUser t7"
 
 
 .gateways 
-g1 or_split ""
+g1 or_split
 g2 or_join ""
 g3 and_split ""
 g4 and_join ""

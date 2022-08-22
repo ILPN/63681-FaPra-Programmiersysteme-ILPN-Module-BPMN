@@ -32,6 +32,7 @@ import { DisplayService } from './display.service';
 import { FormValidationService } from './form-validation.service';
 import { OutputFieldComponent } from '../components/output-field/output-field.component';
 import { AppComponent } from '../app.component';
+import { NodeWithI18n } from '@angular/compiler';
 
 @Injectable({
     providedIn: 'root'
@@ -39,6 +40,7 @@ import { AppComponent } from '../app.component';
 export class ParserService {
 
     @Output() positionChange = new EventEmitter<string>();
+    @Output() textareaError = new EventEmitter<string>();
     
     private text:string[];
     private result!: BpmnGraph;
@@ -230,7 +232,7 @@ export class ParserService {
                 pos++;
             }
         }
-
+        
         let choose: number = 1;
         switch (choose) {
             case 1:
@@ -266,7 +268,7 @@ export class ParserService {
         }
         const name = lineSplit[0];
         if(this.result.nodes.find(el => el.id === name) != undefined) {
-            this.displayerrorService.displayError("Bezeichner " + name + " schon vergeben");
+            this.textareaError.emit("Bezeichner " + name + " schon vergeben");
             return;
         }
         let activity = new BpmnTask(name);
@@ -274,9 +276,10 @@ export class ParserService {
         if(lineSplit[1] && !lineSplit[1].startsWith("(") && !(lineSplit[1] === description.split(" ").join(""))){
             let type = lineSplit[1];
             switch (type.toLowerCase()) {
-            case ("sending"):
+            case ("sending"):{
                 activity = new BpmnTaskSending(name);
                 break;
+            }
             case ("manual"):
                 activity = new BpmnTaskManual(name);
                 break;
@@ -293,7 +296,7 @@ export class ParserService {
                 activity = new BpmnTaskUserTask(name);
                 break;
             default: 
-                this.displayerrorService.displayError("Ungültiger Task Typ "+ type);
+                this.textareaError.emit("Ungültiger Task Typ bei "+ name + ": " + type);
         }}
 
         if(description) activity.label = description;
@@ -304,7 +307,6 @@ export class ParserService {
 
     private parseEvents(line: string): BpmnNode|undefined {
         let description = "";
-        let typeAt:number;
         if(line.includes('"')) {
             description = line.split('"')[1];
             let re = /"[\w ]*"/;
@@ -318,25 +320,24 @@ export class ParserService {
 
         const name = lineSplit[0];
         if(this.result.nodes.find(el => el.id === name) != undefined) {
-            this.displayerrorService.displayError("Bezeichner " + name + " schon vergeben");
+            this.textareaError.emit("Bezeichner " + name + " schon vergeben");
             return;
         }
         let event = new BpmnEvent(name);
 
-        //if the line is finished
         const type = lineSplit[1];
         switch (type.toLowerCase()) {
-            case ("start"):
+            case ("start"):{
                 event = new BpmnEventStart(name);
-                break;
-            case ("intermediate"):
+                break;}
+            case ("intermediate"):{
                 event = new BpmnEventIntermediate(name);
-                break;
-            case ("end"):
+                break;}
+            case ("end"):{
                 event = new BpmnEventEnd(name);
-                break;
+                break;}
             default: 
-                this.displayerrorService.displayError("Ungültiger Event Typ " + type + "'");
+                this.textareaError.emit("Ungültiger Event Typ bei " + name + ": " + type);
         }
 
         if(description) event.label = description;
@@ -358,7 +359,7 @@ export class ParserService {
         }
         const name = lineSplit[0];
         if(this.result.nodes.find(el => el.id === name) != undefined) {
-            this.displayerrorService.displayError("Bezeichner " + name + " schon vergeben");
+            this.textareaError.emit("Bezeichner " + name + " schon vergeben");
             return;
         }
         let gateway = new BpmnGateway(name);
@@ -384,7 +385,7 @@ export class ParserService {
                 gateway = new BpmnGatewaySplitXor(name);
                 break;
             default: 
-                this.displayerrorService.displayError("Ungültiger Gateway Typ " + type); 
+                this.textareaError.emit("Ungültiger Gateway Typ bei " + name + ": " + type); 
         }
         if(description) gateway.label = description;
         return gateway;
@@ -427,7 +428,7 @@ export class ParserService {
                             case("sequenceflow"): sequence = new BpmnEdge(name,node1,node2); break;
                             case("association"): sequence = new BpmnEdgeAssociation(name,node1,node2); break;
                             case("informationflow"): sequence = new BpmnEdgeMessageflow(name,node1,node2); break;
-                            default: this.displayerrorService.displayError("Ungültiger Edge Typ "+ type + node1.id + node2.id);
+                            default: this.textareaError.emit("Ungültiger Edge Typ bei " + node1.id + " " +node2.id + ": "+ type);
                         }
                         if(description) sequence.labelMid = description;
                         
@@ -441,7 +442,8 @@ export class ParserService {
         //wenn beide Knoten angegeben sind, aber keine edge zurückgegeben wurde
         //--> fehlerhafte Knotenangabe
         if(lineSplit[0] && lineSplit[1]) {
-            this.displayerrorService.displayError("nicht vorhandene Verbindungselemente bei Kante " + lineSplit[0] + lineSplit[1]);
+            this.textareaError.emit("Fehlender Knoten bei edge: " + lineSplit[0] + " " + lineSplit[1]);
+           
         }
     }
 }
