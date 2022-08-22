@@ -1,4 +1,4 @@
-import { Component, OnDestroy, Input } from '@angular/core';
+import { Component, OnDestroy} from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { ParserService } from './services/parser.service';
 import { DisplayService } from './services/display.service';

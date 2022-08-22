@@ -32,7 +32,6 @@ import { DisplayService } from './display.service';
 import { FormValidationService } from './form-validation.service';
 import { OutputFieldComponent } from '../components/output-field/output-field.component';
 import { AppComponent } from '../app.component';
-import { NodeWithI18n } from '@angular/compiler';
 
 @Injectable({
     providedIn: 'root'
