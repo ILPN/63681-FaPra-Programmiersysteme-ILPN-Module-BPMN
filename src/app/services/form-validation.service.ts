@@ -47,24 +47,19 @@ export class FormValidationService {
             default: return false;
         }
 
-        //console.log("validating category:" + category);
         const lines = input.split('\n');
-        let substring = input.substring(input.indexOf("." + category));
         let pos;
         let cat = lines.find(el => el.startsWith("." + category));
         if(!cat) {
-            this.displayErrorService.displayError("error: no" + category);
-            //console.log("error: no" + category);
+            console.log("error: no" + category);
         } else {
             pos = lines.indexOf(cat)+1;
             while(pos < lines.length && lines[pos].match(/^\w/) !== null) {
                 let match = lines[pos].match(regexp);
                 if (match === null) {
-                    //console.log("format error at " + category);
-                    this.displayErrorService.displayError("format error at " + category);
+                    console.log("format error at " + category);
                     return false;
                 }
-                //console.log("regexp matched:" + match);
                 pos++;
             }
         }

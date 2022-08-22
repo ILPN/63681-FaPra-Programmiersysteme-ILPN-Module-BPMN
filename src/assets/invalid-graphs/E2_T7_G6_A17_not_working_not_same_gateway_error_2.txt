@@ -2,7 +2,7 @@
 e1 start "Start"
 e2 end "Ende"
 
-.activities
+.tasks
 t1 service "BpmnTaskService t1"
 t2 manual "BpmnTaskManual t2"
 t3 usertask "BpmnTaskUser t3"
@@ -13,28 +13,28 @@ t7 usertask "BpmnTaskUser t7"
 
 
 .gateways 
-g1 or_split ""
-g2 or_join ""
-g3 and_split ""
-g4 and_join ""
-g5 or_split ""
-g6 xor_join ""
+g1 or_split
+g2 or_join 
+g3 and_split
+g4 and_join
+g5 or_split
+g6 xor_join
 
-.sequences
-connector1 sequenceflow "a1" e1 t1
-connector2 sequenceflow "a2" t1 g1
-connector3 sequenceflow "a3" g1 t2
-connector4 sequenceflow "a4" g1 t3
-connector5 sequenceflow "a5" t2 g3
-connector6 sequenceflow "a6" g3 t4
-connector7 sequenceflow "a7" g3 t5
-connector8 sequenceflow "a8" t4 g4
-connector9 sequenceflow "a9" t5 g4
-connector10 sequenceflow "a10" t3 g5
-connector11 sequenceflow "a11" g5 t6
-connector12 sequenceflow "a12" g5 t7
-connector13 sequenceflow "a13" t6 g6
-connector14 sequenceflow "a14" t7 g6
-connector15 sequenceflow "a15" g4 g2
-connector16 sequenceflow "a16" g6 g2
-connector17 sequenceflow "a17" g2 e2
+.edges
+e1 t1 sequenceflow "a1" 
+t1 g1 sequenceflow "a2" 
+g1 t2 sequenceflow "a3" 
+g1 t3 sequenceflow "a4" 
+t2 g3 sequenceflow "a5" 
+g3 t4 sequenceflow "a6" 
+g3 t5 sequenceflow "a7" 
+t4 g4 sequenceflow "a8" 
+t5 g4 sequenceflow "a9" 
+t3 g5 sequenceflow "a10" 
+g5 t6 sequenceflow "a11" 
+g5 t7 sequenceflow "a12" 
+t6 g6 sequenceflow "a13" 
+t7 g6 sequenceflow "a14" 
+g4 g2 sequenceflow "a15" 
+g6 g2 sequenceflow "a16" 
+g2 e2 sequenceflow "a17" 

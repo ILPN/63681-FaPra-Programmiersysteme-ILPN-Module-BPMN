@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy} from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { ParserService } from './services/parser.service';
 import { DisplayService } from './services/display.service';
@@ -16,9 +16,11 @@ export class AppComponent implements OnDestroy {
 
     mode = "free layout"
     public textareaFc: FormControl;
-    private _sub: Subscription;
-    private _sub1: Subscription;
+    private _subValueChange: Subscription;
+    private _subDragging: Subscription;
+    private _subError: Subscription;
     private result: any;
+    textareaError: string | undefined;
     graphIsValid: boolean = false;
 
     constructor(
@@ -27,13 +29,14 @@ export class AppComponent implements OnDestroy {
         private graphValidationService: GraphValidationService
     ) {
         this.textareaFc = new FormControl();
-        this._sub = this.textareaFc.valueChanges
+        this._subValueChange = this.textareaFc.valueChanges
             .pipe(debounceTime(1000))
             .subscribe((val) => this.processSourceChange(val));
-        this._sub1 = this._parserService.positionChange.
+        this._subDragging = this._parserService.positionChange.
             pipe(debounceTime(400)).
             subscribe((val) => this.textareaFc.setValue(val));
-
+        this._subError = this._parserService.textareaError.pipe(debounceTime(400))
+            .subscribe((val) => this.textareaError = val);
         // this.textareaFc.setValue(`Your advertising could be here`);
 
 
@@ -121,11 +124,14 @@ this.textareaFc.setValue(s);
         
 
     ngOnDestroy(): void {
-        this._sub.unsubscribe();
-        this._sub1.unsubscribe();
+        this._subValueChange.unsubscribe();
+        this._subDragging.unsubscribe();
+        this._subError.unsubscribe();
     }
 
     private processSourceChange(newSource: string) {
+        this.textareaError = "";
+
         this.graphIsValid = false
         this.result = this._parserService.parse(newSource);
         if (this.result) {

@@ -19,12 +19,12 @@
     <p *ngIf="graphIsValid">Validierung abgeschlossen. Der angezeigte Graph ist valide.</p>
 </div>
     <div fxLayout="row" fxLayoutAlign="space-evenly start">
-        <input-field buttonText="File upload"
+        <input-field buttonText="Upload"
                      buttonIcon="publish"
                      (newInputEvent)="textareaFc.setValue($event)"></input-field>
         <mat-form-field appearance="outline"
                         class="textarea">
-            <mat-label>Source file</mat-label>
+            <mat-label>Textdatei</mat-label>
             <textarea matInput
                       cdkTextareaAutosize
                       cdkAutosizeMinRows="10"
@@ -46,19 +46,19 @@
                     <p></p>
                     <p>Labels und Koordinaten sind immer optional</p>
                     <p>bei Tasks ist auch der Typ optional</p>
-                    <p>types:</p>
+                    <p>Typen:</p>
                     <p>tasks: sending, manual, usertask, service, businessrule, receiving</p>
                     <p>events: start, end, intermediate</p>
                     <p>gateways: or_split, or_join, and_split, and_join, xor_split, xor_join</p>
                     <p>edges: sequenceflow, association, informationflow, defaultflow</p>
             </details>
         </mat-form-field>
-        <output-field buttonText="File download"
+        <output-field buttonText="Download"
                       buttonIcon="download"
                       [text]="textareaFc.value">
         </output-field>
     </div>
-
+    <p id="textareaErrors">{{textareaError}}</p>
     <!--  Footer  -->
     <hr>
     <app-footer></app-footer>
