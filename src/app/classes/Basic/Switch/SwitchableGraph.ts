@@ -5,6 +5,8 @@ import {BpmnGateway} from '../Bpmn/gateways/BpmnGateway';
 import {GetSvgManager} from '../Interfaces/GetSvgManager';
 import {Svg} from '../Svg/Svg';
 import {SvgManager} from '../Svg/SvgManager/SvgManager';
+import { ClassicSwitch } from './classic-switch';
+import { MarcelsSwitch } from './marcels-switch';
 import {SwitchController} from './switch-controller';
 import {SwitchableEdge} from './SwitchableEdge';
 import {SwitchableGateway} from './SwitchableGateway';
@@ -23,7 +25,9 @@ export class SwitchableGraph implements GetSvgManager {
     constructor(bpmnGraph: BpmnGraph) {
 
         //controls how nodes are switched
-        this._controller = new SwitchController(this);
+        // this._controller = new SwitchController(this);
+        //this._controller = new MarcelsSwitch(this);
+        this._controller = new ClassicSwitch(this);
         this._nodeMap = new Map<BpmnNode, SwitchableNode>();
 
         bpmnGraph.edges.forEach((bpmnEdge: BpmnEdge) => {

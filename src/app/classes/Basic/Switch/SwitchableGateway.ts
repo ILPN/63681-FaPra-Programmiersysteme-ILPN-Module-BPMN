@@ -8,13 +8,18 @@ import { SwitchState } from "./switchstatetype";
 import { SwitchUtils } from "./SwitchUtils";
 
 export class SwitchableGateway extends SwitchableNode {
+    private _combinationArray: SwitchableNode[][] = this.getCombinationsOfNodesAfterOr(this.successors);
+    private _combinationNumber: number = 0;
+    private _combinationInitialized: boolean = false;
+    //  private _combinationStatus: number = 0;
 
-
-//     override addSuccessor(node: SwitchableNode) {
-//     super.addSuccessor(node);
-//    // this._permutationsArray = this.getCombinationsOfNodes(this.successors);
-// }
-
+    //     override addSuccessor(node: SwitchableNode) {
+    //     super.addSuccessor(node);
+    //    // this._permutationsArray = this.getCombinationsOfNodes(this.successors);
+    // }
+    get combinationInitialized(): boolean {
+        return this._combinationInitialized;
+    }
 
     /**  Disables all alternative paths not taken in case of an or gateway*/
     disablePathsNotTakenAfterOrJoin(graph: SwitchableGraph): void {
@@ -163,7 +168,7 @@ export class SwitchableGateway extends SwitchableNode {
      * checks if all nodes before this gateway are enabled
      * @returns
      */
-     private checkIfOrJoinGatewayCanBeSwitched(graph: SwitchableGraph): boolean {
+    private checkIfOrJoinGatewayCanBeSwitched(graph: SwitchableGraph): boolean {
         let answer: boolean = true;
         for (let nodeBefore of this.predecessors)
             if (!nodeBefore.enabled()) {
@@ -231,144 +236,86 @@ export class SwitchableGateway extends SwitchableNode {
     }
 
 
-// ------ Classic Switch Code --------
-private _permutationsArray : SwitchableNode[][] = this.getCombinationsOfNodes(this.successors);
-private _permutationNumber: number = 0;
+    // ------ Classic Switch Code --------
 
-toggleGateway() {
-    console.log("Größe Array = "+this._permutationNumber +" ----- "+this._permutationsArray.length+ " "+this.successors.length);
-
-    this._permutationsArray  = this.getCombinationsOfNodes([...this.successors]);
-
-    this.deactivateToggleGateway();
-    if(this._permutationNumber < (this._permutationsArray.length-1)) {
-        this._permutationNumber++;
-    } else {
-        this._permutationNumber = 0;
+    toggleGateway() {
+        if (this._combinationArray.length > 0) {
+            this.deactivateToggleGateway();
+            if (this._combinationNumber < (this._combinationArray.length - 1)) {
+                this._combinationNumber++;
+            } else {
+                this._combinationNumber = 0;
+            }
+            this.activateToggleGateway();
+        }
     }
-    this.activateToggleGateway();
-    console.log("Größe Array = "+this._permutationNumber +" ----- "+this._permutationsArray.length+ " "+this.successors.length);
-    // if(this._permutationNumber === 0) {
-    //     this.activateToggleGateway();
-    //     this._permutationNumber++;
-    // } else {
-    //     this._permutationNumber = 0;
-    //     this.deactivateToggleGateway();
-    // }
-    
+    /** Used for classic switching. Return a list with all Nodescombinations after a Array. */
+    private getCombinationsList(): SwitchableNode[][] {
+        let array: SwitchableNode[][] = [];
+        if (this.OR_SPLIT()) return this.getCombinationsOfNodesAfterOr([...this.successors]);
+        if (this.XOR_SPLIT()) this.successors.forEach(node => {
+            array.push([node]);
+        });
+        if (this.AND_SPLIT()) array = [[...this.successors]];
+        return array;
+    }
 
-   // let num : string[] = ["1","2","3","4"]
-//let newh = this.getCombinationsOfNodes(this.successors);
+    /**
+         * creates a list for each combination of nodes after or Gateway
+         * @param nodes 
+         * @returns list of lists
+         */
+    private getCombinationsOfNodesAfterOr(nodes: SwitchableNode[]): SwitchableNode[][] {
+        let combis: SwitchableNode[][] = [];
+        while (nodes.length >= 1) {
+            let pos: number = 0;
+            while (pos < nodes.length) {
+                combis.push(this.getCombinationsOfLength(nodes, pos))
+                pos++;
+            }
 
-// console.log("it beginns:");
-// newh.forEach(element => {
-//     var zeile : String = "";
-//     element.forEach(e => { zeile += e + " ";
-//     });
-//     console.log(zeile);
-// });
-
-
-}
-
-
-/**
-     * creates a list for each combination of the specified ids 
-     * @param ids 
-     * @returns list of lists
-     */
- getCombinationsOfNodes(nodes: SwitchableNode[]): SwitchableNode[][] {
-    let combis: SwitchableNode[][] = [];
-    while (nodes.length >= 1) {
-        //minimal combination consists of 2 values
-        let combi_len: number = 1;
-        while (combi_len <= nodes.length) {
-
-            combis.push(...this.getCombinationsOfLength(nodes, combi_len))
-            combi_len++;
+            //remove first element
+            nodes.splice(0, 1);
         }
 
-        //remove first element
-        nodes.splice(0, 1);
+        return combis;
     }
 
-    return combis;
-}
-
-private getCombinationsOfLength(nodes: SwitchableNode[], len: number): SwitchableNode[][] {
-    let combis: SwitchableNode[][] = [];
-
-    let start: number = 1;
-    let end: number = start + len - 1;
-    while (end <= nodes.length) {
-        //always add first element and combination of <len-1> other elements
-        let combi: SwitchableNode[] = [nodes[0], ...nodes.slice(start, end)];
-        combis.push(combi);
-
-        start++;
-        end++;
+    private getCombinationsOfLength(nodes: SwitchableNode[], pos: number): SwitchableNode[] {
+        let combis: SwitchableNode[] = [];
+        for (var i = 0; i <= pos; i++) {
+            combis.push(nodes[i]);
+        }
+        return combis;
+    }
+    /** Used for classic switching. Enable all Nodes by this Combinationnumber. */
+    private activateToggleGateway() {
+        this._combinationArray[this._combinationNumber].forEach(node => {
+            node.enable();
+        });
+    }
+    /** Used for classic switching. Disable all Nodes by this Combinationnumber. */
+    private deactivateToggleGateway() {
+        this._combinationArray[this._combinationNumber].forEach(node => {
+            node.disable();
+        });
     }
 
-    return combis;
+    /**
+    *  Used for classic switching. Activate Gateway.
+    */
+    activateGateway() {
+        this.initializedCombination();
+        if (this._combinationArray.length > 0) this.activateToggleGateway();
+    }
 
-}
-
-// /**
-//      * creates a list for each combination of the specified ids 
-//      * @param ids 
-//      * @returns list of lists
-//      */
-//  getCombinationsOfIds(ids: string[]): string[][] {
-//     let combis: string[][] = [];
-//     while (ids.length >= 1) {
-//         //minimal combination consists of 2 values
-//         let combi_len: number = 1;
-//         while (combi_len <= ids.length) {
-
-//             combis.push(...this.getCombinationsOfLength(ids, combi_len))
-//             combi_len++;
-//         }
-
-//         //remove first element
-//         ids.splice(0, 1);
-//     }
-
-//     return combis;
-// }
-
-// private getCombinationsOfLength(ids: string[], len: number): string[][] {
-//     let combis: string[][] = [];
-
-//     let start: number = 1;
-//     let end: number = start + len - 1;
-//     while (end <= ids.length) {
-//         //always add first element and combination of <len-1> other elements
-//         let combi: string[] = [ids[0], ...ids.slice(start, end)];
-//         combis.push(combi);
-
-//         start++;
-//         end++;
-//     }
-
-//     return combis;
-
-// }
-
-activateToggleGateway() {
-    this._permutationsArray[this._permutationNumber].forEach(node => {
-        node.enable();
-    });
-}
-
-deactivateToggleGateway() {
-    this._permutationsArray[this._permutationNumber].forEach(node => {
-        node.disable();
-    });
-}
-
-switchGateway() {}
-
-// ------ Ende Classic Switch --------
+    private initializedCombination() {
+        if (!this._combinationInitialized) {
+            this._combinationInitialized = true;
+            this._combinationArray = this.getCombinationsList();                                    //this.getCombinationsOfNodes([...this.successors]);
+        }
+    }
+    // ------ Ende Classic Switch --------
 
 
 }

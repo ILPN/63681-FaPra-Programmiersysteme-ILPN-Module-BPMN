@@ -6,16 +6,34 @@ import { SwitchUtils } from "./SwitchUtils";
 
 export class SwitchController {
     private _startEvents: SwitchableNode[];
-    private nodes: SwitchableNode[];
+    private _nodes: SwitchableNode[];
     private _graph: SwitchableGraph;
-    private _switchTyp;
+   //private _switchTyp;
 
     constructor(graph: SwitchableGraph) {
         this._startEvents = [];
-        this.nodes = graph.switchNodes;
+        this._nodes = graph.switchNodes;
         this._graph = graph;
-        this._switchTyp = 1;
+       // this._switchTyp = 1;
     }
+
+
+    get nodes(): SwitchableNode[] {
+        return this._nodes;
+    }
+
+    // set nodes(value: SwitchableNode[]) {
+    //     this._nodes = value;
+    // }
+
+    get graph(): SwitchableGraph {
+        return this._graph;
+    }
+
+    // set graph(value: SwitchableGraph) {
+    //     this._graph = value;
+    // }
+
 
 
     /**
@@ -36,197 +54,106 @@ export class SwitchController {
         });
     }
 
-
-
-
-   /** changes state of the clicked node and connected nodes
-     * @param clickedNode the clicked node
-     */
-    public press(clickedNode: SwitchableNode) {
-        if (clickedNode.switchState === SwitchState.enableable || clickedNode.switchState === SwitchState.switchedButEnableForLoopRun) {
-            if (clickedNode.isStartEvent()) this.disableAllOtherStartEvents(clickedNode);
-            if(this._switchTyp === 0) {
-                this.press_my(clickedNode);
-            } else {
-                this.press_classic(clickedNode);
-            }
-        //     if (clickedNode.isStartEvent()) this.disableAllOtherStartEvents(clickedNode);
-
-
-        //     let nodesToSwitch: SwitchableNode[] = this.getNodesToSwitch(clickedNode)
-        //     nodesToSwitch.forEach(node => {
-        //         if (this.possibleToSwitchNode(node)) node.switch()
-        //     });
-        //     if (clickedNode.isGateway() && (clickedNode as SwitchableGateway).OR_JOIN()) (clickedNode as SwitchableGateway).disablePathsNotTakenAfterOrJoin(this._graph);
-        //     this.checkAllEnableableNodesStillEnableable();
-         } else {
-            if (clickedNode.enabled() && clickedNode.isEndEvent()) {
-                this.newGame();
-            }
-         }
-    }
-
-    /** changes state of the clicked node and connected nodes
-     * @param clickedNode the clicked node
-     */
-     private press_classic(clickedNode: SwitchableNode) {
-                if(clickedNode.isGateway()) {
-                    this.switchGateway_classic(clickedNode);
-                } else {
-                   let nodesToSwitch: SwitchableNode[] = this.getNodesToSwitch(clickedNode)
-                   nodesToSwitch.forEach(node => {
-                       if (this.possibleToSwitchNode(node)) node.switch()
-                    });
-            }
-            //   if (clickedNode.isGateway() && (clickedNode as SwitchableGateway).OR_JOIN()) (clickedNode as SwitchableGateway).disablePathsNotTakenAfterOrJoin(this._graph);
-            //   this.checkAllEnableableNodesStillEnableable();
-
-      }
-
-      private switchGateway_classic(clickedNode: SwitchableNode) {
-        let gateway = clickedNode as SwitchableGateway;
-        if(gateway.isJoinGateway()) {
-            gateway.switchRegular().forEach(node => {
-                if (this.possibleToSwitchNode(node)) node.switch()
-             });
-        } else {
-           // gateway.activateToggleGateway();
-            gateway.toggleGateway();
-
-
-        }
-      }
-
-      private switch_classic(clickedNode: SwitchableNode) : SwitchableNode[] {
-        let nodesToSwitch: SwitchableNode[] = [];
-
-        //add the clicked node
-        SwitchUtils.addItem(clickedNode, nodesToSwitch);
-
-        // if no nodes before the clicked one
-        if (clickedNode.predecessors.length === 0)
-            return SwitchUtils.addItems(clickedNode.switchRegular(), nodesToSwitch);
-
-        // if there is enabled gateway before the clicked node
-        clickedNode.predecessors.forEach(before => {
-            // if (before.enabled() && before.isGateway()) { // before.enabled() &&  for loop
-            //     let gatewayConnections = (before as SwitchableGateway).switchSplit(clickedNode);
-            //     SwitchUtils.addItems(gatewayConnections, nodesToSwitch)
-            // } else
-                SwitchUtils.addItems(clickedNode.switchRegular(), nodesToSwitch);
-        });
-        return nodesToSwitch
-      }
-
-
-
-
-
-
-
-
-    /** changes state of the clicked node and connected nodes
-     * @param clickedNode the clicked node
-     */
-     private press_my(clickedNode: SwitchableNode) {
-
-      //  if (clickedNode.switchState === SwitchState.enableable || clickedNode.switchState === SwitchState.switchedButEnableForLoopRun) {
-            //console.log("Clicked element " + clickedNode.id);
-           // if (clickedNode.isStartEvent()) this.disableAllOtherStartEvents(clickedNode);
-
-
-            let nodesToSwitch: SwitchableNode[] = this.getNodesToSwitch(clickedNode)
-            nodesToSwitch.forEach(node => {
-                if (this.possibleToSwitchNode(node)) node.switch()
-            });
-            if (clickedNode.isGateway() && (clickedNode as SwitchableGateway).OR_JOIN()) (clickedNode as SwitchableGateway).disablePathsNotTakenAfterOrJoin(this._graph);
-            this.checkAllEnableableNodesStillEnableable();
-
-
-       // } else {
-       //    //console.log("The state of this element can not be switched: " + clickedNode.id);
-       //    if (clickedNode.enabled() && clickedNode.isEndEvent()) {
-       //         this.newGame();
-       //     }
-       // }
-    }
-
     /**
-     * collects all the nodes whose state should be switched
-     * @param clickedNode
-     * @returns nodes to switch
-     */
-    private getNodesToSwitch(clickedNode: SwitchableNode): SwitchableNode[] {
-        let nodesToSwitch: SwitchableNode[] = [];
-
-        //add the clicked node
-        SwitchUtils.addItem(clickedNode, nodesToSwitch);
-
-        // if no nodes before the clicked one
-        if (clickedNode.predecessors.length === 0)
-            return SwitchUtils.addItems(clickedNode.switchRegular(), nodesToSwitch);
-
-        // if there is enabled gateway before the clicked node
-        clickedNode.predecessors.forEach(before => {
-            if (before.enabled() && before.isGateway()) { // before.enabled() &&  for loop
-                let gatewayConnections = (before as SwitchableGateway).switchSplit(clickedNode);
-                SwitchUtils.addItems(gatewayConnections, nodesToSwitch)
-            } else
-                SwitchUtils.addItems(clickedNode.switchRegular(), nodesToSwitch);
-        });
-
-        return nodesToSwitch
-    }
-
-
-    /**
-     * checks if it is possible to switch the node state
-     * @param node node to switch
-     * @returns true if the node state can be switched
-     */
-    private possibleToSwitchNode(node: SwitchableNode): boolean {
-        if (node.isGateway() && (node.disabled() || node.enableable() || node.switchedButEnableForLoopRun())) {
-
-            let gateway: SwitchableGateway = node as SwitchableGateway;
-            return gateway.canBeSwitched(this._graph)
-
-        }
-        return true;
-    }
-
-
-    /** collects alle nodes in state enableable
-     * @return enableable nodes
-     */
-    private getAllEnableableNodes(): SwitchableNode[] {
-        let nodes: SwitchableNode[] = [];
-
-        for (let node of this.nodes)
-            if (node.enableable())
-                nodes.push(node);
-
-        return nodes;
-    }
-
-    /**
-     * checks every enableable node and disables it if:
-     * 1. its state cannot be switched
-     * 2. it goes after OR_SPLIT and the corresponding JOIN is switched
-     */
-    private checkAllEnableableNodesStillEnableable() {
-        this.getAllEnableableNodes().forEach(node => {
-            if (!this.possibleToSwitchNode(node))
-                node.disable();
-        });
-    }
-
-    /**
-     * resets diagram into initial state to start switching from start event
-     */
+         * resets diagram into initial state to start switching from start event
+         */
     private newGame() {
-        this.nodes.forEach(node => node.disable());
+        this._nodes.forEach(node => node.disable());
         this._startEvents.forEach(event => {
             event.switchTo(SwitchState.enableable)
         });
     }
+
+
+
+
+    /** Print all Node IDs*/
+    printNodeIDFromList(nodes: SwitchableNode[]) {
+        console.log("switchcontroller/printNodeIDFromList ------ Folgende Nodes befinden sich in der Liste und sollen geschaltet werden:          ");
+        let str: String = "";
+        nodes.forEach(node => str += node.id + ", ");
+        str += " ENDE.";
+        console.log(str);
+    }
+
+    /** changes state of the clicked node and connected nodes
+      * @param clickedNode the clicked node
+      */
+    public press(clickedNode: SwitchableNode) {
+        console.warn("Der Knoten mit der ID: "+clickedNode.id +" ist nicht aktivierbar, er hat den Status: "+clickedNode.switchState);
+        if (clickedNode.switchState === SwitchState.enableable || clickedNode.switchState === SwitchState.switchedButEnableForLoopRun) {
+            if (clickedNode.isStartEvent()) this.disableAllOtherStartEvents(clickedNode);
+            this.press_typ(clickedNode);
+        } else {
+            
+            if (clickedNode.enabled() && clickedNode.isEndEvent()) {
+                this.newGame();
+            } else {
+                console.warn("Der Knoten mit der ID: "+clickedNode.id +" ist nicht aktivierbar, er hat den Status: "+clickedNode.switchState);
+            }
+        }
+    }
+
+    press_typ(clickedNode: SwitchableNode) { }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // /**
+    //  * collects nodes whose needs to be switched when this node is clicked:
+    //  * 1. disabled nodes after the clicked node
+    //  * 2. enabled nodes before the clicked node
+    //  * @returns nodes to switch
+    //  */
+    //  switchRegular(): SwitchableNode[] {
+    //     let nodesToSwitch: SwitchableNode[] = [];
+    //     SwitchUtils.addItem(this, nodesToSwitch)
+    //     this._predecessors.forEach(before => {
+    //         if (before.switchState === SwitchState.enabled) SwitchUtils.addItem(before, nodesToSwitch)
+    //     });
+    //     this._successors.forEach(after => {
+    //         if (after.switchState === SwitchState.disabled || after.switchState === SwitchState.switched) SwitchUtils.addItem(after, nodesToSwitch)
+    //     });
+
+    //     return nodesToSwitch;
+    // }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
