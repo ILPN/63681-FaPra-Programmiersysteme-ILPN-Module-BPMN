@@ -1,6 +1,8 @@
 import { BpmnNode } from "../Bpmn/BpmnNode";
 import { BpmnUtils } from "../Bpmn/BpmnUtils";
 import { BpmnGateway } from "../Bpmn/gateways/BpmnGateway";
+import { ClassicSwitch } from "./classic-switch";
+import { MarcelsSwitch } from "./marcels-switch";
 import { SwitchController } from "./switch-controller";
 import { SwitchableGraph } from "./SwitchableGraph";
 import { SwitchableNode } from "./SwitchableNode";
@@ -11,12 +13,8 @@ export class SwitchableGateway extends SwitchableNode {
     private _combinationArray: SwitchableNode[][] = this.getCombinationsOfNodesAfterOr(this.successors);
     private _combinationNumber: number = 0;
     private _combinationInitialized: boolean = false;
-    //  private _combinationStatus: number = 0;
 
-    //     override addSuccessor(node: SwitchableNode) {
-    //     super.addSuccessor(node);
-    //    // this._permutationsArray = this.getCombinationsOfNodes(this.successors);
-    // }
+
     get combinationInitialized(): boolean {
         return this._combinationInitialized;
     }
@@ -173,7 +171,12 @@ export class SwitchableGateway extends SwitchableNode {
         for (let nodeBefore of this.predecessors)
             if (!nodeBefore.enabled()) {
                 let gateway: SwitchableGateway | undefined = this.searchCorrespondingSplitGateway(graph);
-                if (gateway !== undefined && answer) answer = SwitchUtils.isNoNodeEnabledOrSwitched(SwitchUtils.getAllElementsBetweenNodeToNodeBackward(nodeBefore, gateway, []));
+                if (gateway !== undefined && answer) {
+                       if(SwitchUtils.isClassicSwitch(graph.controller))
+                       answer = SwitchUtils.isNoNodeUnequalDisabled(SwitchUtils.getAllElementsBetweenNodeToNodeBackward(nodeBefore, gateway, []))
+                        else
+                            answer = SwitchUtils.isNoNodeEnabledOrSwitched(SwitchUtils.getAllElementsBetweenNodeToNodeBackward(nodeBefore, gateway, []))
+                }
             }
         return answer;
     }
@@ -191,7 +194,7 @@ export class SwitchableGateway extends SwitchableNode {
      * checks if all nodes before this gateway are enabled
      * @returns
      */
-    private allNodesBeforeEnabled(): boolean {
+    allNodesBeforeEnabled(): boolean {
         for (let nodeBefore of this.predecessors)
             if (!nodeBefore.enabled())
                 return false;
@@ -312,29 +315,10 @@ export class SwitchableGateway extends SwitchableNode {
     private initializedCombination() {
         if (!this._combinationInitialized) {
             this._combinationInitialized = true;
-            this._combinationArray = this.getCombinationsList();                                    //this.getCombinationsOfNodes([...this.successors]);
+            this._combinationArray = this.getCombinationsList();                              
         }
     }
     // ------ Ende Classic Switch --------
 
 
 }
-
-//  class permut {
-//     private _permutation : SwitchableNode[] = [];
-
-//     constructor(input : SwitchableNode[]) {
-//         this._permutation = input;
-//     }
-
-
-//     get permutation(): Array<SwitchableNode> {
-//         return this._permutation
-//     }
-
-//     addToPermutation(node: SwitchableNode) {
-//         SwitchUtils.addItem(node, this._permutation)
-//     }
-
-//  }
-

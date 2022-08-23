@@ -1,3 +1,6 @@
+import { ClassicSwitch } from "./classic-switch";
+import { MarcelsSwitch } from "./marcels-switch";
+import { SwitchController } from "./switch-controller";
 import { SwitchableGateway } from "./SwitchableGateway";
 import { SwitchableNode } from "./SwitchableNode";
 import { SwitchState } from "./switchstatetype";
@@ -51,7 +54,31 @@ export class SwitchUtils {
         });
         return answer
     }
+    // /**
+    //  * checks if the node is a gateway
+    //  * @param node
+    //  * @returns
+    //  */
+    //  public static isNoNodeEnableableOrEnabledOrSwitched(nodeArray: SwitchableNode[]): boolean {
+    //     let answer = true;
+    //     nodeArray.forEach(element => {
+    //         if (element.switchState === SwitchState.enableable || element.switchState === SwitchState.enabled || element.switchState === SwitchState.switched) answer = false;
+    //     });
+    //     return answer
+    // }
 
+        /**
+     * checks if the node is a gateway
+     * @param node
+     * @returns
+     */
+         public static isNoNodeUnequalDisabled(nodeArray: SwitchableNode[]) : boolean {
+            let answer = true;
+            nodeArray.forEach(element => {
+                if (element.switchState !== SwitchState.disabled) answer = false;
+            });
+            return answer
+        }
 
     /**
      * This recursive method create a Array of SwitchableNode where inside all SwitchableNode the are between startNode and endNode. At the beginning the array must be empty. This method searches backward.
@@ -70,6 +97,16 @@ export class SwitchUtils {
         return array;
     }
 
+    // public static isMarcelsSwitch(controller: SwitchController) : boolean {
+    //     return controller instanceof MarcelsSwitch
+    // }
+
+
+
+     public static isClassicSwitch(controller: SwitchController): boolean {
+         return controller instanceof ClassicSwitch;
+     }
+    
     // Only for debugging
     // public static printAllElements(startNode: SwitchableNode, endNode: SwitchableNode, array: SwitchableNode[]): void {
     //     let s: String = "";

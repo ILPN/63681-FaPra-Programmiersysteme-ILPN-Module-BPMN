@@ -1,3 +1,5 @@
+import { ClassicSwitch } from "./classic-switch";
+import { MarcelsSwitch } from "./marcels-switch";
 import { SwitchableGateway } from "./SwitchableGateway";
 import { SwitchableGraph } from "./SwitchableGraph";
 import { SwitchableNode } from "./SwitchableNode";
@@ -8,13 +10,13 @@ export class SwitchController {
     private _startEvents: SwitchableNode[];
     private _nodes: SwitchableNode[];
     private _graph: SwitchableGraph;
-   //private _switchTyp;
+    //private _switchTyp;
 
     constructor(graph: SwitchableGraph) {
         this._startEvents = [];
         this._nodes = graph.switchNodes;
         this._graph = graph;
-       // this._switchTyp = 1;
+        // this._switchTyp = 1;
     }
 
 
@@ -80,23 +82,21 @@ export class SwitchController {
       * @param clickedNode the clicked node
       */
     public press(clickedNode: SwitchableNode) {
-        console.warn("Der Knoten mit der ID: "+clickedNode.id +" ist nicht aktivierbar, er hat den Status: "+clickedNode.switchState);
+        console.warn("Der Knoten mit der ID: " + clickedNode.id + " ist nicht aktivierbar, er hat den Status: " + clickedNode.switchState);
         if (clickedNode.switchState === SwitchState.enableable || clickedNode.switchState === SwitchState.switchedButEnableForLoopRun) {
             if (clickedNode.isStartEvent()) this.disableAllOtherStartEvents(clickedNode);
             this.press_typ(clickedNode);
         } else {
-            
+
             if (clickedNode.enabled() && clickedNode.isEndEvent()) {
                 this.newGame();
             } else {
-                console.warn("Der Knoten mit der ID: "+clickedNode.id +" ist nicht aktivierbar, er hat den Status: "+clickedNode.switchState);
+                console.warn("Der Knoten mit der ID: " + clickedNode.id + " ist nicht aktivierbar, er hat den Status: " + clickedNode.switchState);
             }
         }
     }
 
     press_typ(clickedNode: SwitchableNode) { }
-
-
 
 
 

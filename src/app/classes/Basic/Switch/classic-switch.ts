@@ -82,8 +82,8 @@ export class ClassicSwitch extends SwitchController {
                 console.log("PRESS: " + clickedNode.id + " ::: clickedNode.predecessors.forEach: by ID " + before.id + " false" + " switchstate: " + before.switchState);
             }
         });
-    
-    return nodesToSwitch;
+
+        return nodesToSwitch;
     }
 
     private getNodesToSwitchSuccessors(clickedNode: SwitchableNode): SwitchableNode[] {
@@ -125,19 +125,24 @@ export class ClassicSwitch extends SwitchController {
     }
 
 
-
-
-
-
-
     /** todo */
     private possibleToSwitchNode(node: SwitchableNode): boolean {
+        if (node.isGateway()) {
+            let gateway = node as SwitchableGateway;
+            if (gateway.isJoinGateway()) {
+                console.error("Hier sind wir, bei "+gateway.id+", wir joinen in the club")
+                return gateway.canBeSwitched(this.graph);
+                //         if(gateway.AND_JOIN()) return gateway.allNodesBeforeEnabled();
+                //         if(gateway.OR_JOIN()) {}
+            }
+        }
         return true;
+
     }
 
     private checkAllEnabledNodesStillEnabled() {
         this.nodes.forEach(node => {
-            if (node.switchState === SwitchState.enabled) {
+            if (node.switchState === SwitchState.enabled && !node.isEndEvent()) {
                 if (!this.checkIfIsMinOneNodeEnableable(node.successors)) node.switch();
             }
 
@@ -147,7 +152,7 @@ export class ClassicSwitch extends SwitchController {
     private checkIfIsMinOneNodeEnableable(nodes: SwitchableNode[]): boolean {
         let answer = false;
         nodes.forEach(node => {
-            if (node.switchState === SwitchState.enableable) {
+            if (node.switchState === SwitchState.enableable || (node.switchState === SwitchState.disabled && node.isGateway() && (node as SwitchableGateway).isJoinGateway())) {
                 answer = true;
             }
         });
