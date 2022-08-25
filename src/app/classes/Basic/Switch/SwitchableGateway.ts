@@ -1,16 +1,14 @@
+import { PnUtils } from "../../Petrinet/pn-utils";
 import { BpmnNode } from "../Bpmn/BpmnNode";
 import { BpmnUtils } from "../Bpmn/BpmnUtils";
 import { BpmnGateway } from "../Bpmn/gateways/BpmnGateway";
-import { ClassicSwitch } from "./classic-switch";
-import { MarcelsSwitch } from "./marcels-switch";
-import { SwitchController } from "./switch-controller";
 import { SwitchableGraph } from "./SwitchableGraph";
 import { SwitchableNode } from "./SwitchableNode";
 import { SwitchState } from "./switchstatetype";
 import { SwitchUtils } from "./SwitchUtils";
 
 export class SwitchableGateway extends SwitchableNode {
-    private _combinationArray: SwitchableNode[][] = this.getCombinationsOfNodesAfterOr(this.successors);
+    private _combinationArray: SwitchableNode[][] = [];
     private _combinationNumber: number = 0;
     private _combinationInitialized: boolean = false;
 
@@ -172,10 +170,10 @@ export class SwitchableGateway extends SwitchableNode {
             if (!nodeBefore.enabled()) {
                 let gateway: SwitchableGateway | undefined = this.searchCorrespondingSplitGateway(graph);
                 if (gateway !== undefined && answer) {
-                       if(SwitchUtils.isClassicSwitch(graph.controller))
-                       answer = SwitchUtils.isNoNodeUnequalDisabled(SwitchUtils.getAllElementsBetweenNodeToNodeBackward(nodeBefore, gateway, []))
-                        else
-                            answer = SwitchUtils.isNoNodeEnabledOrSwitched(SwitchUtils.getAllElementsBetweenNodeToNodeBackward(nodeBefore, gateway, []))
+                    if (SwitchUtils.isClassicSwitch(graph.controller))
+                        answer = SwitchUtils.isNoNodeUnequalDisabled(SwitchUtils.getAllElementsBetweenNodeToNodeBackward(nodeBefore, gateway, []))
+                    else
+                        answer = SwitchUtils.isNoNodeEnabledOrSwitched(SwitchUtils.getAllElementsBetweenNodeToNodeBackward(nodeBefore, gateway, []))
                 }
             }
         return answer;
@@ -253,9 +251,10 @@ export class SwitchableGateway extends SwitchableNode {
         }
     }
     /** Used for classic switching. Return a list with all Nodescombinations after a Array. */
-    private getCombinationsList(): SwitchableNode[][] {
+    private getCombinationsList(graph: SwitchableGraph): SwitchableNode[][] {
         let array: SwitchableNode[][] = [];
-        if (this.OR_SPLIT()) return this.getCombinationsOfNodesAfterOr([...this.successors]);
+        if (this.OR_SPLIT()) return this.getCombinationsOfIDsForOr([...this.successors], graph);
+
         if (this.XOR_SPLIT()) this.successors.forEach(node => {
             array.push([node]);
         });
@@ -263,34 +262,32 @@ export class SwitchableGateway extends SwitchableNode {
         return array;
     }
 
-    /**
-         * creates a list for each combination of nodes after or Gateway
-         * @param nodes 
-         * @returns list of lists
-         */
-    private getCombinationsOfNodesAfterOr(nodes: SwitchableNode[]): SwitchableNode[][] {
-        let combis: SwitchableNode[][] = [];
-        while (nodes.length >= 1) {
-            let pos: number = 0;
-            while (pos < nodes.length) {
-                combis.push(this.getCombinationsOfLength(nodes, pos))
-                pos++;
-            }
-
-            //remove first element
-            nodes.splice(0, 1);
-        }
-
-        return combis;
+    private getCombinationsOfIDsForOr(nodesIn: SwitchableNode[], graph: SwitchableGraph): SwitchableNode[][] {
+        let strIN: string[] = [];
+        let strOut: string[][] = [];
+        let nodesOut: SwitchableNode[][] = [];
+        nodesIn.forEach(node => {
+            strIN.push(node.id);
+        });
+        console.log("In: "+strIN);
+        strIN.forEach(s => {
+            strOut.push([s])
+        });
+        strOut.push(...PnUtils.getCombinationsOfIds([...strIN]));   
+        console.log("Out: "+strOut);
+        strOut.forEach(strS1 => {
+            let nodesS2: SwitchableNode[] = [];
+            console.log(strS1);
+            strS1.forEach(s2 => {
+                let nodeS2 = graph.getNode(s2);
+                if (nodeS2 !== undefined) { nodesS2.push(nodeS2); }
+            });
+            if (nodesS2 !== undefined) { nodesOut.push(nodesS2); }
+        });
+        return nodesOut;
     }
 
-    private getCombinationsOfLength(nodes: SwitchableNode[], pos: number): SwitchableNode[] {
-        let combis: SwitchableNode[] = [];
-        for (var i = 0; i <= pos; i++) {
-            combis.push(nodes[i]);
-        }
-        return combis;
-    }
+
     /** Used for classic switching. Enable all Nodes by this Combinationnumber. */
     private activateToggleGateway() {
         this._combinationArray[this._combinationNumber].forEach(node => {
@@ -307,15 +304,15 @@ export class SwitchableGateway extends SwitchableNode {
     /**
     *  Used for classic switching. Activate Gateway.
     */
-    activateGateway() {
-        this.initializedCombination();
+    activateGateway(graph: SwitchableGraph) {
+        this.initializedCombination(graph);
         if (this._combinationArray.length > 0) this.activateToggleGateway();
     }
 
-    private initializedCombination() {
+    private initializedCombination(graph: SwitchableGraph) {
         if (!this._combinationInitialized) {
             this._combinationInitialized = true;
-            this._combinationArray = this.getCombinationsList();                              
+            this._combinationArray = this.getCombinationsList(graph);
         }
     }
     // ------ Ende Classic Switch --------

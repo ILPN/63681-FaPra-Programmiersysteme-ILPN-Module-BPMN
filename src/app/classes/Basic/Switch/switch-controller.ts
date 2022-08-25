@@ -1,3 +1,5 @@
+import { BpmnUtils } from "../Bpmn/BpmnUtils";
+import { BpmnGateway } from "../Bpmn/gateways/BpmnGateway";
 import { ClassicSwitch } from "./classic-switch";
 import { MarcelsSwitch } from "./marcels-switch";
 import { SwitchableGateway } from "./SwitchableGateway";
@@ -10,8 +12,8 @@ export class SwitchController {
     private _startEvents: SwitchableNode[];
     private _nodes: SwitchableNode[];
     private _graph: SwitchableGraph;
-    //private _switchTyp;
-
+    private isCheckedIsWellHandled: boolean = true;
+ 
     constructor(graph: SwitchableGraph) {
         this._startEvents = [];
         this._nodes = graph.switchNodes;
@@ -82,7 +84,7 @@ export class SwitchController {
       * @param clickedNode the clicked node
       */
     public press(clickedNode: SwitchableNode) {
-        console.warn("Der Knoten mit der ID: " + clickedNode.id + " ist nicht aktivierbar, er hat den Status: " + clickedNode.switchState);
+        this.checkIsWellHandled();
         if (clickedNode.switchState === SwitchState.enableable || clickedNode.switchState === SwitchState.switchedButEnableForLoopRun) {
             if (clickedNode.isStartEvent()) this.disableAllOtherStartEvents(clickedNode);
             this.press_typ(clickedNode);
@@ -103,12 +105,49 @@ export class SwitchController {
 
 
 
+/**
+ * This method checks once if the graph is Wellhandled.
+ */
+    checkIsWellHandled() {
+        if (this.isCheckedIsWellHandled) {
+            this.isCheckedIsWellHandled = false;
+            let arrayOfGateways : SwitchableNode[] = [];
+            this._graph.switchNodes.forEach(node => {
+                if(node.isGateway()) {
+                   let associateGateway = BpmnUtils.getCorrespondingGatewayWithoutType(node.bpmnNode as BpmnGateway);            
+                   if (associateGateway == undefined) { 
+                    console.error("undefined gateway");
+                        arrayOfGateways.push(node);
+                    }
+                }
+            });
+        if(arrayOfGateways.length > 0) {
+                let text : String = "Warnung: ";
+                text += (arrayOfGateways.length > 1)?"Die Gateways mit den IDs: [":"Das Gateway mit der ID: [";
+                arrayOfGateways.forEach(node => {
+                    text += node.id +", ";
+                });
+                text = text.substring(0, text.length-2);
+                text += (arrayOfGateways.length > 1)?"] besitzen ":"] besitzt ";
+                text += "keinen oder keinen eindeutigen Partner. Dies bedeutet, dass dieser Graph nicht wellhandled ist. Bei Gateways ohne passendes Gegenstück wird die lokale Symmantik zum joinen verwendet.";
+                console.error(text);
+            }
+        }
+    }
 
 
 
 
 
-
+    // /**
+    //  * Print for a Gateway without associate, one times a massage for Local Symantik 
+    //  */
+    //  public foundNoAssociate(associate: SwitchableNode) {
+    //     if(!this._switchGatewaysWithoutMate.includes(associate)) {
+    //         this._switchGatewaysWithoutMate.push(associate);
+    //         console.error("Warnung: Es wurde zu dem Gateway mit der ID "+associate.id+" kein passendes Gateway gefunden. Es wird daher die lokale Symmantik zum joinen verwendet.");
+    //     }
+    // }
 
 
 

@@ -1,9 +1,9 @@
-import {BpmnNode} from "../Bpmn/BpmnNode";
-import {BpmnEventEnd} from "../Bpmn/events/BpmnEventEnd";
-import {BpmnEventStart} from "../Bpmn/events/BpmnEventStart";
-import {SwitchController} from "./switch-controller";
-import {SwitchState} from "./switchstatetype";
-import {SwitchUtils} from "./SwitchUtils";
+import { BpmnNode } from "../Bpmn/BpmnNode";
+import { BpmnEventEnd } from "../Bpmn/events/BpmnEventEnd";
+import { BpmnEventStart } from "../Bpmn/events/BpmnEventStart";
+import { SwitchController } from "./switch-controller";
+import { SwitchState } from "./switchstatetype";
+import { SwitchUtils } from "./SwitchUtils";
 
 export class SwitchableNode {
     protected _bpmnNode: BpmnNode
@@ -76,10 +76,19 @@ export class SwitchableNode {
         let nodesToSwitch: SwitchableNode[] = [];
         SwitchUtils.addItem(this, nodesToSwitch)
         this._predecessors.forEach(before => {
-            if (before.switchState === SwitchState.enabled) SwitchUtils.addItem(before, nodesToSwitch)
+            if (before.enabled()) {
+                SwitchUtils.addItem(before, nodesToSwitch)
+            } else {
+                if (before.enableable()) {
+                    before._predecessors.forEach(beforebefore => {
+                        if (beforebefore.enabled()) { SwitchUtils.addItem(beforebefore, nodesToSwitch) }
+                    }
+                    )
+                };
+            }
         });
         this._successors.forEach(after => {
-            if (after.switchState === SwitchState.disabled || after.switchState === SwitchState.switched) SwitchUtils.addItem(after, nodesToSwitch)
+            if (after.disabled() || after.switched()) SwitchUtils.addItem(after, nodesToSwitch)
         });
 
         return nodesToSwitch;

@@ -326,7 +326,7 @@ export class BpmnUtils {
         if (!node)
             return null
 
-        while (this.hasInEdges(node)) {
+        while (node &&this.hasInEdges(node)) {
             node = this.before(node);
 
             if (this.isSplitGateway(node))
@@ -348,8 +348,7 @@ export class BpmnUtils {
     public static getCorrespondingJoinWithoutType(node: BpmnNode): BpmnGateway | null {
         if (!node)
             return null
-
-        while (this.hasOutEdges(node)) {
+        while (node && this.hasOutEdges(node)) {
             node = this.next(node);
 
             if (this.isJoinGateway(node))

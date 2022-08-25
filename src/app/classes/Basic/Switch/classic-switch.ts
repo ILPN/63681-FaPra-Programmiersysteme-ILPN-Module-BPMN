@@ -1,7 +1,6 @@
 import { SwitchController } from "./switch-controller";
 import { SwitchableGateway } from "./SwitchableGateway";
 import { SwitchableNode } from "./SwitchableNode";
-import { SwitchState } from "./switchstatetype";
 import { SwitchUtils } from "./SwitchUtils";
 
 export class ClassicSwitch extends SwitchController {
@@ -14,21 +13,20 @@ export class ClassicSwitch extends SwitchController {
             this.switchGateway_classic(clickedNode);
         } else {
             let nodesToSwitch: SwitchableNode[] = this.getNodesToSwitch(clickedNode);
-            //          this.printNodeIDFromList(nodesToSwitch);
             nodesToSwitch.forEach(node => {
                 if (this.possibleToSwitchNode(node)) node.switch();
             });
         }
-        this.checkAllEnabledNodesStillEnabled();
+    //    this.checkAllEnabledNodesStillEnabled();
 
     }
 
 
     /**
-         * collects all the nodes whose state should be switched
-         * @param clickedNode
-         * @returns nodes to switch
-         */
+    * collects all the nodes whose state should be switched
+    * @param clickedNode
+    * @returns nodes to switch
+    */
     private getNodesToSwitch(clickedNode: SwitchableNode): SwitchableNode[] {
         let nodesToSwitch: SwitchableNode[] = [];
 
@@ -50,7 +48,6 @@ export class ClassicSwitch extends SwitchController {
     private getNodesToSwitchPredecessors(clickedNode: SwitchableNode): SwitchableNode[] {
         let nodesToSwitch: SwitchableNode[] = [];
         clickedNode.predecessors.forEach(before => {
-            console.log("PRESS: " + clickedNode.id + " ::: clickedNode.predecessors.forEach: by ID " + before.id + " analysiere     isEnabled: " + before.enabled() + " isGateway " + before.isGateway());
 
 
 
@@ -58,45 +55,71 @@ export class ClassicSwitch extends SwitchController {
             //     console.log("PRESS: "+clickedNode.id+ " ::: clickedNode.predecessors.forEach: by ID "+before.id+" true   ");
             //     let gatewayConnections = (before as SwitchableGateway).switchSplit(clickedNode);
             //     SwitchUtils.addItems(gatewayConnections, nodesToSwitch) 
-            if (before.enableable() && before.isGateway() && (before as SwitchableGateway).isSplitGateway()) { // before.enabled() &&  for loop
-                console.log("PRESS: " + clickedNode.id + " ::: clickedNode.predecessors.forEach: by ID " + before.id + " true   ");
+            if ((before.enableable() || before.switchedButEnableForLoopRun()) && before.isGateway() && (before as SwitchableGateway).isSplitGateway()) { // before.enabled() &&  for loop
+
 
 
                 //et gatewayConnections = (before as SwitchableGateway).switchSplit(clickedNode);
                 //SwitchUtils.addItems(gatewayConnections, nodesToSwitch)
 
                 // clickedNode.switchRegular();
-                SwitchUtils.addItem(before, nodesToSwitch);
+                // SwitchUtils.addItem(before, nodesToSwitch);
                 // before.predecessors.forEach(beforeBefore => {
-                //     if(beforeBefore.enabled()) { 
-                //         SwitchUtils.addItem(beforeBefore, nodesToSwitch); 
+                //     if (beforeBefore.enabled()) {
+                //         SwitchUtils.addItem(beforeBefore, nodesToSwitch);
                 //         //beforeBefore.switchTo(SwitchState.switched);
                 //     }
                 // });
-
-
+                SwitchUtils.addItems(this.getRecursiveAllNodesToSwitch(clickedNode),nodesToSwitch);
+                clickedNode.predecessors.forEach(before => {
+                    if (before.enabled()) {
+                        before.switch();
+                    }});
 
 
             } else {
                 SwitchUtils.addItems(clickedNode.switchRegular(), nodesToSwitch);
-                console.log("PRESS: " + clickedNode.id + " ::: clickedNode.predecessors.forEach: by ID " + before.id + " false" + " switchstate: " + before.switchState);
             }
         });
 
         return nodesToSwitch;
     }
+
+    private getRecursiveAllNodesToSwitch(node: SwitchableNode): SwitchableNode[] {
+        let sn: SwitchableNode[] = [];
+        node.predecessors.forEach(before => {
+            if (before.enabled()) {
+                SwitchUtils.addItem(before, sn)
+            } else {
+                if (before.enableable()) { // Neu CHECK
+                    SwitchUtils.addItem(before, sn)
+                    // before.predecessors.forEach(beforebefore => {
+                    //     if (beforebefore.enabled()) { SwitchUtils.addItem(beforebefore, sn) }
+                    // 
+
+                    //})};
+                    SwitchUtils.addItems(this.getRecursiveAllNodesToSwitch(before),sn);
+                }
+            }
+        });
+
+        return sn;
+    }
+
+
+
 
     private getNodesToSwitchSuccessors(clickedNode: SwitchableNode): SwitchableNode[] {
         let nodesToSwitch: SwitchableNode[] = [];
         clickedNode.successors.forEach(after => {
             if (after.disabled()) {
                 SwitchUtils.addItem(after, nodesToSwitch);
-                if (after.isGateway() && (after as SwitchableGateway).isSplitGateway) (after as SwitchableGateway).activateGateway()
+                if (after.isGateway() && (after as SwitchableGateway).isSplitGateway) (after as SwitchableGateway).activateGateway(this.graph)
             }
         });
         return nodesToSwitch;
     }
-
+    // Probleme mit betterExampleGraphWithoutLoop or loop... ist aber soweit ok
 
 
     private switchGateway_classic(clickedNode: SwitchableNode) {
@@ -105,9 +128,15 @@ export class ClassicSwitch extends SwitchController {
             gateway.switchRegular().forEach(node => {
                 if (this.possibleToSwitchNode(node)) node.switch()
             });
+            clickedNode.predecessors.forEach(before => {
+                if (before.enableable() || before.switchedButEnableForLoopRun()) {
+                    if (this.possibleToSwitchNode(before)) before.switch();
+                }
+            });
+
         } else {
             if (!gateway.combinationInitialized) {
-                gateway.activateGateway();
+                gateway.activateGateway(this.graph);
                 this.switch_before(gateway);
             } else {
                 gateway.toggleGateway();
@@ -118,7 +147,7 @@ export class ClassicSwitch extends SwitchController {
     /** Behebt das Problem dass bei zwei hintereinader geschaltete Gateways, das erste Gateway nach der Aktivierung des zweiten Gateways noch Schalten kann. */
     private switch_before(clickedNode: SwitchableNode) {
         clickedNode.predecessors.forEach(before => {
-            if (before.enableable()) {
+            if (before.enableable() || before.switchedButEnableForLoopRun()) {
                 if (this.possibleToSwitchNode(before)) before.switch();
             }
         });
@@ -130,10 +159,7 @@ export class ClassicSwitch extends SwitchController {
         if (node.isGateway()) {
             let gateway = node as SwitchableGateway;
             if (gateway.isJoinGateway()) {
-                console.error("Hier sind wir, bei "+gateway.id+", wir joinen in the club")
                 return gateway.canBeSwitched(this.graph);
-                //         if(gateway.AND_JOIN()) return gateway.allNodesBeforeEnabled();
-                //         if(gateway.OR_JOIN()) {}
             }
         }
         return true;
@@ -142,7 +168,7 @@ export class ClassicSwitch extends SwitchController {
 
     private checkAllEnabledNodesStillEnabled() {
         this.nodes.forEach(node => {
-            if (node.switchState === SwitchState.enabled && !node.isEndEvent()) {
+            if (node.enabled() && !node.isEndEvent()) {
                 if (!this.checkIfIsMinOneNodeEnableable(node.successors)) node.switch();
             }
 
@@ -152,7 +178,7 @@ export class ClassicSwitch extends SwitchController {
     private checkIfIsMinOneNodeEnableable(nodes: SwitchableNode[]): boolean {
         let answer = false;
         nodes.forEach(node => {
-            if (node.switchState === SwitchState.enableable || (node.switchState === SwitchState.disabled && node.isGateway() && (node as SwitchableGateway).isJoinGateway())) {
+            if (node.enableable() || node.switchedButEnableForLoopRun() || ((node.disabled()) && node.isGateway() && (node as SwitchableGateway).isJoinGateway())) {  // TODO  || node.switched
                 answer = true;
             }
         });

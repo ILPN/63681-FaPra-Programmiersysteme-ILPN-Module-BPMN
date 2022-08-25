@@ -6,7 +6,6 @@ import {GetSvgManager} from '../Interfaces/GetSvgManager';
 import {Svg} from '../Svg/Svg';
 import {SvgManager} from '../Svg/SvgManager/SvgManager';
 import { ClassicSwitch } from './classic-switch';
-import { MarcelsSwitch } from './marcels-switch';
 import {SwitchController} from './switch-controller';
 import {SwitchableEdge} from './SwitchableEdge';
 import {SwitchableGateway} from './SwitchableGateway';
@@ -127,6 +126,7 @@ export class SwitchableGraph implements GetSvgManager {
         }
         return this._svgManager;
     }
+
 
 
 }
