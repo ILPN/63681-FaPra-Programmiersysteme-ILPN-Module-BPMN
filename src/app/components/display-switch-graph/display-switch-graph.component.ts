@@ -18,6 +18,8 @@ export class DisplaySwitchGraphComponent implements OnDestroy, AfterViewInit {
 
     private _sub: Subscription | undefined;
     private bpmnGraph: BpmnGraph | undefined;
+    // textForWellhandled : String = "";
+    // isWellhandled : boolean = true;
 
     constructor(
         private _layoutService: LayoutService,
@@ -26,33 +28,36 @@ export class DisplaySwitchGraphComponent implements OnDestroy, AfterViewInit {
     ) {
     }
 
-    ngAfterViewInit(): void {
+    ngAfterViewInit(typ?: number): void {
         this._sub = this._displayService.diagram$.subscribe((graph) => {
             if (graph == undefined) return
             if (graph.isEmpty()) return
             if (this.rootSvg == undefined || this.drawingArea == undefined) return
             this.bpmnGraph = graph;
-            const switchGraph = new SwitchableGraph(graph);
+            const switchGraph = new SwitchableGraph(graph, 0);
+            if (typeof typ !== 'undefined') {
+            const switchGraph = new SwitchableGraph(graph, 1);  
+            } 
             this.draw(switchGraph.svgManager.getSvg())
-
-
             const svg = switchGraph.svgManager.getSvg()
             this.draw(svg)
             this._layoutService.zoomViewToSvg(svg, this.drawingArea.nativeElement, this.rootSvg.nativeElement)
 
-
+            
+            //if(switchGraph.controller.checkIsWellHandled() === "") 
+          //  this.isWellhandled = true;
         });
     }
 
-    classic():void {
 
+
+    classic():void {
+        this.ngAfterViewInit();
     }
 
     recent():void {
-        
+        this.ngAfterViewInit(1);
     }
-
-
 
 
     ngOnInit(): void {

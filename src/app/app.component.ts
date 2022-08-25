@@ -41,82 +41,52 @@ export class AppComponent implements OnDestroy {
 
 
 
-let s : String = '.events\n'+
-'e1 start "E1 Start1"\n'+
-'e2 start "E2 Start2"\n'+
-'e3 end\n'+
-'\n'+
-'.tasks\n'+
-'t1 manual "t1"\n'+
-'t2 usertask "T2"\n'+
-'t3 "T3"\n'+
-'t4 usertask "T4"\n'+
-'t5\n'+
-'t6 usertask "T6"\n'+
-'t7 "T7"\n'+
-'t8 usertask "T8"\n'+
-'t9 usertask "T9"\n'+
-'t10 manual "T10"\n'+
-'t11 service "T11"\n'+
-'t12 usertask "T12"\n'+
-'t13 manual "T13"\n'+
-'t14 usertask "T14"\n'+
-'t15 manual "T15"\n'+
-'t16 service "T16"\n'+
-'\n'+
-'.gateways\n'+
-'g1J or_join "G1J"\n'+
-'g2S or_split "G2S"\n'+
-'g2J or_join "G2J"\n'+
-'g3S and_split "G2S"\n'+
-'g3J and_join "G3J"\n'+
-'g4S or_split "G4S"\n'+
-'g4J or_join "G4J"\n'+
-'g5S and_split "G5S"\n'+
-'g5J and_join "G5J"\n'+
-'g6S xor_split "G6S"\n'+
-'g6J xor_join\n'+
-'g7S or_split\n'+
-'g7J or_join\n'+
-'\n'+
-'.edges\n'+
-'e1 t1 sequenceflow\n'+      
-'t1 g1J sequenceflow\n'+ 
-'e2 g1J sequenceflow "a3"\n'+ 
-'g1J t2 sequenceflow\n'+
-'t2 g2S sequenceflow\n'+
-'g2S t3 sequenceflow\n'+
-'t3 g3S sequenceflow\n'+
-'g3S t6 sequenceflow\n'+
-'t6 g6S sequenceflow\n'+
-'g6S t7 sequenceflow\n'+
-'g6S t8 sequenceflow "t8"\n'+
-'t7 t15 sequenceflow\n'+
-'t8 t16 sequenceflow\n'+
-'t15 g6J sequenceflow\n'+
-'t16 g6J sequenceflow\n'+
-'g6J g3J sequenceflow\n'+
-'g3S t9 sequenceflow\n'+
-'t9 g7S sequenceflow\n'+
-'g7S t10 sequenceflow\n'+
-'g7S t11 sequenceflow\n'+
-'t10 g7J sequenceflow\n'+
-'t11 g7J sequenceflow\n'+
-'g7J g3J sequenceflow\n'+
-'g2S g4S sequenceflow\n'+
-'g4S t4 sequenceflow\n'+
-'t4 t12 sequenceflow\n'+
-'t12 g4J sequenceflow\n'+
-'g4S t5 sequenceflow\n'+
-'t5 g5S sequenceflow\n'+
-'g5S t13 sequenceflow\n'+
-'g5S t14 sequenceflow\n'+
-'t13 g5J sequenceflow\n'+
-'t14 g5J sequenceflow\n'+
-'g5J g4J sequenceflow\n'+
-'g3J g2J sequenceflow\n'+
-'g4J g2J sequenceflow\n'+
-'g2J e3 sequenceflow';
+        let s : String = '.events\n'+
+        'e1 start "Vorzeitige Abgabe"\n'+
+        'e2 start "Zeit abgelaufen"\n'+
+        'e3 intermediate\n'+
+        'e4 end\n'+
+        '\n'+
+        '.tasks\n'+
+        't1 manual "Einreichen"\n'+
+        't2 usertask "Applaus"\n'+
+        't3 sending "Daumen runter"\n'+
+        't4 sending "Untersuchen"\n'+
+        't5 receiving "Information erhalten"\n'+
+        't6 businessrule "Benoten"\n'+
+        't7 service ""\n'+
+        '\n'+
+        '.gateways\n'+
+        'g1J xor_join ""\n'+
+        'g2S or_split "gefällt es?"\n'+
+        'g2J or_join \n'+
+        'g3S and_split "G2S"\n'+
+        'g3J and_join "G3J"\n'+
+        'g4S xor_split "G4S"\n'+
+        'g4J xor_join "G4J"\n'+
+        '\n'+
+        '.edges\n'+
+        'e1 t1 sequenceflow\n'+
+        't1 g1J association\n'+
+        'e2 g1J association\n'+
+        'g1J e3 sequenceflow\n'+
+        'e3 g2S sequenceflow\n'+
+        'g2S t2 sequenceflow "ja"\n'+
+        'g2S g2J defaultflow "vielleicht"\n'+
+        'g2S t3 sequenceflow "nein"\n'+
+        't2 g2J sequenceflow\n'+
+        't3 g2J sequenceflow\n'+
+        'g2J g3S sequenceflow\n'+
+        'g3S t4 sequenceflow\n'+
+        'g3S t5 sequenceflow\n'+
+        't4 g3J sequenceflow\n'+
+        't5 g3J sequenceflow\n'+
+        'g3J t6 informationflow\n'+
+        't6 g4S sequenceflow\n'+
+        'g4S t7 sequenceflow\n'+
+        't7 g4J sequenceflow\n'+
+        'g4J e4 sequenceflow\n'+
+        'g4S g4J sequenceflow';
 
 console.log(s);
 this.textareaFc.setValue(s);
@@ -148,4 +118,6 @@ this.textareaFc.setValue(s);
             this.graphIsValid = this.graphValidationService.isValid(this.result);
         }
     }
+
+
 }

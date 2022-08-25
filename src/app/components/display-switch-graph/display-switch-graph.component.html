@@ -1,6 +1,7 @@
 <div class="buttonWrap">
     <button (click)="classic()"  mat-raised-button>Klassisch</button>
     <button (click)="recent()" style="margin-left:15px" mat-raised-button>Modern</button>
+    <span> Für Diagramme die nicht Wellhandled sind wird die lokale Semantik verwendet.</span>
 </div>
 <svg #rootSvg id="rootsvg" class="canvas">
     <rect width="100%" height="100%" class="backgroundSwitchableGraph"></rect>

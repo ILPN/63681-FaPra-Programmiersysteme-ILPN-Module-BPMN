@@ -9,7 +9,7 @@ export class SwitchController {
     private _startEvents: SwitchableNode[];
     private _nodes: SwitchableNode[];
     private _graph: SwitchableGraph;
-    private isCheckedIsWellHandled: boolean = true;
+    //private isCheckedIsWellHandled: boolean = true;
  
     constructor(graph: SwitchableGraph) {
         this._startEvents = [];
@@ -17,23 +17,13 @@ export class SwitchController {
         this._graph = graph;
     }
 
-
     get nodes(): SwitchableNode[] {
         return this._nodes;
     }
 
-    // set nodes(value: SwitchableNode[]) {
-    //     this._nodes = value;
-    // }
-
     get graph(): SwitchableGraph {
         return this._graph;
     }
-
-    // set graph(value: SwitchableGraph) {
-    //     this._graph = value;
-    // }
-
 
 
     /**
@@ -80,7 +70,7 @@ export class SwitchController {
       * @param clickedNode the clicked node
       */
     public press(clickedNode: SwitchableNode) {
-        this.checkIsWellHandled();
+        //this.checkIsWellHandled();
         if (clickedNode.switchState === SwitchState.enableable || clickedNode.switchState === SwitchState.switchedButEnableForLoopRun) {
             if (clickedNode.isStartEvent()) this.disableAllOtherStartEvents(clickedNode);
             this.press_typ(clickedNode);
@@ -104,19 +94,17 @@ export class SwitchController {
 /**
  * This method checks once if the graph is Wellhandled.
  */
-    checkIsWellHandled() {
-        if (this.isCheckedIsWellHandled) {
-            this.isCheckedIsWellHandled = false;
-            let arrayOfGateways : SwitchableNode[] = [];
-            this._graph.switchNodes.forEach(node => {
-                if(node.isGateway()) {
-                   let associateGateway = BpmnUtils.getCorrespondingGatewayWithoutType(node.bpmnNode as BpmnGateway);            
-                   if (associateGateway == undefined) { 
-                    console.error("undefined gateway");
-                        arrayOfGateways.push(node);
-                    }
+    checkIsWellHandled() : String {
+        let text : String = "";
+        let arrayOfGateways : SwitchableNode[] = [];
+        this._graph.switchNodes.forEach(node => {
+        if(node.isGateway()) {
+            let associateGateway = BpmnUtils.getCorrespondingGatewayWithoutType(node.bpmnNode as BpmnGateway);            
+            if (associateGateway == undefined) { 
+                arrayOfGateways.push(node);
                 }
-            });
+            }
+        });
         if(arrayOfGateways.length > 0) {
                 let text : String = "Warnung: ";
                 text += (arrayOfGateways.length > 1)?"Die Gateways mit den IDs: [":"Das Gateway mit der ID: [";
@@ -126,69 +114,40 @@ export class SwitchController {
                 text = text.substring(0, text.length-2);
                 text += (arrayOfGateways.length > 1)?"] besitzen ":"] besitzt ";
                 text += "keinen oder keinen eindeutigen Partner. Dies bedeutet, dass dieser Graph nicht wellhandled ist. Bei Gateways ohne passendes Gegenstück wird die lokale Symmantik zum joinen verwendet.";
-                console.error(text);
+                console.warn(text);
             }
-        }
+        return text;
     }
 
-
-
-
-
-    // /**
-    //  * Print for a Gateway without associate, one times a massage for Local Symantik 
-    //  */
-    //  public foundNoAssociate(associate: SwitchableNode) {
-    //     if(!this._switchGatewaysWithoutMate.includes(associate)) {
-    //         this._switchGatewaysWithoutMate.push(associate);
-    //         console.error("Warnung: Es wurde zu dem Gateway mit der ID "+associate.id+" kein passendes Gateway gefunden. Es wird daher die lokale Symmantik zum joinen verwendet.");
-    //     }
-    // }
-
-
-
-
-    // /**
-    //  * collects nodes whose needs to be switched when this node is clicked:
-    //  * 1. disabled nodes after the clicked node
-    //  * 2. enabled nodes before the clicked node
-    //  * @returns nodes to switch
-    //  */
-    //  switchRegular(): SwitchableNode[] {
-    //     let nodesToSwitch: SwitchableNode[] = [];
-    //     SwitchUtils.addItem(this, nodesToSwitch)
-    //     this._predecessors.forEach(before => {
-    //         if (before.switchState === SwitchState.enabled) SwitchUtils.addItem(before, nodesToSwitch)
-    //     });
-    //     this._successors.forEach(after => {
-    //         if (after.switchState === SwitchState.disabled || after.switchState === SwitchState.switched) SwitchUtils.addItem(after, nodesToSwitch)
-    //     });
-
-    //     return nodesToSwitch;
-    // }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+// /**
+//  * This method checks once if the graph is Wellhandled.
+//  */
+//  checkIsWellHandled() : String {
+//     let text : String = "";
+//     if (this.isCheckedIsWellHandled) {
+//         this.isCheckedIsWellHandled = false;
+//         let arrayOfGateways : SwitchableNode[] = [];
+//         this._graph.switchNodes.forEach(node => {
+//             if(node.isGateway()) {
+//                let associateGateway = BpmnUtils.getCorrespondingGatewayWithoutType(node.bpmnNode as BpmnGateway);            
+//                if (associateGateway == undefined) { 
+//                 console.error("undefined gateway");
+//                     arrayOfGateways.push(node);
+//                 }
+//             }
+//         });
+//     if(arrayOfGateways.length > 0) {
+//             let text : String = "Warnung: ";
+//             text += (arrayOfGateways.length > 1)?"Die Gateways mit den IDs: [":"Das Gateway mit der ID: [";
+//             arrayOfGateways.forEach(node => {
+//                 text += node.id +", ";
+//             });
+//             text = text.substring(0, text.length-2);
+//             text += (arrayOfGateways.length > 1)?"] besitzen ":"] besitzt ";
+//             text += "keinen oder keinen eindeutigen Partner. Dies bedeutet, dass dieser Graph nicht wellhandled ist. Bei Gateways ohne passendes Gegenstück wird die lokale Symmantik zum joinen verwendet.";
+//             console.error(text);
+//         }
+//     }
+//     return text;
+// }
 }

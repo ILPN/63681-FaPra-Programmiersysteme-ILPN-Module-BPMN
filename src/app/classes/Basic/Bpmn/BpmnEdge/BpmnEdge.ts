@@ -10,7 +10,6 @@ import { BpmnEdgeCorner } from './BpmnEdgeCorner';
 import { BpmnDummyEdgeCorner } from './BpmnDummyEdgeCorner';
 import { GetSvgManager } from '../../Interfaces/GetSvgManager';
 import { SvgManager } from '../../Svg/SvgManager/SvgManager';
-import { Utility } from 'src/app/classes/Utils/Utility';
 
 export class BpmnEdge extends BEdge implements GetSvgManager {
     private _svgManager: SvgManager | undefined;
@@ -134,7 +133,7 @@ export class BpmnEdge extends BEdge implements GetSvgManager {
     labels(pointsOfLine:Vector[]): SVGElement[] {
         const paddingX = 3;
         const paddingY = -3;
-        const fontSize = 8;
+        const fontSize = 20;
 
 
         let dir;
