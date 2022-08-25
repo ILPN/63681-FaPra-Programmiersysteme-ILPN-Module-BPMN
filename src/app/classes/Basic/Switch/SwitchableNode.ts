@@ -12,6 +12,7 @@ export class SwitchableNode {
     private _id;
     private _predecessors: Array<SwitchableNode>;
     private _successors: Array<SwitchableNode>;
+    private _defaultSuccessors: Array<SwitchableNode>;
 
     constructor(node: BpmnNode, controller: SwitchController) {
         this._bpmnNode = node
@@ -27,7 +28,7 @@ export class SwitchableNode {
         //connected nodes
         this._predecessors = new Array<SwitchableNode>();
         this._successors = new Array<SwitchableNode>();
-
+        this._defaultSuccessors = new Array<SwitchableNode>();
         //switch state on mouse down
         this._bpmnNode.svgManager.getNewSvg().onmousedown = (e) => controller.press(this)
     }
@@ -49,13 +50,22 @@ export class SwitchableNode {
         return this._successors
     }
 
+    get defaultSuccessors(): Array<SwitchableNode> {
+        return this._defaultSuccessors
+    }
+
     addSuccessor(node: SwitchableNode) {
         SwitchUtils.addItem(node, this._successors)
+    }
+
+    addDefaultSuccessor(node: SwitchableNode) {
+        SwitchUtils.addItem(node, this._defaultSuccessors)
     }
 
     addPredecessor(node: SwitchableNode) {
         SwitchUtils.addItem(node, this._predecessors)
     }
+    
 
     get id(): string {
         return this._id
@@ -76,12 +86,13 @@ export class SwitchableNode {
         let nodesToSwitch: SwitchableNode[] = [];
         SwitchUtils.addItem(this, nodesToSwitch)
         this._predecessors.forEach(before => {
-            SwitchUtils.addItems(before.classicAllNodesBeforeToSwitch(), nodesToSwitch);
+            if(SwitchUtils.isClassicSwitch(this._switchController))
+                SwitchUtils.addItems(before.classicAllNodesBeforeToSwitch(), nodesToSwitch);
+            else if (before.switchState === SwitchState.enabled) SwitchUtils.addItem(before, nodesToSwitch); 
         });
         this._successors.forEach(after => {
             if (after.disabled() || after.switched()) SwitchUtils.addItem(after, nodesToSwitch)
         });
-
         return nodesToSwitch;
     }
 

@@ -92,7 +92,7 @@ export class SwitchController {
 
 
 /**
- * This method checks once if the graph is Wellhandled.
+ * This method checks once if the graph is well-handled.
  */
     checkIsWellHandled() : String {
         let text : String = "";
@@ -113,14 +113,14 @@ export class SwitchController {
                 });
                 text = text.substring(0, text.length-2);
                 text += (arrayOfGateways.length > 1)?"] besitzen ":"] besitzt ";
-                text += "keinen oder keinen eindeutigen Partner. Dies bedeutet, dass dieser Graph nicht wellhandled ist. Bei Gateways ohne passendes Gegenstück wird die lokale Symmantik zum joinen verwendet.";
+                text += "keinen oder keinen eindeutigen Partner. Dies bedeutet, dass dieser Graph nicht well-handled ist. Bei Gateways ohne passendes Gegenstück wird die lokale Symmantik zum joinen verwendet.";
                 console.warn(text);
             }
         return text;
     }
 
 // /**
-//  * This method checks once if the graph is Wellhandled.
+//  * This method checks once if the graph is well-handled.
 //  */
 //  checkIsWellHandled() : String {
 //     let text : String = "";
@@ -144,7 +144,7 @@ export class SwitchController {
 //             });
 //             text = text.substring(0, text.length-2);
 //             text += (arrayOfGateways.length > 1)?"] besitzen ":"] besitzt ";
-//             text += "keinen oder keinen eindeutigen Partner. Dies bedeutet, dass dieser Graph nicht wellhandled ist. Bei Gateways ohne passendes Gegenstück wird die lokale Symmantik zum joinen verwendet.";
+//             text += "keinen oder keinen eindeutigen Partner. Dies bedeutet, dass dieser Graph nicht well-handled ist. Bei Gateways ohne passendes Gegenstück wird die lokale Symmantik zum joinen verwendet.";
 //             console.error(text);
 //         }
 //     }

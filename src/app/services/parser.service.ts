@@ -419,9 +419,6 @@ export class ParserService {
                     if (node2.id === lineSplit[1].trim()) {
                         let sequence = new BpmnEdge(name, node1, node2);
 
-                        if(node1.constructor.name === 'BpmnGatewaySplitXor' && node2.constructor.name === 'BpmnGatewayJoinXor' || node1.constructor.name === 'BpmnGatewaySplitOr' && node2.constructor.name === 'BpmnGatewayJoinOr') {
-                            sequence = new BpmnEdgeDefault(name,node1,node2);
-                        } else 
                             switch(type.toLowerCase()){
                             case("defaultflow"): sequence = new BpmnEdgeDefault(name,node1,node2); break;
                             case("sequenceflow"): sequence = new BpmnEdge(name,node1,node2); break;

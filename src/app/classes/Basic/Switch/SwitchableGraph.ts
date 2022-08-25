@@ -1,6 +1,7 @@
 import {BpmnEdge} from '../Bpmn/BpmnEdge/BpmnEdge';
 import {BpmnGraph} from '../Bpmn/BpmnGraph';
 import {BpmnNode} from '../Bpmn/BpmnNode';
+import { BpmnUtils } from '../Bpmn/BpmnUtils';
 import {BpmnGateway} from '../Bpmn/gateways/BpmnGateway';
 import {GetSvgManager} from '../Interfaces/GetSvgManager';
 import {Svg} from '../Svg/Svg';
@@ -101,7 +102,8 @@ export class SwitchableGraph implements GetSvgManager {
         //register predecessor and successor nodes
         switchNodeTo.addPredecessor(switchNodeFrom);
         switchNodeFrom.addSuccessor(switchNodeTo);
-
+        if(BpmnUtils.isDefaultEdge(edge)) switchNodeFrom.addDefaultSuccessor(switchNodeTo);
+        
         //add to map
         this._nodeMap.set(edge.from, switchNodeFrom)
         this._nodeMap.set(edge.to, switchNodeTo)

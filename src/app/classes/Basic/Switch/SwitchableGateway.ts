@@ -253,11 +253,20 @@ export class SwitchableGateway extends SwitchableNode {
     /** Used for classic switching. Return a list with all Nodescombinations after a Array. */
     private getCombinationsList(graph: SwitchableGraph): SwitchableNode[][] {
         let array: SwitchableNode[][] = [];
-        if (this.OR_SPLIT()) return this.getCombinationsOfIDsForOr([...this.successors], graph);
+        //if (this.OR_SPLIT()) return this.getCombinationsOfIDsForOr([...this.successors], graph);
 
-        if (this.XOR_SPLIT()) this.successors.forEach(node => {
-            array.push([node]);
-        });
+        if (this.OR_SPLIT()) {
+            //    array.push(this.defaultSuccessors);
+            //    array.push(...this.getCombinationsOfIDsForOr([...this.successors], graph)); 
+            array.push(this.defaultSuccessors);
+            array.push(...this.getCombinationsOfIDsForOr([...this.successors], graph));
+        }
+        if (this.XOR_SPLIT()) {
+            if (this.defaultSuccessors.length > 0) SwitchUtils.addItem([this.defaultSuccessors[0]], array);
+            this.successors.forEach(node => {
+                if (this.defaultSuccessors.length === 0 || node != this.defaultSuccessors[0]) array.push([node]);
+            });
+        }
         if (this.AND_SPLIT()) array = [[...this.successors]];
         return array;
     }
@@ -269,12 +278,12 @@ export class SwitchableGateway extends SwitchableNode {
         nodesIn.forEach(node => {
             strIN.push(node.id);
         });
-        console.log("In: "+strIN);
+        console.log("In: " + strIN);
         strIN.forEach(s => {
             strOut.push([s])
         });
-        strOut.push(...PnUtils.getCombinationsOfIds([...strIN]));   
-        console.log("Out: "+strOut);
+        strOut.push(...PnUtils.getCombinationsOfIds([...strIN]));
+        console.log("Out: " + strOut);
         strOut.forEach(strS1 => {
             let nodesS2: SwitchableNode[] = [];
             console.log(strS1);
