@@ -1,5 +1,4 @@
 import { ClassicSwitch } from "./classic-switch";
-import { MarcelsSwitch } from "./marcels-switch";
 import { SwitchController } from "./switch-controller";
 import { SwitchableGateway } from "./SwitchableGateway";
 import { SwitchableNode } from "./SwitchableNode";
@@ -54,19 +53,7 @@ export class SwitchUtils {
         });
         return answer
     }
-    // /**
-    //  * checks if the node is a gateway
-    //  * @param node
-    //  * @returns
-    //  */
-    //  public static isNoNodeEnableableOrEnabledOrSwitched(nodeArray: SwitchableNode[]): boolean {
-    //     let answer = true;
-    //     nodeArray.forEach(element => {
-    //         if (element.switchState === SwitchState.enableable || element.switchState === SwitchState.enabled || element.switchState === SwitchState.switched) answer = false;
-    //     });
-    //     return answer
-    // }
-
+ 
         /**
      * checks if the node is a gateway
      * @param node
@@ -97,12 +84,10 @@ export class SwitchUtils {
         return array;
     }
 
-    // public static isMarcelsSwitch(controller: SwitchController) : boolean {
-    //     return controller instanceof MarcelsSwitch
-    // }
-
-
-
+    /** Return true, if the SwitchController is instanceof ClassicSwitch
+     * @param controller SwitchController
+     * @return Return true, if the SwitchController is instanceof ClassicSwitch 
+     */
      public static isClassicSwitch(controller: SwitchController): boolean {
          return controller instanceof ClassicSwitch;
      }

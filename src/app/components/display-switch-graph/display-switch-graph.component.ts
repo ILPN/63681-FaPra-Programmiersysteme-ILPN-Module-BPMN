@@ -44,6 +44,17 @@ export class DisplaySwitchGraphComponent implements OnDestroy, AfterViewInit {
         });
     }
 
+    classic():void {
+
+    }
+
+    recent():void {
+        
+    }
+
+
+
+
     ngOnInit(): void {
     }
 

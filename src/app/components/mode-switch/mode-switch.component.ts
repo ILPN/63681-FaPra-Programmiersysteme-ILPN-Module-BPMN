@@ -8,7 +8,7 @@ import { AppComponent } from 'src/app/app.component';
 })
 export class ModeSwitchComponent implements OnInit,AfterViewInit {
   selectedToggle: string;
-  toggleOptions: Array<string> = ["free layout", "Sugiyama layout", "simulation"];
+  toggleOptions: Array<string> = ["free layout", "Sugiyama layout", "Schalten"];
   constructor( private _appComponent: AppComponent) {
     this.selectedToggle = this.toggleOptions[0]
   }

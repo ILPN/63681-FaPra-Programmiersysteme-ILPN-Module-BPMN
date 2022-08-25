@@ -1,8 +1,5 @@
 import { BpmnUtils } from "../Bpmn/BpmnUtils";
 import { BpmnGateway } from "../Bpmn/gateways/BpmnGateway";
-import { ClassicSwitch } from "./classic-switch";
-import { MarcelsSwitch } from "./marcels-switch";
-import { SwitchableGateway } from "./SwitchableGateway";
 import { SwitchableGraph } from "./SwitchableGraph";
 import { SwitchableNode } from "./SwitchableNode";
 import { SwitchState } from "./switchstatetype";
@@ -18,7 +15,6 @@ export class SwitchController {
         this._startEvents = [];
         this._nodes = graph.switchNodes;
         this._graph = graph;
-        // this._switchTyp = 1;
     }
 
 

@@ -76,16 +76,17 @@ export class SwitchableNode {
         let nodesToSwitch: SwitchableNode[] = [];
         SwitchUtils.addItem(this, nodesToSwitch)
         this._predecessors.forEach(before => {
-            if (before.enabled()) {
-                SwitchUtils.addItem(before, nodesToSwitch)
-            } else {
-                if (before.enableable()) {
-                    before._predecessors.forEach(beforebefore => {
-                        if (beforebefore.enabled()) { SwitchUtils.addItem(beforebefore, nodesToSwitch) }
-                    }
-                    )
-                };
-            }
+            // if (before.enabled()) {
+            //     SwitchUtils.addItem(before, nodesToSwitch)
+            // } else {
+            //     if (before.enableable()) { // Neu CHECK
+            //         before._predecessors.forEach(beforeBefore => {
+            //             if (beforeBefore.enabled()) { SwitchUtils.addItem(beforeBefore, nodesToSwitch) }
+            //         }
+            //         )
+            //     };
+            // }
+            SwitchUtils.addItems(before.classicAllNodesBeforeToSwitch(), nodesToSwitch);
         });
         this._successors.forEach(after => {
             if (after.disabled() || after.switched()) SwitchUtils.addItem(after, nodesToSwitch)
@@ -93,6 +94,78 @@ export class SwitchableNode {
 
         return nodesToSwitch;
     }
+
+
+    classicAllNodesBeforeToSwitch(): SwitchableNode[] {
+        let nodesToSwitch: SwitchableNode[] = [];
+        if (this.enableable() || this.switchedButEnableForLoopRun() || this.enabled()) {
+            SwitchUtils.addItem(this, nodesToSwitch);
+            this._predecessors.forEach(before => {
+                SwitchUtils.addItems(before.classicAllNodesBeforeToSwitch(), nodesToSwitch);
+            }
+            )
+        };
+        return nodesToSwitch;
+    }
+
+
+    // classicAllNodesBeforeToSwitch3(): SwitchableNode[] {
+    //     let nodesToSwitch: SwitchableNode[] = [];
+    //     //  console.log("classicAllNodesBeforeToSwitch: Aufruf auf id: "+ this.id);
+    //     if (this.enabled()) {
+    //         //     console.log("classicAllNodesBeforeToSwitch: Enabled auf id: "+ this.id);
+    //         SwitchUtils.addItem(this, nodesToSwitch);
+    //     } else {
+    //         //     console.log("classicAllNodesBeforeToSwitch: NICHT Enabled auf id: "+ this.id);
+    //         if (this.enableable() || this.switchedButEnableForLoopRun()) { // Neu CHECK
+    //             //         console.log("classicAllNodesBeforeToSwitch: enableable or switchedButEnableForLoopRun auf id: "+ this.id);
+    //             SwitchUtils.addItem(this, nodesToSwitch);
+    //             this._predecessors.forEach(before => {
+    //                 //             console.log("classicAllNodesBeforeToSwitch: Aufruf before auf id: "+ before.id);
+    //                 if (before.enabled()) {
+    //                     SwitchUtils.addItem(before, nodesToSwitch);
+    //                     //                 console.log("classicAllNodesBeforeToSwitch: before enabled auf id: "+ before.id);
+    //                 } else {
+    //                     //                console.log("classicAllNodesBeforeToSwitch: before nicht enabled auf id: "+ before.id);
+    //                     if (before.enableable() || before.switchedButEnableForLoopRun()) {
+    //                         //                    console.log("classicAllNodesBeforeToSwitch: before enableable auf id: "+ before.id);
+    //                         SwitchUtils.addItems(before.classicAllNodesBeforeToSwitch(), nodesToSwitch);
+
+    //                     }
+    //                 }
+    //             }
+    //             )
+    //         };
+    //     }
+    //     //console.log("Bei ID" +this.id+ " gibt es folgenen Inhalt: ");
+    //     //console.log(nodesToSwitch);
+    //     return nodesToSwitch;
+    // }
+
+    // classicAllNodesBeforeToSwitch(node: SwitchableNode): SwitchableNode[] {
+    //     let nodesToSwitch: SwitchableNode[] = [];
+    //     if (node.enabled()) {
+    //         SwitchUtils.addItem(node, nodesToSwitch);
+    //     } else {
+    //         if (node.enableable()) { // Neu CHECK
+    //             SwitchUtils.addItem(node, nodesToSwitch);
+    //             node._predecessors.forEach(before => {
+    //                 if (before.enabled()) {
+    //                     SwitchUtils.addItem(before, nodesToSwitch)
+    //                 } else {
+    //                     if (node.enableable()) {
+    //                         SwitchUtils.addItems(this.classicAllNodesBeforeToSwitch(before), nodesToSwitch);
+    //                     }
+    //                 }
+    //             }
+    //             )
+    //         };
+    //     }
+    //     return nodesToSwitch;
+    // }
+
+
+
 
     disabled(): boolean {
         return this._switchState === SwitchState.disabled;
