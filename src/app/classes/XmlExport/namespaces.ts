@@ -52,6 +52,8 @@ export class Namespace {
     public static EXCLUSIVE_GATEWAY_ELEMENT = this.bpmn(this.EXCLUSIVE_GATEWAY)
     public static INCLUSIVE_GATEWAY = "inclusiveGateway" //OR
     public static INCLUSIVE_GATEWAY_ELEMENT = this.bpmn(this.INCLUSIVE_GATEWAY)
+    public static GATEWAY = "gateway"
+    public static GATEWAY_ELEMENT = this.bpmn(this.GATEWAY)
 
     //BPMNDI Diagram and children
     public static BPMNDI_prefix = "bpmndi:"
