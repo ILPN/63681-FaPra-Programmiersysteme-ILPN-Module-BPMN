@@ -8,7 +8,7 @@ import { AppComponent } from 'src/app/app.component';
 })
 export class ModeSwitchComponent implements OnInit,AfterViewInit {
   selectedToggle: string;
-  toggleOptions: Array<string> = ["free layout", "Sugiyama layout", "simulation"];
+  toggleOptions: Array<string> = ["Manuelles Layout", "Sugiyama Layout", "Schalten"];
   constructor( private _appComponent: AppComponent) {
     this.selectedToggle = this.toggleOptions[0]
   }
@@ -21,7 +21,7 @@ export class ModeSwitchComponent implements OnInit,AfterViewInit {
   selectionChanged(item : any) {
 
     if(item.value == this.toggleOptions[1]){
-      if(!confirm("reapplying the sugiyama layout will override set positions of nodes and delete all corners of edges, do you want to proceed?")) {
+      if(!confirm("Achtung: Durch die erneute Anwendung des Sugiyama Layouts werden die jetzigen Positionen der Knoten und Ecken der Kanten überschrieben!")) {
         setTimeout(()=>{ this.selectedToggle = this._appComponent.mode},5)
         return
       }

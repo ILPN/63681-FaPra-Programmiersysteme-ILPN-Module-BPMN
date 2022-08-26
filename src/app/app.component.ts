@@ -14,7 +14,7 @@ import { GraphValidationService } from "./services/graph-validation.service";
 })
 export class AppComponent implements OnDestroy {
 
-    mode = "free layout"
+    mode = "Manuelles Layout"
     public textareaFc: FormControl;
     private _subValueChange: Subscription;
     private _subDragging: Subscription;
