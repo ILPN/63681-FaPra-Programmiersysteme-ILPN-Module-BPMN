@@ -5,11 +5,10 @@ import { SwitchableNode } from "./SwitchableNode";
 import { SwitchState } from "./switchstatetype";
 import { SwitchUtils } from "./SwitchUtils";
 
-export class SwitchController {
+export abstract class SwitchController {
     private _startEvents: SwitchableNode[];
     private _nodes: SwitchableNode[];
     private _graph: SwitchableGraph;
-    //private isCheckedIsWellHandled: boolean = true;
  
     constructor(graph: SwitchableGraph) {
         this._startEvents = [];
@@ -59,7 +58,6 @@ export class SwitchController {
 
     /** Print all Node IDs*/
     printNodeIDFromList(nodes: SwitchableNode[]) {
-        console.log("switchcontroller/printNodeIDFromList ------ Folgende Nodes befinden sich in der Liste und sollen geschaltet werden:          ");
         let str: String = "";
         nodes.forEach(node => str += node.id + ", ");
         str += " ENDE.";
@@ -84,18 +82,14 @@ export class SwitchController {
         }
     }
 
-    press_typ(clickedNode: SwitchableNode) { }
-
-
-
-
+    abstract press_typ(clickedNode: SwitchableNode) : void;
 
 
 /**
  * This method checks once if the graph is well-handled.
  */
-    checkIsWellHandled() : String {
-        let text : String = "";
+    checkIsWellHandled() : string {
+        let text : string = "";
         let arrayOfGateways : SwitchableNode[] = [];
         this._graph.switchNodes.forEach(node => {
         if(node.isGateway()) {
@@ -106,7 +100,7 @@ export class SwitchController {
             }
         });
         if(arrayOfGateways.length > 0) {
-                let text : String = "Warnung: ";
+                let text : string = "Warnung: ";
                 text += (arrayOfGateways.length > 1)?"Die Gateways mit den IDs: [":"Das Gateway mit der ID: [";
                 arrayOfGateways.forEach(node => {
                     text += node.id +", ";
@@ -118,36 +112,4 @@ export class SwitchController {
             }
         return text;
     }
-
-// /**
-//  * This method checks once if the graph is well-handled.
-//  */
-//  checkIsWellHandled() : String {
-//     let text : String = "";
-//     if (this.isCheckedIsWellHandled) {
-//         this.isCheckedIsWellHandled = false;
-//         let arrayOfGateways : SwitchableNode[] = [];
-//         this._graph.switchNodes.forEach(node => {
-//             if(node.isGateway()) {
-//                let associateGateway = BpmnUtils.getCorrespondingGatewayWithoutType(node.bpmnNode as BpmnGateway);            
-//                if (associateGateway == undefined) { 
-//                 console.error("undefined gateway");
-//                     arrayOfGateways.push(node);
-//                 }
-//             }
-//         });
-//     if(arrayOfGateways.length > 0) {
-//             let text : String = "Warnung: ";
-//             text += (arrayOfGateways.length > 1)?"Die Gateways mit den IDs: [":"Das Gateway mit der ID: [";
-//             arrayOfGateways.forEach(node => {
-//                 text += node.id +", ";
-//             });
-//             text = text.substring(0, text.length-2);
-//             text += (arrayOfGateways.length > 1)?"] besitzen ":"] besitzt ";
-//             text += "keinen oder keinen eindeutigen Partner. Dies bedeutet, dass dieser Graph nicht well-handled ist. Bei Gateways ohne passendes Gegenstück wird die lokale Symmantik zum joinen verwendet.";
-//             console.error(text);
-//         }
-//     }
-//     return text;
-// }
 }

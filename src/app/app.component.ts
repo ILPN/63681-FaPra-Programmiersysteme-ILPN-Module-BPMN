@@ -1,4 +1,4 @@
-import { Component, OnDestroy} from '@angular/core';
+import { Component, OnDestroy } from '@angular/core';
 import { FormControl } from '@angular/forms';
 import { ParserService } from './services/parser.service';
 import { DisplayService } from './services/display.service';
@@ -41,57 +41,57 @@ export class AppComponent implements OnDestroy {
 
 
 
-        let s : String = '.events\n'+
-        'e1 start "Vorzeitige Abgabe"\n'+
-        'e2 start "Zeit abgelaufen"\n'+
-        'e3 intermediate\n'+
-        'e4 end\n'+
-        '\n'+
-        '.tasks\n'+
-        't1 manual "Einreichen"\n'+
-        't2 usertask "Applaus"\n'+
-        't3 sending "Daumen runter"\n'+
-        't4 sending "Untersuchen"\n'+
-        't5 receiving "Information erhalten"\n'+
-        't6 businessrule "Benoten"\n'+
-        't7 service ""\n'+
-        '\n'+
-        '.gateways\n'+
-        'g1J xor_join ""\n'+
-        'g2S or_split "gefällt es?"\n'+
-        'g2J or_join \n'+
-        'g3S and_split "G2S"\n'+
-        'g3J and_join "G3J"\n'+
-        'g4S xor_split "G4S"\n'+
-        'g4J xor_join "G4J"\n'+
-        '\n'+
-        '.edges\n'+
-        'e1 t1 sequenceflow\n'+
-        't1 g1J association\n'+
-        'e2 g1J association\n'+
-        'g1J e3 sequenceflow\n'+
-        'e3 g2S sequenceflow\n'+
-        'g2S t2 sequenceflow "ja"\n'+
-        'g2S g2J defaultflow "vielleicht"\n'+
-        'g2S t3 sequenceflow "nein"\n'+
-        't2 g2J sequenceflow\n'+
-        't3 g2J sequenceflow\n'+
-        'g2J g3S sequenceflow\n'+
-        'g3S t4 sequenceflow\n'+
-        'g3S t5 sequenceflow\n'+
-        't4 g3J sequenceflow\n'+
-        't5 g3J sequenceflow\n'+
-        'g3J t6 informationflow\n'+
-        't6 g4S sequenceflow\n'+
-        'g4S t7 sequenceflow\n'+
-        't7 g4J sequenceflow\n'+
-        'g4J e4 sequenceflow\n'+
-        'g4S g4J sequenceflow';
+        let s: String = '.events\n' +
+            'e1 start "Vorzeitige Abgabe"\n' +
+            'e2 start "Zeit abgelaufen"\n' +
+            'e3 intermediate\n' +
+            'e4 end\n' +
+            '\n' +
+            '.tasks\n' +
+            't1 manual "Einreichen"\n' +
+            't2 usertask "Applaus"\n' +
+            't3 sending "Daumen runter"\n' +
+            't4 sending "Untersuchen"\n' +
+            't5 receiving "Information erhalten"\n' +
+            't6 businessrule "Benoten"\n' +
+            't7 service ""\n' +
+            '\n' +
+            '.gateways\n' +
+            'g1J xor_join ""\n' +
+            'g2S or_split "gefällt es?"\n' +
+            'g2J or_join \n' +
+            'g3S and_split "G2S"\n' +
+            'g3J and_join "G3J"\n' +
+            'g4S xor_split "G4S"\n' +
+            'g4J xor_join "G4J"\n' +
+            '\n' +
+            '.edges\n' +
+            'e1 t1 sequenceflow\n' +
+            't1 g1J association\n' +
+            'e2 g1J association\n' +
+            'g1J e3 sequenceflow\n' +
+            'e3 g2S sequenceflow\n' +
+            'g2S t2 sequenceflow "ja"\n' +
+            'g2S g2J defaultflow "vielleicht"\n' +
+            'g2S t3 sequenceflow "nein"\n' +
+            't2 g2J sequenceflow\n' +
+            't3 g2J sequenceflow\n' +
+            'g2J g3S sequenceflow\n' +
+            'g3S t4 sequenceflow\n' +
+            'g3S t5 sequenceflow\n' +
+            't4 g3J sequenceflow\n' +
+            't5 g3J sequenceflow\n' +
+            'g3J t6 informationflow\n' +
+            't6 g4S sequenceflow\n' +
+            'g4S t7 sequenceflow\n' +
+            't7 g4J sequenceflow\n' +
+            'g4J e4 sequenceflow\n' +
+            'g4S g4J sequenceflow';
 
-console.log(s);
-this.textareaFc.setValue(s);
+        console.log(s);
+        this.textareaFc.setValue(s);
     }
-        
+
 
     ngOnDestroy(): void {
         this._subValueChange.unsubscribe();
@@ -109,7 +109,7 @@ this.textareaFc.setValue(s);
             if (this.result.nodes.length === 0)
                 this.result = BpmnGraph.anotherMonsterGraph();
             this._displayService.display(this.result);
-            this._parserService.afterSugiyamaLayout(this.result,newSource);
+            this._parserService.afterSugiyamaLayout(this.result, newSource);
         }
     }
 

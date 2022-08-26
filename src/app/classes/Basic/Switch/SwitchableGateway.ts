@@ -253,14 +253,11 @@ export class SwitchableGateway extends SwitchableNode {
     /** Used for classic switching. Return a list with all Nodescombinations after a Array. */
     private getCombinationsList(graph: SwitchableGraph): SwitchableNode[][] {
         let array: SwitchableNode[][] = [];
-        //if (this.OR_SPLIT()) return this.getCombinationsOfIDsForOr([...this.successors], graph);
 
         if (this.OR_SPLIT()) {
-            //    array.push(this.defaultSuccessors);
-            //    array.push(...this.getCombinationsOfIDsForOr([...this.successors], graph)); 
             array.push(this.defaultSuccessors);
-            array.push(...this.getCombinationsOfIDsForOr([...this.successors], graph));
-            if(this.defaultSuccessors.length > 0) this.checkForDuplicatesAndDeleteThem(array);
+            array.push(...this.getCombinationsOfNodesForOr([...this.successors], graph));
+            if (this.defaultSuccessors.length > 0) this.checkForDuplicatesAndDeleteThem(array);
         }
         if (this.XOR_SPLIT()) {
             if (this.defaultSuccessors.length > 0) SwitchUtils.addItem([this.defaultSuccessors[0]], array);
@@ -271,39 +268,43 @@ export class SwitchableGateway extends SwitchableNode {
         if (this.AND_SPLIT()) array = [[...this.successors]];
         return array;
     }
-/**
- *  Checks if the array exists multiple times at the first position. If this is the case, it is deleted at the other positions.
- * @param ArrayNodes of SwitchableNode
- */
-private checkForDuplicatesAndDeleteThem(ArrayNodes : SwitchableNode[][]) {
-    let posNodes : SwitchableNode[] = ArrayNodes[1];
-// for(var i = 1; i<ArrayNodes.length;i++) {
-//     if(posNodes.length === ArrayNodes[i].length) {
-//         let b : boolean = true;
-//         posNodes.forEach(node => {
-//             ArrayNodes[i]
-//         });
-//     }
-// }
-}
+    /**
+     *  Checks if the array exists multiple times at the first position. If this is the case, it is deleted at the other positions.
+     * @param ArrayNodes of SwitchableNode
+     */
+    private checkForDuplicatesAndDeleteThem(ArrayNodes: SwitchableNode[][]) {
+        let posNodes: SwitchableNode[] = ArrayNodes[0];
+        var i: number = 1;
+        let b: boolean = true;
+        while (b && i < ArrayNodes.length - 1) {
+            if (posNodes.length === ArrayNodes[i].length) {
+                let b: boolean = true;
+                ArrayNodes[i].forEach(ArrayNode => {
+                    if (!posNodes.includes(ArrayNode))  b = false; 
+                });
+                if (b) {
+                    ArrayNodes.splice(i, 1);
+                }
+            }
+            i++;
+        }
+        console.log(ArrayNodes);
+    }
 
-
-    private getCombinationsOfIDsForOr(nodesIn: SwitchableNode[], graph: SwitchableGraph): SwitchableNode[][] {
+/** Used for classic switching. Create a Combination of Nodes for Switch a Or Gateway. */
+    private getCombinationsOfNodesForOr(nodesIn: SwitchableNode[], graph: SwitchableGraph): SwitchableNode[][] {
         let strIN: string[] = [];
         let strOut: string[][] = [];
         let nodesOut: SwitchableNode[][] = [];
         nodesIn.forEach(node => {
             strIN.push(node.id);
         });
-        console.log("In: " + strIN);
         strIN.forEach(s => {
             strOut.push([s])
         });
         strOut.push(...PnUtils.getCombinationsOfIds([...strIN]));
-        console.log("Out: " + strOut);
         strOut.forEach(strS1 => {
             let nodesS2: SwitchableNode[] = [];
-            console.log(strS1);
             strS1.forEach(s2 => {
                 let nodeS2 = graph.getNode(s2);
                 if (nodeS2 !== undefined) { nodesS2.push(nodeS2); }
