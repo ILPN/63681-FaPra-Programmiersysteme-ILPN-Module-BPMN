@@ -1,9 +1,9 @@
 import { BpmnNode } from "../Basic/Bpmn/BpmnNode";
 import { Arc } from "./arc";
 import { CombiTransition } from "./pn-combi-transition";
-import { PnElement } from "./pn-element";
 import { OnePlaceMultiTransitionsPnSubnet } from "./pn-oneplace-multitrans-subnet";
 import { PnOrJoin } from "./pn-or-join";
+import { Place } from "./pn-place";
 import { Transition } from "./pn-transition";
 import { PnUtils } from "./pn-utils";
 
@@ -45,17 +45,22 @@ export class PnOrSplit extends OnePlaceMultiTransitionsPnSubnet {
      * @param orJoin 
      */
     connectToOrJoin(orJoin: PnOrJoin): void {
-        // let pairs = PnUtils.getMatchingOrSplitJoinTransitions(this.simpleTransitions, orJoin.simpleTransitions)
+        let splitTransitions = this.transitions.filter(trans => !trans.isCombi())
+        let joinTransitions = orJoin.transitions.filter(trans => !trans.isCombi())
+        let pairs = PnUtils.getMatchingOrSplitJoinTransitions(splitTransitions, joinTransitions)
 
-        // pairs.forEach((join, split) => {
-        //     let place = Place.create({ startPlace: false });
-        //     this.addPlace(place)
-        //     this.addArc(Arc.create(split, place));
-        //     orJoin.addArc(Arc.create(place, join))
+        pairs.forEach((join, split) => {
+            let place = Place.create({ startPlace: false });
+            this.addPlace(place)
+            this.addArc(Arc.create(split, place));
+            orJoin.addArc(Arc.create(place, join))
 
-        // })
+        })
     }
 
+    get simpleTransitions(): Array<Transition>{
+        return this.transitions.filter(trans => !trans.isCombi())
+    }
 
 
     //transitions representing combinations of paths contain references to simple transitions 

@@ -1,46 +1,46 @@
+import { Labels } from "src/tests/sample_graphs/labels";
 import { PnElement } from "./pn-element";
 
 /**
  * transition in petri net
  */
-export class Transition extends PnElement{
+export class Transition extends PnElement {
     _label: string
-    constructor(id: string, label: string, public counter = 0){
+    constructor(id: string, label: string, public counter = 0) {
         super(id);
         this._label = this.replaceAllWhiteSpaces(label)
         //counter is only for the cases where BpmnNode is represented by more than one transition
         //for ex., Or-Gateways
-        if(counter > 0){
+        if (counter > 0) {
             this.id += counter
-            this.label += counter
+            if (this.label)
+                this.label += counter
         }
 
     }
 
-    get label(){
+    get label() {
         return this._label
     }
 
-    set label(newLabel: string){
+    set label(newLabel: string) {
         this._label = newLabel
     }
 
-    print(): string{
-       
-        return this.id + " " + this.removeWhiteSpaces(this.label)
+    print(): string {
+
+        return this.id + " " + this.label
     }
 
-    removeWhiteSpaces(value: string): string{
-        return value.replace(" ", "-")
-    }
 
-    addCounterToLabelAndId(counter: number){
+
+    addCounterToLabelAndId(counter: number) {
         this.counter = counter;
         this.id += counter;
         this.label += counter;
     }
 
-    isCombi(): boolean{
+    isCombi(): boolean {
         return false;
     }
 

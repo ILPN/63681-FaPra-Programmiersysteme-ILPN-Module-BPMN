@@ -1,0 +1,18 @@
+.events
+e1 start "E1 Start1" (0,0)
+e2 start "E2 Start2" (0,110)
+e3 end (800,0)
+
+.tasks
+t1 manual "t1" (200,0)
+t2 usertask "T2" (600,0)
+
+.gateways
+
+
+
+.edges
+e1 t1 sequenceflow
+t1 t2 sequenceflow
+e2 t2 sequenceflow "a3"
+t2 e3 sequenceflow

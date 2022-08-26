@@ -1,21 +1,19 @@
-import { BpmnEdge } from "../Basic/Bpmn/BpmnEdge/BpmnEdge";
 import { BpmnNode } from "../Basic/Bpmn/BpmnNode";
 import { BpmnUtils } from "../Basic/Bpmn/BpmnUtils";
-import { BpmnGatewaySplitXor } from "../Basic/Bpmn/gateways/BpmnGatewaySplitXor";
 import { Arc } from "./arc";
-import { Place } from "./pn-place";
 import { PlaceCounter } from "./place-counter";
-import { MultiPlaceOneTransPnSubnet } from "./pn-multiplace-onetrans-subnet";
 import { PnEndEvent } from "./pn-endevent";
+import { MultiPlaceMultiTransitionPnSubnet } from "./pn-multiplace-multitransition";
+import { MultiPlaceOneTransPnSubnet } from "./pn-multiplace-onetrans-subnet";
+import { OnePlaceMultiTransitionsPnSubnet } from "./pn-oneplace-multitrans-subnet";
+import { PnPlaceTransitionSubnet } from "./pn-oneplace-onetrans-subnet";
 import { PnOrJoin } from "./pn-or-join";
 import { PnOrSplit } from "./pn-or-split";
+import { Place } from "./pn-place";
 import { PnStartEvent } from "./pn-startevent";
 import { PnSubnet } from "./pn-subnet";
-import { PnUtils } from "./pn-utils";
-import { MultiPlaceMultiTransitionPnSubnet } from "./pn-multiplace-multitransition";
-import { OnePlaceMultiTransitionsPnSubnet } from "./pn-oneplace-multitrans-subnet";
 import { Transition } from "./pn-transition";
-import { PnPlaceTransitionSubnet } from "./pn-oneplace-onetrans-subnet";
+import { PnUtils } from "./pn-utils";
 
 /**
  * petri net converted from BPMN graph
@@ -119,6 +117,7 @@ export class Petrinet {
 
     private printPlaces(): string {
         let text: string = ".places\n";
+        text += this.startPlace.print() + "\n"
         this.collectPlaces().forEach(place => text += place.print() + "\n")
 
         return text;
