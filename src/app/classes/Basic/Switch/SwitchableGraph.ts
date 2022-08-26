@@ -1,10 +1,13 @@
 import {BpmnEdge} from '../Bpmn/BpmnEdge/BpmnEdge';
 import {BpmnGraph} from '../Bpmn/BpmnGraph';
 import {BpmnNode} from '../Bpmn/BpmnNode';
+import { BpmnUtils } from '../Bpmn/BpmnUtils';
 import {BpmnGateway} from '../Bpmn/gateways/BpmnGateway';
 import {GetSvgManager} from '../Interfaces/GetSvgManager';
 import {Svg} from '../Svg/Svg';
 import {SvgManager} from '../Svg/SvgManager/SvgManager';
+import { ClassicSwitch } from './classic-switch';
+import { MarcelsSwitch } from './marcels-switch';
 import {SwitchController} from './switch-controller';
 import {SwitchableEdge} from './SwitchableEdge';
 import {SwitchableGateway} from './SwitchableGateway';
@@ -19,18 +22,20 @@ export class SwitchableGraph implements GetSvgManager {
     private _switchNodes: SwitchableNode[] = []
     private _controller: SwitchController;
     private _nodeMap: Map<BpmnNode, SwitchableNode>;
+    
 
-    constructor(bpmnGraph: BpmnGraph) {
+    constructor(bpmnGraph: BpmnGraph, controllerTyp: number) {
+        if(controllerTyp != 1) 
+            this._controller = new ClassicSwitch(this) 
+        else  
+            this._controller = new MarcelsSwitch(this);
 
-        //controls how nodes are switched
-        this._controller = new SwitchController(this);
         this._nodeMap = new Map<BpmnNode, SwitchableNode>();
 
         bpmnGraph.edges.forEach((bpmnEdge: BpmnEdge) => {
             let switchEdge: SwitchableEdge = new SwitchableEdge(bpmnEdge);
             SwitchUtils.addItem(switchEdge, this._switchEdges);
             this.addNodesConnectedByEdge(bpmnEdge, this._controller);
-
         })
     }
 
@@ -97,7 +102,8 @@ export class SwitchableGraph implements GetSvgManager {
         //register predecessor and successor nodes
         switchNodeTo.addPredecessor(switchNodeFrom);
         switchNodeFrom.addSuccessor(switchNodeTo);
-
+        if(BpmnUtils.isDefaultEdge(edge)) switchNodeFrom.addDefaultSuccessor(switchNodeTo);
+        
         //add to map
         this._nodeMap.set(edge.from, switchNodeFrom)
         this._nodeMap.set(edge.to, switchNodeTo)
@@ -123,6 +129,7 @@ export class SwitchableGraph implements GetSvgManager {
         }
         return this._svgManager;
     }
+
 
 
 }

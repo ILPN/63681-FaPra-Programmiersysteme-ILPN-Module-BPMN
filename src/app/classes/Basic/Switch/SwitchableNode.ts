@@ -1,9 +1,9 @@
-import {BpmnNode} from "../Bpmn/BpmnNode";
-import {BpmnEventEnd} from "../Bpmn/events/BpmnEventEnd";
-import {BpmnEventStart} from "../Bpmn/events/BpmnEventStart";
-import {SwitchController} from "./switch-controller";
-import {SwitchState} from "./switchstatetype";
-import {SwitchUtils} from "./SwitchUtils";
+import { BpmnNode } from "../Bpmn/BpmnNode";
+import { BpmnEventEnd } from "../Bpmn/events/BpmnEventEnd";
+import { BpmnEventStart } from "../Bpmn/events/BpmnEventStart";
+import { SwitchController } from "./switch-controller";
+import { SwitchState } from "./switchstatetype";
+import { SwitchUtils } from "./SwitchUtils";
 
 export class SwitchableNode {
     protected _bpmnNode: BpmnNode
@@ -12,6 +12,7 @@ export class SwitchableNode {
     private _id;
     private _predecessors: Array<SwitchableNode>;
     private _successors: Array<SwitchableNode>;
+    private _defaultSuccessors: Array<SwitchableNode>;
 
     constructor(node: BpmnNode, controller: SwitchController) {
         this._bpmnNode = node
@@ -27,7 +28,7 @@ export class SwitchableNode {
         //connected nodes
         this._predecessors = new Array<SwitchableNode>();
         this._successors = new Array<SwitchableNode>();
-
+        this._defaultSuccessors = new Array<SwitchableNode>();
         //switch state on mouse down
         this._bpmnNode.svgManager.getNewSvg().onmousedown = (e) => controller.press(this)
     }
@@ -49,13 +50,22 @@ export class SwitchableNode {
         return this._successors
     }
 
+    get defaultSuccessors(): Array<SwitchableNode> {
+        return this._defaultSuccessors
+    }
+
     addSuccessor(node: SwitchableNode) {
         SwitchUtils.addItem(node, this._successors)
+    }
+
+    addDefaultSuccessor(node: SwitchableNode) {
+        SwitchUtils.addItem(node, this._defaultSuccessors)
     }
 
     addPredecessor(node: SwitchableNode) {
         SwitchUtils.addItem(node, this._predecessors)
     }
+    
 
     get id(): string {
         return this._id
@@ -76,14 +86,33 @@ export class SwitchableNode {
         let nodesToSwitch: SwitchableNode[] = [];
         SwitchUtils.addItem(this, nodesToSwitch)
         this._predecessors.forEach(before => {
-            if (before.switchState === SwitchState.enabled) SwitchUtils.addItem(before, nodesToSwitch)
+            if(SwitchUtils.isClassicSwitch(this._switchController))
+                SwitchUtils.addItems(before.classicAllNodesBeforeToSwitch(), nodesToSwitch);
+            else if (before.switchState === SwitchState.enabled) SwitchUtils.addItem(before, nodesToSwitch); 
         });
         this._successors.forEach(after => {
-            if (after.switchState === SwitchState.disabled || after.switchState === SwitchState.switched) SwitchUtils.addItem(after, nodesToSwitch)
+            if (after.disabled() || after.switched()) SwitchUtils.addItem(after, nodesToSwitch)
         });
-
         return nodesToSwitch;
     }
+
+    /**
+     * collects this node and all nodes before which must be switched
+     * @returns nodes to switch
+     */
+    classicAllNodesBeforeToSwitch(): SwitchableNode[] {
+        let nodesToSwitch: SwitchableNode[] = [];
+        if (this.enableable() || this.switchedButEnableForLoopRun() || this.enabled()) {
+            SwitchUtils.addItem(this, nodesToSwitch);
+            this._predecessors.forEach(before => {
+                SwitchUtils.addItems(before.classicAllNodesBeforeToSwitch(), nodesToSwitch);
+            }
+            )
+        };
+        return nodesToSwitch;
+    }
+
+
 
     disabled(): boolean {
         return this._switchState === SwitchState.disabled;
@@ -133,6 +162,15 @@ export class SwitchableNode {
      */
     isEndEvent(): boolean {
         return this._bpmnNode instanceof BpmnEventEnd;
+    }
+
+    /** disables the node and changes its color */
+    enable(): void {
+        if (this.switchState === SwitchState.disabled) {
+            this.switchTo(SwitchState.enableable)
+        } else {
+            this.switchTo(SwitchState.switchedButEnableForLoopRun)
+        }
     }
 
     /** disables the node and changes its color */

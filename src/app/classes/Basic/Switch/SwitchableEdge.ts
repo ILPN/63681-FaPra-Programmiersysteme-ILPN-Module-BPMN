@@ -1,4 +1,5 @@
 import { BpmnEdge } from "../Bpmn/BpmnEdge/BpmnEdge";
+import { BpmnUtils } from "../Bpmn/BpmnUtils";
 
 
 export class SwitchableEdge {
@@ -17,5 +18,6 @@ export class SwitchableEdge {
     get bpmnEdge(): BpmnEdge {
         return this._bpmnEdge
     }
+
 
 }
