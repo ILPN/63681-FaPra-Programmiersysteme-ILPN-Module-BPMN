@@ -24,7 +24,7 @@ export class DisplaySwitchGraphComponent implements OnDestroy, AfterViewInit {
     private _sub: Subscription | undefined;
     private bpmnGraph: BpmnGraph | undefined;
     private _switchableGraph: SwitchableGraph | undefined;
-    // textForWellhandled : String = "";
+    textForWellhandled : String = "";
     // isWellhandled : boolean = true;
 
     constructor(
@@ -32,10 +32,12 @@ export class DisplaySwitchGraphComponent implements OnDestroy, AfterViewInit {
         private _svgService: SvgService,
         private _displayService: DisplayService
     ) {
+        this.textForWellhandled = "";
     }
 
     ngAfterViewInit(typ?: number): void {
         this._sub = this._displayService.diagram$.subscribe((graph) => {
+            this.textForWellhandled = "";
             if (graph == undefined) return
             if (graph.isEmpty()) return
             if (this.rootSvg == undefined || this.drawingArea == undefined) return
@@ -57,11 +59,12 @@ export class DisplaySwitchGraphComponent implements OnDestroy, AfterViewInit {
     }
 
     wellHandledCheck() {
-        let str: string = "";
+        
         if (this._switchableGraph !== undefined) {
-            str = this._switchableGraph.controller.checkIsWellHandled();
-            if (str === "") str = "Dieser Graph ist well-handled.";
-        } else str = "Die Überprüfung ist fehlgeschalgen.";
+            let check = this._switchableGraph.controller.checkIsWellHandled();
+            if (check === "") this.textForWellhandled = "Dieser Graph ist well-handled.";
+            else this.textForWellhandled = "Die Überprüfung ist fehlgeschalgen." + check; 
+        } else this.textForWellhandled = "Der Graph existiert nicht"
         // //(new DisplayErrorService()).displayError(str);
         // this.wellHandledText.emit("Hallo mein Name ist Hase");
         //  this.wellHandledText.pipe().subscribe((val) => this.wellHandledText = val);
