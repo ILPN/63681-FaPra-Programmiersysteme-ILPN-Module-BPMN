@@ -1,4 +1,3 @@
-
 .red {
     color: red;
 }
@@ -32,3 +31,14 @@ hr {
     margin-bottom: 30px;
     width: 100%;
 }
+
+mat-form-field {
+    width: 30%;
+}
+
+#textareaErrors {
+    text-align: center;
+    font-weight: bold;
+    color: red;
+}
+
