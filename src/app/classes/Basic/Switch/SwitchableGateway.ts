@@ -260,6 +260,7 @@ export class SwitchableGateway extends SwitchableNode {
             //    array.push(...this.getCombinationsOfIDsForOr([...this.successors], graph)); 
             array.push(this.defaultSuccessors);
             array.push(...this.getCombinationsOfIDsForOr([...this.successors], graph));
+            if(this.defaultSuccessors.length > 0) this.checkForDuplicatesAndDeleteThem(array);
         }
         if (this.XOR_SPLIT()) {
             if (this.defaultSuccessors.length > 0) SwitchUtils.addItem([this.defaultSuccessors[0]], array);
@@ -270,6 +271,22 @@ export class SwitchableGateway extends SwitchableNode {
         if (this.AND_SPLIT()) array = [[...this.successors]];
         return array;
     }
+/**
+ *  Checks if the array exists multiple times at the first position. If this is the case, it is deleted at the other positions.
+ * @param ArrayNodes of SwitchableNode
+ */
+private checkForDuplicatesAndDeleteThem(ArrayNodes : SwitchableNode[][]) {
+    let posNodes : SwitchableNode[] = ArrayNodes[1];
+// for(var i = 1; i<ArrayNodes.length;i++) {
+//     if(posNodes.length === ArrayNodes[i].length) {
+//         let b : boolean = true;
+//         posNodes.forEach(node => {
+//             ArrayNodes[i]
+//         });
+//     }
+// }
+}
+
 
     private getCombinationsOfIDsForOr(nodesIn: SwitchableNode[], graph: SwitchableGraph): SwitchableNode[][] {
         let strIN: string[] = [];
