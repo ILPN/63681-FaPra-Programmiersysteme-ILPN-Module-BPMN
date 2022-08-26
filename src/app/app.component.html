@@ -8,9 +8,9 @@
     <app-mode-switch></app-mode-switch>
     <!--    Main content    -->
     <div [ngSwitch]="mode">
-        <app-display-draggable-graph *ngSwitchCase="'free layout'"
+        <app-display-draggable-graph *ngSwitchCase="'Manuelles Layout'"
         class="padding full-size"></app-display-draggable-graph>
-        <app-display-reorder-graph *ngSwitchCase="'Sugiyama layout'"
+        <app-display-reorder-graph *ngSwitchCase="'Sugiyama Layout'"
         class="padding full-size"></app-display-reorder-graph>
         <app-display-switch-graph *ngSwitchCase="'Schalten'"
         class="padding full-size"></app-display-switch-graph>

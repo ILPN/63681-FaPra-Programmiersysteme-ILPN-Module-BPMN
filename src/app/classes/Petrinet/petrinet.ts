@@ -1,22 +1,19 @@
-import { BpmnEdge } from "../Basic/Bpmn/BpmnEdge/BpmnEdge";
 import { BpmnNode } from "../Basic/Bpmn/BpmnNode";
 import { BpmnUtils } from "../Basic/Bpmn/BpmnUtils";
-import { BpmnEventStart } from "../Basic/Bpmn/events/BpmnEventStart";
-import { BpmnGatewaySplitOr } from "../Basic/Bpmn/gateways/BpmnGatewaySplitOr";
-import { BpmnGatewaySplitXor } from "../Basic/Bpmn/gateways/BpmnGatewaySplitXor";
 import { Arc } from "./arc";
-import { Place } from "./place";
 import { PlaceCounter } from "./place-counter";
-import { PnAndJoin } from "./pn-and-join";
 import { PnEndEvent } from "./pn-endevent";
+import { MultiPlaceMultiTransitionPnSubnet } from "./pn-multiplace-multitransition";
+import { MultiPlaceOneTransPnSubnet } from "./pn-multiplace-onetrans-subnet";
+import { OnePlaceMultiTransitionsPnSubnet } from "./pn-oneplace-multitrans-subnet";
+import { PnPlaceTransitionSubnet } from "./pn-oneplace-onetrans-subnet";
 import { PnOrJoin } from "./pn-or-join";
 import { PnOrSplit } from "./pn-or-split";
+import { Place } from "./pn-place";
 import { PnStartEvent } from "./pn-startevent";
 import { PnSubnet } from "./pn-subnet";
+import { Transition } from "./pn-transition";
 import { PnUtils } from "./pn-utils";
-import { PnXorJoin } from "./pn-xor-join";
-import { PnXorSplit } from "./pn-xor-split";
-import { Transition } from "./transition";
 
 /**
  * petri net converted from BPMN graph
@@ -24,68 +21,40 @@ import { Transition } from "./transition";
 export class Petrinet {
 
     bpmnPetriMap: Map<BpmnNode, PnSubnet>
-    valid: boolean = true
     errors: string = ""
+    startPlace: Place
 
     constructor(bpmnNodes: Array<BpmnNode>) {
+
         this.bpmnPetriMap = new Map<BpmnNode, PnSubnet>()
 
         //for adding index to places
         PlaceCounter.reset()
+        this.startPlace = Place.create({ startPlace: true })
 
-        //in principle, nodes can be processed in any order;
-        //we process them in specific order to make indexing of the corresponding places more transparent 
-        this.convertStartEvents(BpmnUtils.getStartEvents(bpmnNodes))
-        this.convert(BpmnUtils.getTasks, bpmnNodes)
-        this.convert(BpmnUtils.getGateways, bpmnNodes)
-        this.convert(BpmnUtils.getIntermedEvents, bpmnNodes)
-        this.convert(BpmnUtils.getEndEvents, bpmnNodes)
+        try {
+            //in principle, nodes can be processed in any order;
+            //we process them in specific order to make indexing of the corresponding places more transparent 
+            this.convert(BpmnUtils.getStartEvents, bpmnNodes)
+            this.convert(BpmnUtils.getTasks, bpmnNodes)
+            this.convert(BpmnUtils.getGateways, bpmnNodes)
+            this.convert(BpmnUtils.getIntermedEvents, bpmnNodes)
+            this.convert(BpmnUtils.getEndEvents, bpmnNodes)
 
-        // OR-Split-Transitions and OR-join-Transitions need to be connected by a direct arc with a place inbetween
-        //since nodes can be in principle processed in any order,
-        //we can only be sure to have all necessary transitions after every BPMN node has been converted
-        this.connectEachOrSplitWithOrJoin()
+            // OR-Split-Transitions and OR-join-Transitions need to be connected by a direct arc with a place inbetween
+            //since nodes can be in principle processed in any order,
+            //we can only be sure to have all necessary transitions after every BPMN node has been converted
+            this.connectEachOrSplitWithOrJoin()
+
+        } catch (err) {
+            this.errors += (err as Error).message;
+        }
     }
-
-    private convertStartEvents(startEvents: Array<BpmnNode>) {
-        //if there is one start - process as any other node
-        if (startEvents.length === 1)
-            this.createSingeStartEvent(startEvents[0])
-
-        //add petrinet representation of XOR Split and connect all start events to it
-        else
-            this.createSplitXorBeforeStartEvents(startEvents)
-
-    }
-
-    private createSingeStartEvent(startEvent: BpmnNode) {
-        let start = this.addSubnetForEachOutgoingConnection(startEvent)
-        start.inputPlace?.setAsPetrinetStart()
-
-    }
-
-    private createSplitXorBeforeStartEvents(startEvents: Array<BpmnNode>) {
-
-        //create fake BPMN node to realize XOR split before real start events
-        let fakeSplitXor = new BpmnGatewaySplitXor("FakeStart");
-        fakeSplitXor.label = "FakeStart"
-
-        //connect fake XOR split to start events 
-        startEvents.forEach(start => fakeSplitXor.addOutEdge(new
-            BpmnEdge(fakeSplitXor.id + start.id, fakeSplitXor, start)))
-
-        let fakeStart = this.addSubnetForEachOutgoingConnection(fakeSplitXor)
-        fakeStart.inputPlace!.setAsPetrinetStart()
-
-        startEvents.forEach(start => this.addSubnetForEachOutgoingConnection(start))
-
-    }
-
 
 
     private convert(filter: (nodes: Array<BpmnNode>) => Array<BpmnNode>, bpmnNodes: Array<BpmnNode>) {
         let filteredNodes = filter(bpmnNodes);
-        filteredNodes.forEach(node => this.addSubnetForEachOutgoingConnection(node))
+        filteredNodes.forEach(node => this.createSubnetAndConnectToSuccessors(node))
     }
 
     // OR-Split-Transitions and OR-join-Transitions need to be connected by a direct arc with a place inbetween
@@ -108,17 +77,25 @@ export class Petrinet {
         return Array.from(this.bpmnPetriMap.values())
     }
 
-    print(): { pnText: string, errors: string, valid: boolean } {
+    print(): { pnText: string, errors: string } {
+        //graph initially empty
+        if (this.bpmnNodes.length === 0)
+            return { pnText: "", errors: "Graph hat keine Knoten" };
+
+        //problem in conversion
+        if (this.pnSubnets.length === 0)
+            return { pnText: "", errors: this.errors };
+
+        //at least something was converted
         let text: string = ""
 
-        if (this.valid) {
-            text += ".type pn\n";
-            text += this.printTransitions();
-            text += this.printPlaces()
-            text += this.printArcs();
-        }
+        text += ".type pn\n";
+        text += this.printTransitions();
+        text += this.printPlaces()
+        text += this.printArcs();
 
-        return { pnText: text, errors: this.errors, valid: this.valid };
+
+        return { pnText: text, errors: this.errors };
     }
 
     private printTransitions(): string {
@@ -130,13 +107,17 @@ export class Petrinet {
 
     private printArcs(): string {
         let text: string = ".arcs\n";
-        this.collectArcs().forEach(arc => text += arc.print() + "\n")
+        this.collectArcs().forEach(arc => {
+            this.errors += arc.errors
+            text += arc.print() + "\n"
+        })
 
         return text;
     }
 
     private printPlaces(): string {
         let text: string = ".places\n";
+        text += this.startPlace.print() + "\n"
         this.collectPlaces().forEach(place => text += place.print() + "\n")
 
         return text;
@@ -167,7 +148,7 @@ export class Petrinet {
 
     //each BPMN element is represented by PnSubnet - a collection of places and transitions
     //connect the subnet for the specified BPMN node with the subnets of the outgoing connections
-    private addSubnetForEachOutgoingConnection(bpmnNode: BpmnNode): PnSubnet {
+    private createSubnetAndConnectToSuccessors(bpmnNode: BpmnNode): PnSubnet {
         let before: PnSubnet = this.add(bpmnNode);
 
         bpmnNode.outEdges.forEach(outEdge => {
@@ -179,22 +160,33 @@ export class Petrinet {
 
     }
 
-    private connectSubnets(before: PnSubnet, after: PnSubnet): void {
+    private connectSubnets(subnetFrom: PnSubnet, subnetTo: PnSubnet): void {
+        //subnet from provides transition(s) to connect to the succeeding subnet
+        let transitionsFrom = subnetFrom.transitionsToConnectToNextSubnet
+        if (!transitionsFrom)
+            this.errors += "Element " + subnetFrom.label + " has no transition to connect to the next element "
+                + subnetTo.label
 
-        let result = before.addArcTo(after.inputPlace!);//null-verification caught in result
-        if (result.ok)
-            after.inputPlace!.setConnected()
-        else {
-            let errors = " Fehler beim Verbinden von " + before.id + " zu " + after.id + ". " + result.error
-            this.setErrorStatus(errors)
-        }
+        //target subnet provides input place to connect the predecessor to
+        let placeTo = subnetTo.placeToConnectToPreviousSubnet
+        if (!placeTo)
+            this.errors += "Element " + subnetTo.label + " has no place to connect to the preceding element "
+                + subnetFrom.label
+
+        //connect
+        transitionsFrom.forEach(
+            trans => {
+                if (transitionsFrom && placeTo) {
+                    subnetFrom.addArc(Arc.create(trans, placeTo))
+                    trans.setConnected()
+                    placeTo.setConnected()
+                }
+            }
+        )
 
     }
 
-    private setErrorStatus(errors: string) {
-        this.valid = false
-        this.errors += errors
-    }
+
 
     private add(bpmnNode: BpmnNode): PnSubnet {
         let subnet = this.pnSubnets.find(subnet => subnet.id === bpmnNode.id)
@@ -207,27 +199,28 @@ export class Petrinet {
 
     private createPnSubnet(bpmnNode: BpmnNode): PnSubnet {
         if (BpmnUtils.isSplitXor(bpmnNode))
-            return new PnXorSplit(bpmnNode);
+            return new OnePlaceMultiTransitionsPnSubnet(bpmnNode);
 
-        if (BpmnUtils.isJoinXor(bpmnNode))
-            return new PnXorJoin(bpmnNode);
+        if (BpmnUtils.isSplitOr(bpmnNode))
+            return new PnOrSplit(bpmnNode);
 
         if (BpmnUtils.isEndEvent(bpmnNode))
             return new PnEndEvent(bpmnNode);
 
         if (BpmnUtils.isStartEvent(bpmnNode))
-            return new PnStartEvent(bpmnNode);
+            return new PnStartEvent(bpmnNode, this.startPlace);
+
+        if (BpmnUtils.isJoinXor(bpmnNode))
+            return new MultiPlaceMultiTransitionPnSubnet(bpmnNode);
 
         if (BpmnUtils.isJoinAnd(bpmnNode))
-            return new PnAndJoin(bpmnNode);
+            return new MultiPlaceOneTransPnSubnet(bpmnNode);
 
         if (BpmnUtils.isJoinOr(bpmnNode))
             return new PnOrJoin(bpmnNode);
 
-        if (BpmnUtils.isSplitOr(bpmnNode))
-            return new PnOrSplit(bpmnNode);
 
-        return new PnSubnet(bpmnNode)
+        return new PnPlaceTransitionSubnet(bpmnNode)
     }
 
 }

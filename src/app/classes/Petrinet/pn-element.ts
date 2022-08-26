@@ -14,20 +14,23 @@ export abstract class PnElement {
 
     }
 
-    get id(){
+    get id() {
         return this._id
     }
 
-    set id(newId: string){
+    set id(newId: string) {
         this._id = newId
     }
 
     replaceAllWhiteSpaces(value: string): string {
-        while (value.includes(" ")) {
-            value = value.replace(" ", "-");
+        let newValue = value.trim()
+        if (newValue.length === 0)
+            return ""
+        while (newValue.includes(" ")) {
+            newValue = newValue.replace(" ", "-");
         }
 
-        return value
+        return newValue
     }
 
     connected: boolean;
