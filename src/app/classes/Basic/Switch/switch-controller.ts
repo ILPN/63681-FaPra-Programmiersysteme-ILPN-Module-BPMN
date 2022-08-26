@@ -100,14 +100,14 @@ export abstract class SwitchController {
             }
         });
         if(arrayOfGateways.length > 0) {
-                let text : string = "Warnung: ";
+                text = "Hinweis: ";
                 text += (arrayOfGateways.length > 1)?"Die Gateways mit den IDs: [":"Das Gateway mit der ID: [";
                 arrayOfGateways.forEach(node => {
                     text += node.id +", ";
                 });
                 text = text.substring(0, text.length-2);
                 text += (arrayOfGateways.length > 1)?"] besitzen ":"] besitzt ";
-                text += "keinen oder keinen eindeutigen Partner. Dies bedeutet, dass dieser Graph nicht well-handled ist. Bei Gateways ohne passendes Gegenstück wird die lokale Symmantik zum joinen verwendet.";
+                text += "keinen oder keinen eindeutigen Partner. Dies bedeutet, dass dieser Graph nicht well-handled ist. Bei Gateways ohne passendes Gegenstück wird die lokale Semantik zum Joinen verwendet.";
                 console.warn(text);
             }
         return text;

@@ -1,9 +1,8 @@
 <div class="buttonWrap">
     <button (click)="classic()"  mat-raised-button>Klassisch</button>
     <button (click)="recent()" style="margin-left:15px" mat-raised-button>Modern</button>
-    <button (click)="wellHandledCheck()" style="margin-left:15px" mat-raised-button>well-handled check</button>
-    <span> Hinweis: Für Diagramme die nicht well-handled sind wird die lokale Semantik verwendet.</span>
-    <p id="textareaWellHandled">123:{{textForWellhandled}}</p>
+    <!-- <button (click)="wellHandledCheck()" style="margin-left:15px" mat-raised-button>well-handled check</button> -->
+    <p id="textareaWellHandled" style="color: red;">{{textForWellhandled}}</p>
 </div>
 <svg #rootSvg id="rootsvg" class="canvas">
     <rect width="100%" height="100%" class="backgroundSwitchableGraph"></rect>
