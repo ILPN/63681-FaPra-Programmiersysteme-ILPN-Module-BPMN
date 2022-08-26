@@ -1,4 +1,4 @@
-import { Transition } from "./transition";
+import { Transition } from "./pn-transition";
 
 
 /**
@@ -7,13 +7,14 @@ import { Transition } from "./transition";
 export class CombiTransition extends Transition {
     transitions: Array<Transition>
     constructor(id: string, label: string, transitions: Array<Transition>) {
-        super(id, id);
+        super(id, label);
         this.transitions = transitions //simple transitions combined to create this one
 
         //set index as combination of indexes of combined transitions
         let combiId: string = transitions.map(trans => trans.counter).join("-");
         this.id += combiId;
-        this.label += combiId;
+        if (this.label)
+            this.label += combiId;
     }
 
     /**
@@ -24,8 +25,14 @@ export class CombiTransition extends Transition {
         return this.transitions.map(trans => trans.id);
     }
 
+    containsId(id: string): boolean {
+        return this.getIds().includes(id)
+    }
 
 
+    override isCombi(): boolean {
+        return true
+    }
 
 
 
