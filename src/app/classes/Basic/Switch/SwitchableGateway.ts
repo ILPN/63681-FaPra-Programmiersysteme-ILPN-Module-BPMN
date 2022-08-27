@@ -1,3 +1,5 @@
+import { PnUtils } from "../../Petrinet/pn-utils";
+import { BpmnNode } from "../Bpmn/BpmnNode";
 import { BpmnUtils } from "../Bpmn/BpmnUtils";
 import { BpmnGateway } from "../Bpmn/gateways/BpmnGateway";
 import { SwitchableGraph } from "./SwitchableGraph";
@@ -6,7 +8,14 @@ import { SwitchState } from "./switchstatetype";
 import { SwitchUtils } from "./SwitchUtils";
 
 export class SwitchableGateway extends SwitchableNode {
+    private _combinationArray: SwitchableNode[][] = [];
+    private _combinationNumber: number = 0;
+    private _combinationInitialized: boolean = false;
 
+
+    get combinationInitialized(): boolean {
+        return this._combinationInitialized;
+    }
 
     /**  Disables all alternative paths not taken in case of an or gateway*/
     disablePathsNotTakenAfterOrJoin(graph: SwitchableGraph): void {
@@ -155,12 +164,17 @@ export class SwitchableGateway extends SwitchableNode {
      * checks if all nodes before this gateway are enabled
      * @returns
      */
-     private checkIfOrJoinGatewayCanBeSwitched(graph: SwitchableGraph): boolean {
+    private checkIfOrJoinGatewayCanBeSwitched(graph: SwitchableGraph): boolean {
         let answer: boolean = true;
         for (let nodeBefore of this.predecessors)
             if (!nodeBefore.enabled()) {
                 let gateway: SwitchableGateway | undefined = this.searchCorrespondingSplitGateway(graph);
-                if (gateway !== undefined && answer) answer = SwitchUtils.isNoNodeEnabledOrSwitched(SwitchUtils.getAllElementsBetweenNodeToNodeBackward(nodeBefore, gateway, []));
+                if (gateway !== undefined && answer) {
+                    if (SwitchUtils.isClassicSwitch(graph.controller))
+                        answer = SwitchUtils.isNoNodeUnequalDisabled(SwitchUtils.getAllElementsBetweenNodeToNodeBackward(nodeBefore, gateway, []))
+                    else
+                        answer = SwitchUtils.isNoNodeEnabledOrSwitched(SwitchUtils.getAllElementsBetweenNodeToNodeBackward(nodeBefore, gateway, []))
+                }
             }
         return answer;
     }
@@ -178,7 +192,7 @@ export class SwitchableGateway extends SwitchableNode {
      * checks if all nodes before this gateway are enabled
      * @returns
      */
-    private allNodesBeforeEnabled(): boolean {
+    allNodesBeforeEnabled(): boolean {
         for (let nodeBefore of this.predecessors)
             if (!nodeBefore.enabled())
                 return false;
@@ -223,8 +237,112 @@ export class SwitchableGateway extends SwitchableNode {
     }
 
 
+    // ------ Classic Switch Code --------
+
+    toggleGateway() {
+        if (this._combinationArray.length > 0) {
+            this.deactivateToggleGateway();
+            if (this._combinationNumber < (this._combinationArray.length - 1)) {
+                this._combinationNumber++;
+            } else {
+                this._combinationNumber = 0;
+            }
+            this.activateToggleGateway();
+        }
+    }
+    /** Used for classic switching. Return a list with all Nodescombinations after a Array. */
+    private getCombinationsList(graph: SwitchableGraph): SwitchableNode[][] {
+        let array: SwitchableNode[][] = [];
+
+        if (this.OR_SPLIT()) {
+            array.push(this.defaultSuccessors);
+            array.push(...this.getCombinationsOfNodesForOr([...this.successors], graph));
+            if (this.defaultSuccessors.length > 0) this.checkForDuplicatesAndDeleteThem(array);
+        }
+        if (this.XOR_SPLIT()) {
+            if (this.defaultSuccessors.length > 0) SwitchUtils.addItem([this.defaultSuccessors[0]], array);
+            this.successors.forEach(node => {
+                if (this.defaultSuccessors.length === 0 || node != this.defaultSuccessors[0]) array.push([node]);
+            });
+        }
+        if (this.AND_SPLIT()) array = [[...this.successors]];
+        return array;
+    }
+    /**
+     *  Checks if the array exists multiple times at the first position. If this is the case, it is deleted at the other positions.
+     * @param ArrayNodes of SwitchableNode
+     */
+    private checkForDuplicatesAndDeleteThem(ArrayNodes: SwitchableNode[][]) {
+        let posNodes: SwitchableNode[] = ArrayNodes[0];
+        var i: number = 1;
+        let b: boolean = true;
+        while (b && i < ArrayNodes.length - 1) {
+            if (posNodes.length === ArrayNodes[i].length) {
+                let b: boolean = true;
+                ArrayNodes[i].forEach(ArrayNode => {
+                    if (!posNodes.includes(ArrayNode))  b = false; 
+                });
+                if (b) {
+                    ArrayNodes.splice(i, 1);
+                }
+            }
+            i++;
+        }
+        console.log(ArrayNodes);
+    }
+
+/** Used for classic switching. Create a Combination of Nodes for Switch a Or Gateway. */
+    private getCombinationsOfNodesForOr(nodesIn: SwitchableNode[], graph: SwitchableGraph): SwitchableNode[][] {
+        let strIN: string[] = [];
+        let strOut: string[][] = [];
+        let nodesOut: SwitchableNode[][] = [];
+        nodesIn.forEach(node => {
+            strIN.push(node.id);
+        });
+        strIN.forEach(s => {
+            strOut.push([s])
+        });
+        strOut.push(...PnUtils.getCombinationsOfIds([...strIN]));
+        strOut.forEach(strS1 => {
+            let nodesS2: SwitchableNode[] = [];
+            strS1.forEach(s2 => {
+                let nodeS2 = graph.getNode(s2);
+                if (nodeS2 !== undefined) { nodesS2.push(nodeS2); }
+            });
+            if (nodesS2 !== undefined) { nodesOut.push(nodesS2); }
+        });
+        return nodesOut;
+    }
 
 
+    /** Used for classic switching. Enable all Nodes by this Combinationnumber. */
+    private activateToggleGateway() {
+        this._combinationArray[this._combinationNumber].forEach(node => {
+            node.enable();
+        });
+    }
+    /** Used for classic switching. Disable all Nodes by this Combinationnumber. */
+    private deactivateToggleGateway() {
+        this._combinationArray[this._combinationNumber].forEach(node => {
+            node.disable();
+        });
+    }
+
+    /**
+    *  Used for classic switching. Activate Gateway.
+    */
+    activateGateway(graph: SwitchableGraph) {
+        this.initializedCombination(graph);
+        if (this._combinationArray.length > 0) this.activateToggleGateway();
+    }
+
+    private initializedCombination(graph: SwitchableGraph) {
+        if (!this._combinationInitialized) {
+            this._combinationInitialized = true;
+            this._combinationArray = this.getCombinationsList(graph);
+        }
+    }
+    // ------ Ende Classic Switch --------
 
 
 }

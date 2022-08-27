@@ -49,8 +49,10 @@ export class GraphValidationService {
             if (!this.isEmpty(outgoingEdgeLabel)) {
                 this.displayErrorService.addErrorMessage(`Endereignis mit dem Label "${outgoingEdgeLabel}" enthält  einen Ausgang!`);
             }
-            let labelOfStartEventWithInEdges = this.getLabelOfStartEventWithInEdges(endEvents);
+            let labelOfStartEventWithInEdges = this.getLabelOfEventWithInEdges(endEvents);
             if (this.isEmpty(labelOfStartEventWithInEdges)) {
+                console.log("validiere gerade Endevent");
+                console.log(labelOfStartEventWithInEdges);
                 this.displayErrorService.addErrorMessage(`Endereignis mit dem Label "${labelOfStartEventWithInEdges}" hat keine eingehenden Kanten!`);
             }
         }
@@ -70,9 +72,9 @@ export class GraphValidationService {
         if (!this.cointainsStartEvent(startEventNodes)) {
             this.displayErrorService.addErrorMessage('Graph enthält kein Startereignis. ');
         } else {
-            let labelOfStartEventWithInEdges = this.getLabelOfStartEventWithInEdges(startEventNodes);
-            if (!this.isEmpty(labelOfStartEventWithInEdges)) {
-                this.displayErrorService.addErrorMessage(`Startereignis mit dem Label "${labelOfStartEventWithInEdges}" hat eingehende Kanten!`);
+            let labelOfEventWithInEdges = this.getLabelOfEventWithInEdges(startEventNodes);
+            if (!this.isEmpty(labelOfEventWithInEdges)) {
+                this.displayErrorService.addErrorMessage(`Startereignis mit dem Label "${labelOfEventWithInEdges}" hat eingehende Kanten!`);
             }
             let outgoingEdgeLabel: string = this.getOutgoingEdgeLabel(startEventNodes);
             if (this.isEmpty(outgoingEdgeLabel)) {
@@ -105,11 +107,11 @@ export class GraphValidationService {
         return label === '';
     }
 
-    private getLabelOfStartEventWithInEdges(startEventNodes: BpmnNode[]): string {
+    private getLabelOfEventWithInEdges(eventNodes: BpmnNode[]): string {
         let label: string = '';
-        startEventNodes.forEach(startEventNode => {
-            if (startEventNode.inEdges.length > 0) {
-                label += startEventNode.label;
+        eventNodes.forEach(eventNode => {
+            if (eventNode.inEdges.length > 0) {
+                label += eventNode.label;
             }
         });
         return label;
@@ -143,7 +145,7 @@ export class GraphValidationService {
     private addOrGatewayErrorMessage(gateway: BpmnNode) {
         gateway.label === "" ?
             this.violatedGuidelines.push("In Ihrem Graphen befindet sich ein OR-Gateway. Es empfiehlt sich OR-Gateways grundsätzlich zu meiden.") :
-            this.violatedGuidelines.push(`Das Gateway mit dem Label ${gateway.label} ist ein OR-Gateway. Es empfiehlt sich OR-Gateways grundsätzlich zu meiden.`);
+            this.violatedGuidelines.push(`Das Gateway mit dem Label "${gateway.label}" ist ein OR-Gateway. Es empfiehlt sich OR-Gateways grundsätzlich zu meiden.`);
     }
 
     private addOtherGatewayErrorMessages(gateway: BpmnNode) {

@@ -2,20 +2,20 @@
 StartEv start "StartEvent" (60,190)
 EndEvent end "EndEvent" (1600,190)
 
-.activities
+.tasks
 ManualTask manual "ManualTask" (442,320)
-UserTask usertask "UserTask" (1225,190)
+UserTask usertask "UserTask" (440,130)
 
 .gateways 
 XORSplit xor_split "XORSplit" (210,190)
-XORJoin xor_join "XORJoin" (675,190)
+XORJoin xor_join "XORJoin" (870,190)
 
-.sequences
-connector1 sequenceflow "1" StartEv XORSplit (675,60)
-connector3 sequenceflow "3" XORSplit ManualTask (675,60)
-connector4 sequenceflow "4" XORSplit UserTask (675,320) 
-connector5 sequenceflow "5" ManualTask XORJoin
-connector6 sequenceflow "6" UserTask XORJoin
+.edges
+StartEv XORSplit sequenceflow "1"
+XORSplit ManualTask sequenceflow "3" 
+XORSplit UserTask sequenceflow "4"
+ManualTask XORJoin sequenceflow "5" 
+UserTask XORJoin sequenceflow "6" 
 
  
 

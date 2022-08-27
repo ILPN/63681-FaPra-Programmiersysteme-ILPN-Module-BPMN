@@ -1,18 +1,27 @@
-import { SwitchableGateway } from "./SwitchableGateway";
+import { BpmnUtils } from "../Bpmn/BpmnUtils";
+import { BpmnGateway } from "../Bpmn/gateways/BpmnGateway";
 import { SwitchableGraph } from "./SwitchableGraph";
 import { SwitchableNode } from "./SwitchableNode";
 import { SwitchState } from "./switchstatetype";
 import { SwitchUtils } from "./SwitchUtils";
 
-export class SwitchController {
+export abstract class SwitchController {
     private _startEvents: SwitchableNode[];
-    private nodes: SwitchableNode[];
+    private _nodes: SwitchableNode[];
     private _graph: SwitchableGraph;
-
+ 
     constructor(graph: SwitchableGraph) {
         this._startEvents = [];
-        this.nodes = graph.switchNodes;
+        this._nodes = graph.switchNodes;
         this._graph = graph;
+    }
+
+    get nodes(): SwitchableNode[] {
+        return this._nodes;
+    }
+
+    get graph(): SwitchableGraph {
+        return this._graph;
     }
 
 
@@ -34,108 +43,73 @@ export class SwitchController {
         });
     }
 
+    /**
+         * resets diagram into initial state to start switching from start event
+         */
+    private newGame() {
+        this._nodes.forEach(node => node.disable());
+        this._startEvents.forEach(event => {
+            event.switchTo(SwitchState.enableable)
+        });
+    }
+
+
+
+
+    /** Print all Node IDs*/
+    printNodeIDFromList(nodes: SwitchableNode[]) {
+        let str: String = "";
+        nodes.forEach(node => str += node.id + ", ");
+        str += " ENDE.";
+        console.log(str);
+    }
+
     /** changes state of the clicked node and connected nodes
-     * @param clickedNode the clicked node
-     */
+      * @param clickedNode the clicked node
+      */
     public press(clickedNode: SwitchableNode) {
-
+        //this.checkIsWellHandled();
         if (clickedNode.switchState === SwitchState.enableable || clickedNode.switchState === SwitchState.switchedButEnableForLoopRun) {
-            //console.log("Clicked element " + clickedNode.id);
             if (clickedNode.isStartEvent()) this.disableAllOtherStartEvents(clickedNode);
-
-
-            let nodesToSwitch: SwitchableNode[] = this.getNodesToSwitch(clickedNode)
-            nodesToSwitch.forEach(node => {
-                if (this.possibleToSwitchNode(node)) node.switch()
-            });
-            if (clickedNode.isGateway() && (clickedNode as SwitchableGateway).OR_JOIN()) (clickedNode as SwitchableGateway).disablePathsNotTakenAfterOrJoin(this._graph);
-            this.checkAllEnableableNodesStillEnableable();
-
-
+            this.press_typ(clickedNode);
         } else {
-            //console.log("The state of this element can not be switched: " + clickedNode.id);
+
             if (clickedNode.enabled() && clickedNode.isEndEvent()) {
                 this.newGame();
+            } else {
+                console.warn("Der Knoten mit der ID: " + clickedNode.id + " ist nicht aktivierbar, er hat den Status: " + clickedNode.switchState);
             }
         }
     }
 
-    /**
-     * collects all the nodes whose state should be switched
-     * @param clickedNode
-     * @returns nodes to switch
-     */
-    private getNodesToSwitch(clickedNode: SwitchableNode): SwitchableNode[] {
-        let nodesToSwitch: SwitchableNode[] = [];
+    abstract press_typ(clickedNode: SwitchableNode) : void;
 
-        //add the clicked node
-        SwitchUtils.addItem(clickedNode, nodesToSwitch);
 
-        // if no nodes before the clicked one
-        if (clickedNode.predecessors.length === 0)
-            return SwitchUtils.addItems(clickedNode.switchRegular(), nodesToSwitch);
-
-        // if there is enabled gateway before the clicked node
-        clickedNode.predecessors.forEach(before => {
-            if (before.enabled() && before.isGateway()) { // before.enabled() &&  for loop
-                let gatewayConnections = (before as SwitchableGateway).switchSplit(clickedNode);
-                SwitchUtils.addItems(gatewayConnections, nodesToSwitch)
-            } else
-                SwitchUtils.addItems(clickedNode.switchRegular(), nodesToSwitch);
+/**
+ * This method checks once if the graph is well-handled.
+ */
+    checkIsWellHandled() : string {
+        let text : string = "";
+        let arrayOfGateways : SwitchableNode[] = [];
+        this._graph.switchNodes.forEach(node => {
+        if(node.isGateway()) {
+            let associateGateway = BpmnUtils.getCorrespondingGatewayWithoutType(node.bpmnNode as BpmnGateway);            
+            if (associateGateway == undefined) { 
+                arrayOfGateways.push(node);
+                }
+            }
         });
-
-        return nodesToSwitch
-    }
-
-
-    /**
-     * checks if it is possible to switch the node state
-     * @param node node to switch
-     * @returns true if the node state can be switched
-     */
-    private possibleToSwitchNode(node: SwitchableNode): boolean {
-        if (node.isGateway() && (node.disabled() || node.enableable() || node.switchedButEnableForLoopRun())) {
-
-            let gateway: SwitchableGateway = node as SwitchableGateway;
-            return gateway.canBeSwitched(this._graph)
-
-        }
-        return true;
-    }
-
-
-    /** collects alle nodes in state enableable
-     * @return enableable nodes
-     */
-    private getAllEnableableNodes(): SwitchableNode[] {
-        let nodes: SwitchableNode[] = [];
-
-        for (let node of this.nodes)
-            if (node.enableable())
-                nodes.push(node);
-
-        return nodes;
-    }
-
-    /**
-     * checks every enableable node and disables it if:
-     * 1. its state cannot be switched
-     * 2. it goes after OR_SPLIT and the corresponding JOIN is switched
-     */
-    private checkAllEnableableNodesStillEnableable() {
-        this.getAllEnableableNodes().forEach(node => {
-            if (!this.possibleToSwitchNode(node))
-                node.disable();
-        });
-    }
-
-    /**
-     * resets diagram into initial state to start switching from start event
-     */
-    private newGame() {
-        this.nodes.forEach(node => node.disable());
-        this._startEvents.forEach(event => {
-            event.switchTo(SwitchState.enableable)
-        });
+        if(arrayOfGateways.length > 0) {
+                text = "Hinweis: ";
+                text += (arrayOfGateways.length > 1)?"Die Gateways mit den IDs: [":"Das Gateway mit der ID: [";
+                arrayOfGateways.forEach(node => {
+                    text += node.id +", ";
+                });
+                text = text.substring(0, text.length-2);
+                text += (arrayOfGateways.length > 1)?"] besitzen ":"] besitzt ";
+                text += "keinen oder keinen eindeutigen Partner. Dies bedeutet, dass dieser Graph nicht well-handled ist. Bei Gateways ohne passendes Gegenstück wird die lokale Semantik zum Joinen verwendet.";
+                console.warn(text);
+            }
+        return text;
     }
 }

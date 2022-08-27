@@ -1,3 +1,5 @@
+import { BpmnEdge } from "./BpmnEdge/BpmnEdge"
+import { BpmnEdgeDefault } from "./BpmnEdge/BpmnEdgeDefault"
 import { BpmnNode } from "./BpmnNode"
 import { BpmnEvent } from "./events/BpmnEvent"
 import { BpmnEventEnd } from "./events/BpmnEventEnd"
@@ -257,6 +259,11 @@ export class BpmnUtils {
     public static isJoinOr(node: BpmnNode): boolean {
         return node instanceof BpmnGatewayJoinOr
     }
+
+    public static isDefaultEdge(edge: BpmnEdge): boolean {
+        return edge instanceof BpmnEdgeDefault
+    }
+
  /** get a Notation of the Node as String with "mit der ID node.id"  or "mit dem Namen node.label" */
     public static getNotationNode(node: BpmnNode): String {
         let name = 'mit der ID " '+node.id+'"';
@@ -326,7 +333,7 @@ export class BpmnUtils {
         if (!node)
             return null
 
-        while (this.hasInEdges(node)) {
+        while (node &&this.hasInEdges(node)) {
             node = this.before(node);
 
             if (this.isSplitGateway(node))
@@ -348,8 +355,7 @@ export class BpmnUtils {
     public static getCorrespondingJoinWithoutType(node: BpmnNode): BpmnGateway | null {
         if (!node)
             return null
-
-        while (this.hasOutEdges(node)) {
+        while (node && this.hasOutEdges(node)) {
             node = this.next(node);
 
             if (this.isJoinGateway(node))

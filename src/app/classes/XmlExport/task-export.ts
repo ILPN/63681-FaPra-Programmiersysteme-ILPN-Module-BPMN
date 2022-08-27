@@ -1,5 +1,6 @@
 import { BpmnNode } from "../Basic/Bpmn/BpmnNode";
 import { BpmnUtils } from "../Basic/Bpmn/BpmnUtils";
+import { BpmnTask } from "../Basic/Bpmn/tasks/BpmnTask";
 import { Constants } from "./constants";
 import { Exporter } from "./exporter";
 import { Namespace } from "./namespaces";
@@ -16,20 +17,15 @@ export class TaskExporter extends Exporter {
      * @param bpmnNode 
      * @returns 
      */
-    bpmnTaskXml(bpmnNode: BpmnNode): { element: Element | null, error: string } {
+    bpmnTaskXml(bpmnNode: BpmnTask): Element {
 
         //add under <bpmn:process>
-        let createTaskResult = this.createElementNS(bpmnNode, Namespace.BPMN, this.getTagName(bpmnNode))
+        let task = this.createElementNS(bpmnNode, Namespace.BPMN, this.getTagName(bpmnNode))
 
-        if (createTaskResult.element) {
-            let task = createTaskResult.element
-            task.setAttribute("id", bpmnNode.id + "_" + Random.id())
-            task.setAttribute("name", bpmnNode.label)
+        task.setAttribute("id", Random.id() + "_" + bpmnNode.id)
+        task.setAttribute("name", bpmnNode.label)
 
-            return { element: task, error: "" }
-        }
-
-        return { element: null, error: createTaskResult.error }
+        return task
     }
 
     /**
@@ -65,7 +61,7 @@ export class TaskExporter extends Exporter {
     }
 
     //task type
-    private getTagName(bpmnNode: BpmnNode): string | undefined {
+    private getTagName(bpmnNode: BpmnNode): string{
         if (BpmnUtils.isManualTask(bpmnNode))
             return Namespace.MANUAL_TASK_ELEMENT
         if (BpmnUtils.isServiceTask(bpmnNode))
@@ -78,9 +74,8 @@ export class TaskExporter extends Exporter {
             return Namespace.SEND_TASK_ELEMENT
 
         //general task without type
-        if (BpmnUtils.isTask(bpmnNode))
-            return Namespace.TASK_ELEMENT
+        return Namespace.TASK_ELEMENT
 
-        return undefined
+
     }
 }

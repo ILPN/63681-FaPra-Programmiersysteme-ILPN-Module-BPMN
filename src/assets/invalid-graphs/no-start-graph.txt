@@ -1,14 +1,11 @@
 .events
 EndEvent end "EndEvent" (1600,190)
 
-.activities
+.tasks
 ServiceTask service "ServiceTask" (442,60)
 
-.gateways 
-
-
-.sequences
-connector7 sequenceflow "2" ServiceTask EndEvent
+.edges
+ServiceTask EndEvent sequenceflow "2" 
 
  
 

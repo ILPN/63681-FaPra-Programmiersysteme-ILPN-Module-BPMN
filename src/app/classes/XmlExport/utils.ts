@@ -8,7 +8,7 @@ export class Random{
     public static id(): string{
         let randomLength = this.getRandomLength(2)
         let randomBase = this.getRandomBase()
-        return (Math.random() + 1).toString(randomBase).substring(2 + randomLength);
+        return "id" + (Math.random() + 1).toString(randomBase).substring(2 + randomLength);
     }
 
     private static getRandomLength(max: number) {

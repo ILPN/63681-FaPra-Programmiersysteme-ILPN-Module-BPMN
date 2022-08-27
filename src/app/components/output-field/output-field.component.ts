@@ -35,51 +35,60 @@ export class OutputFieldComponent {
         let textToExport = null;
         let filetype = '.txt';
         switch (type) {
-            case 'bpmn': {
+            case 'bpmn': {   
+                let diagram = this.displayService.diagram;
+                if (this.text) {
+                    let outputText = this.addCoordinates(diagram);
 
-                textToExport = this.text;
-                if (textToExport) {
-                    if (!this.formValidationService.validateFormat(textToExport)) {
-                        this.displayErrorService.displayError("BPMN-Format ist verletzt; nicht exportierbar");
+                    if (!this.formValidationService.validateFormat(outputText)) {
+                        this.displayErrorService.displayError("BPMN-Textformat ist verletzt; nicht exportierbar");
                         return;
                     }
-
+                    textToExport = outputText;
                 };
                 break;
             }
             case 'bpmn-xml': {
                 filetype = ".bpmn";
 
-                //error message and abort if graph is null
+                //abort if graph is null
                 let graph = this.getGraph()
-                if (!graph)
+                if (!graph){
+                    this.displayErrorService.displayError(this.NO_GRAPH_ERR)
                     return
+                }
+                    
 
-                //valid graph
+                //if graph could not be exported as xml -
+                //write errors into the output xml file
                 let result = XmlExporter.exportBpmnAsXml(graph);
+
                 if (result.xmlText)
                     textToExport = result.xmlText
                 else
-                    textToExport = result.error
-
+                    textToExport = this.SOMETHING_WENT_WRONG + result.error
                 break;
             }
 
             case 'pn': {
 
-                //error message and abort if graph is null
+                //abort if graph is null
                 let graph = this.getGraph()
-                if (!graph)
-                    return
-
-                //valid graph
-                let result = new Petrinet(graph.nodes).print();
-                if (!result.valid) {
-                    this.displayErrorService.displayError(this.SOMETHING_WENT_WRONG + ": " + result.errors)
+                if (!graph){
+                    this.displayErrorService.displayError(this.NO_GRAPH_ERR)
                     return
                 }
-                textToExport = result.pnText
+
+                 //if graph could not be exported as Petri net -
+                //write errors into the output file
+                let result = new Petrinet(graph.nodes).print();
+
+                if (result.pnText)
+                    textToExport = result.pnText
+                else
+                    textToExport = this.SOMETHING_WENT_WRONG + result.errors
                 break;
+
             }
         }
 
@@ -115,4 +124,44 @@ export class OutputFieldComponent {
         return graph
     }
 
-}
+    private addCoordinates(diagram: BpmnGraph): string {
+
+        let text = this.text?.split("\n");
+        
+        for (const node of diagram.nodes) {
+            if(text) {
+                let newCoordString = "(" + node.getPos().x + "," + node.getPos().y + ")";
+                let matchLine = text.find(line => line.startsWith(node.id));
+                if(matchLine != undefined) {
+                    let index = text.indexOf(matchLine);
+                    let matchLineNew = matchLine.replace(/\(-?[0-9]*,-?[0-9]*\)/,newCoordString);
+                  
+                    if(matchLine.match(/\(-?[0-9]*,-?[0-9]*\)/) === null) {
+                        matchLineNew = matchLine.replace(/[\n\r]/,"").concat(" "+newCoordString);
+                    }
+                   
+                    text[index] = matchLineNew;
+                
+            }}
+        }
+            for (const edge of diagram.edges){
+                if(text) {
+                let newCoordString1 = "(" + edge.from.x + "," + edge.from.y + ")";
+                let newCoordString2 = "(" + edge.to.x + "," + edge.to.y + ")";
+                let matchLine = text.find(line => line.startsWith(edge.id));
+
+                if(matchLine != undefined) {
+                    let index = text.indexOf(matchLine);
+
+                    let matchLineNew = matchLine.replace(/\(-?[0-9]*,-?[0-9]*\)/,newCoordString1 + " " + newCoordString2);
+                    if(matchLine.match(/\(-?[0-9]*,-?[0-9]*\)/) === null) {
+                        matchLineNew = matchLine.replace(/[\n\r]/,"").concat(" "+newCoordString1 + " " + newCoordString2);
+                    }
+                    text[index] = matchLineNew;
+            }}
+
+        }
+        if(text) {
+            return text.join("\n");
+        }else return "";
+}}
