@@ -1,10 +1,10 @@
-import { Component, OnDestroy } from '@angular/core';
-import { FormControl } from '@angular/forms';
-import { ParserService } from './services/parser.service';
-import { DisplayService } from './services/display.service';
-import { debounceTime, from, Subscription } from 'rxjs';
-import { BpmnGraph } from './classes/Basic/Bpmn/BpmnGraph';
-import { GraphValidationService } from "./services/graph-validation.service";
+import {Component, OnDestroy} from '@angular/core';
+import {FormControl} from '@angular/forms';
+import {ParserService} from './services/parser.service';
+import {DisplayService} from './services/display.service';
+import {debounceTime, Subscription} from 'rxjs';
+import {BpmnGraph} from './classes/Basic/Bpmn/BpmnGraph';
+import {GraphValidationService} from "./services/graph-validation.service";
 
 
 @Component({
@@ -20,8 +20,9 @@ export class AppComponent implements OnDestroy {
     private _subDragging: Subscription;
     private _subError: Subscription;
     private result: any;
+    graphIsSound: boolean = false;
+    showGuidelineRulesCheck: boolean = false;
     textareaError: string | undefined;
-    graphIsValid: boolean = false;
 
     constructor(
         private _displayService: DisplayService,
@@ -45,7 +46,7 @@ export class AppComponent implements OnDestroy {
             'e1 start "Vorzeitige Abgabe"\n' +
             'e2 start "Zeit abgelaufen"\n' +
             'e3 intermediate\n' +
-            'e4 end\n' +
+            'e4 end "Ende gut, alles gut"\n' +
             '\n' +
             '.tasks\n' +
             't1 manual "Einreichen"\n' +
@@ -88,8 +89,8 @@ export class AppComponent implements OnDestroy {
             'g4J e4 sequenceflow\n' +
             'g4S g4J sequenceflow';
 
-        console.log(s);
-        this.textareaFc.setValue(s);
+console.log(s);
+this.textareaFc.setValue(s);
     }
 
 
@@ -102,7 +103,7 @@ export class AppComponent implements OnDestroy {
     private processSourceChange(newSource: string) {
         this.textareaError = "";
 
-        this.graphIsValid = false
+        this.graphIsSound = false
         this.result = this._parserService.parse(newSource);
         if (this.result) {
 
@@ -113,9 +114,10 @@ export class AppComponent implements OnDestroy {
         }
     }
 
-    validateGraph(): void {
+    checkForGuidelines(): void {
         if (this.result !== undefined) {
-            this.graphIsValid = this.graphValidationService.isValid(this.result);
+            this.graphIsSound = this.graphValidationService.isSound(this.result);
+            this.showGuidelineRulesCheck = true;
         }
     }
 

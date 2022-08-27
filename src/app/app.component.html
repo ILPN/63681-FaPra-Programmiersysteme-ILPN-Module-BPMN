@@ -9,14 +9,15 @@
     <!--    Main content    -->
     <div [ngSwitch]="mode">
         <app-display-draggable-graph *ngSwitchCase="'Manuelles Layout'"
-        class="padding full-size"></app-display-draggable-graph>
+                                     class="padding full-size"></app-display-draggable-graph>
         <app-display-reorder-graph *ngSwitchCase="'Sugiyama Layout'"
-        class="padding full-size"></app-display-reorder-graph>
+                                   class="padding full-size"></app-display-reorder-graph>
         <app-display-switch-graph *ngSwitchCase="'Schalten'"
-        class="padding full-size"></app-display-switch-graph>
-    
-    <button (click)="validateGraph()" style="margin-left:15px" mat-raised-button>validiere Graph</button>
-    <p *ngIf="graphIsValid">Validierung abgeschlossen. Der angezeigte Graph ist valide.</p>
+                                  class="padding full-size"></app-display-switch-graph>
+
+        <button (click)="checkForGuidelines()" style="margin-left:15px" mat-raised-button>Check for guidelines</button>
+        <p *ngIf="graphIsSound">Validierung abgeschlossen. Der angezeigte Graph ist Well Handled (Sound).</p>
+        <app-violated-guidelines></app-violated-guidelines>
 </div>
     <div fxLayout="row" fxLayoutAlign="space-evenly start">
         <input-field buttonText="Upload"

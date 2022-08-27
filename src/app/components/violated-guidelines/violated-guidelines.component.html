@@ -1,0 +1,8 @@
+<div
+    *ngIf="violatedGuidelinesVisible()">
+    <p>Ergebnis der Guideline-Analyse:</p>
+    <ul *ngFor="let violatedGuideline of violatedGuidelines">
+        <li>{{violatedGuideline}}</li>
+    </ul>
+</div>
+

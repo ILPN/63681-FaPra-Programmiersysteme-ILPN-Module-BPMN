@@ -1,57 +1,58 @@
-import { Injectable } from '@angular/core';
-import { DisplayErrorService } from "./display-error.service";
-import { BpmnNode } from "../classes/Basic/Bpmn/BpmnNode";
-import { BpmnGraph } from "../classes/Basic/Bpmn/BpmnGraph";
-import { BpmnEventEnd } from "../classes/Basic/Bpmn/events/BpmnEventEnd";
-import { BpmnEventStart } from "../classes/Basic/Bpmn/events/BpmnEventStart";
-import { BpmnEventIntermediate } from "../classes/Basic/Bpmn/events/BpmnEventIntermediate";
-import { BpmnGateway } from "../classes/Basic/Bpmn/gateways/BpmnGateway";
-import { BpmnTask } from "../classes/Basic/Bpmn/tasks/BpmnTask";
-import { BpmnUtils } from "../classes/Basic/Bpmn/BpmnUtils";
+import {Injectable} from '@angular/core';
+import {DisplayErrorService} from "./display-error.service";
+import {BpmnNode} from "../classes/Basic/Bpmn/BpmnNode";
+import {BpmnGraph} from "../classes/Basic/Bpmn/BpmnGraph";
+import {BpmnEventEnd} from "../classes/Basic/Bpmn/events/BpmnEventEnd";
+import {BpmnEventStart} from "../classes/Basic/Bpmn/events/BpmnEventStart";
+import {BpmnEventIntermediate} from "../classes/Basic/Bpmn/events/BpmnEventIntermediate";
+import {BpmnGateway} from "../classes/Basic/Bpmn/gateways/BpmnGateway";
+import {BpmnTask} from "../classes/Basic/Bpmn/tasks/BpmnTask";
+import {BpmnUtils} from "../classes/Basic/Bpmn/BpmnUtils";
+import {DisplayViolatedGuidelinesService} from "./display-violated-guidelines.service";
 
 @Injectable({
     providedIn: 'root'
 })
 export class GraphValidationService {
+    private violatedGuidelines: string[] = [];
 
-    constructor(private displayErrorService: DisplayErrorService) {
+    constructor(
+        private displayErrorService: DisplayErrorService,
+        private displayViolatedGuidelinesService: DisplayViolatedGuidelinesService) {
     }
 
-    // todo: Notizen sind im Todoist
-
-    private errorMessage: string = '';
-
-    isValid(validateableGraph: BpmnGraph): boolean {
+    isSound(validateableGraph: BpmnGraph): boolean {
+        this.resetViolatedGuidelines();
+        this.resetErrorMessages();
         this.validateGraph(validateableGraph.nodes);
-        if (this.isEmpty(this.errorMessage)) {
+        if (this.violatedGuidelines.length !== 0) {
+            this.displayViolatedGuidelinesService.displayViolatedGuidelines(this.violatedGuidelines);
+        }
+        if (this.displayErrorService.getErrorMessages().length == 0) {
             return true;
         } else {
-            this.displayErrorService.displayError(this.errorMessage);
+            this.displayErrorService.showError();
             return false
         }
     }
 
-    resetErrorMessage(): void {
-        this.errorMessage = '';
+    resetViolatedGuidelines(): void {
+        this.violatedGuidelines = [];
+        this.displayViolatedGuidelinesService.resetViolatedGuidelines();
     }
 
     private validateEndEvents(endEvents: BpmnNode[]): void {
         if (!this.cointainsEndEvent(endEvents)) {
-            this.errorMessage += 'Graph enthaelt kein End-Ereignis!\n';
+            this.displayErrorService.addErrorMessage('Graph enthält kein Endereignis!');
         } else {
-            // let outgoingEdgeLabel: string = this.getOutgoingEdgeLabel(endEvents);
-            // if (!this.isEmpty(outgoingEdgeLabel)) {
-            //     this.errorMessage += `EndEvent mit dem Label "${outgoingEdgeLabel}" enthaelt  einen Ausgang!\n`;
-            // }
-            // let labelOfStartEventWithInEdges = this.getLabelOfStartEventWithInEdges(endEvents);
-            // if (this.isEmpty(labelOfStartEventWithInEdges)) {
-            //     this.errorMessage += `EndEvent mit dem Label "${labelOfStartEventWithInEdges}" hat keine eingehende Kanten!\n`;
-            // }
-            endEvents.forEach(EndEventNode => {
-                if (EndEventNode.outEdges.length !== 0) this.errorMessage += "Das End-Ereignis " + BpmnUtils.getNotationNode(EndEventNode) + " verfügt über einen oder mehrere Ausgänge. Dies verstößt gegen Modellierungsrichtlinien.\n"
-                if (EndEventNode.inEdges.length === 0) this.errorMessage += "Das End-Ereignis " + BpmnUtils.getNotationNode(EndEventNode) + " verfügt über keinen Eingang.\n"
-                if (EndEventNode.inEdges.length > 1) this.errorMessage += "Das End-Ereignis " + BpmnUtils.getNotationNode(EndEventNode) + " verfügt über mehr als einen Eingang. Dies verstößt gegen Modellierungsrichtlinien.\n"
-            });
+            let outgoingEdgeLabel: string = this.getOutgoingEdgeLabel(endEvents);
+            if (!this.isEmpty(outgoingEdgeLabel)) {
+                this.displayErrorService.addErrorMessage(`Endereignis mit dem Label "${outgoingEdgeLabel}" enthält  einen Ausgang!`);
+            }
+            let labelOfStartEventWithInEdges = this.getLabelOfEventWithInEdges(endEvents);
+            if (this.isEmpty(labelOfStartEventWithInEdges)) {
+                this.displayErrorService.addErrorMessage(`Endereignis mit dem Label "${labelOfStartEventWithInEdges}" hat keine eingehenden Kanten!`);
+            }
         }
     }
 
@@ -67,152 +68,142 @@ export class GraphValidationService {
 
     private validateStartEvents(startEventNodes: BpmnNode[]): void {
         if (!this.cointainsStartEvent(startEventNodes)) {
-            this.errorMessage += 'Graph enthaelt kein Start-Ereignis ';
+            this.displayErrorService.addErrorMessage('Graph enthält kein Startereignis. ');
         } else {
-            // let labelOfStartEventWithInEdges = this.getLabelOfStartEventWithInEdges(startEventNodes);
-            // if (!this.isEmpty(labelOfStartEventWithInEdges)) {
-            //     this.errorMessage += `StartEvent mit dem Label "${labelOfStartEventWithInEdges}" hat eingehende Kanten!\n`;
-            // }
-            // let outgoingEdgeLabel: string = this.getOutgoingEdgeLabel(startEventNodes);
-            // if (this.isEmpty(outgoingEdgeLabel)) {
-            //     this.errorMessage += `StartEvent mit dem Label "${outgoingEdgeLabel}" enthaelt  keinen Ausgang!\n`;
-            // }
-            startEventNodes.forEach(startEventNode => {
-                if (startEventNode.inEdges.length !== 0) this.errorMessage += "Das Start-Ereignis " + BpmnUtils.getNotationNode(startEventNode) + " verfügt über einen oder mehrere Eingänge. Dies verstößt gegen Modellierungsrichtlinien.\n"
-                if (startEventNode.outEdges.length === 0) this.errorMessage += "Das Start-Ereignis " + BpmnUtils.getNotationNode(startEventNode) + " verfügt über keinen Ausgang.\n"
-                if (startEventNode.outEdges.length > 1) this.errorMessage += "Das Start-Ereignis " + BpmnUtils.getNotationNode(startEventNode) + " verfügt über mehr als einen Ausgang. Dies verstößt gegen Modellierungsrichtlinien.\n"
-            });
+            let labelOfEventWithInEdges = this.getLabelOfEventWithInEdges(startEventNodes);
+            if (!this.isEmpty(labelOfEventWithInEdges)) {
+                this.displayErrorService.addErrorMessage(`Startereignis mit dem Label "${labelOfEventWithInEdges}" hat eingehende Kanten!`);
+            }
+            let outgoingEdgeLabel: string = this.getOutgoingEdgeLabel(startEventNodes);
+            if (this.isEmpty(outgoingEdgeLabel)) {
+                this.displayErrorService.addErrorMessage(`Startereignis mit dem Label "${outgoingEdgeLabel}" enthält  keinen Ausgang!`);
+            }
         }
     }
 
     private validateIntermediateEvents(intermediateEventNodes: BpmnNode[]): void {
-            intermediateEventNodes.forEach(intermediateEventNode => {
-                this.checkOneInAndOut("Das Zwischen-Ereignis ",intermediateEventNode);
-            });
-        }
-    
-
-    private checkOneInAndOut(typ: String, node: BpmnNode) {
-        if (node.inEdges.length === 0) this.errorMessage += typ + " " + BpmnUtils.getNotationNode(node) + " verfügt über keinen Eingang.\n"
-        if (node.inEdges.length > 1) this.errorMessage += typ + " " + BpmnUtils.getNotationNode(node) + " verfügt über mehr als einen Eingänge. Dies verstößt gegen Modellierungsrichtlinien und wird nicht empfohlen.\n"
-        if (node.outEdges.length === 0) this.errorMessage += typ + " " + BpmnUtils.getNotationNode(node) + " verfügt über keinen Ausgang.\n"
-        if (node.outEdges.length > 1) this.errorMessage += typ + " " + BpmnUtils.getNotationNode(node) + " verfügt über mehr als einen Ausgang. Dies verstößt gegen Modellierungsrichtlinien und wird nicht empfohlen.\n"
+        intermediateEventNodes.forEach(intermediateEventNode => {
+            this.checkOneInAndOut(intermediateEventNode);
+        });
     }
 
-
-
+    private checkOneInAndOut(node: BpmnNode): void {
+        let messagePrefix: string = "";
+        if (this.isBpmnTask(node)) {
+            messagePrefix = "Die Aktivität "
+        }
+        if (this.isIntermediateEvent(node)) {
+            messagePrefix = "Das Zwischen-Ereignis ";
+        }
+        if (node.inEdges.length === 0) this.displayErrorService.addErrorMessage(messagePrefix + BpmnUtils.getNotationNode(node) + " verfügt über keinen Eingang.");
+        if (node.inEdges.length > 1) this.violatedGuidelines.push(messagePrefix + BpmnUtils.getNotationNode(node) + " verfügt über mehr als einen Eingang.");
+        if (node.outEdges.length === 0) this.displayErrorService.addErrorMessage(messagePrefix + BpmnUtils.getNotationNode(node) + " verfügt über keinen Ausgang.");
+        if (node.outEdges.length > 1) this.violatedGuidelines.push(messagePrefix + BpmnUtils.getNotationNode(node) + " verfügt über mehr als einen Ausgang.");
+    }
 
     private isEmpty(label: string) {
         return label === '';
     }
 
-    private getLabelOfStartEventWithInEdges(startEventNodes: BpmnNode[]): string {
+    private getLabelOfEventWithInEdges(eventNodes: BpmnNode[]): string {
         let label: string = '';
-        startEventNodes.forEach(startEventNode => {
-            if (startEventNode.inEdges.length > 0) {
-                label += startEventNode.label;
+        eventNodes.forEach(eventNode => {
+            if (eventNode.inEdges.length > 0) {
+                label += eventNode.label;
             }
         });
         return label;
     }
 
-    private isNotXorGateway(node: BpmnNode): boolean {
-        return BpmnUtils.isGateway(node) && !BpmnUtils.isXorGateway(node);
-    }
-
-    private isNotAndGateway(node: BpmnNode): boolean {
-        return BpmnUtils.isGateway(node) && !BpmnUtils.isAndGateway(node);
-    }
-
-    private isNotOrGateway(node: BpmnNode): boolean {
-        return BpmnUtils.isGateway(node) && !BpmnUtils.isOrGateway(node);
-    }
-
-    private isOneLabelEmpty(label1: string, label2: string): boolean {
-        return this.isEmpty(label1) || this.isEmpty(label2);
-    }
-
-
     private validateGateways(gateways: BpmnNode[]): void {
-        // todo: refactoring
         gateways.forEach(gateway => {
-            // XOR-Gateway-Validierung
-            // let gatewayInEdges = gateway.inEdges;
-            // if (BpmnUtils.isXorGateway(gateway)) {
-            //     gatewayInEdges.forEach(gatewayInEdge => {
-            //         if (this.isNotXorGateway(gatewayInEdge.from)) {
-            //             if (this.isOneLabelEmpty(gatewayInEdge.from.label, gateway.label)) {
-            //                 this.errorMessage += "Ein Gateway (ohne Label) welches kein XOR-Gateway und referenziert auf ein andere Gateway (ohne Label) welches ein XOR-Gateway ist! "
-            //             } else {
-            //                 this.errorMessage += gatewayInEdge.from.label + " ist kein XOR-Gateway und referenziert auf " + gateway.label + " welches ein XOR-Gateway ist! "
-            //             }
-            //         }
-            //     })
-            // }
-
-            // // AND-Gateway-Validierung
-            // if (BpmnUtils.isAndGateway(gateway)) {
-            //     gatewayInEdges.forEach(gatewayInEdge => {
-            //         if (this.isNotAndGateway(gatewayInEdge.from)) {
-            //             if (this.isOneLabelEmpty(gatewayInEdge.from.label, gateway.label)) {
-            //                 this.errorMessage += "Ein Gateway (ohne Label) welches kein AND-Gateway und referenziert auf ein andere Gateway (ohne Label) welches ein AND-Gateway ist! "
-            //             } else {
-            //                 this.errorMessage += gatewayInEdge.from.label + " ist kein AND-Gateway und referenziert auf " + gateway.label + " welches ein AND-Gateway ist! "
-            //             }
-            //         }
-            //     })
-            // }
-
-            // // OR-Gateway-Validierung
-            // if (BpmnUtils.isOrGateway(gateway)) {
-            //     gatewayInEdges.forEach(gatewayInEdge => {
-            //         if (this.isNotOrGateway(gatewayInEdge.from)) {
-            //             if (this.isOneLabelEmpty(gatewayInEdge.from.label, gateway.label)) {
-            //                 this.errorMessage += "Ein Gateway (ohne Label) welches kein OR-Gateway und referenziert auf ein andere Gateway (ohne Label) welches ein OR-Gateway ist! "
-            //             } else {
-            //                 this.errorMessage += gatewayInEdge.from.label + " ist kein OR-Gateway und referenziert auf " + gateway.label + " welches ein OR-Gateway ist! "
-            //             }
-            //         }
-            //     })
-            // }
-            if (BpmnUtils.isSplitGateway(gateway)) {
-                if (gateway.inEdges.length === 0) this.errorMessage += "Das Split-Gateway " + BpmnUtils.getNotationNode(gateway) + " verfügt über keinen Eingang.\n"
-                if (gateway.inEdges.length > 1) this.errorMessage += "Das Split-Gateway " + BpmnUtils.getNotationNode(gateway) + " verfügt über mehrere Eingänge. Dies verstößt gegen Modellierungsrichtlinien.\n"
-                if (gateway.outEdges.length === 0) this.errorMessage += "Das Split-Gateway " + BpmnUtils.getNotationNode(gateway) + " verfügt über keinen Ausgang.\n"
-                if (gateway.outEdges.length === 1) this.errorMessage += "Das Split-Gateway " + BpmnUtils.getNotationNode(gateway) + " verfügt nur über einen Ausgang. Dies verstößt gegen Modellierungsrichtlinien.\n"
-            } else {
-                if (gateway.inEdges.length === 0) this.errorMessage += "Das Join-Gateway " + BpmnUtils.getNotationNode(gateway) + " verfügt über keinen Eingang.\n"
-                if (gateway.inEdges.length === 1) this.errorMessage += "Das Join-Gateway " + BpmnUtils.getNotationNode(gateway) + " verfügt nur über einen Eingang. Dies verstößt gegen Modellierungsrichtlinien.\n"
-                if (gateway.outEdges.length === 0) this.errorMessage += "Das Join-Gateway " + BpmnUtils.getNotationNode(gateway) + " verfügt über keinen Ausgang.\n"
-                if (gateway.outEdges.length > 1) this.errorMessage += "Das Join-Gateway " + BpmnUtils.getNotationNode(gateway) + " verfügt über mehrere Ausgänge. Dies verstößt gegen Modellierungsrichtlinien.\n"
+            if (BpmnUtils.isOrGateway(gateway)) {
+                this.addOrGatewayErrorMessage(gateway);
             }
-            var correspondingGateway = BpmnUtils.getCorrespondingGatewayWithoutType(gateway as BpmnGateway);
+            if (BpmnUtils.isSplitGateway(gateway)) {
+                this.addSplitGatewayErrorMessages(gateway);
+            } else {
+                this.addOtherGatewayErrorMessages(gateway);
+            }
+            const correspondingGateway = BpmnUtils.getCorrespondingGatewayWithoutType(gateway as BpmnGateway);
             if (correspondingGateway != null) {
                 if (BpmnUtils.isJoinGateway(gateway)) {
                     if (!BpmnUtils.splitJoinSameType(correspondingGateway, gateway as BpmnGateway)) {
-                        this.gatewayErrorMassage(gateway as BpmnGateway, correspondingGateway);
+                        this.gatewayErrorMessage(gateway as BpmnGateway, correspondingGateway);
                     }
                 } else {
                     if (!BpmnUtils.splitJoinSameType(gateway as BpmnGateway, correspondingGateway)) {
-                        this.gatewayErrorMassage(gateway as BpmnGateway, correspondingGateway);
+                        this.gatewayErrorMessage(gateway as BpmnGateway, correspondingGateway);
                     }
                 }
             }
         })
     }
 
-    private gatewayErrorMassage(gateway: BpmnGateway, correspondingGateway: BpmnGateway) {
+    private addOrGatewayErrorMessage(gateway: BpmnNode) {
+        gateway.label === "" ?
+            this.violatedGuidelines.push("In Ihrem Graphen befindet sich ein OR-Gateway. Es empfiehlt sich OR-Gateways grundsätzlich zu meiden.") :
+            this.violatedGuidelines.push(`Das Gateway mit dem Label "${gateway.label}" ist ein OR-Gateway. Es empfiehlt sich OR-Gateways grundsätzlich zu meiden.`);
+    }
+
+    private addOtherGatewayErrorMessages(gateway: BpmnNode) {
+        if (gateway.inEdges.length === 0)
+            this.displayErrorService
+            .addErrorMessage("Das Join-Gateway " + BpmnUtils.getNotationNode(gateway) + " verfügt über keinen Eingang.");
+        if (gateway.inEdges.length === 1)
+            this.violatedGuidelines
+            .push("Das Join-Gateway "
+                + BpmnUtils.getNotationNode(gateway)
+                + " verfügt nur über einen Eingang. Dies verstößt gegen Modellierungsrichtlinien.");
+        if (gateway.outEdges.length === 0)
+            this.displayErrorService
+            .addErrorMessage("Das Join-Gateway "
+                + BpmnUtils.getNotationNode(gateway) + " verfügt über keinen Ausgang.");
+        if (gateway.outEdges.length > 1)
+            this.violatedGuidelines
+            .push("Das Join-Gateway "
+                + BpmnUtils.getNotationNode(gateway)
+                + " verfügt über mehrere Ausgänge. Dies verstößt gegen Modellierungsrichtlinien.");
+    }
+
+    private addSplitGatewayErrorMessages(gateway: BpmnNode) {
+        if (gateway.inEdges.length === 0)
+            this.displayErrorService
+            .addErrorMessage("Das Split-Gateway " + BpmnUtils.getNotationNode(gateway) + " verfügt über keinen Eingang.");
+        if (gateway.inEdges.length > 1)
+            this.violatedGuidelines
+            .push("Das Split-Gateway "
+                + BpmnUtils.getNotationNode(gateway)
+                + " verfügt über mehrere Eingänge. Dies verstößt gegen Modellierungsrichtlinien."); // die Fehlermeldung wird geworfen, wenn die Gateways ohne Beschriftung sind
+        if (gateway.outEdges.length === 0)
+            this.displayErrorService
+            .addErrorMessage("Das Split-Gateway " + BpmnUtils.getNotationNode(gateway) + " verfügt über keinen Ausgang.");
+        if (gateway.outEdges.length === 1)
+            this.violatedGuidelines.push("Das Split-Gateway "
+                + BpmnUtils.getNotationNode(gateway)
+                + " verfügt nur über einen Ausgang. Dies verstößt gegen Modellierungsrichtlinien."); // die Fehlermeldung wird geworfen, wenn die Gateways ohne Beschriftung sind
+    }
+
+    private gatewayErrorMessage(gateway: BpmnGateway, correspondingGateway: BpmnGateway) {
         let nameGateway = BpmnUtils.getNotationNode(gateway);
         let nameCorrespondingGateway = BpmnUtils.getNotationNode(correspondingGateway);
         let splitOrJoinGateway: String = this.gatewaySplitOrJoinAsString(gateway);
         let typGateway: String = this.gatewayTypAsString(gateway);
         let splitOrJoinCorrespondingGateway: String = this.gatewaySplitOrJoinAsString(correspondingGateway);
         let typCorrespondingGateway: String = this.gatewayTypAsString(correspondingGateway);
-        this.errorMessage += "Das " + splitOrJoinGateway + "-Gateway " + nameGateway + " hat als zugehöriges " + splitOrJoinCorrespondingGateway + "-Gateway, das Gateway " + nameCorrespondingGateway + ". Diese besitzen jedoch unterschiedliche Typen (" + typGateway + "|" + typCorrespondingGateway + ") und können deshalb nicht zusammengehören.\n"
-
+        this.violatedGuidelines
+        .push("Das "
+            + splitOrJoinGateway
+            + "-Gateway "
+            + nameGateway
+            + " hat als zugehöriges "
+            + splitOrJoinCorrespondingGateway
+            + "-Gateway, das Gateway "
+            + nameCorrespondingGateway
+            + ". Diese besitzen jedoch unterschiedliche Typen ("
+            + typGateway + "|" + typCorrespondingGateway
+            + ") und können deshalb nicht zusammengehören.");
     }
-
-
 
     private gatewaySplitOrJoinAsString(gateway: BpmnGateway): String {
         if (BpmnUtils.isSplitGateway(gateway)) return "Split";
@@ -234,7 +225,6 @@ export class GraphValidationService {
         let intermediateEventNodes: BpmnNode[] = [];
         let gateways: BpmnNode[] = [];
 
-
         nodes.forEach(node => {
             if (this.isEndEvent(node)) {
                 endEvents.push(node);
@@ -252,13 +242,6 @@ export class GraphValidationService {
                 gateways.push(node);
             }
         });
-
-        // console.log(startEvents.length);
-        // console.log(endEvents.length);
-        // console.log('BpmnTask:');
-        // console.log(tasks.length);
-        // console.log(intermediateEventNodes.length);
-        // console.log(gateways.length);
         this.validateEndEvents(endEvents);
         this.validateStartEvents(startEvents);
         this.validateIntermediateEvents(intermediateEventNodes);
@@ -309,20 +292,15 @@ export class GraphValidationService {
 
     private validateTasks(tasks: BpmnNode[]): void {
         tasks.forEach(task => {
-            // let taskLabelOfMissingStartEvent = this.getTaskLabelOfMissingStartEvent(task);
-            // if (!this.isEmpty(taskLabelOfMissingStartEvent)) {
-            //     this.errorMessage += `Task mit dem Label "${taskLabelOfMissingStartEvent}" enthaelt keinen Eingang. `;
-            // }
-            // let getLabelOfTaskWithMissingOutEdges = this.hasMissingOutEdges(task);
-            // if (!this.isEmpty(getLabelOfTaskWithMissingOutEdges)) {
-            //     this.errorMessage += `Task mit dem Label "${getLabelOfTaskWithMissingOutEdges}" hat keine Kanten die auf etwas referenzieren! `;
-            // }
-
-                this.checkOneInAndOut("Die Aktivität ",task);
-            
-
+            let taskLabelOfMissingStartEvent = this.getTaskLabelOfMissingStartEvent(task);
+            if (!this.isEmpty(taskLabelOfMissingStartEvent)) {
+                this.displayErrorService.addErrorMessage(`Aktivität mit dem Label "${taskLabelOfMissingStartEvent}" enthält keinen Eingang.`);
+            }
+            let getLabelOfTaskWithMissingOutEdges = this.hasMissingOutEdges(task);
+            if (!this.isEmpty(getLabelOfTaskWithMissingOutEdges)) {
+                this.displayErrorService.addErrorMessage(`Task mit dem Label "${getLabelOfTaskWithMissingOutEdges}" hat keine Kanten die auf etwas referenzieren!`);
+            }
         })
-
     }
 
     private getTaskLabelOfMissingStartEvent(task: BpmnNode): string {
@@ -338,5 +316,9 @@ export class GraphValidationService {
             return task.label;
         }
         return '';
+    }
+
+    private resetErrorMessages() {
+        this.displayErrorService.resetErrorMessages();
     }
 }

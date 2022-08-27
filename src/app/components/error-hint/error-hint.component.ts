@@ -1,6 +1,5 @@
 import {Component} from '@angular/core';
 import {DisplayErrorService} from "../../services/display-error.service";
-import {GraphValidationService} from "../../services/graph-validation.service";
 
 @Component({
     selector: 'app-error-hint',
@@ -10,8 +9,9 @@ import {GraphValidationService} from "../../services/graph-validation.service";
 export class ErrorHintComponent {
     errorVisible: boolean = false;
     msg: string = "";
+    messages: string[] = [];
 
-    constructor(service: DisplayErrorService, private graphValidationService: GraphValidationService) {
+    constructor(service: DisplayErrorService) {
         service.errorHint = this;
     }
 
@@ -22,12 +22,20 @@ export class ErrorHintComponent {
     public removeMessage(): void {
         this.errorVisible = false;
         this.msg = '';
-        this.graphValidationService.resetErrorMessage();
+        this.messages = [];
     }
 
     public setMessage(msg: string) {
         this.msg = msg;
         this.showError();
+    }
+
+    public addErrorMessage(msg: string): void {
+        this.messages.push(msg);
+    }
+
+    public getMessages(): string[] {
+        return this.messages;
     }
 
 }

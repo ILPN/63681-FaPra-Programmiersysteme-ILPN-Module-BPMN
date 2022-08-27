@@ -5,5 +5,11 @@
         class="closeButton"
         (click)="removeMessage()">X
     </button>
-    <p class="message">{{msg}}</p>
+        <p class="message">{{msg}}</p>
+    <div class="messages">
+        <h1 class="message-header">Graph ist nicht sound:</h1>
+        <ul *ngFor="let message of messages">
+            <li class="message">{{message}}</li>
+        </ul>
+    </div>
 </div>

@@ -1,5 +1,5 @@
-import { AfterViewInit, Component, OnInit } from '@angular/core';
-import { AppComponent } from 'src/app/app.component';
+import {AfterViewInit, Component, OnInit} from '@angular/core';
+import {AppComponent} from 'src/app/app.component';
 
 @Component({
   selector: 'app-mode-switch',
@@ -18,7 +18,8 @@ export class ModeSwitchComponent implements OnInit,AfterViewInit {
   ngOnInit(): void {
   }
 
-  selectionChanged(item : any) {
+    selectionChanged(item: any) {
+        this._appComponent.checkForGuidelines();
 
     if(item.value == this.toggleOptions[1]){
       if(!confirm("Achtung: Durch die erneute Anwendung des Sugiyama Layouts werden die jetzigen Positionen der Knoten und Ecken der Kanten überschrieben!")) {
@@ -30,6 +31,6 @@ export class ModeSwitchComponent implements OnInit,AfterViewInit {
     this._appComponent.mode = item.value
 
 
-  }
+    }
 
 }
