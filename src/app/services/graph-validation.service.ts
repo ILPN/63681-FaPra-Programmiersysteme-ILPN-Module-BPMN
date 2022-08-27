@@ -51,8 +51,6 @@ export class GraphValidationService {
             }
             let labelOfStartEventWithInEdges = this.getLabelOfEventWithInEdges(endEvents);
             if (this.isEmpty(labelOfStartEventWithInEdges)) {
-                console.log("validiere gerade Endevent");
-                console.log(labelOfStartEventWithInEdges);
                 this.displayErrorService.addErrorMessage(`Endereignis mit dem Label "${labelOfStartEventWithInEdges}" hat keine eingehenden Kanten!`);
             }
         }
