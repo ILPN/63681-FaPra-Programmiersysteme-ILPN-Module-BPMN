@@ -89,6 +89,7 @@ export class ParserService {
                 
             }
             for (const edge of node.inEdges){
+                if(edgeEnds){
                 let newCoordString = "(" + edgeEnds[0].x + "," + edgeEnds[0].y + ")";
                 let matchLine = this.text.find(line => line.startsWith(edge.id));
 
@@ -103,11 +104,12 @@ export class ParserService {
 
                     this.text[index] = matchLineNew;
                     //console.log("new incoming edge position:" + matchLineNew);
-            }
+            }}
 
         }
 
         for (const edge of node.outEdges){
+            if(edgeStarts){
             let newCoordString = "(" + edgeStarts[0].x + "," + edgeStarts[0].y + ")";
             let matchLine = this.text.find(line => line.startsWith(edge.id));
 
@@ -122,7 +124,7 @@ export class ParserService {
                 //console.log("new outgoing edge position:" + matchLineNew);
         }
 
-        }
+        }}
         let emitText = this.text.join("\n");
         this.positionChange.emit(emitText);
 
@@ -165,9 +167,7 @@ export class ParserService {
     //called when sugiyama layout is selected
     resetCoordinates() {
         for(let i = 0; i < this.text.length; i++) {
-            console.log(this.text[i].match(/\(-?[0-9]*,-?[0-9]*\)/));
             this.text[i] = this.text[i].replace(/\(-?[0-9]*,-?[0-9]*\)/,"");
-            console.log(this.text[i]);
         }
         let emitText = this.text.join("\n");
 

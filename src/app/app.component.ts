@@ -23,6 +23,7 @@ export class AppComponent implements OnDestroy {
     graphIsSound: boolean = false;
     showGuidelineRulesCheck: boolean = false;
     textareaError: string | undefined;
+    dragged: boolean;
 
     constructor(
         private _displayService: DisplayService,
@@ -30,12 +31,13 @@ export class AppComponent implements OnDestroy {
         private graphValidationService: GraphValidationService
     ) {
         this.textareaFc = new FormControl();
+        this.dragged = false;
         this._subValueChange = this.textareaFc.valueChanges
             .pipe(debounceTime(1000))
             .subscribe((val) => this.processSourceChange(val));
         this._subDragging = this._parserService.positionChange.
             pipe(debounceTime(400)).
-            subscribe((val) => this.textareaFc.setValue(val));
+            subscribe((val) => {this.dragged = true; this.textareaFc.setValue(val)});
         this._subError = this._parserService.textareaError.pipe(debounceTime(400))
             .subscribe((val) => this.textareaError = val);
         // this.textareaFc.setValue(`Your advertising could be here`);
@@ -102,8 +104,9 @@ this.textareaFc.setValue(s);
 
     private processSourceChange(newSource: string) {
         this.textareaError = "";
-
         this.graphIsSound = false
+        
+        if(this.dragged) {console.log("dragged"); this.dragged = false; return;};
         this.result = this._parserService.parse(newSource);
         if (this.result) {
 
