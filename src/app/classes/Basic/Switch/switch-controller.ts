@@ -107,7 +107,7 @@ export abstract class SwitchController {
                 });
                 text = text.substring(0, text.length-2);
                 text += (arrayOfGateways.length > 1)?"] besitzen ":"] besitzt ";
-                text += "keinen oder keinen eindeutigen Partner. Dies bedeutet, dass dieser Graph nicht well-handled ist. Bei Gateways ohne passendes Gegenstück wird die lokale Semantik zum Joinen verwendet.";
+                text += "keinen oder keinen eindeutigen Partner. Dies bedeutet, dass dieser Graph nicht well-handled ist. Bei OR Gateways ohne passendes Gegenstück wird die lokale Semantik zum Joinen verwendet.";
                 console.warn(text);
             }
         return text;

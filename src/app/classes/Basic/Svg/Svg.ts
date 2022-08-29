@@ -1,7 +1,7 @@
 import { Vector } from "../../Utils/Vector";
 
 export class Svg {
-    static pointerNoFill(position: Vector, direction: Vector, headLength:number = 15, headWidth:number =10) {
+    static pointerNoFill(position: Vector, direction: Vector, headLength: number = 15, headWidth: number = 10) {
         const half = headWidth / 2
 
         const pointerPath = `m 0,0 ${half},${headLength} ${-headWidth},${0} z`
@@ -21,13 +21,13 @@ export class Svg {
         );
         return pointer
     }
-    static textFrom(text:string, pos:Vector,rotation:number =0, baseline:string= "middle", anchor:string = "left",dx:number =5, dy:number=-5, fontSize:number =12){
+    static textFrom(text: string, pos: Vector, rotation: number = 0, baseline: string = "middle", anchor: string = "left", dx: number = 5, dy: number = -5, fontSize: number = 12) {
         const txt = this.createSvgElement('text');
-        txt.setAttribute('x', 0+"");
-        txt.setAttribute('y', 0+"");
-        txt.setAttribute('dx', dx+"");
-        txt.setAttribute('dy', dy+"");
-        txt.setAttribute("transform",`translate(${pos.x} ${pos.y}) rotate(${rotation}) `)
+        txt.setAttribute('x', 0 + "");
+        txt.setAttribute('y', 0 + "");
+        txt.setAttribute('dx', dx + "");
+        txt.setAttribute('dy', dy + "");
+        txt.setAttribute("transform", `translate(${pos.x} ${pos.y}) rotate(${rotation}) `)
         txt.setAttribute('font-size', `${fontSize}px`);
         txt.setAttribute('text-align', 'justified');
         txt.setAttribute('line-height', '110%');
@@ -81,7 +81,7 @@ export class Svg {
     static empty(): SVGElement {
         return this.createSvgElement("svg")
     }
-    static pointer(position: Vector, direction: Vector, headLength:number = 15, headWidth:number =10) {
+    static pointer(position: Vector, direction: Vector, headLength: number = 15, headWidth: number = 10) {
         const half = headWidth / 2
 
         const pointerPath = `m 0,0 ${half},${headLength} ${-headWidth},${0} z`
@@ -229,10 +229,10 @@ export class Svg {
         return txt;
     }
 
-    static getText(text: string, x: number = 0, y: number = 0, fontSize: number = 20, maxZeilen: number = 4): SVGElement {
-        if(text == undefined) text = ""
+    static getText(text: string, x: number = 0, y: number = 0, fontSize: number = 20, maxZeilen: number = 3): SVGElement {
+        if (text == undefined) text = ""
         text = text.trim()
-        
+
         let txt = this.createSvgElement('text');
         txt.setAttribute('x', `${x}`);
         txt.setAttribute('y', `${y}`);
@@ -270,27 +270,39 @@ export class Svg {
     static splitString(text: String): Array<string> {
         let A: Array<string> = text.split(" ");
         let B: Array<string> = [""];
-        let i: number = 0;
         let j: number = 0;
-        let splitAfter: number = 15;
+        let splitAfter: number = 11;
         let index: number = 0;
 
         A.forEach(Atte => {
-            if ((B[j].length + Atte.length) > splitAfter) {
+            if ((B[j].length + Atte.length) > splitAfter) {   // >
                 if (Atte.length > splitAfter) {
-                    for (index = 0; (Atte.length - index) > splitAfter; index = index + splitAfter) {
-                        B[j] = B[j] + " " + Atte.substring(index, index + splitAfter) + "-";
-                        j++;
-                        B.push("");
+                    index = 0;
+                    let splitNum: number = splitAfter;
+                    while (Atte.length > index) {
+                        if (splitAfter - B[j].length < 4) {
+                            splitNum = splitAfter;
+                            j++;
+                            B.push("");
+                        } else {
+                            splitNum = splitAfter - B[j].length;
+                        }
+                        B[j] = B[j] + " " + Atte.substring(index, index + splitNum);
+                        if (Atte.length > index + splitNum) {
+                            B[j] += "-";
+                            j++;
+                            B.push("");
+                        }
+                        index = index + splitNum;
                     }
-                    B[j] = B[j] + " " + Atte.substring(index, index + splitAfter);
                 } else {
                     j++;
                     B.push("");
-                    B[j] = B[j] + " " + Atte;
+                    B[j] += B[j].length>0?" " + Atte:Atte;
                 }
             } else {
-                B[j] = B[j] + " " + Atte;
+                B[j] += B[j].length>0?" " + Atte:Atte;
+               // B[j] = B[j] + " " + Atte;
             }
         });
         return B;
