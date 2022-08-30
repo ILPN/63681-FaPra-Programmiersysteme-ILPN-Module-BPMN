@@ -287,7 +287,6 @@ export class SwitchableGateway extends SwitchableNode {
             }
             i++;
         }
-        console.log(ArrayNodes);
     }
 
     /** Used for classic switching. Create a Combination of Nodes for Switch a Or Gateway. */
