@@ -28,15 +28,7 @@ export class ClassicSwitch extends SwitchController {
     */
     private getNodesToSwitch(clickedNode: SwitchableNode): SwitchableNode[] {
         let nodesToSwitch: SwitchableNode[] = [];
-
-        //add the clicked node
         SwitchUtils.addItem(clickedNode, nodesToSwitch);
-
-        // if no nodes before the clicked one
-        if (clickedNode.predecessors.length === 0)
-            return SwitchUtils.addItems(clickedNode.switchRegular(), nodesToSwitch);
-
-        // if there is enabled gateway before the clicked node
         SwitchUtils.addItems(this.getNodesToSwitchPredecessors(clickedNode), nodesToSwitch);
         SwitchUtils.addItems(this.getNodesToSwitchSuccessors(clickedNode), nodesToSwitch);
         return nodesToSwitch
