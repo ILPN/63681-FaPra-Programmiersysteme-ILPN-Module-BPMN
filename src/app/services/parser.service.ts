@@ -58,13 +58,18 @@ export class ParserService {
     /**
      * is called after draging or reordering if positions have been changed
      * @param nodes that have changed positions
-     * @param dummyNodes that have changed positions
-     * @param edgeStarts that have changed positions
-     * @param edgeEnds that have changed positions
+     * @param edgeCorners that have changed positions
      */
 
-    positionOfNodesAndEdgesChanged(nodes: BpmnNode[], dummyNodes: BpmnDummyEdgeCorner[], edgeStarts: BpmnEdgeCorner[], edgeEnds: BpmnEdgeCorner[]) {
+    positionOfNodesAndEdgesChanged(nodes: BpmnNode[], edgeCorners: BpmnEdgeCorner[]) {
         //@Vanessa
+        console.log(nodes)
+        console.log(edgeCorners)
+        for (const corner of edgeCorners) {
+            const index = corner.edge.corners.findIndex(c => c==corner)
+            console.log("corner at "+index)
+        }
+
         for (const node of nodes) {
 
             if (this.text != []) {
@@ -88,6 +93,7 @@ export class ParserService {
                 }
                 
             }
+            /*
             for (const edge of node.inEdges){
                 if(edgeEnds){
                 let newCoordString = "(" + edgeEnds[0].x + "," + edgeEnds[0].y + ")";
@@ -125,6 +131,7 @@ export class ParserService {
         }
 
         }}
+        */
         let emitText = this.text.join("\n");
         this.positionChange.emit(emitText);
 

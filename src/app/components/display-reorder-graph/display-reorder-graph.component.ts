@@ -57,29 +57,20 @@ export class DisplayReorderGraphComponent implements OnDestroy, AfterViewInit {
             this._layoutService.sugiResult!)
           dragManager.onStopReorderDrag = (reorderdDragHandles) =>{
             const nodes: BpmnNode[] = []
-            let dummyNodes: BpmnDummyEdgeCorner[] =[]
-            let edgeEnds: BpmnEdgeCorner[]=[]
-            let edgeStarts: BpmnEdgeCorner[]=[]
-
+            let edgeCorners: BpmnEdgeCorner[] =[]
             for (const dh of reorderdDragHandles) {
-                if(dh.dragedElement instanceof BpmnNode){
-                    const node = dh.dragedElement
-                    nodes.push(node)
-                }
-                else if(dh.dragedElement instanceof BpmnDummyEdgeCorner){
-                    dummyNodes.push(dh.dragedElement)
-                }else if(dh.dragedElement instanceof BpmnEdgeCorner){
-                    const corner = dh.dragedElement
-                    if(corner === corner.edge.corners[0]){
-                        edgeStarts.push(corner)
-                    }else if(corner === Utility.lastElement(corner.edge.corners)){
-                        edgeEnds.push(corner)
-                    }
-                }
-                if(!(nodes.length == 0 && dummyNodes.length ==0 && edgeStarts.length ==0 && edgeEnds.length ==0)){
-                    this._parserService.positionOfNodesAndEdgesChanged(nodes,dummyNodes,edgeStarts,edgeEnds)
-                }   
-            }
+              if(dh.dragedElement instanceof BpmnNode){
+                  const node = dh.dragedElement
+                  nodes.push(node)
+              }
+              else if(dh.dragedElement instanceof BpmnEdgeCorner){
+                  const corner = dh.dragedElement                      
+                  edgeCorners.push(corner)
+              }
+          }
+          if(!(nodes.length == 0 && edgeCorners.length ==0 )){
+              this._parserService.positionOfNodesAndEdgesChanged(nodes,edgeCorners)
+          }
           
           
           }
