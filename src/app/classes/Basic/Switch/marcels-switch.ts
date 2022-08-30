@@ -31,7 +31,7 @@ export class MarcelsSwitch extends SwitchController{
         let nodes: SwitchableNode[] = [];
 
         for (let node of this.nodes)
-            if (node.enableable())
+            if (node.enableable() || node.switchedButEnableForLoopRun())
                 nodes.push(node);
 
         return nodes;
@@ -54,26 +54,12 @@ export class MarcelsSwitch extends SwitchController{
      * @param clickedNode the clicked node
      */
      override press_typ(clickedNode: SwitchableNode): void {
-
-        //  if (clickedNode.switchState === SwitchState.enableable || clickedNode.switchState === SwitchState.switchedButEnableForLoopRun) {
-              //console.log("Clicked element " + clickedNode.id);
-             // if (clickedNode.isStartEvent()) this.disableAllOtherStartEvents(clickedNode);
-  
-  
               let nodesToSwitch: SwitchableNode[] = this.my_getNodesToSwitch(clickedNode)
               nodesToSwitch.forEach(node => {
                   if (this.possibleToSwitchNode(node)) node.switch()
               });
               if (clickedNode.isGateway() && (clickedNode as SwitchableGateway).OR_JOIN()) (clickedNode as SwitchableGateway).disablePathsNotTakenAfterOrJoin(this.graph);
               this.checkAllEnableableNodesStillEnableable();
-  
-  
-         // } else {
-         //    //console.log("The state of this element can not be switched: " + clickedNode.id);
-         //    if (clickedNode.enabled() && clickedNode.isEndEvent()) {
-         //         this.newGame();
-         //     }
-         // }
       }
 
 
@@ -94,12 +80,11 @@ export class MarcelsSwitch extends SwitchController{
     
             // if there is enabled gateway before the clicked node
             clickedNode.predecessors.forEach(before => {
-                if (before.enabled() && before.isGateway()) { // before.enabled() &&  for loop
+                if (before.enabled() && before.isGateway()) { 
                     let gatewayConnections = (before as SwitchableGateway).switchSplit(clickedNode);
                     SwitchUtils.addItems(gatewayConnections, nodesToSwitch)
                 } else
                     SwitchUtils.addItems(clickedNode.switchRegular(), nodesToSwitch);
-                    console.log("PRESS: "+clickedNode.id+ " ::: clickedNode.predecessors.forEach: by ID "+before.id+" false" + " switchstate: "+before.switchState);
             });
     
             return nodesToSwitch

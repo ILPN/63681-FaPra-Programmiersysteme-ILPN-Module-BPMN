@@ -18,7 +18,7 @@ export class ClassicSwitch extends SwitchController {
         nodesToSwitch.forEach(node => {
             if (this.possibleToSwitchNode(node)) node.switch();
         });
-      }
+    }
 
 
     /**
@@ -42,15 +42,15 @@ export class ClassicSwitch extends SwitchController {
         return nodesToSwitch
     }
 
-/**
-    * collects all the nodes whose state should be switched before
-    * @param clickedNode
-    * @returns nodes to switch
-    */
+    /**
+        * collects all the nodes whose state should be switched before
+        * @param clickedNode
+        * @returns nodes to switch
+        */
     private getNodesToSwitchPredecessors(clickedNode: SwitchableNode): SwitchableNode[] {
         let nodesToSwitch: SwitchableNode[] = [];
         clickedNode.predecessors.forEach(before => {
-            if ((before.enableable() || before.switchedButEnableForLoopRun()) && before.isGateway() && (before as SwitchableGateway).isSplitGateway()) { 
+            if ((before.enableable() || before.switchedButEnableForLoopRun()) && before.isGateway() && (before as SwitchableGateway).isSplitGateway()) {
                 SwitchUtils.addItems(clickedNode.classicAllNodesBeforeToSwitch(), nodesToSwitch);
             } else {
                 SwitchUtils.addItems(clickedNode.switchRegular(), nodesToSwitch);
@@ -67,7 +67,7 @@ export class ClassicSwitch extends SwitchController {
     private getNodesToSwitchSuccessors(clickedNode: SwitchableNode): SwitchableNode[] {
         let nodesToSwitch: SwitchableNode[] = [];
         clickedNode.successors.forEach(after => {
-            if (after.disabled()) {
+            if (after.disabled() || after.switched()) {
                 SwitchUtils.addItem(after, nodesToSwitch);
                 if (after.isGateway() && (after as SwitchableGateway).isSplitGateway) (after as SwitchableGateway).activateGateway(this.graph)
             }
@@ -76,17 +76,16 @@ export class ClassicSwitch extends SwitchController {
     }
 
 
-/**
-    * collects all the nodes whose state should be switched by pressing a gateway
-    * @param clickedNode
-    * @returns nodes to switch
-    */
-    private switchGateway_classic(clickedNode: SwitchableNode) : SwitchableNode[] {
+    /**
+        * collects all the nodes whose state should be switched by pressing a gateway
+        * @param clickedNode
+        * @returns nodes to switch
+        */
+    private switchGateway_classic(clickedNode: SwitchableNode): SwitchableNode[] {
         let nodesToSwitch: SwitchableNode[] = [];
         let gateway = clickedNode as SwitchableGateway;
         if (gateway.isJoinGateway()) {
-            SwitchUtils.addItems(gateway.switchRegular(), nodesToSwitch);
-            SwitchUtils.addItems(gateway.classicAllNodesBeforeToSwitch(), nodesToSwitch);
+            SwitchUtils.addItems(this.getNodesToSwitch(gateway), nodesToSwitch);
         } else {
             if (!gateway.combinationInitialized) {
                 gateway.activateGateway(this.graph);
@@ -96,18 +95,18 @@ export class ClassicSwitch extends SwitchController {
         }
         return nodesToSwitch;
     }
- 
 
-/**
-    * check it is possible to switch node, used for join gateways
-    * @param node
-    * @returns nodes to switch
-    */
+
+    /**
+        * check it is possible to switch node, used for join gateways
+        * @param node
+        * @returns nodes to switch
+        */
     private possibleToSwitchNode(node: SwitchableNode): boolean {
         if (node.isGateway()) {
             let gateway = node as SwitchableGateway;
             if (gateway.isJoinGateway()) {
-                if(node.enabled()) return true;
+                if (node.enabled()) return true;
                 return gateway.canBeSwitched(this.graph);
             }
         }
