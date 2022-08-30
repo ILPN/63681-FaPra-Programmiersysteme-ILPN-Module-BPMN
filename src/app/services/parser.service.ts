@@ -65,17 +65,16 @@ export class ParserService {
         //@Vanessa
         console.log(nodes)
         console.log(edgeCorners)
-        for (const corner of edgeCorners) {
-            const index = corner.edge.corners.findIndex(c => c==corner)
-            console.log("corner at "+index)
-        }
 
         for (const node of nodes) {
 
             if (this.text != []) {
-                let newCoordString = "(" + node.getPos().x + "," + node.getPos().y + ")";
+                let newX = node.getPos().x.toFixed(0);
+                let newY = node.getPos().y.toFixed(0);
+
+                let newCoordString = "(" + newX + "," + newY + ")";
                 if(!node.getPos().y) {
-                    newCoordString = "(" + node.getPos().x + "," + 0 + ")";
+                    newCoordString = "(" + newX + "," + 0 + ")";
                 }
                 let matchLine = this.text.find(line => line.startsWith(node.id));
                 if(matchLine != undefined) {
@@ -93,6 +92,33 @@ export class ParserService {
                 }
                 
             }
+
+               /*for (const corner of edgeCorners) {
+            const index = corner.edge.corners.findIndex(c => c==corner)
+            console.log("corner at "+index)
+            let newX = corner.x.toFixed(0);
+            let newY = corner.y.toFixed(0);
+
+            let newCoordString = "(" + newX + "," + newY + ")";
+            if(!corner.y) {
+                newCoordString = "(" + newX + "," + 0 + ")";
+            }
+
+            let matchLine = this.text.find(line => line.startsWith(corner.edge.fromId + " " + corner.edge.toId));
+
+            if(matchLine != undefined) {
+                let index = this.text.indexOf(matchLine);
+
+                let matchLineNew = matchLine.replace(/\(-?[0-9]*,-?[0-9]*\)/,newCoordString);
+                if(matchLine.match(/\(-?[0-9]*,-?[0-9]*\)/) === null) {
+                    matchLineNew = matchLine.replace(/[\n\r]/,"").concat(" "+newCoordString);
+                }
+
+                this.text[index] = matchLineNew;
+
+            }
+        }*/
+        
             /*
             for (const edge of node.inEdges){
                 if(edgeEnds){
@@ -145,6 +171,32 @@ export class ParserService {
 
     afterSugiyamaLayout(bpmnGraph: BpmnGraph, text: string){
         let nodes = bpmnGraph.nodes;
+        let edges = bpmnGraph.edges;
+
+        for(const edge of edges){
+            let line = this.text.find(line => line.startsWith(edge.fromId +" "+ edge.toId));
+                if(line != undefined) {
+                    let matched = line.match(/\(-?[0-9]*,-?[0-9]*\)/);
+                    if(matched){
+                        let currentLine = line;
+                        for(let i = 0;i<edge.corners.length;i++){
+                            console.log(i);
+                            console.log(currentLine);
+                            let coordinates = currentLine.substring(currentLine.indexOf("("),currentLine.indexOf(")")+1);
+                            console.log(coordinates)
+                            let coord = coordinates.split(',');
+                            console.log(coord);
+                            coord[0] = coord[0].replace("(", "");
+                            coord[1] = coord[1].replace(")", "");
+                            let x = parseInt(coord[0]);
+                            let y = parseInt(coord[1]);
+                            edge.corners[i].setPosXY(x,y);
+                            console.log("set position of corner:" + x +" "+ y);
+                            currentLine = currentLine.replace(coordinates,"");
+                    }}
+                }
+        }
+
         for (const node of nodes) {
                 //wenn Koordinaten angegeben sind, dann rein in bpmnGraph
                 let line = this.text.find(line => line.startsWith(node.id));
@@ -168,6 +220,8 @@ export class ParserService {
                 }
           
         }
+
+       
         this.displayService.displayOnly(bpmnGraph);
     }
     

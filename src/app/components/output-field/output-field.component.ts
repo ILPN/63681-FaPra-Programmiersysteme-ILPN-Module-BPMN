@@ -146,20 +146,23 @@ export class OutputFieldComponent {
         }
             for (const edge of diagram.edges){
                 if(text) {
-                let newCoordString1 = "(" + edge.from.x + "," + edge.from.y + ")";
-                let newCoordString2 = "(" + edge.to.x + "," + edge.to.y + ")";
-                let matchLine = text.find(line => line.startsWith(edge.id));
-
+                let matchLine = text.find(line => line.startsWith(edge.fromId + " " + edge.toId));
                 if(matchLine != undefined) {
-                    let index = text.indexOf(matchLine);
-
-                    let matchLineNew = matchLine.replace(/\(-?[0-9]*,-?[0-9]*\)/,newCoordString1 + " " + newCoordString2);
-                    if(matchLine.match(/\(-?[0-9]*,-?[0-9]*\)/) === null) {
-                        matchLineNew = matchLine.replace(/[\n\r]/,"").concat(" "+newCoordString1 + " " + newCoordString2);
+                let index = text.indexOf(matchLine);
+                    console.log("old:" + matchLine);
+                    while(matchLine.match(/\(-?[0-9]*,-?[0-9]*\)/)){
+                        matchLine = matchLine.replace(/\(-?[0-9]*,-?[0-9]*\)/,"");
                     }
-                    text[index] = matchLineNew;
-            }}
-
+                    let matchLineNew = matchLine;
+                    console.log("new:" + matchLineNew);
+                    for(const corner of edge.corners){
+                        let newCoordString1 = "(" + corner.x + "," + corner.y + ")";
+                        matchLineNew = matchLineNew.replace(/[\n\r]/,"").concat(" "+newCoordString1);
+                    }
+                    text[index] = matchLineNew;   
+                }
+                 
+            }
         }
         if(text) {
             return text.join("\n");
