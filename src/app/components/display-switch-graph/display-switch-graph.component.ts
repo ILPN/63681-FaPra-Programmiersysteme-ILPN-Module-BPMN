@@ -38,17 +38,25 @@ export class DisplaySwitchGraphComponent implements OnDestroy, AfterViewInit {
             if (graph.isEmpty()) return
             if (this.rootSvg == undefined || this.drawingArea == undefined) return
             this._bpmnGraph = graph;
-            const switchGraph = new SwitchableGraph(graph, 0);
-            if (typeof typ !== 'undefined') {
-                const switchGraph = new SwitchableGraph(graph, 1);
-            }
+            let selectedTyp : number = 0; 
+            if (typeof typ !== 'undefined') selectedTyp = 1;
+            const switchGraph = new SwitchableGraph(graph, selectedTyp);
+            this.showSelectedTyp(selectedTyp);
             this._switchableGraph = switchGraph;
             this.draw(switchGraph.svgManager.getSvg())
             const svg = switchGraph.svgManager.getSvg()
             this.draw(svg)
             this._layoutService.zoomViewToSvg(svg, this.drawingArea.nativeElement, this.rootSvg.nativeElement)
         });
-        
+    }
+
+    private showSelectedTyp(selectedTyp : number) {
+        let enabledId : string  = selectedTyp ===0? "classicButton" : "modernButton";
+        let disabledId : string = selectedTyp ===0? "modernButton"  : "classicButton";
+       const enabledButton = document.getElementById(enabledId);  
+       const disabledButton = document.getElementById(disabledId); 
+       if(enabledButton) enabledButton.style.backgroundColor = "rgb(88, 104, 104)";
+       if(disabledButton) disabledButton.style.backgroundColor = "cadetblue";
     }
 
     wellHandledCheck() {
