@@ -48,6 +48,7 @@ export class DisplayReorderGraphComponent implements OnDestroy, AfterViewInit {
       this._sub = this._displayService.diagram$.subscribe((graph) => {
 
           this.bpmnGraph = graph;
+          this._parserService.deleteAllCoordinates()
           this._layoutService.applySugiyama(this.bpmnGraph)
           if (this.drawingArea == undefined || this.rootSvg == undefined) return;
 
