@@ -108,7 +108,6 @@ export class SwitchableGateway extends SwitchableNode {
         //add this XOR_SPLIT gateway to switchState array
         let nodesToSwitch: SwitchableNode[] = [this];
 
-        // clicked.successors.forEach(after => SwitchUtils.addItem(after, nodesToSwitch));
         clicked.successors.forEach(after => {
             if (after.switchState === SwitchState.disabled || after.switchState === SwitchState.switched) SwitchUtils.addItem(after, nodesToSwitch)
         });
@@ -160,22 +159,22 @@ export class SwitchableGateway extends SwitchableNode {
         return true;
     }
 
+
     /**
      * checks if all nodes before this gateway are enabled
      * @returns
      */
     private checkIfOrJoinGatewayCanBeSwitched(graph: SwitchableGraph): boolean {
         let answer: boolean = true;
-        for (let nodeBefore of this.predecessors)
-            if (!nodeBefore.enabled()) {
-                let gateway: SwitchableGateway | undefined = this.searchCorrespondingSplitGateway(graph);
-                if (gateway !== undefined && answer) {
-                    if (SwitchUtils.isClassicSwitch(graph.controller))
-                        answer = SwitchUtils.isNoNodeUnequalDisabled(SwitchUtils.getAllElementsBetweenNodeToNodeBackward(nodeBefore, gateway, []))
-                    else
-                        answer = SwitchUtils.isNoNodeEnabledOrSwitched(SwitchUtils.getAllElementsBetweenNodeToNodeBackward(nodeBefore, gateway, []))
-                }
-            }
+        let gateway: SwitchableGateway | undefined = this.searchCorrespondingSplitGateway(graph);
+        if (gateway !== undefined)
+            for (let nodeBefore of this.predecessors)
+                if (!nodeBefore.enabled())
+                    if (answer)
+                        if (SwitchUtils.isClassicSwitch(graph.controller))
+                            answer = SwitchUtils.isNoNodeEnableable(SwitchUtils.getAllElementsBetweenNodeToNodeBackward(nodeBefore, gateway, []))
+                        else
+                            answer = SwitchUtils.isNoNodeEnabled(SwitchUtils.getAllElementsBetweenNodeToNodeBackward(nodeBefore, gateway, []))
         return answer;
     }
 
@@ -280,7 +279,7 @@ export class SwitchableGateway extends SwitchableNode {
             if (posNodes.length === ArrayNodes[i].length) {
                 let b: boolean = true;
                 ArrayNodes[i].forEach(ArrayNode => {
-                    if (!posNodes.includes(ArrayNode))  b = false; 
+                    if (!posNodes.includes(ArrayNode)) b = false;
                 });
                 if (b) {
                     ArrayNodes.splice(i, 1);
@@ -288,10 +287,9 @@ export class SwitchableGateway extends SwitchableNode {
             }
             i++;
         }
-        console.log(ArrayNodes);
     }
 
-/** Used for classic switching. Create a Combination of Nodes for Switch a Or Gateway. */
+    /** Used for classic switching. Create a Combination of Nodes for Switch a Or Gateway. */
     private getCombinationsOfNodesForOr(nodesIn: SwitchableNode[], graph: SwitchableGraph): SwitchableNode[][] {
         let strIN: string[] = [];
         let strOut: string[][] = [];
@@ -333,6 +331,7 @@ export class SwitchableGateway extends SwitchableNode {
     */
     activateGateway(graph: SwitchableGraph) {
         this.initializedCombination(graph);
+        this._combinationNumber = 0;
         if (this._combinationArray.length > 0) this.activateToggleGateway();
     }
 

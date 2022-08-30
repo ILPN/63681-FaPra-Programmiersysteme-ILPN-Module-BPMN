@@ -42,30 +42,45 @@ export class SwitchUtils {
     }
 
     /**
-     * checks if the node is a gateway
+     * checks if the node[] has no node with the switchState enabled
      * @param node
      * @returns
      */
-    public static isNoNodeEnabledOrSwitched(nodeArray: SwitchableNode[]): boolean {
+    public static isNoNodeEnabled(nodeArray: SwitchableNode[]): boolean {
         let answer = true;
         nodeArray.forEach(element => {
-            if (element.switchState === SwitchState.enabled || element.switchState === SwitchState.switched) answer = false;
+            if (element.enabled()) answer = false;
         });
         return answer
     }
- 
-        /**
-     * checks if the node is a gateway
+
+    /**
+     * checks if the node[] has no node with the switchState enabled
      * @param node
      * @returns
      */
-         public static isNoNodeUnequalDisabled(nodeArray: SwitchableNode[]) : boolean {
-            let answer = true;
-            nodeArray.forEach(element => {
-                if (element.switchState !== SwitchState.disabled) answer = false;
-            });
-            return answer
-        }
+    public static isNoNodeEnableable(nodeArray: SwitchableNode[]): boolean {
+        let answer = true;
+        nodeArray.forEach(element => {
+            if (element.enableable() || element.switchedButEnableForLoopRun()) answer = false;
+        });
+        return answer
+    }
+
+    /**
+     * checks if the node[] has no node with the switchState disabled
+     * @param node
+     * @returns
+     */
+    public static isNoNodeUnequalDisabled(nodeArray: SwitchableNode[]): boolean {
+        let answer = true;
+        nodeArray.forEach(element => {
+            if (element.disabled()) answer = false;
+        });
+        return answer
+    }
+
+
 
     /**
      * This recursive method create a Array of SwitchableNode where inside all SwitchableNode the are between startNode and endNode. At the beginning the array must be empty. This method searches backward.
@@ -88,10 +103,10 @@ export class SwitchUtils {
      * @param controller SwitchController
      * @return Return true, if the SwitchController is instanceof ClassicSwitch 
      */
-     public static isClassicSwitch(controller: SwitchController): boolean {
-         return controller instanceof ClassicSwitch;
-     }
-    
+    public static isClassicSwitch(controller: SwitchController): boolean {
+        return controller instanceof ClassicSwitch;
+    }
+
     // Only for debugging
     // public static printAllElements(startNode: SwitchableNode, endNode: SwitchableNode, array: SwitchableNode[]): void {
     //     let s: String = "";

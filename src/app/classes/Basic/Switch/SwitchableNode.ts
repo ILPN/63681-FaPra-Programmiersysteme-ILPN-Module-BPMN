@@ -166,7 +166,7 @@ export class SwitchableNode {
 
     /** disables the node and changes its color */
     enable(): void {
-        if (this.switchState === SwitchState.disabled) {
+        if (this.disabled()) {
             this.switchTo(SwitchState.enableable)
         } else {
             this.switchTo(SwitchState.switchedButEnableForLoopRun)
@@ -175,10 +175,11 @@ export class SwitchableNode {
 
     /** disables the node and changes its color */
     disable(): void {
-        if (this.switchState === SwitchState.switchedButEnableForLoopRun) {
-            this.switchTo(SwitchState.switched)
+        if(this.switched()) this.switchTo(SwitchState.switchedButEnableForLoopRun); // TODO Symptombekämpfung weil wird bei Loop nicht Richtig initialisiert 
+        if (this.switchedButEnableForLoopRun()) {
+            this.switchTo(SwitchState.switched);
         } else {
-            this.switchTo(SwitchState.disabled)
+            this.switchTo(SwitchState.disabled);
         }
     }
 

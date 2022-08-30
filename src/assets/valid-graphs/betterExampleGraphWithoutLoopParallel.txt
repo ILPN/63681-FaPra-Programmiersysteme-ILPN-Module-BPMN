@@ -1,0 +1,47 @@
+.events
+e1 start "Vorzeitige Abgabe"
+e2 start "Zeit abgelaufen"
+e3 intermediate
+e4 end
+
+.tasks
+t1 manual "Einreichen"
+t2 usertask "Applaus"
+t3 sending "Daumen runter"
+t4 sending "Untersuchen"
+t5 receiving "Information erhalten"
+t6 businessrule ""
+t7 service ""
+
+.gateways
+g1J xor_join ""
+g2S or_split "gefällt es?"
+g2J or_join 
+g3S and_split "G3S"
+g3J and_join "G3J"
+g4S xor_split 
+g4J xor_join
+
+.edges
+e1 t1 sequenceflow
+t1 g1J association
+e2 g1J association
+g1J e3 sequenceflow
+e3 g4S sequenceflow
+g4S g2S sequenceflow
+g2S t2 sequenceflow "ja"
+g2S g2J defaultflow "vielleicht"
+g2S t3 sequenceflow "nein"
+t2 g2J sequenceflow
+t3 g2J sequenceflow
+g2J g4J sequenceflow
+g4S g3S sequenceflow
+g3S t4 sequenceflow
+g3S t5 sequenceflow
+t4 g3J sequenceflow
+t5 g3J sequenceflow
+g3J g4J sequenceflow
+g4S t6 informationflow
+t6 g4J defaultflow
+g4J t7 sequenceflow
+t7 e4 sequenceflow
