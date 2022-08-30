@@ -71,12 +71,12 @@ export class ParserService {
         edgeCorners: BpmnEdgeCorner[]
     ) {
         //@Vanessa
-        console.log(nodes);
+        /*console.log(nodes);
         console.log(edgeCorners);
         for (const corner of edgeCorners) {
             const index = corner.edge.corners.findIndex((c) => c == corner);
             console.log('corner at ' + index);
-        }
+        }*/
 
         for (const node of nodes) {
             if (this.text != []) {
@@ -196,18 +196,13 @@ export class ParserService {
                     if(matched){
                         let currentLine = line;
                         for(let i = 0;i<edge.corners.length;i++){
-                            console.log(i);
-                            console.log(currentLine);
                             let coordinates = currentLine.substring(currentLine.indexOf("("),currentLine.indexOf(")")+1);
-                            console.log(coordinates)
                             let coord = coordinates.split(',');
-                            console.log(coord);
                             coord[0] = coord[0].replace("(", "");
                             coord[1] = coord[1].replace(")", "");
                             let x = parseInt(coord[0]);
                             let y = parseInt(coord[1]);
                             edge.corners[i].setPosXY(x,y);
-                            console.log("set position of corner:" + x +" "+ y);
                             currentLine = currentLine.replace(coordinates,"");
                     }}
                 }
@@ -243,6 +238,7 @@ export class ParserService {
     //called when sugiyama layout is selected
     resetCoordinates() {
         for (let i = 0; i < this.text.length; i++) {
+            while(this.text[i].match(/\(-?[0-9]*,-?[0-9]*\)/))
             this.text[i] = this.text[i].replace(/\(-?[0-9]*,-?[0-9]*\)/, '');
         }
         let emitText = this.text.join('\n');

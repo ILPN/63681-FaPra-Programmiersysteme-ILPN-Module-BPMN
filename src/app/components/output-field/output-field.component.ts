@@ -149,12 +149,10 @@ export class OutputFieldComponent {
                 let matchLine = text.find(line => line.startsWith(edge.fromId + " " + edge.toId));
                 if(matchLine != undefined) {
                 let index = text.indexOf(matchLine);
-                    console.log("old:" + matchLine);
                     while(matchLine.match(/\(-?[0-9]*,-?[0-9]*\)/)){
                         matchLine = matchLine.replace(/\(-?[0-9]*,-?[0-9]*\)/,"");
                     }
                     let matchLineNew = matchLine;
-                    console.log("new:" + matchLineNew);
                     for(const corner of edge.corners){
                         let newCoordString1 = "(" + corner.x + "," + corner.y + ")";
                         matchLineNew = matchLineNew.replace(/[\n\r]/,"").concat(" "+newCoordString1);
