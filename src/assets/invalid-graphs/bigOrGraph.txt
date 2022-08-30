@@ -1,0 +1,30 @@
+.events
+e1 start "Ereignis1"
+
+.tasks
+t1 manual "Aktiviäet 1"
+t2 usertask
+t3 usertask "Aktivität 3"
+t4 sending "Aktivität 4"
+t5 receiving 
+t6 businessrule
+t7 service
+
+.gateways
+g1S or_split "gefällt es dir?"
+g1J or_join 
+
+.edges
+e1 t1 sequenceflow
+t1 g1S association
+g1S t2 association
+g1S t3 sequenceflow
+g1S t4 sequenceflow
+g1S t5 defaultflow
+g1S t6 sequenceflow
+t2 g1J association
+t3 g1J sequenceflow
+t4 g1J sequenceflow
+t5 g1J defaultflow
+t6 g1J sequenceflow
+g1J t7 sequenceflow

@@ -1,0 +1,44 @@
+.events
+e1 start "Ereignis1"
+e2 start "Ereignis2"
+e3 intermediate "zwi"
+e4 end "1234"
+
+.tasks
+t1 manual "Aktiviäet 1"
+t2 usertask
+t3 usertask "Aktivität 3"
+t4 sending "Aktivität 4"
+t5 receiving 
+t6 businessrule
+t7 service
+
+.gateways
+g1S xor_split "G1S"
+g1J xor_join "G1J"
+g2S or_split "gefällt es dir?"
+g2J or_join 
+g3S and_split "G3S"
+g3J and_join "G3J"
+
+.edges
+e1 t1 sequenceflow
+t1 g1J association
+e2 g1J association
+g1J g2S sequenceflow
+g2S t2 sequenceflow
+g2S g2J defaultflow
+g2S t3 sequenceflow
+t2 g2J sequenceflow
+t3 g2J sequenceflow
+g2J e3 sequenceflow
+e3 g3S sequenceflow
+g3S t4 sequenceflow
+g3S t5 sequenceflow
+t4 g3J sequenceflow
+t5 g3J sequenceflow
+g3J t6 informationflow
+t6 g1S sequenceflow
+g1S t7 defaultflow
+g1S g1J sequenceflow
+t7 e4 sequenceflow

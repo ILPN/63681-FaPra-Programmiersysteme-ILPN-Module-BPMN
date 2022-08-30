@@ -47,7 +47,7 @@ export abstract class SwitchController {
          * resets diagram into initial state to start switching from start event
          */
     private newGame() {
-        this._nodes.forEach(node => node.disable());
+        this._nodes.forEach(node => node.switchTo(SwitchState.disabled));
         this._startEvents.forEach(event => {
             event.switchTo(SwitchState.enableable)
         });
