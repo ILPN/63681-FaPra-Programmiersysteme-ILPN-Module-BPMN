@@ -113,7 +113,7 @@ export class DisplayReorderGraphComponent implements OnDestroy, AfterViewInit {
         this.drawingArea.nativeElement.appendChild(dragHandleSvgs);
         this._layoutService.zoomViewToSvg(bpmnGraphSvg, this.drawingArea.nativeElement,this.rootSvg.nativeElement)
       });
-      this._parserService.resetCoordinates();
+      //this._parserService.resetCoordinates();
 
     }
 

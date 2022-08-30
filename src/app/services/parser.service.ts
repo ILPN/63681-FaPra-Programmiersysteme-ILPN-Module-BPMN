@@ -37,9 +37,6 @@ import { AppComponent } from '../app.component';
     providedIn: 'root',
 })
 export class ParserService {
-    deleteAllCoordinates() {
-        console.log('nothing happening here yet');
-    }
 
     @Output() positionChange = new EventEmitter<string>();
     @Output() textareaError = new EventEmitter<string>();
@@ -58,6 +55,17 @@ export class ParserService {
             this.afterSugiyamaLayout;
         this.text = [];
         this.seqCount = 0;
+    }
+
+    //called when sugiyama layout is selected
+    deleteAllCoordinates() {
+        for (let i = 0; i < this.text.length; i++) {
+            while(this.text[i].match(/\(-?[0-9]*,-?[0-9]*\)/))
+            this.text[i] = this.text[i].replace(/\(-?[0-9]*,-?[0-9]*\)/, '');
+        }
+        let emitText = this.text.join('\n');
+
+        this.positionChange.emit(emitText);
     }
 
     /**
@@ -233,17 +241,6 @@ export class ParserService {
 
        
         this.displayService.displayOnly(bpmnGraph);
-    }
-
-    //called when sugiyama layout is selected
-    resetCoordinates() {
-        for (let i = 0; i < this.text.length; i++) {
-            while(this.text[i].match(/\(-?[0-9]*,-?[0-9]*\)/))
-            this.text[i] = this.text[i].replace(/\(-?[0-9]*,-?[0-9]*\)/, '');
-        }
-        let emitText = this.text.join('\n');
-
-        this.positionChange.emit(emitText);
     }
 
     parse(text: string): BpmnGraph | undefined {
