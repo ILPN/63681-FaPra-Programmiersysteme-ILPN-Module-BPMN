@@ -49,6 +49,8 @@ export class DisplayDraggableGraphComponent
                 dEdge.edge.removeCorner(i)
             }
             dEdge.svgManager.redraw()
+            this._parserService.positionOfNodesAndEdgesChanged([],dEdge.edge.corners)
+
         }
     }
 

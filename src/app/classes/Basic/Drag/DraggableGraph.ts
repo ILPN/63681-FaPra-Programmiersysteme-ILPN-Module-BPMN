@@ -73,7 +73,7 @@ export class DraggableGraph implements GetSvgManager {
     private makeDraggable() {
         this.bpmnGraphSvg = this.bpmnGraph.svgManager.getNewSvg()
         for (const edge of this.bpmnGraph.edges) {
-            this.dEdges.set(edge,new DraggableEdge(edge,this.dragManager))
+            this.dEdges.set(edge,new DraggableEdge(edge,this.dragManager,this._parserService))
         }
         const dragManager = this.dragManager
         for (const node of this.bpmnGraph.nodes) {
