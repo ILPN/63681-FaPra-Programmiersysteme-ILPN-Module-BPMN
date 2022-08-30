@@ -61,7 +61,7 @@ export class DisplayDraggableGraphComponent
             for (let i = 0; i < corners.length-1; i++) {
                 const c1 = corners[i];
                 const c2 = corners[i+1];
-                if(c1.y !== c2.y){
+                if(Math.abs(c1.y - c2.y)> 1 && Math.abs(c1.x - c2.x)> 1){
                     const cs = [c1,c2]
                     cs.sort((a,b) => a.y-b.y)
                     const pos = new Vector(cs[0].x, cs[1].y)
