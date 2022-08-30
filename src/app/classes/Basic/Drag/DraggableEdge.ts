@@ -199,6 +199,7 @@ export class DraggableEdge implements GetSvgManager {
         Utility.addSimulatedClickListener(deleteCircle, (e) => {
             this.edge.removeCorner(i);
             this.svgManager.redraw();
+            this.parserService.positionOfNodesAndEdgesChanged([],this.edge.corners)
         });
 
         return deleteCircle;
