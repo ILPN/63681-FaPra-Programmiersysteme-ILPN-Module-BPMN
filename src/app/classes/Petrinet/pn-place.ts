@@ -5,7 +5,7 @@ export class Place extends PnElement {
     private _token: number
 
     private constructor(id: number) {
-        super("p_" + id)
+        super("p" + id)
 
         //token = 0 for non-start place
         this._token = 0

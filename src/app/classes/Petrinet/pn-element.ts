@@ -27,7 +27,7 @@ export abstract class PnElement {
         if (newValue.length === 0)
             return ""
         while (newValue.includes(" ")) {
-            newValue = newValue.replace(" ", "-");
+            newValue = newValue.replace(" ", "");
         }
 
         return newValue
