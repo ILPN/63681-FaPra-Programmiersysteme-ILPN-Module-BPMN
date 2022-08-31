@@ -244,7 +244,10 @@ export class SwitchableGateway extends SwitchableNode {
             if (this._combinationNumber < (this._combinationArray.length - 1)) {
                 this._combinationNumber++;
             } else {
-                this._combinationNumber = 0;
+                if (this._combinationArray[0].length === 0)
+                    this._combinationNumber = 1;
+                else
+                    this._combinationNumber = 0;
             }
             this.activateToggleGateway();
         }
@@ -259,10 +262,16 @@ export class SwitchableGateway extends SwitchableNode {
             if (this.defaultSuccessors.length > 0) this.checkForDuplicatesAndDeleteThem(array);
         }
         if (this.XOR_SPLIT()) {
-            if (this.defaultSuccessors.length > 0) SwitchUtils.addItem([this.defaultSuccessors[0]], array);
+            if (this.defaultSuccessors.length === 0)
+                array.push(this.defaultSuccessors);
+            else
+                if (this.defaultSuccessors.length > 0)
+                    SwitchUtils.addItem([this.defaultSuccessors[0]], array);
+
             this.successors.forEach(node => {
-                if (this.defaultSuccessors.length === 0 || node != this.defaultSuccessors[0]) array.push([node]);
+                if (this.defaultSuccessors.length === 0 || node !== array[0][0]) array.push([node]);
             });
+
         }
         if (this.AND_SPLIT()) array = [[...this.successors]];
         return array;

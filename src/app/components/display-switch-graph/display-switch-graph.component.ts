@@ -51,8 +51,8 @@ export class DisplaySwitchGraphComponent implements OnDestroy, AfterViewInit {
     }
 
     private showSelectedTyp(selectedTyp : number) {
-        let enabledId : string  = selectedTyp ===0? "classicButton" : "modernButton";
-        let disabledId : string = selectedTyp ===0? "modernButton"  : "classicButton";
+        let enabledId : string  = selectedTyp ===0? "localSwitchingButton" : "globalSwitchingButton";
+        let disabledId : string = selectedTyp ===0? "globalSwitchingButton"  : "localSwitchingButton";
        const enabledButton = document.getElementById(enabledId);  
        const disabledButton = document.getElementById(disabledId); 
        if(enabledButton) enabledButton.style.backgroundColor = "rgb(88, 104, 104)";
