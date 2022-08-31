@@ -11,7 +11,7 @@ export class CombiTransition extends Transition {
         this.transitions = transitions //simple transitions combined to create this one
 
         //set index as combination of indexes of combined transitions
-        let combiId: string = transitions.map(trans => trans.counter).join("-");
+        let combiId: string = transitions.map(trans => trans.counter).join("AND");
         this.id += combiId;
         if (this.label)
             this.label += combiId;
