@@ -1,12 +1,13 @@
 import {Utility} from '../../Utils/Utility';
 import {Vector} from '../../Utils/Vector';
 import {BNode} from '../B/BNode';
+import { GetSvgManager } from '../Interfaces/GetSvgManager';
 import {Position} from '../Interfaces/Position';
 import {Svg} from '../Svg/Svg';
 import {SvgManager} from '../Svg/SvgManager/SvgManager';
 import {BpmnEdge} from './BpmnEdge/BpmnEdge';
 
-export class BpmnNode extends BNode implements Position {
+export class BpmnNode extends BNode implements Position, GetSvgManager {
     readonly radius: number = 35
 
     getPos(): Vector {
