@@ -511,13 +511,6 @@ export class ParserService {
                                     node2
                                 );
                                 break;
-                            case 'informationflow':
-                                sequence = new BpmnEdgeMessageflow(
-                                    name,
-                                    node1,
-                                    node2
-                                );
-                                break;
                             default:
                                 this.textareaError.emit(
                                     'Ungültiger Edge Typ bei ' +

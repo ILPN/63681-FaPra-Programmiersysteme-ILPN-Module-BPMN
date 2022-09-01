@@ -84,7 +84,7 @@ export class AppComponent implements OnDestroy {
             'g3S t5 sequenceflow\n' +
             't4 g3J sequenceflow\n' +
             't5 g3J sequenceflow\n' +
-            'g3J t6 informationflow\n' +
+            'g3J t6 sequenceflow\n' +
             't6 g4S sequenceflow\n' +
             'g4S t7 sequenceflow\n' +
             't7 g4J sequenceflow\n' +
