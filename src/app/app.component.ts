@@ -70,8 +70,8 @@ export class AppComponent implements OnDestroy {
             '\n' +
             '.edges\n' +
             'e1 t1 sequenceflow\n' +
-            't1 g1J association\n' +
-            'e2 g1J association\n' +
+            't1 g1J sequenceflow\n' +
+            'e2 g1J sequenceflow\n' +
             'g1J e3 sequenceflow\n' +
             'e3 g2S sequenceflow\n' +
             'g2S t2 sequenceflow "ja"\n' +
