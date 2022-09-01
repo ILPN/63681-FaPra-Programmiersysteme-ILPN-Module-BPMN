@@ -41,7 +41,7 @@ export class FormValidationService {
         switch (category) {
 
             case "tasks": regexp = /^[\w]+( "[\w ]*")? (Sending|Manual|Service|BusinessRule|Receiving|UserTask)?(?: \([0-9]*,[0-9]*\))?/i; break;
-            case "edges": regexp = /^[\w]+ [\w]+( "[\w ]*")? (SequenceFlow|Association|InformationFlow|DefaultFlow)(?: \([0-9]*,[0-9]*\))?/i; break;
+            case "edges": regexp = /^[\w]+ [\w]+( "[\w ]*")? (SequenceFlow|Association|DefaultFlow)(?: \([0-9]*,[0-9]*\))?/i; break;
             case "events": regexp = /^[\w]+( "[\w ]*")? (Start|End|Intermediate)(?: \([0-9]*,[0-9]*\))?/i; break;
             case "gateways": regexp = /^[\w]+( "[\w ]*")? (XOR_SPLIT|XOR_JOIN|AND_SPLIT|AND_JOIN|OR_SPLIT|OR_JOIN)(?: \([0-9]*,[0-9]*\))?/i; break;
             default: return false;
