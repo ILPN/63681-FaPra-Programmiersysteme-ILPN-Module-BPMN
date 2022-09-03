@@ -1,7 +1,6 @@
 import {NgModule} from '@angular/core';
 import {BrowserModule} from '@angular/platform-browser';
 import {AppComponent} from './app.component';
-
 import {FlexLayoutModule} from '@angular/flex-layout';
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -21,6 +20,7 @@ import {DisplayDraggableGraphComponent} from './components/display-draggable-gra
 import {DisplayReorderGraphComponent} from './components/display-reorder-graph/display-reorder-graph.component';
 import {DisplaySwitchGraphComponent} from './components/display-switch-graph/display-switch-graph.component';
 import {ViolatedGuidelinesComponent} from './components/violated-guidelines/violated-guidelines.component';
+import {APP_BASE_HREF, PlatformLocation} from '@angular/common';
 
 @NgModule({
     declarations: [
@@ -47,7 +47,13 @@ import {ViolatedGuidelinesComponent} from './components/violated-guidelines/viol
         FormsModule,
         MatIconModule,
         ReactiveFormsModule,],
-    providers: [],
+    providers: [
+        {
+            provide: APP_BASE_HREF,
+            useFactory: (s: PlatformLocation) => s.getBaseHrefFromDOM(),
+            deps: [PlatformLocation]
+        }
+    ],
     bootstrap: [AppComponent]
 })
 export class AppModule {
