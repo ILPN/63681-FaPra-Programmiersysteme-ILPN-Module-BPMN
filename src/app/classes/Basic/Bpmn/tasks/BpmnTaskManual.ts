@@ -3,7 +3,7 @@ import { BpmnTask } from "./BpmnTask"
 
 export class BpmnTaskManual extends BpmnTask{
     override getIconUrl(){
-        return "/ilovepetrinets/template/assets/manual.svg"
+        return "assets/manual.svg"
     }
 
 }
